@@ -110,5 +110,6 @@ endif
 # Tests that depend on compiled models
 ##
 test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail))
+test/interface/fixed_param_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
 
 
