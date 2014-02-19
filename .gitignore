@@ -1,13 +1,6 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+# emacs backup files
+*~
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
+# built tools
+bin/
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
