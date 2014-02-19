@@ -113,3 +113,4 @@ test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-mode
 test/interface/fixed_param_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
 test/interface/optimization_output_test.o: src/test/test-models/optimization_output$(EXE)
 test/interface/print_test.o: src/test/interface/matrix_output.csv bin/print$(EXE)
+test/interface/gm/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
