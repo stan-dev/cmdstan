@@ -111,5 +111,4 @@ endif
 ##
 test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail))
 test/interface/fixed_param_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
-
-
+test/interface/optimization_output_test.o: src/test/test-models/optimization_output$(EXE)
