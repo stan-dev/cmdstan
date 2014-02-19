@@ -8,7 +8,7 @@
 help:
 
 ## Disable implicit rules.
-SUFIXES:
+.SUFFIXES:
 
 ##
 # Users should only need to set these three variables for use.
@@ -68,6 +68,12 @@ PATH_SEPARATOR = /
 ##
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+
+%$(EXE) : %.cpp %.stan bin/libstan.a 
+	@echo ''
+	@echo '--- Linking C++ model ---'
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
+
 
 ##
 # Tell make the default way to compile a .o file.
@@ -171,6 +177,8 @@ build: bin/stanc$(EXE) bin/print$(EXE)
 
 clean:
 	$(RM) -r test
+	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-all: clean
 	$(RM) -r bin

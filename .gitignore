@@ -2,5 +2,12 @@
 *~
 
 # built tools
-bin/
+/bin/
 
+# built tests
+/test/
+
+# test models
+/src/test/test-models/*
+!/src/test/test-models/*.stan
+!/src/test/test-models/*.R

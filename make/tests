@@ -7,10 +7,20 @@ GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
 ##
+# target path_separator for use in some tests that need to 
+# call executables.
+##
+.PHONY: path_separator
+path_separator :
+	@echo $(PATH_SEPARATOR)
+
+##
 # PERCENT used for secondary expansion
 # $$(PERCENT) turns into %.
 ##
 PERCENT = %
+
+TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f)
 
 ##
 # Target to verify header files are coherent
@@ -94,3 +104,11 @@ $(TEST_TARGETS):
 	@echo 'requirements. Please install make 3.81 or higher.           '
 	@echo '------------------------------------------------------------'
 endif
+
+
+##
+# Tests that depend on compiled models
+##
+test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail))
+
+
