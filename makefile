@@ -164,30 +164,6 @@ endif
 build: bin/stanc$(EXE) bin/print$(EXE)
 	@echo '--- Stan tools built ---'
 
-
-# -include make/tests    # tests: test-all, test-unit, test-models
-# -include make/doxygen  # doxygen
-# -include make/manual   # manual: manual, doc/stan-reference.pdf
-# -include make/demo     # for building demos
-
-# ifneq (,$(filter-out runtest/%,$(filter-out clean%,$(MAKECMDGOALS))))
-#   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
-# endif
-
-# ifneq (,$(filter runtest/%,$(MAKECMDGOALS)))
-#   -include $(addsuffix .d,$(subst runtest/,,$(MAKECMDGOALS)))
-# endif
-
-# ifneq (,$(filter runtest_no_fail/%,$(MAKECMDGOALS)))
-#   -include $(addsuffix .d,$(subst runtest_no_fail/,,$(MAKECMDGOALS)))
-# endif
-
-# .PHONY: all build docs
-# build: bin/stanc$(EXE)
-# 	@echo '--- Stan tools built ---'
-# docs: manual doxygen
-# all: build docs
-
 ##
 # Clean up.
 ##
