@@ -157,6 +157,7 @@ endif
 
 -include make/libstan  # libstan.a
 -include make/models   # models
+-include make/tests
 -include stan/make/command  # bin/stanc, bin/print
 
 .PHONY: build

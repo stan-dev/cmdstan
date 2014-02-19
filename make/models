@@ -2,7 +2,7 @@
 # Models (to be passed through stanc)
 ##
 MODEL_HEADER := stan/src/stan/model/model_header.hpp
-CMDSTAN_MAIN := src/main.cpp
+CMDSTAN_MAIN := src/cmdstan/main.cpp
 
 .PRECIOUS: %.cpp %.o
 $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.cpp bin/libstan.a %.stan
