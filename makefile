@@ -188,25 +188,13 @@ build: bin/stanc$(EXE) bin/print$(EXE)
 # docs: manual doxygen
 # all: build docs
 
-# ##
-# # Clean up.
-# ##
-# MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-# .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all
-# clean:
-# 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-# 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.cpp) $(MODEL_SPECS:%.stan=%$(EXE)) $(MODEL_SPECS:%.stan=%.o) $(MODEL_SPECS:%.stan=%.d))
+##
+# Clean up.
+##
+.PHONY: clean clean-all
 
-# clean-dox:
-# 	$(RM) -r doc/api
+clean:
+	$(RM) -r test
 
-# clean-manual:
-# 	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
-
-# clean-models:
-# 	$(RM) -r models $(MODEL_HEADER).d
-
-# clean-all: clean clean-manual clean-models
-# 	$(RM) -r test/* bin
-# 	$(RM) $(shell find src -type f -name '*.d') $(shell find src -type f -name '*.o') $(shell find src/test/unit-distribution -name '*_generated_test.cpp' -type f | sed 's#\(.*\)/.*#\1/*_generated_test.cpp#' | sort -u)
-
+clean-all: clean
+	$(RM) -r bin
