@@ -105,6 +105,11 @@ $(TEST_TARGETS):
 	@echo '------------------------------------------------------------'
 endif
 
+##
+# Model tests. Adding built model as a depedency.
+##
+$(patsubst src/%_test.cpp,%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/%_test.o : stan/src/%$(EXE)
+
 
 ##
 # Tests that depend on compiled models
