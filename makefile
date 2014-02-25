@@ -149,15 +149,25 @@ endif
 	@echo '    3. Look at the samples:'
 	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
-	@echo 'Common targets:'
-	@echo '  Model related:'
-	@echo '  - bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '  - bin/print$(EXE): Build the print utility.'
-	@echo '  - bin/libstan.a  : Build the Stan static library (used in linking models).'
-	@echo '  - bin/libstanc.a : Build the Stan compiler static library (used in linking'
-	@echo '                     bin/stanc$(EXE))'
-	@echo '  - *$(EXE)        : If a Stan model exists at *.stan, this target will build'
-	@echo '                     the Stan model as an executable.'
+	@echo 'Dev-relevant targets:'
+	@echo '  Stan management targets:'
+	@echo '  - stan-update    : Initializes and updates the Stan repository'
+	@echo '  - stan-update-*  : Updates the Stan repository to the specified'
+	@echo '                     branch or commit hash.'
+	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
+	@echo '                     what is in the repository.'
+	@echo '  Test targets:'
+	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
+	@echo '  - src/test/models   : Runs model tests in CmdStan'
+	@echo 'Model related:'
+	@echo ''
+	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '- bin/print$(EXE): Build the print utility.'
+	@echo '- bin/libstan.a  : Build the Stan static library (used in linking models).'
+	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
+	@echo '                   bin/stanc$(EXE))'
+	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
+	@echo '                   the Stan model as an executable.'
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
@@ -182,16 +192,14 @@ clean:
 clean-all: clean
 	$(RM) -r bin
 
-stan/src :
-	git submodule init
-	git submodule update
-
 .PHONY: stan-update
-stan-update : stan/src
+stan-update :
+	git submodule init
 	git submodule update
 
 stan-update-%:
 	cd stan; git checkout $*; git pull
 
+.PHONY: stan-revert
 stan-revert:
 	git submodule update --init
