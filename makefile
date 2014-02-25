@@ -3,7 +3,6 @@
 # make 3.81.
 ##
 
-
 # The default target of this Makefile is...
 help:
 
@@ -182,3 +181,17 @@ clean:
 
 clean-all: clean
 	$(RM) -r bin
+
+stan/src :
+	git submodule init
+	git submodule update
+
+.PHONY: stan-update
+stan-update : stan/src
+	git submodule update
+
+stan-update-%:
+	cd stan; git checkout $*; git pull
+
+stan-revert:
+	git submodule update --init
