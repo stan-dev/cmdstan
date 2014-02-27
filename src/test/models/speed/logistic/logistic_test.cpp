@@ -69,8 +69,6 @@ public:
     std::vector<std::string> model_path;
     model_path.push_back("stan");
     model_path.push_back("src");
-    model_path.push_back("stan");
-    model_path.push_back("src");
     model_path.push_back("models");
     model_path.push_back("speed");
     model_path.push_back("logistic");
