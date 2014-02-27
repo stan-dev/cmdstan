@@ -85,10 +85,17 @@ ifneq ($(filter second-expansion,$(.FEATURES)),)
 # Each src/test/* depends on each executable that's generated
 # by the test file.
 ##
+
+## n is used to add line breaks (necessary for windows)
+define n
+
+
+endef
+
 .SECONDEXPANSION:
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): src/test/%: $$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES))
-	$(foreach test,$^,$(test) --gtest_output="xml:$(basename $(test)).xml"; echo;)
+	$(foreach test,$^,$(test) --gtest_output="xml:$(basename $(test)).xml"; $n)
 	@echo ''
 	@echo 'Ran '$(words $(filter test/%,$^))' tests for '$@
 else
