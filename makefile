@@ -152,7 +152,7 @@ endif
 	@echo 'Dev-relevant targets:'
 	@echo '  Stan management targets:'
 	@echo '  - stan-update    : Initializes and updates the Stan repository'
-	@echo '  - stan-update-*  : Updates the Stan repository to the specified'
+	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
 	@echo '                     branch or commit hash.'
 	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
 	@echo '                     what is in the repository.'
@@ -197,7 +197,7 @@ stan-update :
 	git submodule init
 	git submodule update
 
-stan-update-%:
+stan-update/%:
 	cd stan; git checkout $*; git pull
 
 .PHONY: stan-revert
