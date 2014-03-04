@@ -200,6 +200,10 @@ stan-update :
 stan-update/%:
 	cd stan; git checkout $*; git pull
 
+stan-pr/%:
+	cd stan; git checkout develop; git merge $* --ff;
+
+
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init
