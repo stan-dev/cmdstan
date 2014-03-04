@@ -198,10 +198,18 @@ stan-update :
 	git submodule update
 
 stan-update/%:
+ifeq ($(OS),win)
+	cd stan && git checkout $* && git pull
+else
 	cd stan; git checkout $*; git pull
+endif
 
-stan-pr/%:
-	cd stan; git checkout develop; git merge $* --ff;
+stan-pr/%: stan-update
+ifeq ($(OS),win)
+	cd stan && git reset --hard origin/develop && git merge $* --ff --no-commit
+else
+	cd stan; git reset --hard origin/develop; git merge $* --ff --no-commit
+endif
 
 
 .PHONY: stan-revert
