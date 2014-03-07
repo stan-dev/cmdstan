@@ -11,3 +11,6 @@
 /src/test/test-models/*
 !/src/test/test-models/*.stan
 !/src/test/test-models/*.R
+
+# local make include
+make/local

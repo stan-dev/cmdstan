@@ -71,7 +71,7 @@ test/%$(EXE) : test/%.o bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
-	$@ --gtest_output="xml:$(basename $@).xml"
+	$(WINE) $@ --gtest_output="xml:$(basename $@).xml"
 endif
 
 ####
@@ -95,7 +95,7 @@ endef
 .SECONDEXPANSION:
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS): src/test/%: $$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$$@)/$$(PERCENT),$$(ALL_TEST_EXECUTABLES))
-	$(foreach test,$^,$(test) --gtest_output="xml:$(basename $(test)).xml"; $n)
+	$(foreach test,$^,$(WINE) $(test) --gtest_output="xml:$(basename $(test)).xml"; $n)
 	@echo ''
 	@echo 'Ran '$(words $(filter test/%,$^))' tests for '$@
 else
