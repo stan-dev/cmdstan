@@ -107,6 +107,14 @@ posterior values.
 
 For Windows, the forward slash in paths need to be converted to backslashes.
 
+
+\subsection{Output of Print Command}
+
+\subsubsection{\code{n\_divergent}}
+
+Stan uses a symplectic integrator to approximate the exact solution of the Hamiltonian dynamics and when the step size is too large relative to the curvature of the log posterior this approximation can diverge and threaten the validity of the sampler. \code{n\_divergent} counts the number of iterations within a given sample that have diverged and any non-zero value suggests that the samples may be biased in which case the step size needs to be decreased. Note that, because sampling is immediately terminated once a divergence is encountered, \code{n\_divergent} should be only 0 or 1.
+
+
 \section{Command-line Options}
 
 In addition to the filenames, \code{print} includes three flags to customize the output.  
