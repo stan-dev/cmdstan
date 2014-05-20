@@ -201,7 +201,7 @@ stan-update/%: stan-update
 	cd stan && git checkout $* && git pull
 
 stan-pr/%: stan-update
-	cd stan && git checkout develop && git reset --hard HEAD~ && git pull --ff && git merge $* --ff --no-edit
+	cd stan && git checkout develop && git reset --hard HEAD~ && git pull --ff && git merge $* --ff --no-edit --strategy=ours
 
 .PHONY: stan-revert
 stan-revert:
