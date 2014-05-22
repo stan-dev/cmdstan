@@ -24,6 +24,7 @@ AR = ar
 ##
 # Library locations
 ##
+STAN_HOME ?= stan/
 EIGEN ?= stan/lib/eigen_3.2.0
 BOOST ?= stan/lib/boost_1.54.0
 GTEST ?= stan/lib/gtest_1.7.0
@@ -159,8 +160,8 @@ endif
 	@echo '  Test targets:'
 	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
 	@echo '  - src/test/models   : Runs model tests in CmdStan'
-	@echo 'Model related:'
 	@echo ''
+	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
 	@echo '- bin/print$(EXE): Build the print utility.'
 	@echo '- bin/libstan.a  : Build the Stan static library (used in linking models).'
@@ -168,12 +169,16 @@ endif
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
+	@echo ''
+	@echo 'Documentation:'
+	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
 -include stan/make/command  # bin/stanc, bin/print
+-include stan/make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/print$(EXE)
@@ -182,15 +187,23 @@ build: bin/stanc$(EXE) bin/print$(EXE)
 ##
 # Clean up.
 ##
-.PHONY: clean clean-all
+.PHONY: clean clean-manual clean-all
 
-clean:
+clean: clean-manual
 	$(RM) -r test
 	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
+clean-manual:
+	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+
+
 clean-all: clean
 	$(RM) -r bin
+
+##
+# Submodule related tasks
+##
 
 .PHONY: stan-update
 stan-update :
@@ -206,3 +219,9 @@ stan-pr/%: stan-update
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init
+
+
+##
+# Manual related
+##
+manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
