@@ -11,3 +11,24 @@
 /src/test/test-models/*
 !/src/test/test-models/*.stan
 !/src/test/test-models/*.R
+
+# local make include
+make/local
+
+# /doc/
+/doc
+/doc/*.pdf
+
+# temporary latex files
+*.aux
+*.bbl
+*.blg
+*.cb
+*.cb2
+*.idx
+*.log
+*.out
+*.upa
+
+# built manual
+src/docs/**/*.pdf
