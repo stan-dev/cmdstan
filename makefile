@@ -177,11 +177,13 @@ endif
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
--include stan/make/command  # bin/stanc, bin/print
+-include make/command  # bin/stanc, bin/print
 -include stan/make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/print$(EXE)
+	@echo ''
+	@echo ''
 	@echo '--- Stan tools built ---'
 
 ##
