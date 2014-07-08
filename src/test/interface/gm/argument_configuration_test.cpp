@@ -105,12 +105,12 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       remove_duplicates(argument);
 
       SCOPED_TRACE(command + argument);
-
+      
       run_command_output out = run_command(command + argument);
 
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
-      
+
       if (expected_success == false) {
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
@@ -131,7 +131,8 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
         EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
       
       output.clear();
@@ -242,6 +243,9 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
     
       output.str(out.output);
@@ -450,6 +454,9 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
       
       output.str(out.output);
@@ -541,8 +548,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
-      }
-      else {
+      } else {
         expected_output.str(std::string());
         expected_output << "A method must be specified!" << std::endl;
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
@@ -637,9 +643,10 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
       if (argument.length() == 0) continue;
       remove_duplicates(argument);
       argument = method_argument + argument;
-      
       run_command_output out = run_command(command + argument);
-      
+      EXPECT_FALSE(out.hasError) 
+        << "command: " << out.command << std::endl;
+
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
       expected_output.str( method_output.str() + expected_output.str() );
@@ -657,6 +664,9 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
       
       output.str(out.output);
@@ -857,6 +867,9 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
       
       output.str(out.output);
@@ -1061,6 +1074,9 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
+      } else {
+        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
       }
       
       output.str(out.output);
