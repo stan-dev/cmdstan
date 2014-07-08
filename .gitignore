@@ -29,6 +29,8 @@ make/local
 *.log
 *.out
 *.upa
+*.brf
+*.toc
 
 # built manual
 src/docs/**/*.pdf

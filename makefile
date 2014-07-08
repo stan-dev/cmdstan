@@ -177,11 +177,13 @@ endif
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
--include stan/make/command  # bin/stanc, bin/print
+-include make/command  # bin/stanc, bin/print
 -include stan/make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/print$(EXE)
+	@echo ''
+	@echo ''
 	@echo '--- Stan tools built ---'
 
 ##
@@ -211,10 +213,10 @@ stan-update :
 	git submodule update
 
 stan-update/%: stan-update
-	cd stan && git checkout $* && git pull
+	cd stan && git fetch --all && git checkout $* && git pull
 
 stan-pr/%: stan-update
-	cd stan && git checkout develop && git reset --hard HEAD~ && git pull --ff && git merge $* --ff --no-edit --strategy=ours
+	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
 
 .PHONY: stan-revert
 stan-revert:
