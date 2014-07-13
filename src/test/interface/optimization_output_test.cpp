@@ -53,21 +53,6 @@ TEST_F(CmdStan, optimize_default) {
   EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
 }
 
-TEST_F(CmdStan, optimize_nesterov) {
-  run_command_output out = run_command(base_command + " optimize algorithm=nesterov");
-
-  ASSERT_EQ(0, out.err_code);
-
-  stan::mcmc::chains<> chains = parse_output_file();
-  ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1, chains.num_samples());
-
-  EXPECT_NEAR(1, chains.samples(y11)[0], 0.5);
-  EXPECT_NEAR(100, chains.samples(y21)[0], 5);
-  EXPECT_NEAR(10000, chains.samples(y12)[0], 50);
-  EXPECT_NEAR(1000000, chains.samples(y22)[0], 500);
-}
-
 TEST_F(CmdStan, optimize_bfgs) {
   run_command_output out = run_command(base_command + " optimize algorithm=bfgs");
 

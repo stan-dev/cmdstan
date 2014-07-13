@@ -831,7 +831,7 @@ configuration.  The other arguments may appear in any order.
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Optimization algorithm}
-      {Valid values: \  \code{nesterov, bfgs, newton}}
+      {Valid values: \  \code{bfgs, lbfgs, newton}}
       {Defaults to \code{bfgs}}
 \end{description}
 %
@@ -944,19 +944,6 @@ this is unlikely to be an issue for typical Stan models.
            {Valid values: $0 < \mbox{\code{history\_size}}$}
            {Defaults to \code{5}}
 %
-\end{description}
-%
-The following options are for the Nesterov optimizer.
-%
-\begin{description}
-      \hierlongcmd{\indentarrow\indentarrow\indentarrow}{\farg{\bfseries nesterov}}
-        {Nesterov's accelerated gradient method}
-        {Valid subarguments: \code{stepsize}}
-%
-        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{stepsize}{$$double$$}
-          {Step size for discrete evolution}
-          {Valid values: \  $0 < \mbox{\code{stepsize}}$}
-          {Defaults to \code{1}}
 \end{description}
 %
 The following argument is for Newton's optimization method;  there are
@@ -1612,43 +1599,11 @@ The command skeleton for BFGS is in \reffigure{bfgs-command}.
 \label{bfgs-command.figure}
 \end{figure}
 %
-
-Stan also supports Nesterov's dual-averaging method
-\citep{Nesterov:2009} for optimization.  The BFGS method is the
-default approach because it is more efficient.  The command skeleton
-for dual averaging is shown in \reffigure{nesterov-command};  it is
-identical to that for BFGS other than the algorithm name.
-%
-\begin{figure}
-\begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model optimize                                   \
-                 algorithm=nesterov                     \
-                   [stepsize=<double>]                  \
-                 [iter=<int>]                           \
-                 [save_iterations=<boolean>]            \
-             [data file=<string>]                       \
-             [init=<string>]                            \
-             [random seed=<int>]                        \
-             [output                                    \
-                  [file=<string>]                       \
-                  [diagnostic_file=<string>]            \
-                  [refresh=<int>] ]
-\end{Verbatim}
-\end{quote}
-\caption{\small\it Command skeleton for invoking the Nesterov
-  dual-averaging ptimizer.  All arguments and their default values are
-  described in detail in
-  \refsection{detailed-command-arguments}.}
-\label{nesterov-command.figure}
-\end{figure}
-%
 Stan also supports Newton's method; see \citep{NocedalWright:2006} for
 more information.  This method is the least efficient of the three,
 but has the advantage of setting its own step size.  Other than not
 having a stepsize argument, the skeleton for Newton's method shown in
-\reffigure{newton-command} is identical to that for BFGS and
-Nesterov's dual averaging.
+\reffigure{newton-command} is identical to that for BFGS.
 %
 \begin{figure}
 \begin{quote}
