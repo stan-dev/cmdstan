@@ -1,5 +1,5 @@
-#ifndef __TEST__MODELS__MODEL_TEST_FIXTURE_HPP__
-#define __TEST__MODELS__MODEL_TEST_FIXTURE_HPP__
+#ifndef TEST__MODELS__MODEL_TEST_FIXTURE_HPP
+#define TEST__MODELS__MODEL_TEST_FIXTURE_HPP
 
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
