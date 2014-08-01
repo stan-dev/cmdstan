@@ -1,5 +1,5 @@
-#ifndef __TEST__MODELS__UTILITY_HPP__
-#define __TEST__MODELS__UTILITY_HPP__
+#ifndef TEST__MODELS__UTILITY_HPP
+#define TEST__MODELS__UTILITY_HPP
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>

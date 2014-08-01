@@ -87,7 +87,6 @@ TEST(StanUiCommand, printReallyPrints) {
 
   // OPTIMIZATION
   test_optimize_prints(path + " optimize algorithm=newton");
-  test_optimize_prints(path + " optimize algorithm=nesterov");
   test_optimize_prints(path + " optimize algorithm=bfgs");
 }
 
