@@ -1,5 +1,5 @@
-#ifndef __TEST__MODELS__UTILITY_HPP__
-#define __TEST__MODELS__UTILITY_HPP__
+#ifndef TEST__MODELS__UTILITY_HPP
+#define TEST__MODELS__UTILITY_HPP
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
@@ -23,14 +23,11 @@ int count_matches(const std::string& target,
  * @return '\' for Windows, '/' otherwise.
  */
 char get_path_separator() {
-  static char path_separator = 0;
-  if (path_separator == 0) {
-    FILE *in;
-    if(!(in = popen("make path_separator --no-print-directory", "r")))
-      throw std::runtime_error("\"make path_separator\" has failed.");
-    path_separator = fgetc(in);
-    pclose(in);
-  }
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+  static char path_separator = '\\';
+#else
+  static char path_separator = '/';
+#endif
   return path_separator;
 }
 
