@@ -142,11 +142,11 @@ endif
 	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
-	@echo '  Example - Sample from a normal: stan/src/models/basic_distributions/normal.stan'
+	@echo '  Example - Sample from a normal: stan/example-models/basic_distributions/normal.stan'
 	@echo '    1. Build the model:'
-	@echo '       make stan/src/models/basic_distributions/normal$(EXE)'
+	@echo '       make stan/example-models/basic_distributions/normal$(EXE)'
 	@echo '    2. Run the model:'
-	@echo '       stan'$(PATH_SEPARATOR)'src'$(PATH_SEPARATOR)'models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
+	@echo '       stan'$(PATH_SEPARATOR)'example-models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
 	@echo '    3. Look at the samples:'
 	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
@@ -210,7 +210,7 @@ clean-all: clean
 .PHONY: stan-update
 stan-update :
 	git submodule init
-	git submodule update
+	git submodule update --recursive
 
 stan-update/%: stan-update
 	cd stan && git fetch --all && git checkout $* && git pull
@@ -220,7 +220,7 @@ stan-pr/%: stan-update
 
 .PHONY: stan-revert
 stan-revert:
-	git submodule update --init
+	git submodule update --init --recursive
 
 
 ##
