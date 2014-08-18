@@ -210,7 +210,7 @@ clean-all: clean
 .PHONY: stan-update
 stan-update :
 	git submodule init
-	git submodule update
+	git submodule update --recursive
 
 stan-update/%: stan-update
 	cd stan && git fetch --all && git checkout $* && git pull
@@ -220,7 +220,7 @@ stan-pr/%: stan-update
 
 .PHONY: stan-revert
 stan-revert:
-	git submodule update --init
+	git submodule update --init --recursive
 
 
 ##
