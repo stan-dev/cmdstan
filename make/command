@@ -1,10 +1,10 @@
-.PRECIOUS: bin/print$(EXE)
-bin/print$(EXE) : bin/cmdstan/print.o bin/libstan.a
+.PRECIOUS: $(CMDSTAN_HOME)bin/print$(EXE)
+$(CMDSTAN_HOME)bin/print$(EXE) : $(CMDSTAN_HOME)bin/cmdstan/print.o $(CMDSTAN_HOME)bin/libstan.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
 
-.PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a
+.PRECIOUS: $(CMDSTAN_HOME)bin/stanc$(EXE)
+$(CMDSTAN_HOME)bin/stanc$(EXE) : $(CMDSTAN_HOME)bin/cmdstan/stanc.o $(CMDSTAN_HOME)bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 

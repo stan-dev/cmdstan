@@ -16,26 +16,39 @@ help:
 # - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
-CC = g++
-O = 3
+CC = clang++
+O = 0
 O_STANC = 0
 AR = ar
 
 ##
+# to call this makefile from elsewhere (-f ../.../path/to/this/makefile)
+# we need to make all paths in compiler and shell commands absolute paths
+##
+CMDSTAN_HOME := $(dir $(lastword $(abspath $(MAKEFILE_LIST))))
+STANAPI_HOME := $(CMDSTAN_HOME)stan/
+
+##
+# to call this makefile from elsewhere (-f ../.../path/to/this/makefile)
+# we need to tell makefile where to search for source files
+# includes current directory last
+##
+VPATH = $(CMDSTAN_HOME)src:$(STANAPI_HOME)src:.
+
+##
 # Library locations
 ##
-STAN_HOME ?= stan/
-EIGEN ?= stan/lib/eigen_3.2.0
-BOOST ?= stan/lib/boost_1.54.0
-GTEST ?= stan/lib/gtest_1.7.0
+EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
+BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
+GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I stan/src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = -Lbin -lstan
-LDLIBS_STANC = -Lbin -lstanc
+LDLIBS = -L$(CMDSTAN_HOME)bin -lstan
+LDLIBS_STANC = -L$(CMDSTAN_HOME)bin -lstanc
 EXE = 
 PATH_SEPARATOR = /
 
@@ -46,7 +59,8 @@ PATH_SEPARATOR = /
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include stan/make/detect_cc
+-include $(STANAPI_HOME)make/detect_cc
+
 
 # OS is set automatically by this script
 ##
@@ -56,12 +70,13 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include stan/make/detect_os
+-include $(STANAPI_HOME)make/detect_os
+
 
 ##
 # Get information about the version of make.
 ##
--include stan/make/detect_make
+-include $(STANAPI_HOME)make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -69,7 +84,7 @@ PATH_SEPARATOR = /
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.cpp %.stan bin/libstan.a 
+%$(EXE) : %.cpp %.stan $(CMDSTAN_HOME)bin/libstan.a 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
@@ -78,16 +93,16 @@ PATH_SEPARATOR = /
 ##
 # Tell make the default way to compile a .o file.
 ##
-bin/%.o : src/%.cpp
+$(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-##
-# Tell make the default way to compile a .o file.
-##
-bin/stan/%.o : stan/src/stan/%.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+### not needed if using VPATH
+## Tell make the default way to compile a .o file.
+###
+#bin/stan/%.o : %.cpp
+#	@mkdir -p $(dir $@)
+#	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 
 ##
@@ -95,7 +110,7 @@ bin/stan/%.o : stan/src/stan/%.cpp
 # Applies to all *.cpp files in src.
 # Test cpp files are handled slightly differently.
 ##
-bin/%.d : src/%.cpp
+bin/%.d : %.cpp
 	@if test -d $(dir $@); \
 	then \
 	(set -e; \
@@ -117,6 +132,10 @@ bin/%.d : src/%.cpp
 
 .PHONY: help
 help:
+	@echo '--------------------------------------------------------------------------------'
+	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
+	@echo 'STANAPI_HOME: ' $(STANAPI_HOME)
+	@echo 'VPATH: ' $(VPATH)
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'Stan makefile:'
 	@echo '  Current configuration:'
@@ -173,16 +192,19 @@ endif
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
-
--include make/libstan  # libstan.a
--include make/models   # models
--include make/tests
--include make/command  # bin/stanc, bin/print
--include stan/make/manual
+KLUDGE := $(dir stan/foo)
+-include $(CMDSTAN_HOME)make/libstan  # libstan.a
+-include $(CMDSTAN_HOME)make/models   # models
+-include $(CMDSTAN_HOME)make/tests
+-include $(CMDSTAN_HOME)make/command  # bin/stanc, bin/print
+-include $(STANAPI_HOME)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/print$(EXE)
+build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 	@echo ''
+	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
+	@echo 'STANAPI_HOME: ' $(STANAPI_HOME)
+	@echo 'VPATH: ' $(VPATH)
 	@echo ''
 	@echo '--- Stan tools built ---'
 
@@ -192,16 +214,16 @@ build: bin/stanc$(EXE) bin/print$(EXE)
 .PHONY: clean clean-manual clean-all
 
 clean: clean-manual
-	$(RM) -r test
+	$(RM) -r $(CMDSTAN_HOME)test
 	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-manual:
-	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	cd $(CMDSTAN_HOME)src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 
 clean-all: clean
-	$(RM) -r bin
+	$(RM) -r $(CMDSTAN_HOME)bin
 
 ##
 # Submodule related tasks
@@ -226,4 +248,4 @@ stan-revert:
 ##
 # Manual related
 ##
-manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
+manual: $(CMDSTAN_HOME)src/docs/cmdstan-guide/cmdstan-guide.pdf
