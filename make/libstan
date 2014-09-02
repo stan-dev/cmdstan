@@ -1,10 +1,8 @@
+# create library file cmdstan/bin/libstan.a
+
 LIBSTAN_OFILES = $(CMDSTAN_HOME)bin/stan/agrad/rev/var_stack.o
 
 $(CMDSTAN_HOME)bin/libstan.a : $(LIBSTAN_OFILES)
-	@echo ''
-	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
-	@echo 'STANAPI_HOME: ' $(STANAPI_HOME)
-	@echo 'VPATH: ' $(VPATH)
 	@mkdir -p $(dir $@)
 	$(AR) -rs $(CMDSTAN_HOME)bin/libstan.a $(LIBSTAN_OFILES)
 
@@ -12,15 +10,12 @@ TEMPLATE_INSTANTIATION := $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -n
 TEMPLATE_INSTANTIATION += $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:%.cpp=$(CMDSTAN_HOME)bin/%.o)
 $(CMDSTAN_HOME)bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
-	@echo ''
-	@echo 'making libstan.a, TEMPLATE_INST :' $(TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs $(CMDSTAN_HOME)bin/libstanc.a $(TEMPLATE_INSTANTIATION)
 
 $(TEMPLATE_INSTANTIATION) : $(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
 
 
 ##

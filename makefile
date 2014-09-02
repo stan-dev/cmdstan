@@ -10,7 +10,7 @@ help:
 .SUFFIXES:
 
 ##
-# Users should only need to set these three variables for use.
+# Set default values which can be overridden via file make/local
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
@@ -22,17 +22,14 @@ O_STANC = 0
 AR = ar
 
 ##
-# to call this makefile from elsewhere (-f ../.../path/to/this/makefile)
-# we need to make all paths in compiler and shell commands absolute paths
+# create absolute filepaths, set search path for source files
+# includes current working directory last to compile user models
+# in order to use this makefile from elsewhere all paths in
+# compiler and shell commands must be absolute paths
+# (e.g. make -f ../.../path/to/this/makefile)
 ##
 CMDSTAN_HOME := $(dir $(lastword $(abspath $(MAKEFILE_LIST))))
 STANAPI_HOME := $(CMDSTAN_HOME)stan/
-
-##
-# to call this makefile from elsewhere (-f ../.../path/to/this/makefile)
-# we need to tell makefile where to search for source files
-# includes current directory last
-##
 VPATH = $(CMDSTAN_HOME)src:$(STANAPI_HOME)src:.
 
 ##
@@ -192,7 +189,6 @@ endif
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
-KLUDGE := $(dir stan/foo)
 -include $(CMDSTAN_HOME)make/libstan  # libstan.a
 -include $(CMDSTAN_HOME)make/models   # models
 -include $(CMDSTAN_HOME)make/tests
