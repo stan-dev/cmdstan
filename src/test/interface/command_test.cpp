@@ -128,7 +128,7 @@ TEST(StanUiCommand, zero_init_value_fail) {
 
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -150,7 +150,7 @@ TEST(StanUiCommand, zero_init_domain_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -180,7 +180,7 @@ TEST(StanUiCommand, user_init_value_fail) {
     + " output file=test/output.csv";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -210,7 +210,7 @@ TEST(StanUiCommand, user_init_domain_fail) {
     + " output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
