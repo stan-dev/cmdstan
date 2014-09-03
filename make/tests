@@ -20,8 +20,6 @@ path_separator :
 ##
 PERCENT = %
 
-TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f) $(shell find stan/example-models -name '*.stan' -type f)
-
 ##
 # Target to verify header files are coherent
 ##

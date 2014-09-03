@@ -16,8 +16,8 @@ help:
 # - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
 ##
-CC = clang++
-O = 0
+CC = g++
+O = 3
 O_STANC = 0
 AR = ar
 
@@ -69,11 +69,6 @@ PATH_SEPARATOR = /
 ##
 -include $(STANAPI_HOME)make/detect_os
 
-
-##
-# Get information about the version of make.
-##
--include $(STANAPI_HOME)make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -129,10 +124,6 @@ bin/%.d : %.cpp
 
 .PHONY: help
 help:
-	@echo '--------------------------------------------------------------------------------'
-	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
-	@echo 'STANAPI_HOME: ' $(STANAPI_HOME)
-	@echo 'VPATH: ' $(VPATH)
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'Stan makefile:'
 	@echo '  Current configuration:'
@@ -197,10 +188,6 @@ endif
 
 .PHONY: build
 build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
-	@echo ''
-	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
-	@echo 'STANAPI_HOME: ' $(STANAPI_HOME)
-	@echo 'VPATH: ' $(VPATH)
 	@echo ''
 	@echo '--- Stan tools built ---'
 
