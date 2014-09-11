@@ -1,5 +1,5 @@
 #include <stan/gm/error_codes.hpp>
-#include <stan/common/command.hpp>
+#include <stan/services/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <test/utility.hpp>
@@ -325,8 +325,8 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   sampler<TypeParam> throwing_sampler;
   Eigen::VectorXd cont_params;
   
-  EXPECT_FALSE(stan::common::init_adapt(&throwing_sampler, 
-                                        0, 0, 0, 0, cont_params));
+  EXPECT_FALSE(stan::services::init::init_adapt(&throwing_sampler,
+                                                0, 0, 0, 0, cont_params));
 }
 
 REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
