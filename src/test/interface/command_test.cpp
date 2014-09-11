@@ -1,4 +1,4 @@
-#include <stan/gm/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
@@ -99,7 +99,7 @@ TEST(StanUiCommand, refresh_zero_ok) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_EQ(0, count_matches("Iteration:", out.output));
 }
 
@@ -112,7 +112,7 @@ TEST(StanUiCommand, refresh_nonzero_ok) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=1 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_EQ(20, count_matches("Iteration:", out.output));
 }
 
@@ -128,7 +128,7 @@ TEST(StanUiCommand, zero_init_value_fail) {
 
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -150,7 +150,7 @@ TEST(StanUiCommand, zero_init_domain_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -180,7 +180,7 @@ TEST(StanUiCommand, user_init_value_fail) {
     + " output file=test/output.csv";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -210,7 +210,7 @@ TEST(StanUiCommand, user_init_domain_fail) {
     + " output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -228,7 +228,7 @@ TEST(StanUiCommand, CheckCommand_default) {
    
   std::string command = convert_model_path(model_path);
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_help) {
@@ -241,7 +241,7 @@ TEST(StanUiCommand, CheckCommand_help) {
    std::string command = convert_model_path(model_path) + " help";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
@@ -254,7 +254,7 @@ TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
   std::string command = convert_model_path(model_path) + " foo";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanUiCommand, timing_info) {
@@ -266,7 +266,7 @@ TEST(StanUiCommand, timing_info) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   
   std::fstream output_csv_stream("test/output.csv");
   std::stringstream output_sstream;

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/gm/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 
@@ -20,7 +20,7 @@ TEST(gm,csv_header_consistency) {
     + " output file=" + samples;
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_FALSE(out.hasError);
 
   std::ifstream ifstream;
