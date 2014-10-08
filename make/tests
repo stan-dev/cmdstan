@@ -115,7 +115,7 @@ endif
 ##
 # Model tests. Adding built model as a depedency.
 ##
-$(patsubst src/%_test.cpp,%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/%_test.o : stan/src/%$(EXE)
+$(patsubst src/test/models/%_test.cpp,test/models/%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/models/%_test.o : $(STANAPI_HOME)example-models/%$(EXE)
 
 
 ##

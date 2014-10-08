@@ -24,15 +24,15 @@ AR = ar
 ##
 # Library locations
 ##
-STAN_HOME ?= stan/
-EIGEN ?= stan/lib/eigen_3.2.0
-BOOST ?= stan/lib/boost_1.54.0
-GTEST ?= stan/lib/gtest_1.7.0
+STANAPI_HOME ?= stan/
+EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
+BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
+GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I stan/src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -Lbin -lstan
 LDLIBS_STANC = -Lbin -lstanc
@@ -46,7 +46,7 @@ PATH_SEPARATOR = /
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include stan/make/detect_cc
+-include $(STANAPI_HOME)make/detect_cc
 
 # OS is set automatically by this script
 ##
@@ -56,12 +56,12 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include stan/make/detect_os
+-include $(STANAPI_HOME)make/detect_os
 
 ##
 # Get information about the version of make.
 ##
--include stan/make/detect_make
+-include $(STANAPI_HOME)make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -85,7 +85,7 @@ bin/%.o : src/%.cpp
 ##
 # Tell make the default way to compile a .o file.
 ##
-bin/stan/%.o : stan/src/stan/%.cpp
+bin/stan/%.o : $(STANAPI_HOME)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
@@ -178,7 +178,7 @@ endif
 -include make/models   # models
 -include make/tests
 -include make/command  # bin/stanc, bin/print
--include stan/make/manual
+-include $(STANAPI_HOME)make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/print$(EXE)
