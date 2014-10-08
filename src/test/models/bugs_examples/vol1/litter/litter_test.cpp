@@ -10,8 +10,7 @@ public:
   static std::vector<std::string> get_model_path() {
     std::vector<std::string> model_path;
     model_path.push_back("stan");
-    model_path.push_back("src");
-    model_path.push_back("models");
+    model_path.push_back("example-models");
     model_path.push_back("bugs_examples");
     model_path.push_back("vol1");
     model_path.push_back("litter");
