@@ -20,7 +20,7 @@ path_separator :
 ##
 PERCENT = %
 
-TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f) $(shell find stan/src/models -name '*.stan' -type f)
+TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f) $(shell find stan/example-models -name '*.stan' -type f)
 
 ##
 # Target to verify header files are coherent
@@ -115,7 +115,7 @@ endif
 ##
 # Model tests. Adding built model as a depedency.
 ##
-$(patsubst src/%_test.cpp,%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/%_test.o : stan/src/%$(EXE)
+$(patsubst src/test/models/%_test.cpp,test/models/%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/models/%_test.o : $(STANAPI_HOME)example-models/%$(EXE)
 
 
 ##
