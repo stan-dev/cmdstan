@@ -1,12 +1,22 @@
 \chapter{Getting Started}
 
 \noindent
-This chapter is designed to help users get acquainted with the overall
-design of the \Stan language and calling \Stan from the command line.
-Later chapters are devoted to expanding on the material in this
-chapter with full reference documentation.  The content is identical
-to that found on the getting-started with the command-line
-documentation on the Stan home page, \url{http://mc-stan.org/}.
+This chapter is designed to help users get acquanited with the overall
+design of the \Stan language and basic use of the \CmdStan
+interface. Later chapters are devoted to expanding on the material in
+this chapter with full reference documentation.
+
+\section{Installation}
+
+For information about supported versions of Windows, Mac, and Linux
+platforms see
+\refappendix{install}.
+For step-by-step installation instructions, see
+\begin{itemize}
+  \item Windows: \refappendix{install-windows}
+  \item Mac: \refappendix{install-mac}
+  \item Linux: \refappendix{install-linux}.
+\end{itemize}
 
 \section{For BUGS Users}
 
@@ -14,78 +24,62 @@ An appendix in the language user's guide and reference manual
 describes some similarities and important differences between Stan and
 BUGS (including WinBUGS, OpenBUGs, and JAGS).
 
+\section{Building \CmdStan}
 
-\section{Installation}
+Building \CmdStan uses the \code{make} command-line utility and works
+the same way across all supported platforms.
+\begin{enumerate}
+  \item Open a command-line terminal window and change directories to
+    the \CmdStan directory.
+    %
+    \begin{quote}
+      \begin{Verbatim}
+> cd <cmdstan-home>
+      \end{Verbatim}
+    \end{quote}
+    %
+  \item \emph{Optional:} \ Set local \code{make} variables by editing
+    the file \verb+make/local+. For most installations, this step can
+    be skipped. See \refappendix{make-options} for a list of options.
+    %
+  \item Use make to build \CmdStan. If multiple CPU cores are
+    available, the call to make can be parallelized with the
+    \code{-j2} option, where \code{2} is the number of CPU cores. The
+    parallel option (\code{-j2}) can be safely omitted.
+    %
+    \begin{quote}
+      \begin{Verbatim}
+> make build -j2
+      \end{Verbatim}
+    \end{quote}
+    %
+    \emph{Warning:} \ The \code{make} program may take 10+ minutes and
+    consume 2+ GB of memory to build \code{stanc}.  Compiler warnings,
+    such as \code{uname:~not found}, may be safely ignored.
 
-For information about supported versions of Windows, Mac and Linux
-platforms along with step-by-step installation instructions, see
-\refappendix{install}.
+\end{enumerate}
 
-\section{Building Stan}
-
-Building Stan itself works the same way across platforms.
-To build Stan, first open a command-line terminal application.  Then change
-directories to the directory in which Stan is installed (i.e., the
-directory containing the file named \code{makefile}).
-%
+When \CmdStan is successfully built, the \code{make} program will report 
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <stan-home>
-\end{Verbatim}
+  \begin{Verbatim}[fontshape=sl]
+--- CmdStan built ---
+  \end{Verbatim}
 \end{quote}
-%
-Then make the library with the following make command
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make bin/libstan.a
-\end{Verbatim}
-\end{quote}
-%
-then make the model parser and code generator with the following call,
-adjusting the \code{2} in \code{-j2} to the number of CPU cores
-available 
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make -j2 bin/stanc
-\end{Verbatim}
-\end{quote}
-%
-On Windows, that'll be \code{bin/stanc.exe}.  
 
-\emph{Warning:} \ The \code{make} program may take 10+ minutes and
-consume 2+ GB of memory to build \code{stanc}.  Compiler warnings,
-such as \code{uname:~not found}, may be safely ignored.
- 
-Finally, make the Stan output summary program with the following
-make command.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make bin/print
-\end{Verbatim}
-\end{quote}
-%
+\section{Compiling and Executing a Stan Program}\label{compiling-model.section}
 
-Building \code{libstan.a}, \code{bin/stanc}, and \code{bin/print}
-needs to be done only once.
-
-\section{Compiling and Executing a Model}\label{compiling-model.section}
-
-The rest of this quick-start guide explains how to code
-and run a very simple Bayesian model.
+The rest of this quick-start guide explains how to code and run a very
+simple Bayesian model.
 
 \subsection{A Simple Bernoulli Model}
 
-The following simple model is available in the source
-distribution located at \code{<stan-home>} as
+The following simple model is distributed with \CmdStan and is located (relative to \code{<cmdstan-home>}) at
 %
 \begin{quote}
-\nolinkurl{src/models/basic_estimators/bernoulli.stan}
+\nolinkurl{stan/example-models/basic_estimators/bernoulli.stan}
 \end{quote}
 %
-The file contains the following model.
+The file contains the following \Stan program.
 %
 \begin{quote}
 \begin{Verbatim}
@@ -111,7 +105,7 @@ prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
 \subsubsection{Implicit Uniform Priors}
 
 If no prior is specified for a parameter, it is implicitly given a
-uniform prior on its support.  For parameters such as \code{theta} in
+uniform prior on its support. For parameters such as \code{theta} in
 the example, which are constrained to fall between 0 and 1, this
 produces a proper uniform distribution on the support of \code{theta}.
 Because $\distro{Beta}(1,1)$ is the uniform distribution, the
@@ -171,7 +165,7 @@ the language user's guide and reference manual on optimization.
 A data set of $\mbox{\code{N}}=10$ observations is available in the file
 %
 \begin{quote}
-\nolinkurl{src/models/basic_estimators/bernoulli.data.R}
+\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}
 \end{quote}
 %
 The content of the file is as follows.
@@ -187,51 +181,45 @@ This defines the contents of two variables, \code{N} and \code{y},
 using an R-like syntax (see \refchapter{dump} for more information).
 
 
+\subsection{Compiling a \Stan Program}
 
-\subsection{Generating and Compiling the Model}
+A single call to \code{make} will translate a \Stan program to \Cpp
+code, then compile it for execution. This call will also build
+\CmdStan if it has not been built already.
 
-A single call to \code{make} will generate the \Cpp code for a
-model with a name ending in \code{.stan} and compile it for
-execution.  This call will also compile the library \code{libstan.a}
-and the parser/code generator \code{stanc} if they have not already
-been compiled.
+The \Stan program must be in a file with the file extension
+\code{.stan}. The argument to \code{make} will be the executable to
+generate. For Mac and Linux, it is the name of the \Stan program with
+the \code{.stan} omitted. For Windows, replace \code{.stan} with
+\code{.exe}.
 
-First, change directories to \code{<stan-home>}, the directory where
-Stan was unpacked that contains the file named \code{makefile} and
-a subdirectory called \code{src/}.
+To build the Bernoulli example, from \code{<cmdstan-home>} issue
+the following command for Mac and Linux:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd <stan-home>
+> make stan/example-models/basic_estimators/bernoulli 
 \end{Verbatim}
 \end{quote}
 %
-Then issue the following command:
-%
+For Windows, the command is the same with the addition of \code{.exe}
+at the end of the target:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make src/models/basic_estimators/bernoulli 
+> make stan/example-models/basic_estimators/bernoulli.exe
 \end{Verbatim}
 \end{quote}
-%
-The command for Windows is the same, including the forward slashes.
 
-The \code{make} command may be applied to files in locations
-that are not subdirectories issued from another directory as follows.
-Just replace the relative path \code{src/models/...} with the
-actual path.
+The generated \Cpp code and the compiled executable will be placed in
+the same directory as the \Stan program.
 
-The C++ generated for the model and its compiled executable
-form will be placed in the same directory as the model.
+\subsection{Sampling from the \Stan Program}
 
-
-\subsection{Sampling from the Model}
-
-The model can be executed from the directory in which it resides.
+The program can be executed from the directory in which it resides.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd src/models/basic_estimators 
+> cd stan/example-models/basic_estimators 
 \end{Verbatim}
 \end{quote}
 %
@@ -243,22 +231,19 @@ To execute sampling of the model under Linux or Mac, use
 \end{Verbatim}
 \end{quote}
 %
-The \code{./} prefix before the executable is only required under
-Linux and the Mac when executing a model from the directory in which
-it resides.
 
-For the Windows DOS terminal, the \code{./} prefix is not needed,
-resulting in the following command.
+In Windows, the \code{./} prefix is not needed, resulting in the
+following command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> bernoulli sample data file=bernoulli.data.R
+> bernoulli.exe sample data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
 Whether the command is run in Windows, Linux, or on the Mac, the
-output is the same.  First, the parameters are echoed to the standard output,
-which shows up on the terminal as follows.
+output is the same.  First, the parameters are echoed to the standard
+output, which shows up on the terminal as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
@@ -343,7 +328,7 @@ as comments (i.e., lines beginning with the pound sign (\Verb|#|)).
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 1
+# stan_version_minor = 5
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = sample (Default)
@@ -489,34 +474,22 @@ generated for \code{bernoulli} on Linux or Mac,  use
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <stan-home>/bin/print output.csv
+> <cmdstan-home>/bin/print output.csv
 \end{Verbatim}
 \end{quote}
 %
-where \code{<stan-home>} is the path to where Stan was unpacked.  For
-Windows use backslashes for the executable,
+For Windows use backslashes for the executable,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <stan-home>\bin\print output.csv
+> <cmdstan-home>\bin\print.exe output.csv
 \end{Verbatim}
 \end{quote}
 %
 The output of the command will display information about the run
 followed by information for each parameter and generated quantity. For
 \code{bernoulli}, we ran 1 chain and saved 1000 iterations. The
-information is echoed to the standard output stream.  For the running
-example, the path to \code{<stan-home>} can be specified from the
-directory in which the Bernoulli model resides using \code{../} (with
-backslashes on Windows) as
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ../../../bin/print output.csv 
-\end{Verbatim}
-\end{quote}
-%
-For Windows, reverse the slashes.  The output is
+information is echoed to the standard output stream. The output is
 %
 \begin{Verbatim}[fontshape=sl,fontsize=\footnotesize]
 Inference for Stan model: bernoulli_model

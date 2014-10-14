@@ -29,7 +29,7 @@ new versions of these operating systems and gradually phase out
 testing on older versions.
 
 
-\section{Step-by-Step Mac Install Instructions}
+\section{Step-by-Step Mac Install Instructions}\label{install-mac.appendix}
 
 This section provides step-by-step install instructions for the Mac;
 Linux and Windows sections follow.  It repeats the step-by-step
@@ -118,7 +118,7 @@ Move the resulting directory to a location where it will not be
 deleted, henceforth called \code{<stan-home>}.
 
 
-\section{Step-by-Step Linux Install Instructions}
+\section{Step-by-Step Linux Install Instructions}\label{install-linux.appendix}
 
 Stan has been tested on various Linux installations, including
 Ubuntu, Debian, and Red Hat.
@@ -208,9 +208,9 @@ with
 
 
 
-\section{Step-by-Step Windows Install Instructions}
+\section{Step-by-Step Windows Install Instructions}\label{install-windows.appendix}
 
-Stan has been tested on Windows XP, Windows 7, and Windows 8.  
+Stan has been tested on Windows XP, Windows 7, and Windows 8.
 
 Stan also runs under Cygwin, which provides a unix-like shell on top
 of Windows.  Instructions for Cygwin installation are provided below
@@ -234,7 +234,7 @@ the Run window, then press \code{[Return]} on the keyboard to run.
 
 \Stan defaults to a 64-bit build. On a 32-bit operating system, set
 the \verb|BIT| variable to 32. For example, to build the Bernoulli
-model in \refsection{compiling-model}, replace the original command
+model in \refsection{compiling}, replace the original command
 with:
 %
 \begin{quote}
@@ -545,6 +545,10 @@ Stan 2.0 does not support \Cpp-11.  The remaining incompatibility with
 the parser will be included soon after Stan 2.0 is released.  This
 will include support for the latest versions of \code{g++} and
 \code{clang++}.
+
+
+\section{\code{Make} options}\label{make-options.appendix}
+
 
 
 \section{Optional Components for Developers}

@@ -184,7 +184,7 @@ endif
 build: bin/stanc$(EXE) bin/print$(EXE)
 	@echo ''
 	@echo ''
-	@echo '--- Stan tools built ---'
+	@echo '--- CmdStan built ---'
 
 ##
 # Clean up.
