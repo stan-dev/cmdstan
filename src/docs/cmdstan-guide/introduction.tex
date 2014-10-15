@@ -1,9 +1,11 @@
 \chapter{Overview}
 
 \noindent
-This document is a user's guide for the CmdStan interface to the Stan
-probabilistic modeling language. CmdStan is one of several interfaces
-to Stan; there are also R, Python, and Matlab interfaces.
+This document is a user's guide for the \CmdStan interface to the
+\Stan probabilistic modeling language. \CmdStan takes \Stan programs
+and generates executables that can be run directly from the command
+line. \CmdStan is one of several interfaces to Stan; there are also R,
+Python, and Matlab interfaces.
 
 \section{Stan Home Page}\label{home-page.section}
 
@@ -35,3 +37,13 @@ models, is detailed in the {\it Stan Modeling Language User's Guide
 There are many example models for Stan, in addition to those in the
 user's guide and reference. These are all linked from the Stan home
 page (see \refsection{home-page}).
+
+
+\section{Benefits of \CmdStan}
+
+Although \CmdStan has the least amount functionality among the \Stan
+interfaces, the minimal nature of \CmdStan makes it trivial to install
+and use the latest development version of the \Stan library. It also
+has the least dependencies, which makes it easy to run on limited
+environments such as clusters. The output generated can be post-processed
+using other interfaces.
