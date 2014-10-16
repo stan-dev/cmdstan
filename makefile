@@ -174,6 +174,7 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+include make/local    # for local variables
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
