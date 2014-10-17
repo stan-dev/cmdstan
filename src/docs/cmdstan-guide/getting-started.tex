@@ -1,10 +1,10 @@
 \chapter{Getting Started}
 
 \noindent
-This chapter is designed to help users get acquanited with the overall
-design of the \Stan language and basic use of the \CmdStan
-interface. Later chapters are devoted to expanding on the material in
-this chapter with full reference documentation.
+This chapter is designed to help users get acquanited with the
+\CmdStan interface. Later chapters are devoted to expanding on the
+material in this chapter with full reference documentation. See the
+\Stan user's manual for details about the \Stan language.
 
 \section{Installation}
 
@@ -70,13 +70,13 @@ and there will be two executables in the \code{bin} folder:
 %
 \begin{itemize}
   \item \code{stanc}, the \Stan compiler. The \Stan compiler
-    translates a \Stan program into \Cpp code. See \refsection{stanc}
+    translates a \Stan program into \Cpp code. See \refchapter{stanc}
     for details.
   \item \code{print}, a posterior analysis tool. The \code{print}
     command summarizes the comma-separated values files that are
     generated from \Stan program runs. For each parameter within the
     \Stan program, \code{print} reports the mean, standard deviation,
-    quantiles, R-hat, and other values. See \refsection{print} for
+    quantiles, $\hat{R}$, and other values. See \refchapter{print} for
     details.
 \end{itemize}
 
@@ -243,7 +243,8 @@ given.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 Gradient evaluation took 4e-06 seconds
-1000 transitions using 10 leapfrog steps per transition would take 0.04 seconds.
+1000 transitions using 10 leapfrog steps per transition would 
+  take 0.04 seconds.
 Adjust your expectations accordingly!
 \end{Verbatim}
 \end{quote}
@@ -379,7 +380,7 @@ The output ends with timing details,%
 
 The command-line program \code{bin/print} will display summary
 information about the run (for more information, see
-\refchapter{print-command}). To run \code{print} on the output file
+\refchapter{print}). To run \code{print} on the output file
 generated for \code{bernoulli} on Linux or Mac, type
 %
 \begin{quote}
@@ -445,54 +446,6 @@ finished, the results would be analyzed using \code{print} to assess
 convergence and inspect the means and quantiles of the fitted
 variables.  Additionally, downstream inferences may be performed using
 the draws (e.g., to make decisions or predictions for unseen data).
-
-\subsection{Compile-time Errors}
-
-\Stan tries to report errors and warnings in order to help users
-correctly formulate and debug models. Compile-time errors occur when
-\Stan programs are not syntaxtically valid. These errors prevent \Cpp
-code from being generated and must be addressed before proceeding. See
-the user's guide for more details.
-
-\subsection{Run-time Warnings}
-
-Run-time warnings occur while the program is executing. 
-
-\subsubsection{Metropolis Rejection Warning}
-
-The Metropolis sampler may reject a proposal due to an error arising
-in the evaluation of the log probability function.  Such errors are
-typically due to underflow or overflow in numerical computations that
-are the unavoidable consequence of floating-point approximations to
-continuous real values.  The following is an example of such a
-message.
-%
-\begin{quote}\small
-\begin{Verbatim}
-Informational Message: The current Metropolis proposal is about 
-to be rejected because of the following issue:
-  stan::prob::normal_log(d): Scale parameter is 0, but must be > 0!
-If this warning occurs sporadically, such as for highly constrained 
-variable types like covariance matrices, then the sampler is fine,
-but if this warning occurs often then your model may be either severely 
-ill-conditioned or misspecified.
-\end{Verbatim}
-\end{quote}
-%
-This is just an \emph{informational message} \, (i.e., a warning); if
-the message only occurs sporadically, then {\it the sampler is fine}
-and the user need not worry.  Particularly in early stages of sampler
-adaptation before adaptation has converged on the high-mass volume of
-the posterior, the numerical approximation to functions and to the
-Hamiltonian dynamics followed by the sampler can lead to numerical
-issues. The post-adaptation draws are still valid with the presence of
-these messages.
-
-If this message occurs repeatedly, the model may have a poorly
-conditioned constraint (typically with covariance or correlation
-matrices) or may be misformulated.  In a future version of \Stan, we
-plan to rank such messages by severity and turn this one off by
-default so as not to needlessly worry users.
 
 \subsection{Optimization}
 
@@ -602,7 +555,7 @@ and a line for the values.  Here, the header indicates the
 unnormalized log probability with \code{lp\_\_} and the model
 parameter \code{theta}.  The maximum log probability is -5.0 and the
 posterior mode for \code{theta} is 0.20.  The mode exactly matches
-what we would expect from the data.  
+what we would expect from the data.%
 %
 \footnote{The Jacobian adjustment included for the sampler's log
   probability function is not applied during optimization, because it can
@@ -633,10 +586,6 @@ and on Windows with
 \end{Verbatim}
 \end{quote}
 %
-It may help to glance at the command-line skeletons in
-\reffigure{nuts-command} through \reffigure{diagnostic-command} to get
-a handle on the options then read the detailed descriptions earlier in
-\refchapter{stan-cmd}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -746,4 +695,52 @@ a handle on the options then read the detailed descriptions earlier in
 %% test and model tests can take even longer.  It is faster to run the
 %% Clang compiler (option \code{CC=clang++}), and to run in multiple
 %% processes in parallel (e.g., option \code{-j4} for four threads).
+
+%% \subsection{Compile-time Errors}
+
+%% \Stan tries to report errors and warnings in order to help users
+%% correctly formulate and debug models. Compile-time errors occur when
+%% \Stan programs are not syntaxtically valid. These errors prevent \Cpp
+%% code from being generated and must be addressed before proceeding. See
+%% the user's guide for more details.
+
+%% \subsection{Run-time Warnings}
+
+%% Run-time warnings occur while the program is executing. 
+
+%% \subsubsection{Metropolis Rejection Warning}
+
+%% The Metropolis sampler may reject a proposal due to an error arising
+%% in the evaluation of the log probability function.  Such errors are
+%% typically due to underflow or overflow in numerical computations that
+%% are the unavoidable consequence of floating-point approximations to
+%% continuous real values.  The following is an example of such a
+%% message.
+%% %
+%% \begin{quote}\small
+%% \begin{Verbatim}
+%% Informational Message: The current Metropolis proposal is about 
+%% to be rejected because of the following issue:
+%%   stan::prob::normal_log(d): Scale parameter is 0, but must be > 0!
+%% If this warning occurs sporadically, such as for highly constrained 
+%% variable types like covariance matrices, then the sampler is fine,
+%% but if this warning occurs often then your model may be either severely 
+%% ill-conditioned or misspecified.
+%% \end{Verbatim}
+%% \end{quote}
+%% %
+%% This is just an \emph{informational message} \, (i.e., a warning); if
+%% the message only occurs sporadically, then {\it the sampler is fine}
+%% and the user need not worry.  Particularly in early stages of sampler
+%% adaptation before adaptation has converged on the high-mass volume of
+%% the posterior, the numerical approximation to functions and to the
+%% Hamiltonian dynamics followed by the sampler can lead to numerical
+%% issues. The post-adaptation draws are still valid with the presence of
+%% these messages.
+
+%% If this message occurs repeatedly, the model may have a poorly
+%% conditioned constraint (typically with covariance or correlation
+%% matrices) or may be misformulated.  In a future version of \Stan, we
+%% plan to rank such messages by severity and turn this one off by
+%% default so as not to needlessly worry users.
 
