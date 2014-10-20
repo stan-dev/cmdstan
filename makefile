@@ -25,7 +25,7 @@ AR = ar
 # Library locations
 ##
 STANAPI_HOME ?= stan/
-EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
+EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.2
 BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
