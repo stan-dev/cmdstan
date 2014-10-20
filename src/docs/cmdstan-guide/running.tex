@@ -1,8 +1,7 @@
-
-\chapter{Running a \Stan Program}\label{stan-cmd.chapter}
+\chapter{Running a \CmdStan Program}\label{stan-cmd.chapter}
 
 \noindent 
-Once a \Stan program is compiled, it can be run in many different
+Once a \CmdStan program is compiled, it can be run in many different
 ways.  It can be used to sample or optimize parameters, or to diagnose
 a model.  Before diving into the detailed configurations, the first
 section provides some simple examples.
@@ -10,12 +9,12 @@ section provides some simple examples.
 
 \section{Getting Started by Example}\label{command-getting-started.section}
 
-Once a \Stan program defining a model has been converted to a \Cpp
-program for that model (see \refsection{stanc}) and the resulting \Cpp
-program compiled to a platform-specific executable (see
-\refsection{compiling-cpp}), the model is ready to be run.
+Once a \CmdStan program has been converted to a \Cpp program for that
+model (see \refchapter{stanc}) and the resulting \Cpp program compiled
+to a platform-specific executable (see \refchapter{compiling}),
+the model is ready to be run.
 
-All of the Stan functionality is highly configurable from the command
+All of the \CmdStan functionality is highly configurable from the command
 line; the options are defined later in this chapter.  Each command
 option also has defaults, which are used in this section.
 
@@ -106,10 +105,10 @@ DOS.
 
 \subsubsection{Combining Parallel Chains}
 
-Stan has commands to analyze the output of multiple chains, each
-stored in their own file;  see \refchapter{print-command}.  RStan also
-has commands to read in multiple CSV files produced by Stan's
-command-line sampler.  
+\CmdStan has commands to analyze the output of multiple chains, each
+stored in their own file; see \refchapter{print}.  RStan also
+has commands to read in multiple CSV files produced by \CmdStan's
+command-line sampler.
 
 To compute posterior quantities, it is sometimes easier to have the
 chains merged into a single CSV file.  If the grep and sed programs
@@ -131,15 +130,15 @@ line.  Operations like these can also be scripted, using shell scripts
 (\code{.sh}) on Mac OS and Linux and DOS batch (\code{.bat}) files on
 Windows.  A sequence of several such commands can be executed from a
 single script file.  Such scripts might contain \code{stanc} commands
-(see \refsection{stanc}) and \code{bin/print} commands (see
-\refchapter{print-command}) can be executed from a single script
-file.  At some point, it is worthwhile to move to something with
-stronger dependency control such as makefiles.
+(see \refchapter{stanc}) and \code{print} commands (see
+\refchapter{print}) can be executed from a single script file.
+At some point, it is worthwhile to move to something with stronger
+dependency control such as makefiles.
 
 
 \subsection{Optimization}
 
-Stan can find the posterior mode (assuming there is one).  If the
+\CmdStan can find the posterior mode (assuming there is one).  If the
 posterior is not convex, there is no guarantee Stan will be able to
 find the global mode as opposed to a local optimum of log probability.
 
@@ -168,10 +167,10 @@ written.
 
 \section{Diagnostics}\label{diagnostics.section}
 
-Stan has a basic diagnostic feature that will calculate gradients of
+\CmdStan has a basic diagnostic feature that will calculate gradients of
 the initial state and compare them with those calculated with finite
 differences.  If there are discrepancies, there is a problem with the
-model or initial states (or a bug in Stan).  To run on the different
+model or initial states (or a bug in \Stan).  To run on the different
 platforms, use one of the following.
 
 \subsubsection{Windows}
@@ -195,7 +194,7 @@ platforms, use one of the following.
 
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
-\Stan executables are highly configurable, allowing the user to specify
+\CmdStan executables are highly configurable, allowing the user to specify
 and customize not only the calculation method but also the data, output,
 initialization, and random number generation.  The arguments are defined
 hierarchically so that, for example, optimization settings are not necessary
@@ -205,7 +204,7 @@ The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
 called ``flags'') which define self-contained categories of arguments.
 
-Stan's commands have more hierarchical structure than is typical of
+\CmdStan's commands have more hierarchical structure than is typical of
 command line executables, which usually have at most two subgroups of
 commands.  Arguments grouped within a category are not ordered with
 respect to each other.  The only ordering is that the global options
@@ -383,7 +382,7 @@ or a help request.
 
 All commands other than \code{help} must include at least one
 method, specified explicitly as \code{method=\farg{method\_name}} or
-implicitly with only \farg{method\_name}.  Currently Stan supports
+implicitly with only \farg{method\_name}.  Currently \CmdStan supports
 the following methods:
 %
 \begin{center}
@@ -568,7 +567,7 @@ update of the slow parameters.
 
 Currently all \Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
-sampler should not be confused with running Stan's optimization method).
+sampler should not be confused with running \Stan's optimization method).
 This optimization procedure is extremely flexible and for completeness
 we have exposed each option, using the notation of
 \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  In practice the
@@ -1564,7 +1563,7 @@ interdependence.
 
 \subsection{Optimization Templates}
 %
-Stan supports several optimizers.  These share many of their
+\CmdStan supports several optimizers.  These share many of their
 configuration options with the samplers.  The default optimizer is the
 Broyden-Fletcher-Goldfarb-Shanno (BFGS) method and a limited-memory
 version of this algorithm, L-BFGS, is also implemented (see
