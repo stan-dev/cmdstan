@@ -1,3 +1,6 @@
+# mac os x hidden file
+.DS_Store
+
 # emacs backup files
 *~
 
@@ -31,6 +34,10 @@ make/local
 *.upa
 *.brf
 *.toc
+*.fdb_latexmk
+*.fls
+*.ilg
+*.ind
 
 # built manual
 src/docs/**/*.pdf

@@ -25,7 +25,7 @@ AR = ar
 # Library locations
 ##
 STANAPI_HOME ?= stan/
-EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
+EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.2
 BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
@@ -174,6 +174,7 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+include make/local    # for local variables
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
@@ -184,7 +185,7 @@ endif
 build: bin/stanc$(EXE) bin/print$(EXE)
 	@echo ''
 	@echo ''
-	@echo '--- Stan tools built ---'
+	@echo '--- CmdStan built ---'
 
 ##
 # Clean up.
@@ -226,4 +227,5 @@ stan-revert:
 ##
 # Manual related
 ##
+.PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
