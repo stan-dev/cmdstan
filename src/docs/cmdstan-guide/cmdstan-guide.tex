@@ -2,7 +2,8 @@
 
 \usepackage{../../../stan/src/docs/stan-reference/stan-manuals}
 
-\newcommand{\cmdstanversion}{2.4.0}
+\newcommand{\cmdstanversion}{2.5.0}
+\newcommand{\CmdStan}{CmdStan\xspace}
 
 \begin{document}
 
@@ -17,20 +18,26 @@
 \include{introduction}
 \include{getting-started}
 
-\part{Commands and Data Formats}
+\part{\CmdStan Tools}
+\include{tools}
+\include{stanc}
+\include{print}
+
+\part{\CmdStan Executables}
 \include{compiling}
 \include{running}
-\include{output-analysis}
-\include{dump-format}
 
 \appendix
 % following out of order to get TOC right (no idea why)
 \addcontentsline{toc}{part}{Appendices}
+
 \part*{Appendices}
 \include{licensing}
+\include{installation}
+\include{dump-format}
+
 % addtocontents out of order for same reason (no idea why)
 \addtocontents{toc}{\bigskip\mbox{ }\par}
-\include{installation}
 
 \phantomsection
 \include{references}

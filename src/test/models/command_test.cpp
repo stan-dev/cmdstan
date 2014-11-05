@@ -20,7 +20,7 @@ public:
   }
 
   void SetUp() {
-    model_path = "stan" + separator + "src" + separator + "models" + separator + "command";
+    model_path = "stan" + separator + "example-models" + separator + "command";
 
   }
   std::string model_path;

@@ -42,6 +42,7 @@ GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 ##
 # Set default compiler options.
 ## 
+<<<<<<< HEAD
 CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -L$(CMDSTAN_HOME)bin -lstan
@@ -59,6 +60,7 @@ PATH_SEPARATOR = /
 -include $(STANAPI_HOME)make/detect_cc
 
 
+
 # OS is set automatically by this script
 ##
 # These includes should update the following variables
@@ -68,7 +70,6 @@ PATH_SEPARATOR = /
 #   - EXE
 ##
 -include $(STANAPI_HOME)make/detect_os
-
 
 ##
 # Tell make the default way to compile a .o file.
@@ -88,6 +89,7 @@ PATH_SEPARATOR = /
 $(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+
 
 ### not needed if using VPATH
 ## Tell make the default way to compile a .o file.
@@ -180,16 +182,25 @@ endif
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
+<<<<<<< HEAD
 -include $(CMDSTAN_HOME)make/libstan  # libstan.a
 -include $(CMDSTAN_HOME)make/models   # models
 -include $(CMDSTAN_HOME)make/tests
 -include $(CMDSTAN_HOME)make/command  # bin/stanc, bin/print
+=======
+
+include make/local    # for local variables
+-include make/libstan  # libstan.a
+-include make/models   # models
+-include make/tests
+-include make/command  # bin/stanc, bin/print
+>>>>>>> 53fd941f19138cb0300a7fd4c2b11d0e47a79aad
 -include $(STANAPI_HOME)make/manual
 
 .PHONY: build
 build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 	@echo ''
-	@echo '--- Stan tools built ---'
+	@echo '--- CmdStan built ---'
 
 ##
 # Clean up.

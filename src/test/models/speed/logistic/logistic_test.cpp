@@ -68,8 +68,7 @@ public:
   static void SetUpTestCase() {
     std::vector<std::string> model_path;
     model_path.push_back("stan");
-    model_path.push_back("src");
-    model_path.push_back("models");
+    model_path.push_back("example-models");
     model_path.push_back("speed");
     model_path.push_back("logistic");
 
@@ -379,8 +378,7 @@ TEST_F(LogisticSpeedTest,Prerequisites) {
   }
 
   std::vector<std::string> test_file;
-  test_file.push_back("src");
-  test_file.push_back("models");
+  test_file.push_back("example-models");
   test_file.push_back("speed");
   test_file.push_back("empty.jags");
   command = "jags ";
