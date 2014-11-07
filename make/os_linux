@@ -6,6 +6,11 @@
 #   - EXE
 ##
 
+#### MM NOTE:  compare to stan/make/os_linux
+#### diff between is:  LDLIBS += -static (here)  LDFLAGS += -static (there)
+#### which is correct?  (implications for stan, not cmdstan???)
+#### LDFLAGS not used directly anywhere, AFAIK
+
 ifeq (g++,$(CC_TYPE))
   LDFLAGS += -lpthread
   CFLAGS_GTEST += -DGTEST_HAS_PTHREAD=0

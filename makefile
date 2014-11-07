@@ -166,7 +166,10 @@ build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 ##
 # Clean up.  Removes Stan compiler and libraries.
 ##
-.PHONY: clean
-clean: 
+.PHONY: clean clean-all
+
+clean: clean-all
+
+clean-all:
 	$(RM) -r $(CMDSTAN_HOME)bin
 
