@@ -173,3 +173,22 @@ clean: clean-all
 clean-all:
 	$(RM) -r $(CMDSTAN_HOME)bin
 
+##
+# Submodule related tasks
+##
+
+.PHONY: stan-update
+stan-update :
+	git submodule init
+	git submodule update --recursive
+
+stan-update/%: stan-update
+	cd $(STANAPI_HOME) && git fetch --all && git checkout $* && git pull
+
+stan-pr/%: stan-update
+	cd $(STANAPI_HOME) && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
+
+.PHONY: stan-revert
+stan-revert:
+	git submodule update --init --recursive
+
