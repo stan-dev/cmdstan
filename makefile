@@ -1,6 +1,4 @@
 # Makefile for CmdStan.
-# User-facing rules for binaries and Stan models.
-# Rules for developer tasks are in makefile.developer.
 ##
 
 # Default target.
@@ -36,6 +34,7 @@ C++11 = false
 ##
 EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
 BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
+GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
 ##
 # Set default compiler options.
@@ -150,11 +149,47 @@ endif
 	@echo '    3. Look at the samples:'
 	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
+	@echo ' For developer targets:'
+	@echo ' - help-dev'
 	@echo '--------------------------------------------------------------------------------'
+
+.PHONY: help-dev
+help-dev:
+	@echo '--------------------------------------------------------------------------------'
+	@echo 'CmdStan developer targets'
+	@echo '  Stan management targets:'
+	@echo '  - stan-update    : Initializes and updates the Stan repository'
+	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
+	@echo '                     branch or commit hash.'
+	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
+	@echo '                     what is in the repository.'
+	@echo '  Test targets:'
+	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
+	@echo '  - src/test/models   : Runs model tests in CmdStan'
+	@echo ''
+	@echo 'Model related:'
+	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '- bin/print$(EXE): Build the print utility.'
+	@echo '- bin/libstan.a  : Build the Stan static library (used in linking models).'
+	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
+	@echo '                   bin/stanc$(EXE))'
+	@echo ''
+	@echo 'Documentation:'
+	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
+	@echo '--------------------------------------------------------------------------------'
+
+
+
+
 -include $(CMDSTAN_HOME)make/local    # for local variables
 -include $(CMDSTAN_HOME)make/libstan  # libstan.a
 -include $(CMDSTAN_HOME)make/models   # models
 -include $(CMDSTAN_HOME)make/command  # bin/stanc, bin/print
+
+# developer tasks
+-include $(CMDSTAN_HOME)make/tests
+-include $(STANAPI_HOME)make/manual
+
 
 .PHONY: build
 build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
@@ -164,11 +199,18 @@ build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 ##
 # Clean up.  Removes Stan compiler and libraries.
 ##
-.PHONY: clean clean-all
+.PHONY: clean clean-manual clean-all
 
-clean: clean-all
+clean: clean-manual
+	$(RM) -r $(CMDSTAN_HOME)test
+	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
-clean-all:
+clean-manual:
+	cd $(CMDSTAN_HOME)src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+
+
+clean-all: clean
 	$(RM) -r $(CMDSTAN_HOME)bin
 
 ##
