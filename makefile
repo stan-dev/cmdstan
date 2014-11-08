@@ -10,11 +10,9 @@ help:
 .SUFFIXES:
 
 ##
-# create absolute filepaths, set search path for source files
-# includes current working directory last to compile user models
-# in order to use this makefile from elsewhere all paths in
-# compiler and shell commands must be absolute paths
-# (e.g. make -f ../.../path/to/this/makefile)
+# Create absolute filepaths, set search path for source files
+# so that this makefile can be referenced from elsewhere,
+# e.g., make -f ../.../path/to/this/makefile
 ##
 CMDSTAN_HOME := $(dir $(lastword $(abspath $(MAKEFILE_LIST))))
 STANAPI_HOME := $(CMDSTAN_HOME)stan/
@@ -66,7 +64,7 @@ PATH_SEPARATOR = /
 #   - CFLAGS
 #   - EXE
 ##
--include $(CMDSTAN_HOME)make/os_$(OS_TYPE)
+-include $(STANAPI_HOME)make/os_$(OS_TYPE)
 
 ##
 # Rules to compile .stan models
@@ -134,14 +132,14 @@ endif
 	@echo ' Build the Stan biniaries bin/stanc$(EXE) and bin/print$(EXE):'
 	@echo '  - build'
 	@echo ''
-	@echo ' Build a Stan model:'
-	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
+	@echo ' Build a Stan model from a .stan program file,'
+	@echo '  e.g., for program file foo/bar.stan, the make target is:'
 	@echo '  - foo/bar$(EXE)'
 	@echo ''
-	@echo '  make will:'
+	@echo '  This target requires several processing steps:'
 	@echo '  1. If necessary, build the Stan compiler: bin/stanc$(EXE)'
 	@echo '     Called only if no bin/stanc$(EXE) found.  See target "build"'
-	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp'
+	@echo '  2. Run the Stan compiler over foo/bar.stan to generate C++ code, foo/bar.cpp'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
 	@echo '  Example - Sample from a normal: example-models/basic_distributions/normal.stan'

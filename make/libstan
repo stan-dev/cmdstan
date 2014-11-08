@@ -1,4 +1,5 @@
-# create library file cmdstan/bin/libstan.a
+# creates library file cmdstan/bin/libstan.a
+# stan src files are in cmdstan/stan/src/stan
 
 LIBSTAN_OFILES = $(CMDSTAN_HOME)bin/stan/agrad/rev/var_stack.o
 
@@ -9,6 +10,7 @@ $(CMDSTAN_HOME)bin/libstan.a : $(LIBSTAN_OFILES)
 TEMPLATE_INSTANTIATION := $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -name '*_inst.cpp')
 TEMPLATE_INSTANTIATION += $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:%.cpp=$(CMDSTAN_HOME)bin/%.o)
+
 $(CMDSTAN_HOME)bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs $(CMDSTAN_HOME)bin/libstanc.a $(TEMPLATE_INSTANTIATION)
@@ -16,7 +18,6 @@ $(CMDSTAN_HOME)bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 $(TEMPLATE_INSTANTIATION) : $(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
 
 ##
 # Generate dependencies for libraries
