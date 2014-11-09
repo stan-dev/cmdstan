@@ -40,6 +40,7 @@ GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 # Set default compiler options.
 ## 
 CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = -L$(CMDSTAN_HOME)bin -lstan
 LDLIBS_STANC = -L$(CMDSTAN_HOME)bin -lstanc
 EXE = 
@@ -119,6 +120,7 @@ help:
 	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - EXE (suffix for executable): ' $(EXE)
 ifdef TEMPLATE_DEPTH
 	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
 endif
@@ -156,14 +158,14 @@ endif
 .PHONY: help-dev
 help-dev:
 	@echo '--------------------------------------------------------------------------------'
-	@echo 'CmdStan developer targets'
+	@echo 'CmdStan developer targets - must be in CmdStan home directory to run these.'
 	@echo '  Stan management targets:'
 	@echo '  - stan-update    : Initializes and updates the Stan repository'
 	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
 	@echo '                     branch or commit hash.'
 	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
 	@echo '                     what is in the repository.'
-	@echo '  Test targets:'
+	@echo '  Test targets: run these via script runCmdStan.py'
 	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
 	@echo '  - src/test/models   : Runs model tests in CmdStan'
 	@echo ''
@@ -178,9 +180,7 @@ help-dev:
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
-
-
-
+# common tasks
 -include $(CMDSTAN_HOME)make/local    # for local variables
 -include $(CMDSTAN_HOME)make/libstan  # libstan.a
 -include $(CMDSTAN_HOME)make/models   # models
@@ -189,7 +189,6 @@ help-dev:
 # developer tasks
 -include $(CMDSTAN_HOME)make/tests
 -include $(STANAPI_HOME)make/manual
-
 
 .PHONY: build
 build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
@@ -213,6 +212,14 @@ clean-manual:
 clean-all: clean
 	$(RM) -r $(CMDSTAN_HOME)bin
 
+
+##
+# CmdStan manual.
+##
+.PHONY: $(CMDSTAN_HOME)src/docs/cmdstan-guide/cmdstan-guide.tex
+manual: $(CMDSTAN_HOME)src/docs/cmdstan-guide/cmdstan-guide.pdf
+
+
 ##
 # Submodule related tasks
 ##
@@ -231,4 +238,7 @@ stan-pr/%: stan-update
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init --recursive
+
+
+
 
