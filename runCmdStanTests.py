@@ -61,6 +61,13 @@ def makeTest(name, j):
         command = 'make -j%d %s' % (j,target)
     doCommand(command)
 
+def makeBuild(j):
+    if (j == None):
+        command = 'make build'
+    else:
+        command = 'make -j%d build' % j
+    doCommand(command)
+
 
 def makeTestModel(target, j):
     if (j == None):
@@ -124,7 +131,11 @@ def main():
             except ValueError:
                 stopErr("bad value for -j flag",-1)
 
-#    # pass 0:  make src/test/test-models/*.stan
+
+    # pass 0:  make build
+    makeBuild(j)
+
+# make tests??    
 #    files = [f for f in os.listdir('src/test/test-models')]
 #    for name in files:
 #        if (name.endswith('.stan')):
