@@ -167,7 +167,6 @@ help-dev:
 	@echo '                     what is in the repository.'
 	@echo '  Test targets: run these via script runCmdStan.py'
 	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
-	@echo '  - src/test/models   : Runs model tests in CmdStan'
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
@@ -238,7 +237,5 @@ stan-pr/%: stan-update
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init --recursive
-
-
 
 
