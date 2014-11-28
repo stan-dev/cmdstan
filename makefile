@@ -228,3 +228,4 @@ stan-revert:
 ##
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
+
