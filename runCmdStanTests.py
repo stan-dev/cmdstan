@@ -36,6 +36,8 @@ def isWin():
 
 # set up good makefile target name    
 def mungeName(name):
+    if (debug):
+        print("munge input: %s" % name)
     if (name.startswith("src")):
         name = name.replace("src/","",1)
     if (name.endswith(testsfx)):
@@ -43,7 +45,12 @@ def mungeName(name):
         if (isWin()):
             name += winsfx
             name = name.replace("\\","/")
+
+    name = name.replace(" ", "\\ ").replace("(","\\(").replace(")","\\)")
+    if (debug):
+        print("munge return: %s" % name)
     return name
+
 
 def doCommand(command):
     print("------------------------------------------------------------")
@@ -135,19 +142,11 @@ def main():
     # pass 0:  make build
     makeBuild(j)
 
-# make tests??    
-#    files = [f for f in os.listdir('src/test/test-models')]
-#    for name in files:
-#        if (name.endswith('.stan')):
-#            name = name.replace('.stan','')
-#            name = 'src/test/test-models/%s' % name
-#            if (debug):
-#                print("test-model: %s" % name)
-#            makeTestModel(name,j)
-            
     # pass 1:  call make to compile test targets
     for i in range(argsIdx,len(sys.argv)):
         testname = sys.argv[i]
+        if (debug):
+            print("testname: %s" % testname)
         if (not(os.path.exists(testname))):
             stopErr('%s: no such file or directory' % testname,-1)
         if (not(os.path.isdir(testname))):
