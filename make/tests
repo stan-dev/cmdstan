@@ -20,7 +20,7 @@ path_separator :
 ##
 PERCENT = %
 
-TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f) $(shell find stan/example-models -name '*.stan' -type f)
+TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f)
 
 ##
 # Target to verify header files are coherent
@@ -67,7 +67,7 @@ ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
 ALL_TEST_EXECUTABLES = $(patsubst src/%.cpp,%$(EXE),$(ALL_TESTS))
 
 .PRECIOUS: test/%.o
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
@@ -111,11 +111,6 @@ $(TEST_TARGETS):
 	@echo 'requirements. Please install make 3.81 or higher.           '
 	@echo '------------------------------------------------------------'
 endif
-
-##
-# Model tests. Adding built model as a depedency.
-##
-$(patsubst src/%_test.cpp,%_test.o,$(filter src/test/models/%,$(ALL_TESTS))) : test/%_test.o : stan/src/%$(EXE)
 
 
 ##
