@@ -20,7 +20,7 @@ test/gtest.o: $(GTEST)/src/gtest-all.cc
 ##
 # Rule for building a test
 ##
-test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
+test/%.o : src/test/%_test.cpp $(LIBGTEST)
 	@echo '-*- compile $@'
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
@@ -28,7 +28,7 @@ test/%.o : src/test/%_test.cpp $(LIBGTEST) bin/libstan.a
 ##
 # Rule for building a test executable
 ##
-test/%$(EXE) : test/%.o bin/libstan.a
+test/%$(EXE) : test/%.o
 	@echo '-*- link $@'
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS)
@@ -41,7 +41,7 @@ test/%$(EXE) : test/%.o bin/libstan.a
 ##
 # Target to verify cmdstan header files
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/cmdstan -name '*.hpp' -type f)) 
+HEADER_TESTS := $(addsuffix -test,$(shell find $(CMDSTAN_HOME)src/cmdstan -name '*.hpp' -type f)) 
 
 ifeq ($(OS_TYPE),win) 
   DEV_NULL = nul

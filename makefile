@@ -41,7 +41,7 @@ GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 ## 
 CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = -L$(CMDSTAN_HOME)bin -lstan
+LDLIBS = 
 LDLIBS_STANC = -L$(CMDSTAN_HOME)bin -lstanc
 EXE = 
 PATH_SEPARATOR = /
@@ -72,7 +72,7 @@ PATH_SEPARATOR = /
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.cpp %.stan $(CMDSTAN_HOME)bin/libstan.a 
+%$(EXE) : %.cpp %.stan
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
@@ -171,7 +171,6 @@ help-dev:
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
 	@echo '- bin/print$(EXE): Build the print utility.'
-	@echo '- bin/libstan.a  : Build the Stan static library (used in linking models).'
 	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                   bin/stanc$(EXE))'
 	@echo ''
@@ -181,7 +180,7 @@ help-dev:
 
 # common tasks
 -include $(CMDSTAN_HOME)make/local    # for local variables
--include $(CMDSTAN_HOME)make/libstan  # libstan.a
+-include $(CMDSTAN_HOME)make/libstan  # libstanc.a
 -include $(CMDSTAN_HOME)make/models   # models
 -include $(CMDSTAN_HOME)make/command  # bin/stanc, bin/print
 

@@ -1,5 +1,5 @@
 .PRECIOUS: $(CMDSTAN_HOME)bin/print$(EXE)
-$(CMDSTAN_HOME)bin/print$(EXE) : $(CMDSTAN_HOME)bin/cmdstan/print.o $(CMDSTAN_HOME)bin/libstan.a
+$(CMDSTAN_HOME)bin/print$(EXE) : $(CMDSTAN_HOME)bin/cmdstan/print.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
 

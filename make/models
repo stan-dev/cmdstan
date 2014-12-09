@@ -5,7 +5,7 @@ MODEL_HEADER := $(STANAPI_HOME)src/stan/model/model_header.hpp
 CMDSTAN_MAIN := $(CMDSTAN_HOME)src/cmdstan/main.cpp
 
 .PRECIOUS: %.cpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.cpp $(CMDSTAN_HOME)bin/libstan.a %.stan
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.cpp %.stan
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
