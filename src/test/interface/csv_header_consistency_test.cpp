@@ -3,7 +3,7 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 
-TEST(gm,csv_header_consistency) {
+TEST(interface,csv_header_consistency) {
   // from stan-dev/stan issue #109
   std::vector<std::string> model_path;
   model_path.push_back("src");

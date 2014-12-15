@@ -1,5 +1,5 @@
-TEMPLATE_INSTANTIATION := $(shell find stan/src/stan/gm -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell find stan/src/stan/gm -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(shell find stan/src/stan/lang -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find stan/src/stan/lang -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:stan/src/%.cpp=bin/%.o)
 bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)

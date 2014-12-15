@@ -2,7 +2,7 @@
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 
-TEST(gm,print_uninitialized) {
+TEST(interface,print_uninitialized) {
   // This was stan-dev/stan issue #91
   std::vector<std::string> model_path;
   model_path.push_back("src");
