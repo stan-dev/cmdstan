@@ -69,11 +69,10 @@ PATH_SEPARATOR = /
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.cpp %.stan 
+%$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
-
 
 ##
 # Tell make the default way to compile a .o file.
@@ -139,7 +138,7 @@ endif
 	@echo ''
 	@echo '  This target will:'
 	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
-	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.cpp.'
+	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
 	@echo '  Example - Sample from a normal: stan/example-models/basic_distributions/normal.stan'
@@ -192,7 +191,7 @@ build: bin/stanc$(EXE) bin/print$(EXE)
 
 clean: clean-manual
 	$(RM) -r test
-	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-manual:
