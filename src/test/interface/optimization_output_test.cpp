@@ -2,6 +2,10 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
