@@ -2,6 +2,10 @@
 #include <stan/gm/error_codes.hpp>
 #include <test/utility.hpp>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 TEST(gm,print_uninitialized) {
   // This was stan-dev/stan issue #91
   std::vector<std::string> model_path;

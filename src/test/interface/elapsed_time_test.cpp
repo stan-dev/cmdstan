@@ -3,6 +3,11 @@
 #include <fstream>
 #include <streambuf>
 
+using cmdstan::test::count_matches;
+using cmdstan::test::get_path_separator;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 TEST(CommandElapsedTime, PrintToScreen) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
