@@ -1565,10 +1565,40 @@ interdependence.
 %
 \CmdStan supports several optimizers.  These share many of their
 configuration options with the samplers.  The default optimizer is the
-Broyden-Fletcher-Goldfarb-Shanno (BFGS) method and a limited-memory
-version of this algorithm, L-BFGS, is also implemented (see
-\citep{NocedalWright:2006} for more information on BFGS and L-BFGS).
-The command skeleton for BFGS is in \reffigure{bfgs-command}.
+the limited memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) method;
+\cite{NocedalWright:2006} contains an excellent overview of both the
+BFGS and L-BFGS algorithms.  The command skeleton for L-BFGS is in
+\reffigure{l-bfgs-command} and the one for BFGS is in
+\reffigure{bfgs-command}.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model optimize                                   \
+                 algorithm=lbfgs                         \
+                     [init_alpha=<double>]              \
+                     [tol_obj=<double>]                 \
+                     [tol_rel_obj=<double>]             \
+                     [tol_grad=<double>]                \
+                     [tol_rel_grad=<double>]            \
+                     [tol_param=<double>]               \
+                     [history_size=<int>]               \
+                 [iter=<int>]                           \
+                 [save_iterations=<boolean>]            \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [diagnostic_file=<string>]            \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the L-BFGS optimizer.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}
+\label{l-bfgs-command.figure}
+\end{figure}
 %
 \begin{figure}
 \begin{quote}
