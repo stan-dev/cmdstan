@@ -13,6 +13,11 @@
 #include <vector>
 #include <sstream>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::multiple_command_separator;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 void clean_line(std::string& line) {
   line.erase(0, 1);
   if (line.find("(Default)") != std::string::npos)

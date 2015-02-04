@@ -3,6 +3,10 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 TEST(gm,csv_header_consistency) {
   // from stan-dev/stan issue #109
   std::vector<std::string> model_path;

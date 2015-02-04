@@ -2,6 +2,11 @@
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
 
+using cmdstan::test::count_matches;
+using cmdstan::test::get_path_separator;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 TEST(CommandPrint, next_index_1d) {
   std::vector<int> dims(1);
   std::vector<int> index(1,1);

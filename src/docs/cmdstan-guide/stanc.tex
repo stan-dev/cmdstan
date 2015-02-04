@@ -39,7 +39,7 @@ For Linux and Mac:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
-> bin/stanc --name=bernoulli --o=bernoulli.cpp \
+> bin/stanc --name=bernoulli --o=bernoulli.hpp \
   stan/example-models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
@@ -51,7 +51,7 @@ For Windows:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
-> bin\stanc.exe --name=bernoulli --o=bernoulli.cpp ^
+> bin\stanc.exe --name=bernoulli --o=bernoulli.hpp ^
     stan/example-models/basic_estimators/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
@@ -67,7 +67,7 @@ contain only alphanumeric characters (\code{a--z}, \code{A--Z}, and
 any \Cpp reserved keyword.  
 
 The \Cpp code implementing the class is written to the file
-\code{bernoulli.cpp} in the current directory.  The final argument,
+\code{bernoulli.hpp} in the current directory.  The final argument,
 \code{bernoulli.stan}, is the file from which to read the \Stan
 program.
 
@@ -105,7 +105,7 @@ Default: {\tt {\slshape class\_name = model\_file}\_model}
 \mbox{ } \\ 
 Specify the name of the file into which the generated \Cpp is written.
 \\[2pt]
-Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.cpp}
+Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.hpp}
 %
 \end{description}
 

@@ -1,10 +1,12 @@
 #include <stan/mcmc/chains.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/io/stan_csv_reader.hpp>
-
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
 
 void test_constant(const Eigen::VectorXd& samples) {
   for (int i = 1; i < samples.size(); i++)
