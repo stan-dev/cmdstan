@@ -12,8 +12,11 @@
 \frontmatter
 \include{title}
 \tableofcontents
+\newcounter{savepage}
+\setcounter{savepage}{\arabic{page} + 2}
 
 \mainmatter
+\setcounter{page}{\thesavepage}
 \part{Introduction}
 \include{introduction}
 \include{getting-started}
