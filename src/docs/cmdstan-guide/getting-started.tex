@@ -43,8 +43,9 @@ the same way across all supported platforms.
     %
   \item Use make to build \CmdStan. If multiple CPU cores are
     available, the call to make can be parallelized with the
-    \code{-j2} option, where \code{2} is the number of CPU cores. The
-    parallel option (\code{-j2}) can be safely omitted.
+    \code{-j{\slshape N}} option, where \code{{\slshape N}} is the number of CPU cores. The
+    parallel option (\code{-j{\slshape N}}) can be safely omitted.
+  For instance, to run on 2 cores, use
     %
     \begin{quote}
       \begin{Verbatim}[fontshape=sl]
@@ -54,7 +55,8 @@ the same way across all supported platforms.
     %
     \emph{Warning:} \ The \code{make} program may take 10+ minutes and
     consume 2+ GB of memory to build \CmdStan.  Compiler warnings,
-    such as \code{uname:~not found}, may be safely ignored.
+    such as \code{uname:~not found} or \code{warning: unused
+      variable}, may be safely ignored.
 
 \end{enumerate}
 %
@@ -87,13 +89,14 @@ simple Bayesian model.
 
 \subsection{A Simple Bernoulli Model}
 
-The following simple model is distributed with \CmdStan and is located at
+The following is a simplet, complete Stan program for a Bernoulli
+model of binary data.%
 %
-\begin{quote}
-\href{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.stan}{\nolinkurl{stan/example-models/basic_estimators/bernoulli.stan}}
-\end{quote}
-%
-The file contains the following \Stan program.
+\footnote{The model is distributed with Stan's example models
+  repository,
+  \url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.stan},
+  and is also available with the CmdStan distribution at the path
+  \nolinkurl{examples/bernoulli/bernoulli.stan}.  }
 %
 \begin{quote}
 \begin{Verbatim}
@@ -118,13 +121,15 @@ prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
 
 \subsection{Data Set}
 
-A data set of $\mbox{\code{N}}=10$ observations is available in the file
+A data set of $\mbox{\code{N}}=10$ observations is coded as follows.
 %
-\begin{quote}
-\href{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.data.R}{\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}}
-\end{quote}
-%
-The content of the file is as follows.
+\footnote{
+The data is also available from the \code{example-models} repository
+on GitHub,
+\url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.data.R}.
+It is also included with the CmdStan distribution and can be found at path
+\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}.
+}
 %
 \begin{quote}
 \begin{Verbatim}
@@ -294,11 +299,11 @@ sampled.
 lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,theta
 \end{Verbatim}
 %
-The first column reports the unnormalized log probability of the model.  The next
-columns provide sampler-dependent information; here, it is columns two
-through five. For basic Hamiltonian Monte Carlo (HMC) and its adaptive
-variant No-U-Turn sampler (NUTS), the sampler-depedent parameters are
-described in the following table.
+The first column reports the unnormalized log probability of the
+model.  The next columns provide sampler-dependent information; here,
+it is columns two through five. For basic Hamiltonian Monte Carlo
+(HMC) and its adaptive variant, the No-U-Turn sampler (NUTS), the
+sampler-depedent parameters are described in the following table.
 %
 \begin{center}
 \begin{tabular}{l|l|l}
@@ -463,7 +468,7 @@ details.
 \end{Verbatim}
 \end{quote}
 %
-which prints out
+Executing this command prints the following.
 %
 \begin{Verbatim}[fontsize=\footnotesize]
  method = optimize
@@ -491,8 +496,8 @@ which prints out
    refresh = 100 (Default)
 
 initial log joint probability = -5.18908
-  Iter      log prob        ||dx||      ||grad||       alpha      alpha0  # evals  Notes 
-     4      -5.00402    0.00400907   7.80306e-05           1           1        7   
+  Iter     log prob        ||dx||      ||grad||    alpha   alpha0  # evals  Notes 
+     4     -5.00402    0.00400907   7.80306e-05        1        1        7   
 Optimization terminated normally: 
   Convergence detected: relative gradient magnitude is below tolerance
 \end{Verbatim}

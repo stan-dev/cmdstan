@@ -6,6 +6,12 @@
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
+using cmdstan::test::multiple_command_separator;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
+
 TEST(StanUiCommand, countMatches) {
   EXPECT_EQ(-1, count_matches("", ""));
   EXPECT_EQ(-1, count_matches("", "abc"));
