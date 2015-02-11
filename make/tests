@@ -122,5 +122,5 @@ test/interface/fixed_param_sampler_test.o: $(addsuffix $(EXE),$(addprefix src/te
 test/interface/optimization_output_test.o: src/test/test-models/optimization_output$(EXE)
 test/interface/print_test.o: src/test/interface/matrix_output.csv bin/print$(EXE)
 test/interface/print_uninitialized_test.o: src/test/test-models/print_uninitialized$(EXE)
-test/interface/gm/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
+test/interface/services/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
 test/interface/elapsed_time_test.o: src/test/test-models/test_model$(EXE)

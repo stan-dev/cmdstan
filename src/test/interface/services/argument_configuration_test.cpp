@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/gm/error_codes.hpp>
-#include <stan/gm/arguments/argument_probe.hpp>
-#include <stan/gm/arguments/arg_method.hpp>
-#include <stan/gm/arguments/arg_id.hpp>
-#include <stan/gm/arguments/arg_data.hpp>
-#include <stan/gm/arguments/arg_init.hpp>
-#include <stan/gm/arguments/arg_random.hpp>
-#include <stan/gm/arguments/arg_output.hpp>
+#include <stan/services/error_codes.hpp>
+#include <stan/services/arguments/argument_probe.hpp>
+#include <stan/services/arguments/arg_method.hpp>
+#include <stan/services/arguments/arg_id.hpp>
+#include <stan/services/arguments/arg_data.hpp>
+#include <stan/services/arguments/arg_init.hpp>
+#include <stan/services/arguments/arg_random.hpp>
+#include <stan/services/arguments/arg_output.hpp>
 
 #include <test/utility.hpp>
 
@@ -65,10 +65,10 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_method());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_method());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -133,10 +133,10 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
         expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
         n_output = 2;
         
-        EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+        EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
       
@@ -168,7 +168,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::gm::arg_method method;
+  stan::services::arg_method method;
   method.print(&method_output, 0, "");
   
   std::string l0;
@@ -189,10 +189,10 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   method_output.seekg(std::ios_base::beg);
 
   std::stringstream s;
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_id());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_id());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -249,7 +249,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
         n_output = 2;
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
     
@@ -284,10 +284,10 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_id());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_id());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -379,7 +379,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::gm::arg_method method;
+  stan::services::arg_method method;
   method.print(&method_output, 0, "");
   
   std::string l0;
@@ -400,10 +400,10 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_data());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_data());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -460,7 +460,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
         n_output = 2;
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
       
@@ -495,10 +495,10 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_data());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_data());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -589,7 +589,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::gm::arg_method method;
+  stan::services::arg_method method;
   method.print(&method_output, 0, "");
   
   std::string l0;
@@ -610,10 +610,10 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_init());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_init());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   // Check argument consistency
   bool expected_success = false;
@@ -670,7 +670,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
         n_output = 2;
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
       
@@ -701,10 +701,10 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_init());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_init());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -792,7 +792,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::gm::arg_method method;
+  stan::services::arg_method method;
   method.print(&method_output, 0, "");
   
   std::string l0;
@@ -813,10 +813,10 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_random());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_random());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -873,7 +873,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
         n_output = 2;
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
       
@@ -904,10 +904,10 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_random());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_random());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -999,7 +999,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::gm::arg_method method;
+  stan::services::arg_method method;
   method.print(&method_output, 0, "");
   
   std::string l0;
@@ -1020,10 +1020,10 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_output());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_output());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
@@ -1080,7 +1080,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
         n_output = 2;
         
       } else {
-        EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code) 
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
           << "command: " << out.command;
       }
       
@@ -1115,10 +1115,10 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   // Prepare arguments
   std::stringstream s;
   
-  std::vector<stan::gm::argument*> valid_arguments;
-  valid_arguments.push_back(new stan::gm::arg_output());
+  std::vector<stan::services::argument*> valid_arguments;
+  valid_arguments.push_back(new stan::services::arg_output());
   
-  stan::gm::argument_probe probe(valid_arguments);
+  stan::services::argument_probe probe(valid_arguments);
   probe.probe_args(s);
   
   // Check argument consistency
