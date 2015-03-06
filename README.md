@@ -31,3 +31,7 @@ The core Stan C++ code and CmdStan are licensed under new BSD.
 1. Download the latest release tarball (use the "green" link) from: [CmdStan releases](https://github.com/stan-dev/cmdstan/releases)
 2. Unpack the tarball.
 3. From the folder, type `make` for a quick tutorial on how to build models.
+
+## Installation using git
+See [Getting Started with
+CmdStan](https://github.com/stan-dev/cmdstan/wiki/Getting-Started-with-CmdStan) for instructions how to clone both CmdStan and Stan submodule.
