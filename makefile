@@ -132,6 +132,17 @@ endif
 	@echo '  - BOOST                    ' $(BOOST)
 	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
+	@echo 'Build CmdStan utilities:'
+	@echo '  - build'
+	@echo ''
+	@echo '  This target will:'
+	@echo '  1. Build the Stan Compiler bin/stanc$(EXE).'
+	@echo '  2. Build the print utility bin/print$(EXE)'
+	@echo ''
+	@echo '  Before building CmdStan utilities the first time you need'
+	@echo '  to initialize the Stan repository with:'
+	@echo '     make stan-update'
+	@echo ''
 	@echo 'Build a Stan model:'
 	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
 	@echo '  - foo/bar$(EXE)'
