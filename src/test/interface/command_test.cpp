@@ -124,7 +124,7 @@ TEST(StanUiCommand, refresh_nonzero_ok) {
 
 TEST(StanUiCommand, zero_init_value_fail) {
   std::string expected_message
-    = "Rejecting initialization at zero because of vanishing density.\n";
+    = "Rejecting proposed initial value using method zero because of vanishing density.\n";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -145,7 +145,7 @@ TEST(StanUiCommand, zero_init_value_fail) {
 
 TEST(StanUiCommand, zero_init_domain_fail) {
   std::string expected_message
-    = "Rejecting initialization at zero because of gradient failure.\n";
+    = "Rejecting proposed initial value using method zero because of gradient failure.\n";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -167,7 +167,7 @@ TEST(StanUiCommand, zero_init_domain_fail) {
 
 TEST(StanUiCommand, user_init_value_fail) {
   std::string expected_message
-    = "Rejecting user-specified initialization because of vanishing density.\n";
+    = "Rejecting proposed initial value using method user specified because of vanishing density.\n";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -197,7 +197,7 @@ TEST(StanUiCommand, user_init_value_fail) {
 
 TEST(StanUiCommand, user_init_domain_fail) {
   std::string expected_message
-    = "Rejecting user-specified initialization because of gradient failure.\n";
+    = "Rejecting proposed initial value using method user specified because of gradient failure.\n";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
