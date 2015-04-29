@@ -1,6 +1,6 @@
 \chapter{Running a \CmdStan Program}\label{stan-cmd.chapter}
 
-\noindent 
+\noindent
 Once a \CmdStan program is compiled, it can be run in many different
 ways.  It can be used to sample or optimize parameters, or to diagnose
 a model.  Before diving into the detailed configurations, the first
@@ -51,9 +51,9 @@ system time.
 
 \subsection{Sampling in Parallel}
 
-The previous example executes one chain, which can be repeated to 
+The previous example executes one chain, which can be repeated to
 generate multiple chains. However, users may want to execute chains
-in parallel on a multicore machine. 
+in parallel on a multicore machine.
 
 \subsubsection{Mac OS and Linux}
 
@@ -78,7 +78,7 @@ The terminal standard output will be interleaved for all chains
 running concurrently.  To suppress all terminal output, direct the
 standard output to the ``null'' device.  This is achieved by
 postfixing \code{> /dev/null} to a command, which in the above case,
-means changing the second-to-last line to 
+means changing the second-to-last line to
 \begin{quote}
 \begin{Verbatim}
        output file=samples$i.csv > /dev/null &  \
@@ -96,7 +96,7 @@ snippet above
 \begin{Verbatim}[fontshape=sl]
 > for /l %x in (1, 1, 4) do start /b model  sample   ^
    random seed=12345 id=%x data file=my_data         ^
-   output file=samples%x.csv 
+   output file=samples%x.csv
 \end{Verbatim}
 \end{quote}
 %
@@ -119,7 +119,7 @@ file.  The command is the same on Windows, Mac OS and Linux.
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > grep lp__ samples1.csv > combined.csv
-> sed '/^[#l]/d' samples*.csv >> combined.csv 
+> sed '/^[#l]/d' samples*.csv >> combined.csv
 \end{Verbatim}
 \end{quote}
 
@@ -145,7 +145,7 @@ find the global mode as opposed to a local optimum of log probability.
 For optimization, the mode is calculated without the Jacobian
 adjustment for constrained variables, which shifts the mode due to the
 change of variables.  Thus modes correspond to modes of the model as
-written.  
+written.
 
 \subsubsection{Windows}
 %
@@ -164,6 +164,35 @@ written.
 \end{quote}
 
 
+\subsection{Variational Inference}
+
+\CmdStan can fit a variational approximation to the posterior. The approximation
+is a Gaussian in the unconstrained variable space. \Stan implements two
+variational algorithms. The \code{algorithm=meanfield} option uses a fully
+factorized Gaussian for the approximation. The \code{algorithm=fullrank} option
+uses a Gaussian with a full-rank covariance matrix for the approximation.
+
+\subsubsection{Mac OS and Linux}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model variational algorithm=meanfield            \
+             data file=my_data
+> ./my_model variational algorithm=fullrank             \
+             data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model variational algorithm=meanfield              \
+           data file=my_data
+> my_model variational algorithm=fullrank               \
+           data file=my_data
+\end{Verbatim}
+\end{quote}
 
 \section{Diagnostics}\label{diagnostics.section}
 
@@ -198,7 +227,7 @@ platforms, use one of the following.
 and customize not only the calculation method but also the data, output,
 initialization, and random number generation.  The arguments are defined
 hierarchically so that, for example, optimization settings are not necessary
-when sampling.  
+when sampling.
 
 The atomic elements of the hierarchy (i.e., those without
 corresponding values) are \textit{categorical arguments} (sometimes
@@ -232,11 +261,11 @@ each command on one line with single spaces separating the elements.
 
 > ./model sample random seed=1                          \
                  output file=samples.csv                \
-                        diagnostic_file=diagnostics.csv 
+                        diagnostic_file=diagnostics.csv
 
 > ./model sample random seed=1                          \
                  output diagnostic_file=diagnostics.csv \
-                        file=samples.csv 
+                        file=samples.csv
 \end{Verbatim}
 \end{quote}
 %
@@ -248,16 +277,16 @@ exhaust all valid combinations.
 
 Categorical arguments may appear is isolation, for example when
 introducing \code{sample} or \code{random}, or they may appear as
-the values for other arguments, such as \code{hmc} which not only 
+the values for other arguments, such as \code{hmc} which not only
 introduces a category of HMC related arguments but also defines the
-value of the argument \code{algorithm}.  A visual diagram of the available 
-categorical arguments is shown in \reffigure{hierarchy}, with the mutual 
-exclusivity of these arguments as values shown in \reffigure{configuration}.  
+value of the argument \code{algorithm}.  A visual diagram of the available
+categorical arguments is shown in \reffigure{hierarchy}, with the mutual
+exclusivity of these arguments as values shown in \reffigure{configuration}.
 Specifying conflicting arguments
 causes the execution to immediately terminate.
 
 \begin{figure}
-\setlength{\unitlength}{0.01in} 
+\setlength{\unitlength}{0.01in}
 \centering
 \begin{picture}(480, 480)
 \small\tt
@@ -317,7 +346,7 @@ causes the execution to immediately terminate.
 \end{figure}
 
 \begin{figure}
-\setlength{\unitlength}{0.01in} 
+\setlength{\unitlength}{0.01in}
 %\centering
 \begin{picture}(480, 480)
 %
@@ -392,6 +421,8 @@ the following methods:
 \\
 {\tt optimize} &  find posterior mode using optimization
 \\
+{\tt variational} &  fit variational approximation
+\\
 {\tt diagnose} &  diagnose models
 \end{tabular}
 \end{center}
@@ -436,8 +467,8 @@ from it, can accessed by specifying \code{help-all} instead,
 
 \section{Full Argument Hierarchy}\label{detailed-command-arguments.section}
 
-Here we present the full argument hierarchy, along with relevant details.  
-Some typical use-case examples are provided in the next section. 
+Here we present the full argument hierarchy, along with relevant details.
+Some typical use-case examples are provided in the next section.
 
 \subsection{Typographical Conventions}
 
@@ -465,7 +496,7 @@ Categorical arguments that appear as values to other arguments; displays all val
 
 Every command must have exactly one method specified as the very first
 argument.  The value type of \code{list element} means that the valid
-values are enumerated as a list. 
+values are enumerated as a list.
 
 \begin{description}
 \hiercmdarg{}{method}{$$list element$$}
@@ -484,8 +515,8 @@ may appear in any order.
 \begin{description}
   \hierlongcmd{\indentarrow}{\farg{\bfseries sample}}
     {Bayesian inference with Markov Chain Monte Carlo}
-    {Valid subarguments: 
-      \code{num\_samples, num\_warmup, save\_warmup, 
+    {Valid subarguments:
+      \code{num\_samples, num\_warmup, save\_warmup,
         \\ \hspace*{24pt} thin, adapt, algorithm}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{num\_samples}{$$int$$}
@@ -513,7 +544,7 @@ may appear in any order.
 \subsubsection{Sampling Adaptation-Specific Parameters}
 
 \begin{figure}
-\setlength{\unitlength}{0.005in} 
+\setlength{\unitlength}{0.005in}
 \centering
 \begin{picture}(1000, 200)
 %
@@ -530,7 +561,7 @@ may appear in any order.
 %
 \end{picture}
 \caption{\small\it Adaptation during warmup occurs in three stages: an initial
-fast adaptation interval (I), a series of expanding slow adaptation intervals (II), 
+fast adaptation interval (I), a series of expanding slow adaptation intervals (II),
 and a final fast adaptation interval (III).  For HMC, both the fast and slow intervals
 are used for adapting the step size, while the slow intervals are used for learning
 the (co)variance necessitated by the metric.  Iteration numbering
@@ -543,10 +574,10 @@ stages (Figure \ref{adaptation.figure}), with two \textit{fast} intervals
 surrounding a series of growing \textit{slow} intervals.  Here fast
 and slow refer to parameters that adapt using local and global
 information, respectively; the Hamiltonian Monte Carlo samplers,
-for example, define the step size as a fast parameter and 
+for example, define the step size as a fast parameter and
 the (co)variance as a slow parameter.  The size of the the initial
 and final fast intervals and the initial size of the slow interval
-are all customizable, although user-specified values may be modified 
+are all customizable, although user-specified values may be modified
 slightly in order to ensure alignment with the warmup period.
 
 The motivation behind this partitioning of the warmup period is to
@@ -562,7 +593,7 @@ with only parameters that can learn from local information adapted.
 After this initial stage parameters that require global information,
 for example (co)variances, are estimated in a series of expanding,
 memoryless windows; often fast parameters will be adapted here
-as well.  Lastly the fast parameters are allowed to adapt to the final 
+as well.  Lastly the fast parameters are allowed to adapt to the final
 update of the slow parameters.
 
 Currently all \Stan sampling algorithms utilize dual averaging to
@@ -576,13 +607,13 @@ parameters, and we do not recommend changing the defaults without
 experience with the dual averaging algorithm.  For more information,
 see the discussion of dual averaging in \citep{Hoffman-Gelman:2011,
  Hoffman-Gelman:2014}.
-  
+
 Variances or covariances are estimated using Welford accumulators
 to avoid a loss of precision over many floating point operations.
 
 The following subarguments are introduced by the categorical argument
 \code{adapt}.  Each subargument must contiguously follow \code{adapt},
-though they may appear in any order.  
+though they may appear in any order.
 
 \begin{description}
     \hierlongcmd{\indentarrow\indentarrow}{\bfseries adapt}
@@ -644,7 +675,7 @@ their blockages; see also the \code{stepsize\_jitter} argument.
 The following batch of arguments are used to control the sampler used
 for sampling.  The top-level specification is for engine, the only
 valid value of which is \code{hmc} (this will change in the future as
-we add new samplers).  
+we add new samplers).
 
 \begin{description}
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
@@ -671,7 +702,7 @@ different specifications of the latter as \textit{engines}.
 In the \code{static\_hmc} implementation the total integration time
 must be specified by the user, where as the \code{nuts}
 implementation uses the No-U-Turn Sampler to determine
-an optimal integration time dynamically. 
+an optimal integration time dynamically.
 %
 \begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{engine}{$$list element$$}
@@ -708,11 +739,11 @@ NUTS generates a proposal by evolving the initial system both forwards
 and backwards in time to form a balanced binary tree.  At each iteration
 of the NUTS algorithm the tree depth is increased by one, doubling
 the number of leapfrog steps and effectively doubles the computation
-time.  The algorithm terminates in one of two ways: either the NUTS 
+time.  The algorithm terminates in one of two ways: either the NUTS
 criterion is satisfied for a new subtree or the completed tree, or the
-depth of the completed tree hits \code{max\_depth}.  
+depth of the completed tree hits \code{max\_depth}.
 
-Both the tree depth and the actual number of leapfrog steps computed are 
+Both the tree depth and the actual number of leapfrog steps computed are
 reported along with the parameters in the output as \code{treedepth\_\_} and
 \code{n\_leapfrog\_\_}, respectively.  Because the final subtree may only
 be partially constructed, these two will always satisfy
@@ -808,7 +839,7 @@ simulation error in the Hamiltonian dynamics calculation.  See
 
 The fixed parameter sampler generates a new sample without changing
 the current state of the Markov chain; only generated quantities may
-change.  This can be useful when, for example, trying to generate pseudo-data 
+change.  This can be useful when, for example, trying to generate pseudo-data
 using the generated quantities block. If the parameters block is empty (no parameters) then using {\tt algorithm=fixed\_param} is mandatory.
 %
 \begin{description}
@@ -835,7 +866,7 @@ configuration.  The other arguments may appear in any order.
 \end{description}
 %
 The following options are for the (L-)BFGS optimizer.  BFGS is the default
-optimizer and also much faster than the other optimizers.  
+optimizer and also much faster than the other optimizers.
 
 Convergence monitoring in (L-)BFGS is controlled by a number of tolerance
 values, any one of which being satisified causes the algorithm to
@@ -860,7 +891,7 @@ or
 || \theta_{i} - \theta_{i-1} || < \mbox{\code{tol\_param}}.
 \]
 %
-\item The gradient is considered to have converged to 0 if 
+\item The gradient is considered to have converged to 0 if
 \[
 || g_{i} || < \mbox{\code{tol\_grad}}
 \]
@@ -875,7 +906,7 @@ parameters at iteration $i$, $y$ is the data, $p(\theta_{i}|y)$ is
 the posterior probability of $\theta_{i}$ up to a proportion,
 $\nabla_{\theta}$ is the gradient operator with respect to $\theta$,
 $g_{i} = \nabla_{\theta} \log p(\theta_{i}|y)$ is the gradient at
-iteration $i$, $\hat{H}_{i}$ is the estimate of the Hessian at 
+iteration $i$, $\hat{H}_{i}$ is the estimate of the Hessian at
 iteration $i$, $|u|$ is absolute value (L1 norm) of $u$,
 $||u||$ is vector length (L2 norm) of $u$, and $\epsilon \approx 2e-16$ is
 machine precision.  Any of the convergence tests can be disabled
@@ -972,6 +1003,57 @@ The remaining arguments apply to all optimizers.
 %
 \end{description}
 
+\subsection{Variational Inference-Specific Commands}
+
+The following arguments are for the top-level method \code{variational}.
+They allow control of the variational inference algorithm, and some of its
+configuration.
+
+\begin{description}
+%
+  \hierlongcmd{\indentarrow}{\farg{\bfseries variational}}
+    {Variational inference}
+    {Valid subarguments: \code{algorithm, grad\_samples, elbo\_samples,
+    eta\_stepsize, iter, tol\_rel\_obj}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
+      {Variational inference algorithm}
+      {Valid values: \ \code{meanfield, fullrank}}
+      {Defaults to \code{meanfield}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{grad\_samples}{$$int$$}
+      {Number of samples for Monte Carlo estimate of gradients}
+      {Valid values: \ $0 < \mbox{\code{grad\_samples}}$}
+      {Defaults to \code{10}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{elbo\_samples}{$$int$$}
+      {Number of samples for Monte Carlo estimate of ELBO (objective function)}
+      {Valid values: \ $0 < \mbox{\code{elbo\_samples}}$}
+      {Defaults to \code{100}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{eta\_stepsize}{$$double$$}
+      {Stepsize weighting parameter for variational iteration}
+      {Valid values: \ $0 < \mbox{\code{eta\_stepsize}} \leq 1.0$}
+      {Defaults to \code{0.1}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
+      {Total number of iterations}
+      {Valid values: \ $0 < \mbox{\code{iter}}$}
+      {Defaults to \code{2000}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{tol\_rel\_obj}{$$double$$}
+      {onvergence tolerance on the relative norm of the objective}
+      {Valid values: \ $0 < \mbox{\code{tol\_rel\_obj}}$}
+      {Defaults to \code{0.01}}
+\end{description}
+%
+% The following options are for the (L-)BFGS optimizer.  BFGS is the default
+% optimizer and also much faster than the other optimizers.
+
+% Convergence monitoring in (L-)BFGS is controlled by a number of tolerance
+% values, any one of which being satisified causes the algorithm to
+% terminate with a solution.
+
 \subsection{Diagnostic-Specific Arguments}
 
 The following arguments are specific to diagnostics.  As of now, the
@@ -1039,15 +1121,15 @@ subarguments of the top-level method.
 
 Initialization is only applied to parameters defined in the parameters
 block.  Any initial values supplied for transformed parameters or
-generated quantities are ignored. 
+generated quantities are ignored.
 
 \begin{description}
 \hiercmdarg{}{init}{$$string$$}
   {Initialization method: \\
         \hspace*{8pt} $\bullet$ \ real number $\mbox{\farg{x}} > 0$ initializes randomly bewteen [-\farg{x},
-        \farg{x}]; 
+        \farg{x}];
         \\
-        \hspace*{8pt} $\bullet$ \  \code{0} initializes to 0; 
+        \hspace*{8pt} $\bullet$ \  \code{0} initializes to 0;
         \\
         \hspace*{8pt} $\bullet$ \  non-number interpreted as a data file}
   {Valid values: \  All}
@@ -1067,7 +1149,7 @@ generated quantities are ignored.
   \hiercmdarg{\indentarrow}{seed}{$$unsigned int$$}
     {Random number generator seed}
     {Valid values: \\
-      \hspace*{8pt} $\bullet$ \ $\mbox{\code{seed}} \geq 0$ generates seed; 
+      \hspace*{8pt} $\bullet$ \ $\mbox{\code{seed}} \geq 0$ generates seed;
       \\
       \hspace*{8pt} $\bullet$ \ $\mbox{\code{seed}} < 0$ uses seed generated from time}
     {Defaults to \code{-1}}
@@ -1135,7 +1217,7 @@ The problem is that we forgot to specify a method.
 All \Stan arguments have default values, except for the method.  This
 is the only argument that must be specified by the user and a model
 will not run without it (not to say that the model will run without error,
-for example a model that requires data will eventually fail unless an input file 
+for example a model that requires data will eventually fail unless an input file
 is specified with \code{file} under \code{data}).  Assuming that we want to draw
 MCMC samples from our model, we can either specify a method
 implicitly,
@@ -1179,7 +1261,7 @@ random
 \end{Verbatim}
 \end{quote}
 %
-before printing usage information.  For information on the 
+before printing usage information.  For information on the
 seed argument we just call help one level deeper,
 %
 \begin{quote}
@@ -1246,7 +1328,7 @@ sampling algorithm, as noted in the suggestion,
 > ./model method=sample algorithm=hmc metric=unit \
           data file=model.data.R                  \
           init=model.init.R                       \
-          random seed=5       
+          random seed=5
 \end{Verbatim}
 \end{quote}
 %
@@ -1352,7 +1434,7 @@ sample
 
     hmc
       Hamiltonian Monte Carlo
-      Valid subarguments: engine, metric, stepsize, 
+      Valid subarguments: engine, metric, stepsize,
                           stepsize_jitter
 
       engine=<list element>
@@ -1432,7 +1514,7 @@ Failed to parse arguments, terminating Stan
 \end{quote}
 %
 Where did that negative sign come from?  Clumsy fingers are nothing
-to be embarrassed about, especially with such complex argument 
+to be embarrassed about, especially with such complex argument
 configurations.  Removing the guilty character, we try
 %
 \begin{quote}
@@ -1452,7 +1534,8 @@ which finally runs without issue.
 \section{Command Templates}
 
 This section provides templates for all of the arguments deriving from
-each of the possible methods: \code{sample}, \code{optimize}, and \code{diagnose}.  
+each of the possible methods: \code{sample}, \code{optimize}, \code{variational}
+and \code {diagnose}.
 Arguments in square brackets are optional,
 those not in square brackets are required for the template.
 
@@ -1460,7 +1543,7 @@ those not in square brackets are required for the template.
 %
 The No-U-Turn sampler (NUTS) is the default (and recommended) sampler
 for Stan.  The full set of configuration options is in
-\reffigure{nuts-command}.  
+\reffigure{nuts-command}.
 %
 \begin{figure}
 \begin{quote}
@@ -1657,6 +1740,66 @@ having a stepsize argument, the skeleton for Newton's method shown in
 \label{newton-command.figure}
 \end{figure}
 %
+
+\subsection{Variational Inference Templates}
+%
+\CmdStan implements two variational inference algorithms. Details of both
+methods are described in CITATION. The command skeleton for the \code{meanfield}
+algorithm is in \reffigure{meanfield-command}. The command skeleton for the
+\code{fullrank} algorithm is in \reffigure{fullrank-command}.
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model variational                                \
+                 algorithm=meanfield                    \
+                     [grad_samples=<int>]               \
+                     [elbo_samples=<int>]               \
+                     [eta_stepsize=<double>]            \
+                     [iter=<int>]                       \
+                     [tol_rel_obj=<double>]             \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [diagnostic_file=<string>]            \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the meanfield variational
+  inference algorithm.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}
+\label{meanfield-command.figure}
+\end{figure}
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model variational                                \
+                 algorithm=fullrank                     \
+                     [grad_samples=<int>]               \
+                     [elbo_samples=<int>]               \
+                     [eta_stepsize=<double>]            \
+                     [iter=<int>]                       \
+                     [tol_rel_obj=<double>]             \
+             [data file=<string>]                       \
+             [init=<string>]                            \
+             [random seed=<int>]                        \
+             [output                                    \
+                  [file=<string>]                       \
+                  [diagnostic_file=<string>]            \
+                  [refresh=<int>] ]
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for invoking the fullrank variational
+  inference algorithm.
+  All arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}
+\label{fullrank-command.figure}
+\end{figure}
+
 
 \subsection{Diagnostic Command Skeleton}
 
