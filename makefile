@@ -26,7 +26,7 @@ AR = ar
 ##
 STANAPI_HOME ?= stan/
 EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
-BOOST ?= $(STANAPI_HOME)lib/boost_1.55.0
+BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
 
 ##
