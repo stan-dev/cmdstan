@@ -28,11 +28,12 @@ STANAPI_HOME ?= stan/
 EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
 BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
+MATH  ?= $(STANAPI_HOME)lib/stan_math_2.6.3
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
