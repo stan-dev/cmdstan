@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <ios>
 #include <stan/mcmc/chains.hpp>
-#include <stan/command/print.hpp>
+#include <cmdstan/print_helper.hpp>
 
 /**
  * The Stan print function.
