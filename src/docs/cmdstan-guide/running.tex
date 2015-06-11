@@ -421,13 +421,13 @@ the following methods:
 \\
 {\tt optimize} &  find posterior mode using optimization
 \\
-{\tt variational} &  fit variational approximation
+{\tt variational} &  fit variational approximation (experimental)
 \\
 {\tt diagnose} &  diagnose models
 \end{tabular}
 \end{center}
 %
-All remaining configurations are option, with default values
+All remaining configurations are optional, with default values
 provided for all arguments not explicitly specified.
 
 \subsection{Help}
@@ -1005,16 +1005,17 @@ The remaining arguments apply to all optimizers.
 
 \subsection{Variational Inference-Specific Commands}
 
-The following arguments are for the top-level method \code{variational}.
+The following arguments are for the top-level method \code
+{experimental variational}.
 They allow control of the variational inference algorithm, and some of its
 configuration.
 
 \begin{description}
 %
-  \hierlongcmd{\indentarrow}{\farg{\bfseries variational}}
+  \hierlongcmd{\indentarrow}{\farg{\bfseries experimental variational}}
     {Variational inference}
     {Valid subarguments: \code{algorithm, grad\_samples, elbo\_samples,
-    eta\_stepsize, iter, tol\_rel\_obj}}
+    eta\_adagrad, iter, tol\_rel\_obj, eval\_elbo, output\_samples}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Variational inference algorithm}
@@ -1024,27 +1025,37 @@ configuration.
     \hiercmdarg{\indentarrow\indentarrow}{grad\_samples}{$$int$$}
       {Number of samples for Monte Carlo estimate of gradients}
       {Valid values: \ $0 < \mbox{\code{grad\_samples}}$}
-      {Defaults to \code{10}}
+      {Defaults to \code{1}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{elbo\_samples}{$$int$$}
       {Number of samples for Monte Carlo estimate of ELBO (objective function)}
       {Valid values: \ $0 < \mbox{\code{elbo\_samples}}$}
       {Defaults to \code{100}}
 %
-    \hiercmdarg{\indentarrow\indentarrow}{eta\_stepsize}{$$double$$}
-      {Stepsize weighting parameter for variational iteration}
-      {Valid values: \ $0 < \mbox{\code{eta\_stepsize}} \leq 1.0$}
+    \hiercmdarg{\indentarrow\indentarrow}{eta\_adagrad}{$$double$$}
+      {Stepsize weighting parameter for adaptive stepsize sequence}
+      {Valid values: \ $0 < \mbox{\code{eta\_adagrad}} \leq 1.0$}
       {Defaults to \code{0.1}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
-      {Total number of iterations}
+      {Maximum number of iterations}
       {Valid values: \ $0 < \mbox{\code{iter}}$}
-      {Defaults to \code{2000}}
+      {Defaults to \code{10000}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{tol\_rel\_obj}{$$double$$}
-      {onvergence tolerance on the relative norm of the objective}
+      {Convergence tolerance on the relative norm of the objective}
       {Valid values: \ $0 < \mbox{\code{tol\_rel\_obj}}$}
       {Defaults to \code{0.01}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{eval\_elbo}{$$int$$}
+      {Evaluate ELBO every Nth iteration}
+      {Valid values: \ $0 < \mbox{\code{eval\_elbo}}$}
+      {Defaults to \code{100}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{output\_samples}{$$int$$}
+      {Number of posterior samples to draw and save}
+      {Valid values: \ $0 < \mbox{\code{output\_samples}}$}
+      {Defaults to \code{1000}}
 \end{description}
 %
 % The following options are for the (L-)BFGS optimizer.  BFGS is the default
@@ -1743,21 +1754,23 @@ having a stepsize argument, the skeleton for Newton's method shown in
 
 \subsection{Variational Inference Templates}
 %
-\CmdStan implements two variational inference algorithms. Details of both
-methods are described in CITATION. The command skeleton for the \code{meanfield}
+\CmdStan implements Automatic Differentiation Variational Inference
+\citep{Kucukelbir:2015}. The command skeleton for the \code{meanfield}
 algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \code{fullrank} algorithm is in \reffigure{fullrank-command}.
 %
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model variational                                \
+> ./my_model experimental variational                   \
                  algorithm=meanfield                    \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta_stepsize=<double>]            \
+                     [eta_adagrad=<double>]             \
                      [iter=<int>]                       \
                      [tol_rel_obj=<double>]             \
+                     [eval_elbo=<int>]                  \
+                     [output_samples=<int>]             \
              [data file=<string>]                       \
              [init=<string>]                            \
              [random seed=<int>]                        \
@@ -1777,13 +1790,15 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model variational                                \
+> ./my_model experimental variational                   \
                  algorithm=fullrank                     \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta_stepsize=<double>]            \
+                     [eta_adagrad=<double>]             \
                      [iter=<int>]                       \
                      [tol_rel_obj=<double>]             \
+                     [eval_elbo=<int>]                  \
+                     [output_samples=<int>]             \
              [data file=<string>]                       \
              [init=<string>]                            \
              [random seed=<int>]                        \
