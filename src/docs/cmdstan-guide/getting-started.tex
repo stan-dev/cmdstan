@@ -89,8 +89,8 @@ simple Bayesian model.
 
 \subsection{A Simple Bernoulli Model}
 
-The following is a simplet, complete Stan program for a Bernoulli
-model of binary data.%
+The following is a simple, complete Stan program for a Bernoulli model
+of binary data.%
 %
 \footnote{The model is distributed with Stan's example models
   repository,
@@ -456,7 +456,7 @@ the draws (e.g., to make decisions or predictions for unseen data).
 
 \CmdStan can be used for finding posterior modes as well as sampling
 from the posterior distribution. The executable does not need to be
-recompiled in order to switch from optimization to sampling, and the
+recompiled in order to switch from sampling to optimization, and the
 data input format is the same. The following is a minimal call to
 \Stan's optimizer using defaults for everything but the location of the
 data file. See \refsection{stan-command-line-options} for more
@@ -652,16 +652,18 @@ iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes
 2700       -6.3             0.010            0.012   MEAN ELBO CONVERGED
   \end{Verbatim}
 %
-The first part of the output reports on the configuration used. Here it
-indicates the default mean-field setting of the variational inference
-algorithm. It also indicates the default parameter sizes and tolerances for
-monitoring algorithm convergence. The second part of the output describes the
-progression and convergence of the algorithm. The variational inference
-algorithm in \Stan is stochastic; this makes it challenging to assess
-convergence. The evidence lower bound (ELBO) is the variational objective
-function. While the algorithm appears to have converged in $\sim$100 iterations,
-the algorithm runs for another few thousand iterations until the mean change in
-ELBO drops below the default tolerance of 1e-2.
+The first part of the output reports on the configuration used. Here
+it indicates the default mean-field setting of the variational
+inference algorithm. It also indicates the default parameter sizes and
+tolerances for monitoring the algorithm's convergence. The second part
+of the output describes the progression of the algorithm. The evidence
+lower bound (ELBO) is the variational objective function and is
+evaluated based on a Monte Carlo estimate. The variational inference
+algorithm in \Stan is stochastic, which makes it challenging to assess
+convergence. That is, while the algorithm appears to have converged in
+$\sim$100 iterations, the algorithm runs for another few thousand
+iterations until the mean change in ELBO drops below the default
+tolerance of 1e-2.
 
 
 \subsubsection{Variational Inference Output}
