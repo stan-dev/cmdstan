@@ -29,7 +29,7 @@ TEST(interface,csv_header_consistency) {
 
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
-  stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream));
+  stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream, &std::cout));
   ifstream.close();
   
   EXPECT_EQ(1, chains.num_samples());

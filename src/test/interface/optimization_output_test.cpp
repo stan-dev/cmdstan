@@ -30,7 +30,7 @@ class CmdStan : public testing::Test {
     std::ifstream output_stream;
     output_stream.open(output_file.data());
   
-    stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream);
+    stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream, 0);
     stan::mcmc::chains<> chains(parsed_output);
     output_stream.close();
     return chains;

@@ -1,5 +1,5 @@
 #include <stan/services/error_codes.hpp>
-#include <stan/services/command.hpp>
+#include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <test/utility.hpp>
@@ -37,7 +37,7 @@ void test_sample_prints(const std::string& base_cmd) {
   EXPECT_TRUE(count_matches("z=", cmd_output) >= 200); 
   // model
   EXPECT_TRUE(count_matches("y=", cmd_output) >= 200);
-  // generated antities [only on saved iterations, should be num samples]
+  // generated quantities [only on saved iterations, should be num samples]
   EXPECT_TRUE(count_matches("w=", cmd_output) == 100);
 }
 
@@ -332,7 +332,8 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   Eigen::VectorXd cont_params;
   
   EXPECT_FALSE(stan::services::init::init_adapt(&throwing_sampler,
-                                                0, 0, 0, 0, cont_params));
+                                                0, 0, 0, 0, cont_params,
+                                                &std::cout));
 }
 
 REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,

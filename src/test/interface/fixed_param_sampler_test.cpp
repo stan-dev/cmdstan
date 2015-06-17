@@ -34,7 +34,7 @@ TEST(McmcPersistentSampler, check_persistency) {
   std::ifstream output_stream;
   output_stream.open( (convert_model_path(model_path) + ".csv").data() );
   
-  stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream);
+  stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream, 0);
   stan::mcmc::chains<> chains(parsed_output);
   
   for (int i = 0; i < chains.num_params(); ++i) {
