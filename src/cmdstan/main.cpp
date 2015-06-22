@@ -1,4 +1,4 @@
-#include <stan/services/command.hpp>
+#include <cmdstan/command.hpp>
 #include <boost/exception/diagnostic_information.hpp> 
 #include <boost/exception_ptr.hpp> 
 
