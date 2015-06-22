@@ -4,6 +4,7 @@
 #include <ios>
 #include <stan/mcmc/chains.hpp>
 #include <cmdstan/print_helper.hpp>
+#include <fstream>
 
 /**
  * The Stan print function.
