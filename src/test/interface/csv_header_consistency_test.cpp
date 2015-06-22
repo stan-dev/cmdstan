@@ -2,6 +2,7 @@
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
@@ -29,7 +30,7 @@ TEST(interface,csv_header_consistency) {
 
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
-  stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream));
+  stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream, &std::cout));
   ifstream.close();
   
   EXPECT_EQ(1, chains.num_samples());
