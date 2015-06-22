@@ -3,6 +3,7 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;

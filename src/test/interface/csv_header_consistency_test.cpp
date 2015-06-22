@@ -2,6 +2,7 @@
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
