@@ -582,26 +582,24 @@ details.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./bernoulli experimental variational
-              data file=bernoulli.data.R
+> ./bernoulli variational data file=bernoulli.data.R
 \end{Verbatim}
 \end{quote}
 %
 Executing this command prints the following.
 %
 \begin{Verbatim}[fontsize=\footnotesize]
-method = experimental
- experimental
-   variational
-     algorithm = meanfield (Default)
-       meanfield
-     iter = 10000 (Default)
-     grad_samples = 1 (Default)
-     elbo_samples = 100 (Default)
-     eta_adagrad = 0.10000000000000001 (Default)
-     tol_rel_obj = 0.01 (Default)
-     eval_elbo = 100 (Default)
-     output_samples = 1000 (Default)
+method =
+ variational
+   algorithm = meanfield (Default)
+     meanfield
+   iter = 10000 (Default)
+   grad_samples = 1 (Default)
+   elbo_samples = 100 (Default)
+   eta_adagrad = 0.10000000000000001 (Default)
+   tol_rel_obj = 0.01 (Default)
+   eval_elbo = 100 (Default)
+   output_samples = 1000 (Default)
 id = 0 (Default)
 data
  file = bernoulli.data.R
@@ -613,13 +611,13 @@ output
  diagnostic_file =  (Default)
  refresh = 100 (Default)
 
+This is Automatic Differentiation Variational Inference.
 
-Gradient evaluation took 4e-06 seconds
-1000 iterations under these settings should take 0.004 seconds.
+(EXPERIMENTAL ALGORITHM: expect frequent updates to the procedure.)
+
+Gradient evaluation took 1.1e-05 seconds
+1000 iterations under these settings should take 0.011 seconds.
 Adjust your expectations accordingly!
-
-
-This is Automatic Differentiation Variational Inference (mean-field).
 
 iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes
    0         -7             1.000            1.000
@@ -678,18 +676,17 @@ output for sampling, first dumping the entire set of parameters used.
 # stan_version_minor = 6
 # stan_version_patch = 3
 # model = bernoulli_model
-# method = experimental
-#   experimental
-#     variational
-#       algorithm = meanfield (Default)
-#         meanfield
-#       iter = 10000 (Default)
-#       grad_samples = 1 (Default)
-#       elbo_samples = 100 (Default)
-#       eta_adagrad = 0.10000000000000001 (Default)
-#       tol_rel_obj = 0.01 (Default)
-#       eval_elbo = 100 (Default)
-#       output_samples = 1000 (Default)
+# method = variational
+#   variational
+#     algorithm = meanfield (Default)
+#       meanfield
+#     iter = 10000 (Default)
+#     grad_samples = 1 (Default)
+#     elbo_samples = 100 (Default)
+#     eta_adagrad = 0.10000000000000001 (Default)
+#     tol_rel_obj = 0.01 (Default)
+#     eval_elbo = 100 (Default)
+#     output_samples = 1000 (Default)
 # id = 0 (Default)
 # data
 #   file = bernoulli.data.R
