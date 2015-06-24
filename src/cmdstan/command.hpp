@@ -746,132 +746,133 @@ namespace stan {
       }
 
       //////////////////////////////////////////////////
-      //           EXPERIMENTAL Algorithms            //
+      //           VARIATIONAL Algorithms             //
       //////////////////////////////////////////////////
 
-      if (parser.arg("method")->arg("experimental")) {
-        if (parser.arg("method")->arg("experimental")->arg("variational")) {
-          stan::services::list_argument* algo
-            = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
-              ->arg("experimental")->arg("variational")->arg("algorithm"));
 
-          int grad_samples = dynamic_cast<stan::services::int_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("grad_samples"))->value();
+      if (parser.arg("method")->arg("variational")) {
+        stan::services::list_argument* algo
+          = dynamic_cast<stan::services::list_argument*>(parser.arg("method")
+            ->arg("variational")->arg("algorithm"));
 
-          int elbo_samples = dynamic_cast<stan::services::int_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("elbo_samples"))->value();
+        int grad_samples = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("grad_samples"))->value();
 
-          int max_iterations = dynamic_cast<stan::services::int_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("iter"))->value();
+        int elbo_samples = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("elbo_samples"))->value();
 
-          double tol_rel_obj = dynamic_cast<stan::services::real_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("tol_rel_obj"))->value();
+        int max_iterations = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("iter"))->value();
 
-          double eta_adagrad = dynamic_cast<stan::services::real_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("eta_adagrad"))->value();
+        double tol_rel_obj = dynamic_cast<stan::services::real_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("tol_rel_obj"))->value();
 
-          int eval_elbo = dynamic_cast<stan::services::int_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("eval_elbo"))->value();
+        double eta_adagrad = dynamic_cast<stan::services::real_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("eta_adagrad"))->value();
 
-          int output_samples = dynamic_cast<stan::services::int_argument*>
-            (parser.arg("method")->arg("experimental")
-                                 ->arg("variational")
-                                 ->arg("output_samples"))->value();
+        int eval_elbo = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("eval_elbo"))->value();
 
-          // Check timing
-          clock_t start_check = clock();
+        int output_samples = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("output_samples"))->value();
 
-          double init_log_prob;
-          Eigen::VectorXd init_grad
-            = Eigen::VectorXd::Zero(model.num_params_r());
+        // Check timing
+        clock_t start_check = clock();
 
-          stan::model::gradient(model, cont_params, init_log_prob,
-                                init_grad, &std::cout);
+        double init_log_prob;
+        Eigen::VectorXd init_grad
+          = Eigen::VectorXd::Zero(model.num_params_r());
 
-          clock_t end_check = clock();
-          double deltaT
-            = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
+        stan::model::gradient(model, cont_params, init_log_prob,
+                              init_grad, &std::cout);
 
-          std::cout << std::endl;
-          std::cout << "Gradient evaluation took " << deltaT
-                    << " seconds" << std::endl;
-          std::cout << "1000 iterations under these settings should take "
-                    << 1e3 * grad_samples * deltaT << " seconds." << std::endl;
-          std::cout << "Adjust your expectations accordingly!"
-                    << std::endl << std::endl;
-          std::cout << std::endl;
+        clock_t end_check = clock();
+        double deltaT
+          = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
 
-          if (algo->value() == "fullrank") {
-            if (output_stream) {
-              std::vector<std::string> names;
-              names.push_back("lp");
-              model.constrained_param_names(names, true, true);
+        std::cout << std::endl;
+        std::cout << "This is Automatic Differentiation Variational Inference.";
+        std::cout << std::endl;
 
-              (*output_stream) << names.at(0);
-              for (size_t i = 1; i < names.size(); ++i) {
-                (*output_stream) << "," << names.at(i);
-              }
-              (*output_stream) << std::endl;
+        std::cout << std::endl;
+        std::cout << "(EXPERIMENTAL ALGORITHM: expect frequent updates to the"
+                  << " procedure.)";
+        std::cout << std::endl;
+
+        std::cout << std::endl;
+        std::cout << "Gradient evaluation took " << deltaT
+                  << " seconds" << std::endl;
+        std::cout << "1000 iterations under these settings should take "
+                  << 1e3 * grad_samples * deltaT << " seconds." << std::endl;
+        std::cout << "Adjust your expectations accordingly!";
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        if (algo->value() == "fullrank") {
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            model.constrained_param_names(names, true, true);
+
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
             }
-
-            stan::variational::advi<Model,
-                                    stan::variational::normal_fullrank,
-                                    rng_t>
-              cmd_advi(model,
-                       cont_params,
-                       grad_samples,
-                       elbo_samples,
-                       eta_adagrad,
-                       base_rng,
-                       eval_elbo,
-                       output_samples,
-                       &std::cout,
-                       output_stream,
-                       diagnostic_stream);
-            cmd_advi.run(tol_rel_obj, max_iterations);
+            (*output_stream) << std::endl;
           }
 
-          if (algo->value() == "meanfield") {
-            if (output_stream) {
-              std::vector<std::string> names;
-              names.push_back("lp");
-              model.constrained_param_names(names, true, true);
+          stan::variational::advi<Model,
+                                  stan::variational::normal_fullrank,
+                                  rng_t>
+            cmd_advi(model,
+                     cont_params,
+                     grad_samples,
+                     elbo_samples,
+                     eta_adagrad,
+                     base_rng,
+                     eval_elbo,
+                     output_samples,
+                     &std::cout,
+                     output_stream,
+                     diagnostic_stream);
+          cmd_advi.run(tol_rel_obj, max_iterations);
+        }
 
-              (*output_stream) << names.at(0);
-              for (size_t i = 1; i < names.size(); ++i) {
-                (*output_stream) << "," << names.at(i);
-              }
-              (*output_stream) << std::endl;
+        if (algo->value() == "meanfield") {
+          if (output_stream) {
+            std::vector<std::string> names;
+            names.push_back("lp");
+            model.constrained_param_names(names, true, true);
+
+            (*output_stream) << names.at(0);
+            for (size_t i = 1; i < names.size(); ++i) {
+              (*output_stream) << "," << names.at(i);
             }
-
-            stan::variational::advi<Model,
-                                    stan::variational::normal_meanfield,
-                                    rng_t>
-              cmd_advi(model,
-                       cont_params,
-                       grad_samples,
-                       elbo_samples,
-                       eta_adagrad,
-                       base_rng,
-                       eval_elbo,
-                       output_samples,
-                       &std::cout,
-                       output_stream,
-                       diagnostic_stream);
-            cmd_advi.run(tol_rel_obj, max_iterations);
+            (*output_stream) << std::endl;
           }
+
+          stan::variational::advi<Model,
+                                  stan::variational::normal_meanfield,
+                                  rng_t>
+            cmd_advi(model,
+                     cont_params,
+                     grad_samples,
+                     elbo_samples,
+                     eta_adagrad,
+                     base_rng,
+                     eval_elbo,
+                     output_samples,
+                     &std::cout,
+                     output_stream,
+                     diagnostic_stream);
+          cmd_advi.run(tol_rel_obj, max_iterations);
         }
       }
 
