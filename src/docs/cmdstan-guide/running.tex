@@ -1006,13 +1006,13 @@ The remaining arguments apply to all optimizers.
 \subsection{Variational Inference-Specific Commands}
 
 The following arguments are for the top-level method \code
-{experimental variational}.
+{variational}.
 They allow control of the variational inference algorithm, and some of its
 configuration.
 
 \begin{description}
 %
-  \hierlongcmd{\indentarrow}{\farg{\bfseries experimental variational}}
+  \hierlongcmd{\indentarrow}{\farg{\bfseries variational}}
     {Variational inference}
     {Valid subarguments: \code{algorithm, grad\_samples, elbo\_samples,
     eta\_adagrad, iter, tol\_rel\_obj, eval\_elbo, output\_samples}}
@@ -1762,7 +1762,7 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model experimental variational                   \
+> ./my_model variational                                \
                  algorithm=meanfield                    \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
@@ -1790,7 +1790,7 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \begin{figure}
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> ./my_model experimental variational                   \
+> ./my_model variational                                \
                  algorithm=fullrank                     \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
