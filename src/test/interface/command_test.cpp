@@ -1,10 +1,16 @@
-#include <stan/gm/error_codes.hpp>
-#include <stan/common/command.hpp>
+#include <stan/services/error_codes.hpp>
+#include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
 #include <test/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
+
+using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
+using cmdstan::test::multiple_command_separator;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
 
 TEST(StanUiCommand, countMatches) {
   EXPECT_EQ(-1, count_matches("", ""));
@@ -31,7 +37,7 @@ void test_sample_prints(const std::string& base_cmd) {
   EXPECT_TRUE(count_matches("z=", cmd_output) >= 200); 
   // model
   EXPECT_TRUE(count_matches("y=", cmd_output) >= 200);
-  // generated antities [only on saved iterations, should be num samples]
+  // generated quantities [only on saved iterations, should be num samples]
   EXPECT_TRUE(count_matches("w=", cmd_output) == 100);
 }
 
@@ -99,7 +105,7 @@ TEST(StanUiCommand, refresh_zero_ok) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_EQ(0, count_matches("Iteration:", out.output));
 }
 
@@ -112,13 +118,13 @@ TEST(StanUiCommand, refresh_nonzero_ok) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=1 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_EQ(20, count_matches("Iteration:", out.output));
 }
 
 TEST(StanUiCommand, zero_init_value_fail) {
   std::string expected_message
-    = "Rejecting initialization at zero because of vanishing density.\n";
+    = "Rejecting initial value";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -128,7 +134,7 @@ TEST(StanUiCommand, zero_init_value_fail) {
 
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -139,7 +145,7 @@ TEST(StanUiCommand, zero_init_value_fail) {
 
 TEST(StanUiCommand, zero_init_domain_fail) {
   std::string expected_message
-    = "Rejecting initialization at zero because of gradient failure.\n";
+    = "Rejecting initial value";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -150,7 +156,7 @@ TEST(StanUiCommand, zero_init_domain_fail) {
   std::string command = convert_model_path(model_path) + " sample init=0 output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -161,7 +167,7 @@ TEST(StanUiCommand, zero_init_domain_fail) {
 
 TEST(StanUiCommand, user_init_value_fail) {
   std::string expected_message
-    = "Rejecting user-specified initialization because of vanishing density.\n";
+    = "Rejecting initial value";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -180,7 +186,7 @@ TEST(StanUiCommand, user_init_value_fail) {
     + " output file=test/output.csv";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -191,7 +197,7 @@ TEST(StanUiCommand, user_init_value_fail) {
 
 TEST(StanUiCommand, user_init_domain_fail) {
   std::string expected_message
-    = "Rejecting user-specified initialization because of gradient failure.\n";
+    = "Rejecting initial value";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -210,7 +216,7 @@ TEST(StanUiCommand, user_init_domain_fail) {
     + " output file=test/output.csv";
   
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
   
   EXPECT_TRUE(out.header.length() > 0U);
   EXPECT_TRUE(out.body.length() > 0U);
@@ -228,7 +234,7 @@ TEST(StanUiCommand, CheckCommand_default) {
    
   std::string command = convert_model_path(model_path);
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_help) {
@@ -241,7 +247,7 @@ TEST(StanUiCommand, CheckCommand_help) {
    std::string command = convert_model_path(model_path) + " help";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
@@ -254,7 +260,7 @@ TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
   std::string command = convert_model_path(model_path) + " foo";
 
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::USAGE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanUiCommand, timing_info) {
@@ -266,7 +272,7 @@ TEST(StanUiCommand, timing_info) {
   
   std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::gm::error_codes::OK), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   
   std::fstream output_csv_stream("test/output.csv");
   std::stringstream output_sstream;
@@ -325,8 +331,9 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   sampler<TypeParam> throwing_sampler;
   Eigen::VectorXd cont_params;
   
-  EXPECT_FALSE(stan::common::init_adapt(&throwing_sampler, 
-                                        0, 0, 0, 0, cont_params));
+  EXPECT_FALSE(stan::services::init::init_adapt(&throwing_sampler,
+                                                0, 0, 0, 0, cont_params,
+                                                &std::cout));
 }
 
 REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,

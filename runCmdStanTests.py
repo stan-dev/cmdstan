@@ -41,7 +41,7 @@ def mungeName(name):
     if (name.startswith("src")):
         name = name.replace("src/","",1)
     if (name.endswith(testsfx)):
-        name = name.replace(testsfx,"")
+        name = name.replace(testsfx,"_test")
         if (isWin()):
             name += winsfx
             name = name.replace("\\","/")

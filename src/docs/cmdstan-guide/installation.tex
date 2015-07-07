@@ -20,7 +20,8 @@ on the compiler and linker.
 %
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat), 
-\item Mac OS X (Mavericks, Snow Leopard, Lion, Mountain Lion), and
+\item Mac OS X (10.10 ``Yosemite,'' 10.9 ``Mavericks,'' 10.8
+  ``Mountain Lion,'' 10.7 ``Lion,'' and 10.6 ``Snow Leopard'')
 \item Windows (XP, 7, 8).
 \end{itemize}
 %
@@ -36,18 +37,31 @@ The only two absolute requirements for running \CmdStan are the
 
 \subsection{\CmdStan Source}
 
-In order to compile \Stan program, the \CmdStan source code is required.
-The latest version of \CmdStan can be downloaded from the following link.
+In order to compile \Stan program, the \CmdStan source code is
+required.  The \CmdStan source code distribution includes \CmdStan's
+source code, \Stan's source code, documentation, build scripts, unit
+tests, example models models, documentation and source for the
+required libraries Boost and Eigen, and the source for an optional
+testing library, Google Test.
+
+\subsubsection{CmdStan: Stable Releases}
+
+The latest release version of \CmdStan can be downloaded
+from the CmdStan home page:
 %
 \begin{quote}
-\url{http://mc-stan.org/}
+\url{http://mc-stan.org/cmdstan.html}
 \end{quote}
 %
-The \CmdStan source code distribution includes \CmdStan's source code,
-\Stan's source code, documentation, build scripts, unit tests, example
-models models, documentation and source for the required libraries
-Boost and Eigen, and the source for an optional testing library,
-Google Test.
+
+\subsubsection{CmdStan: Development Source Control}
+
+The source code repository is hosted by GitHub, and contains the
+latest versions of CmdStan (and Stan) underdevelopment.  See:
+%
+\begin{quote}
+http://mc-stan.org/source-repos.html
+\end{quote}
 
 \subsubsection{Boost C++ Library Source}
 
@@ -56,7 +70,7 @@ metaprogramming facilities are implemented with the Boost \Cpp
 Library.
 %
 \begin{itemize}
-\item Home: http://www.boost.org/users/license.html
+\item Home: \url{http://www.boost.org/users/license.html}
 \item License: Boost Software License
 \item Tested Version: 1.54.0
 \end{itemize}
@@ -194,10 +208,10 @@ This should print version information for make.
 
 \subsection{Downloading and Unpacking \CmdStan}
 
-The \CmdStan source code distributions are named
-\code{cmdstan-2.5.p.tar.gz}, where \code{p} is the patch
-version. Download the latest \CmdStan source tarball from the \CmdStan
-downloads page,
+The \CmdStan source code distribution is named
+\code{cmdstan-\cmdstanversion.tar.gz}; the versions here are major version 2,
+minor version 6, and patch level 0.  Download the latest \CmdStan
+source tarball from the \CmdStan downloads page,
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -253,7 +267,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.5.p.tar.gz 
+> tar --no-same-owner -xzf cmdstan-\cmdstanversion.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
@@ -317,8 +331,7 @@ is at 4.2.1 or later.
 
 \subsection{Download and Unpack \CmdStan Source}
 
-Download the most recent version of \code{cmdstan-2.5.p.tar.gz}
-(\code{p} the patch level) from
+Download the most recent version of \code{cmdstan-\cmdstanversion.tar.gz} from
 the \CmdStan downloads list,
 %
 \begin{quote}
@@ -329,11 +342,11 @@ Open the folder containing the download in the Finder
 (typically, the user's top-level \code{Downloads} folder).
 
 If the Mac OS has not automatically unpacked the \code{.tar.gz}
-file into file \code{cmdstan-2.5.p.tar},
+file into file \code{cmdstan-\cmdstanversion.tar},
 double-click the \code{.tar.gz} file to unpack.
 
 Double click on the \code{.tar} file to unarchive
-directory \code{cmdstan-2.5.p}.
+directory \code{cmdstan-\cmdstanversion}.
 
 Move the resulting directory to a location where it will not be
 deleted, henceforth called \code{<cmdstan-home>}.
@@ -380,8 +393,7 @@ A password will likely be required by the superuser command \code{sudo}.
 \subsection{Downloading and Unpacking \CmdStan Source}
 
 Download the most recent stable version of \CmdStan,
-\code{cmdstan-2.5.p.tar.gz}, where \code{p} the patch level, from the
-\CmdStan downloads page,
+\code{cmdstan-\cmdstanversion.tar.gz}, from the \CmdStan downloads page,
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -402,14 +414,14 @@ where \code{<download-dir>} is replaced with the actual path to the directory.
 
 Then, unpack the distribution into the subdirectory
 \begin{quote}
-\nolinkurl{<download-dir>/cmdstan-2.5.p}
+\nolinkurl{<download-dir>/cmdstan-\cmdstanversion}
 \end{quote}
 %
 with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.5.p.tar.gz
+> tar -xzf cmdstan-\cmdstanversion.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -589,7 +601,7 @@ versions of code in the version control repository.
 \begin{itemize}
 \item Home: \url{http://git-scm.com/}
 \item License: GPL2
-\item Tested Version(s): Mac version 1.7.8.4, Windows version 1.7.9
+\item Tested Version(s): Mac versions 1.8.2.3 and 1.7.8.4; Windows version 1.7.9
 \end{itemize}
 
 
@@ -604,7 +616,7 @@ Home: \url{http://code.google.com/p/googletest/}
 \item
 License: BSD
 \item
-Tested Version(s): 1.6.0
+Tested Version(s): 1.7.0
 \end{itemize}
 %
 The Google Test framework is distributed with \Stan.

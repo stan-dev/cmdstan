@@ -32,14 +32,16 @@ C++11 = false
 ##
 # Library locations
 ##
-EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.0
-BOOST ?= $(STANAPI_HOME)lib/boost_1.54.0
+STANAPI_HOME ?= $(CMDSTAN_HOME)stan/
+EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
+BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
+MATH  ?= $(STANAPI_HOME)lib/stan_math_2.6.3
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -L$(CMDSTAN_HOME)bin -lstanc
@@ -72,11 +74,10 @@ PATH_SEPARATOR = /
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.cpp %.stan
+%$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
-
 
 ##
 # Rule to compile stan binaries.
@@ -128,19 +129,24 @@ endif
 	@echo '  - EIGEN                    ' $(EIGEN)
 	@echo '  - BOOST                    ' $(BOOST)
 	@echo ''
-	@echo ' Targets:'
-	@echo ''
-	@echo ' Build the Stan biniaries bin/stanc$(EXE) and bin/print$(EXE):'
+	@echo 'Build CmdStan utilities:'
 	@echo '  - build'
 	@echo ''
-	@echo ' Build a Stan model from a .stan program file,'
-	@echo '  e.g., for program file foo/bar.stan, the make target is:'
+	@echo '  This target will:'
+	@echo '  1. Build the Stan Compiler bin/stanc$(EXE).'
+	@echo '  2. Build the print utility bin/print$(EXE)'
+	@echo ''
+	@echo '  Before building CmdStan utilities the first time you need'
+	@echo '  to initialize the Stan repository with:'
+	@echo '     make stan-update'
+	@echo ''
+	@echo 'Build a Stan model:'
+	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
 	@echo '  - foo/bar$(EXE)'
 	@echo ''
-	@echo '  This target requires several processing steps:'
-	@echo '  1. If necessary, build the Stan compiler: bin/stanc$(EXE)'
-	@echo '     Called only if no bin/stanc$(EXE) found.  See target "build"'
-	@echo '  2. Run the Stan compiler over foo/bar.stan to generate C++ code, foo/bar.cpp'
+	@echo '  This target will:'
+	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
+	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
 	@echo '  Example - Sample from a normal: example-models/basic_distributions/normal.stan'
@@ -200,7 +206,7 @@ build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 
 clean: clean-manual
 	$(RM) -r $(CMDSTAN_HOME)test
-	$(RM) $(wildcard $(patsubst %.stan,%.cpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-manual:

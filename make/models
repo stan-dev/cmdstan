@@ -4,8 +4,8 @@
 MODEL_HEADER := $(STANAPI_HOME)src/stan/model/model_header.hpp
 CMDSTAN_MAIN := $(CMDSTAN_HOME)src/cmdstan/main.cpp
 
-.PRECIOUS: %.cpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.cpp %.stan
+.PRECIOUS: %.hpp %.o
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
@@ -15,4 +15,3 @@ $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : 
 	@echo ''
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) $(CMDSTAN_HOME)bin$(PATH_SEPARATOR)stanc$(EXE) $< --o=$@
-

@@ -2,7 +2,7 @@
 
 \usepackage{../../../stan/src/docs/stan-reference/stan-manuals}
 
-\newcommand{\cmdstanversion}{2.5.0}
+\newcommand{\cmdstanversion}{2.6.2}
 \newcommand{\CmdStan}{CmdStan\xspace}
 
 \begin{document}
@@ -12,8 +12,11 @@
 \frontmatter
 \include{title}
 \tableofcontents
+\newcounter{savepage}
+\setcounter{savepage}{\arabic{page} + 2}
 
 \mainmatter
+\setcounter{page}{\thesavepage}
 \part{Introduction}
 \include{introduction}
 \include{getting-started}

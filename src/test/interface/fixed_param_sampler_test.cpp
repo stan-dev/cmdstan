@@ -1,10 +1,13 @@
 #include <stan/mcmc/chains.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/io/stan_csv_reader.hpp>
-
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
+#include <fstream>
 
+using cmdstan::test::convert_model_path;
+using cmdstan::test::run_command;
+using cmdstan::test::run_command_output;
 
 void test_constant(const Eigen::VectorXd& samples) {
   for (int i = 1; i < samples.size(); i++)
@@ -32,7 +35,7 @@ TEST(McmcPersistentSampler, check_persistency) {
   std::ifstream output_stream;
   output_stream.open( (convert_model_path(model_path) + ".csv").data() );
   
-  stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream);
+  stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream, 0);
   stan::mcmc::chains<> chains(parsed_output);
   
   for (int i = 0; i < chains.num_params(); ++i) {
