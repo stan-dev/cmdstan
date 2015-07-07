@@ -16,6 +16,9 @@ CMDSTAN_HOME := $(dir $(lastword $(abspath $(MAKEFILE_LIST))))
 STANAPI_HOME := $(CMDSTAN_HOME)stan/
 VPATH = $(CMDSTAN_HOME)src:$(STANAPI_HOME)src:.
 
+tmp:
+	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
+
 ##
 # Set default values which can be overridden via file make/local
 # - CC: The compiler to use. Expecting g++ or clang++.
