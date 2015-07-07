@@ -1,5 +1,5 @@
-TEMPLATE_INSTANTIATION := $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell cd $(STANAPI_HOME)src; find stan/gm -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(shell find $(CMDSTAN_HOME)stan/src/stan/lang -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find $(CMDSTAN_HOME)stan/src/stan/lang -type f -name '*_def.cpp')
 TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:%.cpp=$(CMDSTAN_HOME)bin/%.o)
 
 $(CMDSTAN_HOME)bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
