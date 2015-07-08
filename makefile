@@ -1,30 +1,41 @@
 # Makefile for CmdStan.
-# This makefile relies heavily on the make defaults for
-# make 3.81.
 ##
 
-# The default target of this Makefile is...
+# Default target.
 help:
 
 ## Disable implicit rules.
 .SUFFIXES:
 
 ##
-# Users should only need to set these three variables for use.
+# Create absolute filepaths, set search path for source files
+# so that this makefile can be referenced from elsewhere,
+# e.g., make -f ../.../path/to/this/makefile
+##
+CMDSTAN_HOME := $(dir $(lastword $(abspath $(MAKEFILE_LIST))))
+STANAPI_HOME := $(CMDSTAN_HOME)stan/
+VPATH = $(CMDSTAN_HOME)src:$(STANAPI_HOME)src:.
+
+tmp:
+	@echo 'CMDSTAN_HOME: ' $(CMDSTAN_HOME)
+
+##
+# Set default values which can be overridden via file make/local
 # - CC: The compiler to use. Expecting g++ or clang++.
-# - O: Optimization level. Valid values are {0, 1, 2, 3}.
+# - O: Optimization level for models. Valid values are {0, 1, 2, 3}.
+# - O_STANC: Optimization level for stan binaries. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
 ##
 CC = g++
 O = 3
 O_STANC = 0
 AR = ar
+C++11 = false
 
 ##
 # Library locations
 ##
-STANAPI_HOME ?= stan/
+STANAPI_HOME ?= $(CMDSTAN_HOME)stan/
 EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
 BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
@@ -33,10 +44,10 @@ MATH  ?= $(STANAPI_HOME)lib/stan_math_2.7.0
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I $(CMDSTAN_HOME)src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS =
-LDLIBS_STANC = -Lbin -lstanc
+LDLIBS = 
+LDLIBS_STANC = -L$(CMDSTAN_HOME)bin -lstanc
 EXE = 
 PATH_SEPARATOR = /
 
@@ -49,23 +60,19 @@ PATH_SEPARATOR = /
 ##
 -include $(STANAPI_HOME)make/detect_cc
 
-# OS is set automatically by this script
-##
-# These includes should update the following variables
-# based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
-#   - EXE
-##
+## 
+# Detect OS_TYPE
 -include $(STANAPI_HOME)make/detect_os
 
 ##
-# Get information about the version of make.
+# Update the following variables based on the OS_TYPE:
+#   - CFLAGS
+#   - EXE
 ##
--include $(STANAPI_HOME)make/detect_make
+-include $(STANAPI_HOME)make/os_$(OS_TYPE)
 
 ##
-# Tell make the default way to compile a .o file.
+# Rules to compile .stan models
 ##
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
@@ -76,26 +83,18 @@ PATH_SEPARATOR = /
 	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
 
 ##
-# Tell make the default way to compile a .o file.
+# Rule to compile stan binaries.
 ##
-bin/%.o : src/%.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
-
-##
-# Tell make the default way to compile a .o file.
-##
-bin/stan/%.o : $(STANAPI_HOME)src/stan/%.cpp
+$(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
 
+
 ##
-# Rule for generating dependencies.
-# Applies to all *.cpp files in src.
-# Test cpp files are handled slightly differently.
+# Rule for generating dependencies for *.cpp files.
 ##
-bin/%.d : src/%.cpp
+bin/%.d : %.cpp
 	@if test -d $(dir $@); \
 	then \
 	(set -e; \
@@ -118,20 +117,20 @@ bin/%.d : src/%.cpp
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
-	@echo 'Stan makefile:'
-	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):   ' $(OS)
+	@echo 'CmdStan makefile'
+	@echo ' Configuration:'
+	@echo '  - OS_TYPE (Operating System):   ' $(OS_TYPE)
 	@echo '  - CC (Compiler):           ' $(CC)
 	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
 	@echo '  - O (Optimization Level):  ' $(O)
 	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - EXE (suffix for executable): ' $(EXE)
 ifdef TEMPLATE_DEPTH
 	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
 endif
 	@echo '  Library configuration:'
 	@echo '  - EIGEN                    ' $(EIGEN)
 	@echo '  - BOOST                    ' $(BOOST)
-	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
 	@echo 'Build CmdStan utilities:'
 	@echo '  - build'
@@ -153,22 +152,29 @@ endif
 	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
 	@echo ''
-	@echo '  Example - Sample from a normal: stan/example-models/basic_distributions/normal.stan'
+	@echo '  Example - Sample from a normal: example-models/basic_distributions/normal.stan'
 	@echo '    1. Build the model:'
-	@echo '       make stan/example-models/basic_distributions/normal$(EXE)'
+	@echo '       make example-models/basic_distributions/normal$(EXE)'
 	@echo '    2. Run the model:'
-	@echo '       stan'$(PATH_SEPARATOR)'example-models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
+	@echo '       example-models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
 	@echo '    3. Look at the samples:'
 	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
-	@echo 'Dev-relevant targets:'
+	@echo ' For developer targets:'
+	@echo ' - help-dev'
+	@echo '--------------------------------------------------------------------------------'
+
+.PHONY: help-dev
+help-dev:
+	@echo '--------------------------------------------------------------------------------'
+	@echo 'CmdStan developer targets - must be in CmdStan home directory to run these.'
 	@echo '  Stan management targets:'
 	@echo '  - stan-update    : Initializes and updates the Stan repository'
 	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
 	@echo '                     branch or commit hash.'
 	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
 	@echo '                     what is in the repository.'
-	@echo '  Test targets:'
+	@echo '  Test targets: run these via script runCmdStan.py'
 	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
 	@echo ''
 	@echo 'Model related:'
@@ -176,42 +182,50 @@ endif
 	@echo '- bin/print$(EXE): Build the print utility.'
 	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                   bin/stanc$(EXE))'
-	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
-	@echo '                   the Stan model as an executable.'
 	@echo ''
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
--include make/local    # for local variables
--include make/libstan  # libstan.a
--include make/models   # models
--include make/tests
--include make/command  # bin/stanc, bin/print
+# common tasks
+-include $(CMDSTAN_HOME)make/local    # for local variables
+-include $(CMDSTAN_HOME)make/libstan  # libstanc.a
+-include $(CMDSTAN_HOME)make/models   # models
+-include $(CMDSTAN_HOME)make/command  # bin/stanc, bin/print
+
+# developer tasks
+-include $(CMDSTAN_HOME)make/tests
 -include $(STANAPI_HOME)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/print$(EXE)
-	@echo ''
+build: $(CMDSTAN_HOME)bin/stanc$(EXE) $(CMDSTAN_HOME)bin/print$(EXE)
 	@echo ''
 	@echo '--- CmdStan built ---'
 
 ##
-# Clean up.
+# Clean up.  Removes Stan compiler and libraries.
 ##
 .PHONY: clean clean-manual clean-all
 
 clean: clean-manual
-	$(RM) -r test
+	$(RM) -r $(CMDSTAN_HOME)test
 	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-manual:
-	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	cd $(CMDSTAN_HOME)src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 
 clean-all: clean
-	$(RM) -r bin
+	$(RM) -r $(CMDSTAN_HOME)bin
+
+
+##
+# CmdStan manual.
+##
+.PHONY: $(CMDSTAN_HOME)src/docs/cmdstan-guide/cmdstan-guide.tex
+manual: $(CMDSTAN_HOME)src/docs/cmdstan-guide/cmdstan-guide.pdf
+
 
 ##
 # Submodule related tasks
@@ -223,19 +237,13 @@ stan-update :
 	git submodule update --recursive
 
 stan-update/%: stan-update
-	cd stan && git fetch --all && git checkout $* && git pull
+	cd $(STANAPI_HOME) && git fetch --all && git checkout $* && git pull
 
 stan-pr/%: stan-update
-	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
+	cd $(STANAPI_HOME) && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
 
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init --recursive
 
-
-##
-# Manual related
-##
-.PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
-manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 

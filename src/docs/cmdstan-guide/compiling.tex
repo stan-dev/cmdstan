@@ -1,4 +1,4 @@
-\chapter{Compiling \CmdStan Exectuables}\label{compiling.chapter}
+\chapter{Compiling \Stan Programs with  \CmdStan}\label{compiling.chapter}
 
 \noindent
 Preparing a \Stan program to be run involves two steps,
@@ -8,46 +8,64 @@ Preparing a \Stan program to be run involves two steps,
 \item compiling the resulting \Cpp to an executable.
 \end{enumerate}
 %
-This chapter discusses both steps, as well as their encapsulation into
-a single make target.  
 
 \section{Translating and Compiling through {\tt\bfseries make}}\label{make-models.section}
 
-The simplest way to compile a \CmdStan program is through the \code{make}
-build tool, which encapsulates the translation and compilation step
-into a single command.  The commands making up the \code{make} target
-for compiling a model are described in the following sections, and the
-following chapter describes how to run a compiled model.
+The simplest way to compile a \Stan program is through the \code{make}
+build tool, which runs in conjunction with a file called a \emph{makefile}.
+The makefile contains rules to translate and compile a \Stan program,
+as well as rules for building \CmdStan itself.
+The arguments to the \code{make} command are called targets.
+Given the name of a target, \code{make} looks for rules which
+specify how to build that target.
+
+The \code{make -f} flag specifies the name of the makefile.
+If no \code{-f} flag is specified, make looks for a file named \code{makefile}
+in the current working directory.
+The \CmdStan home directory contains a makefile named \code{makefile}
+which contains a target that 
+combines the rules for translation and compiling a \Stan program,
+so that we can build the \CmdStan executable via a single call to \code{make}.
+
+Given a \Stan program called \code{my\_model.stan},
+we tell \code{make} to build the executable \code{my\_model}
+as follows, where \code{\$CMDSTAN\_HOME} is the path to the
+\CmdStan home directory.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make -f $CMDSTAN_HOME/makefile my\_model
+\end{Verbatim}
+\end{quote}
+%$
 
 \subsection{Translating and Compiling Test Models}
 
-There are a number of example models distributed with \CmdStan which
-unpack into the path \code{stan/example-models}.  To build the simple
-example
-\nolinkurl{stan/example-models/basic\_estimators/bernoulli.stan}, the
-following call to \code{make} suffices.  First the directory is
-changed to \CmdStan's home directory by replacing
-\code{<cmdstan-home>} with the appropriate path.
+Open source Stan models, together with data simulators and real data,
+are available from the Stan GitHub repository 
+\url{https://github.com/stan-dev/example-models},
+which contains basic examples used in the manual
+as well as Stan versions of models found in books, including
+Gelman and Hill 2007, Lee and Wagenmakers 2014, and most of the BUGS examples.
+
+The directory \code{example-models/basic\_estimators}
+contains the \Stan program \code{bernoulli.stan}
+together with a data file in Rdump format \code{bernoulli.data.R}.
+To build the \CmdStan executable model, working from this directory,
+the following call to \code{make} suffices:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd <cmdstan-home>
+> make -f $CMDSTAN_HOME/makefile bernoulli
 \end{Verbatim}
 \end{quote}
-%
+%$
 The following call will build an executable form of the Bernoulli
 estimator. On Windows, replace \code{bernoulli} with \code{bernoulli.exe}.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make stan/example-models/basic_estimators/bernoulli
-\end{Verbatim}
-\end{quote}
-%
 This will translate the model \code{bernoulli.stan} to a \Cpp file and
 compile a \CmdStan program using the generated \Cpp file, putting the
 executable in
-\nolinkurl{stan/example-models/basic_distributions/bernoulli(.exe)}.
+\code{example-models/basic\_estimators/bernoulli(.exe)}.
 
 \subsection{Dependencies in {\tt\bfseries make}}
 
@@ -65,22 +83,26 @@ If the file containing the \Stan program is updated, the next call to
 \subsection{Getting Help from the {\tt makefile}}
 
 \CmdStan's \code{makefile}, which contains the top-level instructions to
-\code{make}, provides extensive help in terms of targets and options.
-It is located at the top-level of the distribution, so first change
-directories to that location.
+\code{make}, provides help for targets and options.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd <cmdstan-home>
+> make -f $CMDSTAN_HOME/makefile help
 \end{Verbatim}
-\end{quote} 
-and then invoke make with the target \code{help},
-
+\end{quote}
+%$
+From the \CmdStan home directory, it is not necessary to specify the makefile.
+Furthermore, the help target is the default target, so the following two calls
+to make are equivalent:
+%
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make help
+> make
 \end{Verbatim}
 \end{quote}
+%
+
 
 
 \subsection{Options to \code{make}}

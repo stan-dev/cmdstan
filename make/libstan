@@ -1,15 +1,14 @@
-TEMPLATE_INSTANTIATION := $(shell find stan/src/stan/lang -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell find stan/src/stan/lang -type f -name '*_def.cpp')
-TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:stan/src/%.cpp=bin/%.o)
-bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
-	@mkdir -p $(dir $@)
-	$(AR) -rs bin/libstanc.a $(TEMPLATE_INSTANTIATION)
+TEMPLATE_INSTANTIATION := $(shell find $(CMDSTAN_HOME)stan/src/stan/lang -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find $(CMDSTAN_HOME)stan/src/stan/lang -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:%.cpp=$(CMDSTAN_HOME)bin/%.o)
 
-$(TEMPLATE_INSTANTIATION) : bin/stan/%.o : stan/src/stan/%.cpp
+$(CMDSTAN_HOME)bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
+	@mkdir -p $(dir $@)
+	$(AR) -rs $(CMDSTAN_HOME)bin/libstanc.a $(TEMPLATE_INSTANTIATION)
+
+$(TEMPLATE_INSTANTIATION) : $(CMDSTAN_HOME)bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
-
 
 ##
 # Generate dependencies for libraries
