@@ -168,8 +168,6 @@ endif
 	@echo '                     branch or commit hash.'
 	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
 	@echo '                     what is in the repository.'
-	@echo '  Test targets:'
-	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
@@ -219,8 +217,7 @@ clean-all: clean
 
 .PHONY: stan-update
 stan-update :
-	git submodule init
-	git submodule update --recursive
+	git submodule update --init --recursive
 
 stan-update/%: stan-update
 	cd stan && git fetch --all && git checkout $* && git pull
