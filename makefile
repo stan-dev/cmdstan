@@ -181,6 +181,7 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+-include $(HOME)/.config/cmdstan/make.local    # define local variables
 -include make/local    # for local variables
 -include make/libstan  # libstan.a
 -include make/models   # models
