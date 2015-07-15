@@ -21,7 +21,14 @@ Please give a descriptive summary of the bug.
 
 __CmdStan Version__
 
-For tagged versions, please report the version number.
+For tagged versions, please report the version number. Type `make help` and it will be listed at the top.
+
+```
+> make help
+--------------------------------------------------------------------------------
+CmdStan v2.7.0 help
+...
+```
 
 For git cloned versions, report the result of typing `git rev-parse HEAD` from the command line.
 
@@ -62,7 +69,14 @@ Please give a descriptive summary of the feature.
 
 __Version__
 
-For tagged versions, please report the version number.
+For tagged versions, please report the version number. Type `make help` and it will be listed at the top.
+
+```
+> make help
+--------------------------------------------------------------------------------
+CmdStan v2.7.0 help
+...
+```
 
 For git cloned versions, report the result of typing `git rev-parse HEAD` from the command line.
 
