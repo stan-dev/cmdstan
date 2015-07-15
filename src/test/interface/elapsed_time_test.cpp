@@ -28,12 +28,12 @@ TEST(CommandElapsedTime, PrintToFile) {
   path_separator.push_back(get_path_separator());
   std::string command = "src" + path_separator + "test" 
     + path_separator + "test-models" + path_separator + "test_model"
-    + " sample output file=test/output.csv";
+    + " sample output file=test/output2.csv";
 
   run_command_output out = run_command(command);
   ASSERT_FALSE(out.hasError) 
     << "\"" << out.command << "\" quit with an error";
-  std::ifstream ifstream("test/output.csv");
+  std::ifstream ifstream("test/output2.csv");
   std::string output_file((std::istreambuf_iterator<char>(ifstream)),
                            std::istreambuf_iterator<char>());
   ifstream.close();

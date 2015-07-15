@@ -26,13 +26,14 @@ AR = ar
 ##
 STANAPI_HOME ?= stan/
 EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
-BOOST ?= $(STANAPI_HOME)lib/boost_1.55.0
+BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
 GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
+MATH  ?= $(STANAPI_HOME)lib/stan_math_2.7.0
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
@@ -167,8 +168,6 @@ endif
 	@echo '                     branch or commit hash.'
 	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
 	@echo '                     what is in the repository.'
-	@echo '  Test targets:'
-	@echo '  - src/test/interface: Runs tests on CmdStan interface.'
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
@@ -218,8 +217,7 @@ clean-all: clean
 
 .PHONY: stan-update
 stan-update :
-	git submodule init
-	git submodule update --recursive
+	git submodule update --init --recursive
 
 stan-update/%: stan-update
 	cd stan && git fetch --all && git checkout $* && git pull

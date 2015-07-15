@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
@@ -30,7 +31,7 @@ class CmdStan : public testing::Test {
     std::ifstream output_stream;
     output_stream.open(output_file.data());
   
-    stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream);
+    stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream, 0);
     stan::mcmc::chains<> chains(parsed_output);
     output_stream.close();
     return chains;
