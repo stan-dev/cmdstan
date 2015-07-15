@@ -42,12 +42,12 @@ of the following, depending on platform.
 \end{quote}
 %
 On both platforms, this command reads the data from file
-\code{my\_data}, runs warmup tuning for 1000 iterations (the values
-of which are discarded), and then runs the fully-adaptive \NUTS
-sampler for 1000 iterations, writing the parameter (and other) values
-to the file \code{samples.csv} in the current working directory.  When
-no random number seed is specified, a seed is generated from the
-system time.
+\code{my\_data}, runs warmup tuning for 1000 iterations (the values of
+which are discarded), and then runs the fully-adaptive \NUTS sampler
+for 1000 iterations, writing the parameter (and other) values to the
+file \code{samples.csv} in the current working directory.  When no
+random number seed is specified, a seed is generated from the system
+time.
 
 \subsection{Sampling in Parallel}
 
@@ -65,8 +65,8 @@ To sample four chains using a Bash shell on Mac OS or Linux, execute%
 \begin{Verbatim}[fontshape=sl]
 > for i in {1..4}
   do
-    ./my_model sample random seed=12345
-       id=$i data file=my_data
+    ./my_model sample random seed=12345 \
+       id=$i data file=my_data \
        output file=samples$i.csv &
  done
 \end{Verbatim}
@@ -81,7 +81,7 @@ postfixing \code{> /dev/null} to a command, which in the above case,
 means changing the second-to-last line to
 \begin{quote}
 \begin{Verbatim}
-       output file=samples$i.csv > /dev/null &  \
+       output file=samples$i.csv > /dev/null &
 \end{Verbatim}
 \end{quote}
 
@@ -114,7 +114,7 @@ To compute posterior quantities, it is sometimes easier to have the
 chains merged into a single CSV file.  If the grep and sed programs
 are installed, then the following will combine the four
 comma-separated values files into a single comma-separated values
-file.  The command is the same on Windows, Mac OS and Linux.
+file.  The command is the same on Windows, Mac OS, and Linux.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -176,9 +176,9 @@ uses a Gaussian with a full-rank covariance matrix for the approximation.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./my_model variational algorithm=meanfield            \
+> ./my_model variational algorithm=meanfield  \
              data file=my_data
-> ./my_model variational algorithm=fullrank             \
+> ./my_model variational algorithm=fullrank   \
              data file=my_data
 \end{Verbatim}
 \end{quote}
@@ -187,9 +187,9 @@ uses a Gaussian with a full-rank covariance matrix for the approximation.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> my_model variational algorithm=meanfield              \
+> my_model variational algorithm=meanfield    \
            data file=my_data
-> my_model variational algorithm=fullrank               \
+> my_model variational algorithm=fullrank     \
            data file=my_data
 \end{Verbatim}
 \end{quote}
@@ -202,19 +202,19 @@ differences.  If there are discrepancies, there is a problem with the
 model or initial states (or a bug in \Stan).  To run on the different
 platforms, use one of the following.
 
-\subsubsection{Windows}
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> my_model diagnose data file=my_data
-\end{Verbatim}
-\end{quote}
-
 \subsubsection{Mac OS and Linux}
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > ./my_model diagnose data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model diagnose data file=my_data
 \end{Verbatim}
 \end{quote}
 
@@ -1172,8 +1172,7 @@ generated quantities are ignored.
 \begin{description}
 \hierlongcmd{}{{\bfseries output}}
   {File output options}
-  {Valid subarguments: \code{file, diagnostic\_file,
-      \\ \hspace*{24pt}, refresh}}
+  {Valid subarguments: \code{file, diagnostic\_file, refresh}}
 %
   \hiercmdarg{\indentarrow}{file}{$$string$$}
     {Output file}
