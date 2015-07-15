@@ -43,8 +43,8 @@ fi
 
 cat <<EOF > TEST_RESULTS
 Summary
-Date:                 `date`
-CmdStan directory: `basename $PWD`
+Date:                         `date`
+CmdStan directory:            `basename $PWD`
 
 CmdStan tests                 exit code = ${CMDSTAN_TESTS}
 Stan unit tests               exit code = ${STAN_UNIT_TESTS}
