@@ -4,7 +4,7 @@ If you've clicked on the "guidelines for contributing" link from the GitHub issu
 
 These links will pre-populate an issue with a template:
 
-- [Bug Report](https://github.com/stan-dev/cmdstan/issues/new?body=__CmdStan%20Version__%0A%0A__Operating%20System__%0A%0A__Compiler__%0A%0A__Description__%0A%0A__Steps__%0A%0A__Output__%0A%0A__Expected%20Output__%0A%0A__Additional%20Information__)
+- [Bug Report](https://github.com/stan-dev/cmdstan/issues/new?body=%23%23%20Bug%20Report%0A%0A__CmdStan%20Version__%0A%0A__Operating%20System__%0A%0A__Compiler__%0A%0A__Description__%0A%0A__Steps__%0A%0A__Output__%0A%0A__Expected%20Output__%0A%0A__Additional%20Information__)
 - [Feature Request](https://github.com/stan-dev/cmdstan/issues/new?body=%23%23%20Feature%20Request%0A%0A__Version__%0A%0A__Description__%0A%0A__Example__%0A%0A__Additional%20Information__%0A%0A)
 
 
