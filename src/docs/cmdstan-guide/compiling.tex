@@ -9,45 +9,40 @@ Preparing a \Stan program to be run involves two steps,
 \end{enumerate}
 %
 This chapter discusses both steps, as well as their encapsulation into
-a single make target.  
+a single \code{make} target.
 
 \section{Translating and Compiling through {\tt\bfseries make}}\label{make-models.section}
 
-The simplest way to compile a \CmdStan program is through the \code{make}
-build tool, which encapsulates the translation and compilation step
-into a single command.  The commands making up the \code{make} target
-for compiling a model are described in the following sections, and the
-following chapter describes how to run a compiled model.
+The simplest way to compile a \CmdStan program is through the
+\code{make} build tool, which encapsulates the translation and
+compilation step into a single command.  The commands making up the
+\code{make} target for compiling a model are described in the
+following sections, and the following chapter describes how to run a
+compiled model.
+
+Before compiling a \CmdStan program, change directories to
+\code{<cmdstan-home>}. 
 
 \subsection{Translating and Compiling Test Models}
 
 There are a number of example models distributed with \CmdStan which
-unpack into the path \code{stan/example-models}.  To build the simple
-example
-\nolinkurl{stan/example-models/basic\_estimators/bernoulli.stan}, the
-following call to \code{make} suffices.  First the directory is
-changed to \CmdStan's home directory by replacing
-\code{<cmdstan-home>} with the appropriate path.
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <cmdstan-home>
-\end{Verbatim}
-\end{quote}
+unpack into the path \code{examples}.  To build the simple example
+\nolinkurl{examples/bernoulli/bernoulli.stan}, the following call to
+\code{make} suffices.
 %
 The following call will build an executable form of the Bernoulli
 estimator. On Windows, replace \code{bernoulli} with \code{bernoulli.exe}.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make stan/example-models/basic_estimators/bernoulli
+> make examples/bernoulli/bernoulli
 \end{Verbatim}
 \end{quote}
 %
-This will translate the model \code{bernoulli.stan} to a \Cpp file and
-compile a \CmdStan program using the generated \Cpp file, putting the
-executable in
-\nolinkurl{stan/example-models/basic_distributions/bernoulli(.exe)}.
+This will translate the model \code{bernoulli.stan} to a \Cpp file,
+\code{bernoulli.hpp}, and compile a \CmdStan program using the
+generated \Cpp file, putting the executable in
+\nolinkurl{examples/bernoulli/bernoulli(.exe)}.
 
 \subsection{Dependencies in {\tt\bfseries make}}
 
@@ -61,27 +56,17 @@ If the file containing the \Stan program is updated, the next call to
 \code{make} will rebuild the \CmdStan executable.
 
 
-
 \subsection{Getting Help from the {\tt makefile}}
 
 \CmdStan's \code{makefile}, which contains the top-level instructions to
-\code{make}, provides extensive help in terms of targets and options.
-It is located at the top-level of the distribution, so first change
-directories to that location.
+\code{make}, provides extensive help in terms of targets and options. Invoke
+\code{make} with the target \code{help}:
 %
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> cd <cmdstan-home>
-\end{Verbatim}
-\end{quote} 
-and then invoke make with the target \code{help},
-
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make help
 \end{Verbatim}
 \end{quote}
-
 
 \subsection{Options to \code{make}}
 

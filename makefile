@@ -152,6 +152,12 @@ help:
 	@echo '    3. Look at the samples:'
 	@echo '       > bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
 	@echo ''
+	@echo ''
+	@echo '  Clean CmdStan:'
+	@echo ''
+	@echo '    Remove the built CmdStan tools:'
+	@echo '    > make clean-all'
+	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: help-dev
