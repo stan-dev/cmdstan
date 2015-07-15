@@ -39,7 +39,7 @@ LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.6.2
+CMDSTAN_VERSION := 2.7.0
 
 ##
 # Get information about the compiler used.
