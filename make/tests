@@ -7,7 +7,7 @@ GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
 
 ##
-# target path_separator for use in some tests that need to 
+# target path_separator for use in some tests that need to
 # call executables.
 ##
 .PHONY: path_separator
@@ -25,8 +25,8 @@ TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f)
 ##
 # Target to verify header files are coherent
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/cmdstan -name '*.hpp' -type f)) 
-ifeq ($(OS),win) 
+HEADER_TESTS := $(addsuffix -test,$(shell find src/cmdstan -name '*.hpp' -type f))
+ifeq ($(OS),win)
   DEV_NULL = nul
 else
   DEV_NULL = /dev/null
@@ -42,7 +42,7 @@ test/dummy.cpp:
 
 ##
 # Build the google test library.
-## 
+##
 $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
@@ -77,7 +77,7 @@ endif
 ####
 ## These make rules apply if SECONDEXPANSION is available
 ## in make.
-#### 
+####
 ifneq ($(filter second-expansion,$(.FEATURES)),)
 ##
 # Defining the test target implicit static rule.
@@ -100,9 +100,9 @@ $(TEST_TARGETS): src/test/%: $$(filter $$(patsubst src/$$(PERCENT),$$(PERCENT),$
 	@echo 'Ran '$(words $(filter test/%,$^))' tests for '$@
 else
 ####
-## Warning for developers that don't have a 
+## Warning for developers that don't have a
 ## current enough version of make (3.81 or higher).
-#### 
+####
 .PHONY: $(TEST_TARGETS)
 $(TEST_TARGETS):
 	@echo ''
@@ -120,6 +120,7 @@ test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-mode
 test/interface/csv_header_consistency_test.o: src/test/test-models/csv_header_consistency$(EXE)
 test/interface/fixed_param_sampler_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
 test/interface/optimization_output_test.o: src/test/test-models/optimization_output$(EXE)
+test/interface/variational_output_test.o: src/test/test-models/variational_output$(EXE)
 test/interface/print_test.o: src/test/interface/matrix_output.csv bin/print$(EXE)
 test/interface/print_uninitialized_test.o: src/test/test-models/print_uninitialized$(EXE)
 test/interface/services/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
