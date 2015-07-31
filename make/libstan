@@ -1,11 +1,11 @@
-TEMPLATE_INSTANTIATION := $(shell find $(STANAPI_HOME)src/stan/lang -type f -name '*_inst.cpp')
-TEMPLATE_INSTANTIATION += $(shell find $(STANAPI_HOME)src/stan/lang -type f -name '*_def.cpp')
-TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:$(STANAPI_HOME)src/%.cpp=bin/%.o)
+TEMPLATE_INSTANTIATION := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp')
+TEMPLATE_INSTANTIATION += $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
+TEMPLATE_INSTANTIATION := $(TEMPLATE_INSTANTIATION:$(STAN)src/%.cpp=bin/%.o)
 bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs bin/libstanc.a $(TEMPLATE_INSTANTIATION)
 
-$(TEMPLATE_INSTANTIATION) : bin/stan/%.o : $(STANAPI_HOME)src/stan/%.cpp
+$(TEMPLATE_INSTANTIATION) : bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
