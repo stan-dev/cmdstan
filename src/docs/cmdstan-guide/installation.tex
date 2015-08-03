@@ -491,21 +491,17 @@ these variables. That said, it is easy to point \CmdStan to other versions
 of these libraries in other directories.
 %
 \begin{itemize}
-  \item \Verb|STANAPI_HOME|. The location of the \Stan source
-    directory. The default is \Verb|STANAPI_HOME=stan/|. Note: the
+  \item \Verb|STAN|. The location of the \Stan source
+    directory. The default is \Verb|STAN=stan/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/lib/stan_math_2.7.0|. If
-    \Verb|STANAPI_HOME| is set, the default will be the
-    \Verb|lib/stan_math_2.7.0| folder within \Verb|STANAPI_HOME|.
-  \item \Verb|BOOST|. The location of the Boost library. The default
-    is \Verb|BOOST=stan/lib/boost_1.58.0|. If \Verb|STANAPI_HOME| is
-    set, the default will be the \Verb|lib/boost_1.58.0| folder within
-    \Verb|STANAPI_HOME|.
-  \item \Verb|EIGEN|. The location of the Eigen library. The default
-    is \Verb|EIGEN=stan/lib/eigen_3.4.0|. If \Verb|STANAPI_HOME| is
-    set, the default will be the \Verb|lib/eigen_3.4.0| folder within
-    \Verb|STANAPI_HOME|.
+    default is \Verb|MATH=stan/lib/stan_math_2.7.0|.
+  \item \Verb|BOOST|. The location of the Boost library. If
+    \Verb|BOOST| is not explicitly set, this will default to the
+    \Verb|lib/boost_1.58.0| folder within \Verb|MATH|.
+  \item \Verb|EIGEN|. The location of the Eigen library. If
+    \Verb|EIGEN| is not explicitly set, this will default to the
+    \Verb|lib/eigen_3.4.0| folder within \Verb|MATH|.
 \end{itemize}
 %
 
