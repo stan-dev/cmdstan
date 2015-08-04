@@ -731,20 +731,20 @@ output for sampling, first dumping the entire set of parameters used.
 #   file = output.csv (Default)
 #   diagnostic_file =  (Default)
 #   refresh = 100 (Default)
-lp,theta
-0,0.221171
-0,0.166458
-0,0.297987
-0,...
-0,...
-0,...
+lp__,theta
+-6.77173,0.223462
+-6.74816,0.252055
+-6.92751,0.180521
+-7.25717,0.13987
+-6.91783,0.182266
+...
 \end{Verbatim}
 \end{quote}
 %
 Note that everything is a comment other than a line for the header,
-and a line for the values.  Here, the header indicates the
-unnormalized log probability with \code{lp\_\_}, which is not evaluated
-in the variational algorithm. The ELBO is also not stored unless a diagnostic
+and a line for the values. The header indicates the
+unnormalized log probability with \code{lp\_\_} based on the variational
+parameters. The ELBO is not stored unless a diagnostic
 option is given. See \refsection{stan-command-line-options} for more details.
 The first line is special: it is the mean of the variational approximation.
 The rest of the output contains \code{output\_samples} number of samples
