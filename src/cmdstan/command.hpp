@@ -818,7 +818,7 @@ namespace stan {
         if (algo->value() == "fullrank") {
           if (output_stream) {
             std::vector<std::string> names;
-            names.push_back("lp");
+            names.push_back("lp__");
             model.constrained_param_names(names, true, true);
 
             (*output_stream) << names.at(0);
@@ -848,7 +848,7 @@ namespace stan {
         if (algo->value() == "meanfield") {
           if (output_stream) {
             std::vector<std::string> names;
-            names.push_back("lp");
+            names.push_back("lp__");
             model.constrained_param_names(names, true, true);
 
             (*output_stream) << names.at(0);
