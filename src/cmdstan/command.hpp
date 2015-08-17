@@ -835,14 +835,13 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
                      base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta_adagrad, tol_rel_obj, max_iterations);
         }
 
         if (algo->value() == "meanfield") {
@@ -865,14 +864,13 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
                      base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta_adagrad, tol_rel_obj, max_iterations);
         }
       }
 
