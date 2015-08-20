@@ -19,7 +19,7 @@ on the compiler and linker.
 \CmdStan has been tested on the following operating systems.
 %
 \begin{itemize}
-\item Linux (Debian, Ubuntu, Red Hat), 
+\item Linux (Debian, Ubuntu, Red Hat)
 \item Mac OS X (10.10 ``Yosemite,'' 10.9 ``Mavericks,'' 10.8
   ``Mountain Lion,'' 10.7 ``Lion,'' and 10.6 ``Snow Leopard'')
 \item Windows (XP, 7, 8).
@@ -40,9 +40,9 @@ The only two absolute requirements for running \CmdStan are the
 In order to compile \Stan program, the \CmdStan source code is
 required.  The \CmdStan source code distribution includes \CmdStan's
 source code, \Stan's source code, documentation, build scripts, unit
-tests, example models models, documentation and source for the
-required libraries Boost and Eigen, and the source for an optional
-testing library, Google Test.
+tests, documentation and source for the required libraries, Stan Math
+Library, Boost, and Eigen, and the source for an optional testing
+library, Google Test.
 
 \subsubsection{CmdStan: Stable Releases}
 
@@ -63,6 +63,33 @@ latest versions of CmdStan (and Stan) underdevelopment.  See:
 http://mc-stan.org/source-repos.html
 \end{quote}
 
+\subsubsection{Stan Library Source}
+
+The source code for Stan's parse and implementation of inference
+algorithms are in the \Stan library.
+%
+\begin{itemize}
+\item Home: \url{http://mc-stan.org/stan.html}
+\item License: BSD
+\item Tested Version: 2.7.0
+\end{itemize}
+%
+The \Stan source code is distributed with \CmdStan.
+
+\subsubsection{Stan Math Library Source}
+
+\Stan's mathematical functions and inference algorithm rely on the
+reverse-mode automatic differentiation implemented in the \Stan Math
+Library.
+%
+\begin{itemize}
+\item Home: \url{http://mc-stan.org}
+\item License: BSD
+\item Tested Version: 2.7.0
+\end{itemize}
+%
+The \Stan Math Library source code is distributed with \CmdStan
+
 \subsubsection{Boost C++ Library Source}
 
 \Stan's parser and some of its mathematical functions and template
@@ -72,10 +99,10 @@ Library.
 \begin{itemize}
 \item Home: \url{http://www.boost.org/users/license.html}
 \item License: Boost Software License
-\item Tested Version: 1.54.0
+\item Tested Version: 1.58.0
 \end{itemize}
 %
-The Boost source code is distributed with \Stan.
+The Boost source code is distributed with \CmdStan.
 
 
 \subsubsection{Eigen Matrix and Linear Algebra Library Source}
@@ -86,10 +113,10 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.2.0
+\item Tested Version: 3.2.4
 \end{itemize}
 %
-The Eigen source code is distributed with \Stan.
+The Eigen source code is distributed with \CmdStan.
 
 
 \subsection{\Cpp Compiler}
@@ -109,15 +136,13 @@ Home: \url{http://gcc.gnu.org/}
 \\
 License: GPL3+
 %
-\item \clang, Mac 2.9--3.1, Linux 2.9--3.1
+\item \clang, Mac 2.9--3.1, 6.1, Linux 2.9--3.1
 \\
 Home: \url{http://clang.llvm.org/}
 \\
 License: BSD
 %
 \item mingw-64, version 2.0 (Windows 7, cross-compiled from Debian Linux)
-%
-\item Intel \Cpp, Linux version 12.1.3
 %
 \end{itemize}
 %
@@ -209,9 +234,9 @@ This should print version information for make.
 \subsection{Downloading and Unpacking \CmdStan}
 
 The \CmdStan source code distribution is named
-\code{cmdstan-\cmdstanversion.tar.gz}; the versions here are major version 2,
-minor version 6, and patch level 0.  Download the latest \CmdStan
-source tarball from the \CmdStan downloads page,
+\code{cmdstan-\cmdstanversion.tar.gz}; the versions here are major
+version 2, minor version 7, and patch level 0.  Download the latest
+\CmdStan source tarball from the \CmdStan downloads page,
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -267,7 +292,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-\cmdstanversion.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.7.0.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
@@ -421,7 +446,7 @@ with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-\cmdstanversion.tar.gz
+> tar -xzf cmdstan-2.7.0.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -466,17 +491,17 @@ these variables. That said, it is easy to point \CmdStan to other versions
 of these libraries in other directories.
 %
 \begin{itemize}
-  \item \Verb|STANAPI_HOME|. The location of the \Stan source
-    directory. The default is \Verb|STANAPI_HOME=stan/|. Note: the
+  \item \Verb|STAN|. The location of the \Stan source
+    directory. The default is \Verb|STAN=stan/|. Note: the
     trailing forward slash is necessary.
-  \item \Verb|BOOST|. The location of the Boost library. The default
-    is \Verb|BOOST=stan/lib/boost_1.54.0|. If \Verb|STANAPI_HOME| is
-    set, the default will be the \Verb|lib/boost_1.54.0| folder within
-    \Verb|STANAPI_HOME|.
-  \item \Verb|EIGEN|. The location of the Eigen library. The default
-    is \Verb|EIGEN=stan/lib/eigen_3.2.0|. If \Verb|STANAPI_HOME| is
-    set, the default will be the \Verb|lib/eigen_3.2.0| folder within
-    \Verb|STANAPI_HOME|.
+  \item \Verb|MATH|. The location of the Stan Math Library. The
+    default is \Verb|MATH=stan/lib/stan_math_2.7.0|.
+  \item \Verb|BOOST|. The location of the Boost library. If
+    \Verb|BOOST| is not explicitly set, this will default to the
+    \Verb|lib/boost_1.58.0| folder within \Verb|MATH|.
+  \item \Verb|EIGEN|. The location of the Eigen library. If
+    \Verb|EIGEN| is not explicitly set, this will default to the
+    \Verb|lib/eigen_3.4.0| folder within \Verb|MATH|.
 \end{itemize}
 %
 
@@ -507,7 +532,7 @@ These are the additional options and typically do not need to be set.
 \end{itemize}
 %
 
-\subsection{Rebuildling \CmdStan}
+\subsection{Rebuilding \CmdStan}
 
 When compiler flags are changed, \CmdStan needs to be rebuilt in order
 for the changes to take place. The easiest way to do this is to type:
@@ -693,7 +718,7 @@ terminal window to install it.
 \end{quote}
 %
 In this command, {\slshape gccVersion} is the name of a compiler
-version, such as \code{g++=mp-4.6}, for version 4.6.  Errors may arise
+version, such as \code{g++-mp-4.6}, for version 4.6.  Errors may arise
 during the install such as the following.
 %
 \begin{quote}\small\tt

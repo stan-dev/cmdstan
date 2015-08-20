@@ -8,10 +8,18 @@ material in this chapter with full reference documentation. See the
 
 \section{Installation}
 
+Installation of \CmdStan is simple, just download and unpack the source.
+\CmdStan requires:
+\begin{itemize}
+  \item The \CmdStan source and all its libraries. Everything is
+    included in the release tarball or zip file.
+  \item The \code{make} utility.
+  \item A \Cpp compiler.
+\end{itemize}
+
 For information about supported versions of Windows, Mac, and Linux
-platforms see
-\refappendix{install}.
-For step-by-step installation instructions, see
+platforms see \refappendix{install}. For step-by-step installation
+instructions of the prerequisites, see
 \begin{itemize}
   \item Windows: \refappendix{install-windows}
   \item Mac: \refappendix{install-mac}
@@ -21,14 +29,15 @@ For step-by-step installation instructions, see
 
 \section{Building \CmdStan}
 
-Building \CmdStan involves generating the \Stan compiler,
-\code{stanc}, and a basic posterior analsyis tool, \code{print}.  The
-build process utilizes the \code{make} command-line utility and works
-the same way across all supported platforms.
+Building \CmdStan involves building executable programs for the \Stan
+compiler, \code{stanc}, and a basic posterior analsyis tool,
+\code{print}.  The build process utilizes the \code{make} command-line
+utility and works the same way across all supported platforms.
 %
 \begin{enumerate}
   \item Open a command-line terminal window and change directories to
-    the \CmdStan directory.
+    the \CmdStan directory. From here on, we'll refer to this location as
+    \code{<cmdstan-home>}.
     %
     \begin{quote}
       \begin{Verbatim}[fontshape=sl]
@@ -36,16 +45,32 @@ the same way across all supported platforms.
       \end{Verbatim}
     \end{quote}
     %
-  \item \emph{Optional:} \ Set local \code{make} variables by editing
-    the file \verb+make/local+. For most installations, this step can
-    be skipped. See \refappendix{make-options} for a list of available
-    options.
+    \noindent
+    A listing of the files and directory of this folder should show these files:
     %
-  \item Use make to build \CmdStan. If multiple CPU cores are
-    available, the call to make can be parallelized with the
-    \code{-j{\slshape N}} option, where \code{{\slshape N}} is the number of CPU cores. The
-    parallel option (\code{-j{\slshape N}}) can be safely omitted.
-  For instance, to run on 2 cores, use
+    \begin{quote}
+      \begin{Verbatim}
+> ls
+LICENSE            makefile
+README.md          runCmdStanTests.py
+doc                src
+examples           stan
+make               test-all.sh
+      \end{Verbatim}
+    \end{quote}
+    %
+  \item \emph{Optional:} \ Set local \code{make} variables by editing
+    the file \verb+~/.config/cmdstan/make.local+ or
+    \verb+<cmdstan-home>/make/local+. See \refappendix{make-options}
+    for a list of available options.  For most installations, this
+    step can be skipped. Setting local \code{make} variables here will
+    persist between builds.
+    %
+  \item Use make to build \CmdStan. When multiple CPU cores are
+    available on the system, the call to make can be parallelized.  It
+    can either be specified directly when calling \code{make} with the
+    \code{-j{\slshape N}} option, where \code{{\slshape N}} is the
+    number of CPU cores. For instance, to run on 2 cores, use
     %
     \begin{quote}
       \begin{Verbatim}[fontshape=sl]
@@ -54,17 +79,14 @@ the same way across all supported platforms.
     \end{quote}
     %
     \emph{Warning:} \ The \code{make} program may take 10+ minutes and
-    consume 2+ GB of memory to build \CmdStan.  Compiler warnings,
-    such as \code{uname:~not found} or \code{warning: unused
-      variable}, may be safely ignored.
-
+    consume 2+ GB of memory to build \CmdStan.
 \end{enumerate}
 %
 When \CmdStan is successfully built, the \code{make} program will report
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan built ---
+--- CmdStan v2.7.0 built ---
   \end{Verbatim}
 \end{quote}
 %
@@ -141,6 +163,9 @@ y <- c(0,1,0,0,0,0,0,0,0,1)
 This defines the contents of two variables, \code{N} and \code{y},
 using an R-like syntax (see \refchapter{dump} for more information).
 
+\subsection{Change directories to \code{<cmdstan-home>}}
+
+Before building any Stan program, change directories to \code{<cmdstan-home>}.
 
 \subsection{Compiling a \Stan Program}
 
@@ -154,12 +179,12 @@ argument. For Mac and Linux, it is the name of the \Stan program with
 the \code{.stan} omitted. For Windows, replace \code{.stan} with
 \code{.exe}.
 
-To build the Bernoulli example, from \code{<cmdstan-home>} issue
+To build the Bernoulli example, use
 the following command for Mac and Linux:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make stan/example-models/basic_estimators/bernoulli
+> make examples/bernoulli/bernoulli
 \end{Verbatim}
 \end{quote}
 %
@@ -167,12 +192,17 @@ For Windows, the command is the same with the addition of \code{.exe}
 at the end of the target:
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make stan/example-models/basic_estimators/bernoulli.exe
+> make examples/bernoulli/bernoulli.exe
 \end{Verbatim}
 \end{quote}
 
-The generated \Cpp code and the compiled executable will be placed in
-the same directory as the \Stan program.
+The generated \Cpp code (\code{bernoulli.hpp}) and the compiled
+executable will be placed in the same directory as the \Stan program.
+
+\emph{Note:} to build a \Stan program, you must be in the
+\code{<cmdstan-home>} directory. The path to the \Stan program must not
+contain a space. If using relative paths, the relative path must not
+contain a space.
 
 \subsection{Sampling from the \Stan Program}
 
@@ -180,7 +210,7 @@ The program can be executed from the directory in which it resides.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> cd stan/example-models/basic_estimators
+> cd examples/bernoulli
 \end{Verbatim}
 \end{quote}
 %
@@ -279,7 +309,7 @@ lines beginning with the pound sign (\Verb|#|)).
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 5
+# stan_version_minor = 7
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = sample (Default)
@@ -470,6 +500,7 @@ details.
 %
 Executing this command prints the following.
 %
+\begin{quote}
 \begin{Verbatim}[fontsize=\footnotesize]
  method = optimize
    optimize
@@ -501,6 +532,7 @@ initial log joint probability = -5.18908
 Optimization terminated normally:
   Convergence detected: relative gradient magnitude is below tolerance
 \end{Verbatim}
+\end{quote}
 %
 The first part of the output reports on the configuration used, here
 indicating the default L-BFGS optimizer, with default initial stepsize
@@ -524,7 +556,7 @@ output for sampling, first dumping the entire set of parameters used.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 5
+# stan_version_minor = 7
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = optimize
@@ -588,6 +620,7 @@ details.
 %
 Executing this command prints the following.
 %
+\begin{quote}
 \begin{Verbatim}[fontsize=\footnotesize]
 method =
  variational
@@ -648,7 +681,8 @@ iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes
 2500       -6.2             0.012            0.014
 2600       -6.2             0.011            0.014
 2700       -6.3             0.010            0.012   MEAN ELBO CONVERGED
-  \end{Verbatim}
+\end{Verbatim}
+\end{quote}
 %
 The first part of the output reports on the configuration used. Here
 it indicates the default mean-field setting of the variational
@@ -673,8 +707,8 @@ output for sampling, first dumping the entire set of parameters used.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 6
-# stan_version_patch = 3
+# stan_version_minor = 7
+# stan_version_patch = 0
 # model = bernoulli_model
 # method = variational
 #   variational
@@ -697,20 +731,20 @@ output for sampling, first dumping the entire set of parameters used.
 #   file = output.csv (Default)
 #   diagnostic_file =  (Default)
 #   refresh = 100 (Default)
-lp,theta
-0,0.221171
-0,0.166458
-0,0.297987
-0,...
-0,...
-0,...
+lp__,theta
+-6.77173,0.223462
+-6.74816,0.252055
+-6.92751,0.180521
+-7.25717,0.13987
+-6.91783,0.182266
+...
 \end{Verbatim}
 \end{quote}
 %
 Note that everything is a comment other than a line for the header,
-and a line for the values.  Here, the header indicates the
-unnormalized log probability with \code{lp\_\_}, which is not evaluated
-in the variational algorithm. The ELBO is also not stored unless a diagnostic
+and a line for the values. The header indicates the
+unnormalized log probability with \code{lp\_\_} based on the variational
+parameters. The ELBO is not stored unless a diagnostic
 option is given. See \refsection{stan-command-line-options} for more details.
 The first line is special: it is the mean of the variational approximation.
 The rest of the output contains \code{output\_samples} number of samples

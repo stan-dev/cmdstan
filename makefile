@@ -24,22 +24,20 @@ AR = ar
 ##
 # Library locations
 ##
-STANAPI_HOME ?= stan/
-EIGEN ?= $(STANAPI_HOME)lib/eigen_3.2.4
-BOOST ?= $(STANAPI_HOME)lib/boost_1.58.0
-GTEST ?= $(STANAPI_HOME)lib/gtest_1.7.0
-MATH  ?= $(STANAPI_HOME)lib/stan_math_2.7.0
+STAN ?= stan/
+MATH ?= $(STAN)lib/stan_math/
+-include $(MATH)make/libraries
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STANAPI_HOME)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
+CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
-
+CMDSTAN_VERSION := 2.7.0
 
 ##
 # Get information about the compiler used.
@@ -47,7 +45,7 @@ PATH_SEPARATOR = /
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include $(STANAPI_HOME)make/detect_cc
+-include $(STAN)make/detect_cc
 
 # OS is set automatically by this script
 ##
@@ -57,12 +55,12 @@ PATH_SEPARATOR = /
 #   - CFLAGS_GTEST
 #   - EXE
 ##
--include $(STANAPI_HOME)make/detect_os
+-include $(STAN)make/detect_os
 
 ##
 # Get information about the version of make.
 ##
--include $(STANAPI_HOME)make/detect_make
+-include $(STAN)make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
@@ -85,7 +83,7 @@ bin/%.o : src/%.cpp
 ##
 # Tell make the default way to compile a .o file.
 ##
-bin/stan/%.o : $(STANAPI_HOME)src/stan/%.cpp
+bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
@@ -116,9 +114,54 @@ bin/%.d : src/%.cpp
 	fi
 
 .PHONY: help
-help:
+help:	
 	@echo '--------------------------------------------------------------------------------'
-	@echo 'Stan makefile:'
+	@echo 'CmdStan v$(CMDSTAN_VERSION) help'
+	@echo ''
+	@echo '  Build CmdStan utilities:'
+	@echo '    > make build'
+	@echo ''
+	@echo '    This target will:'
+	@echo '    1. Build the Stan compiler bin/stanc$(EXE).'
+	@echo '    2. Build the print utility bin/print$(EXE)'
+	@echo ''
+	@echo '    Note: to build using multiple cores, use the -j option to make. '
+	@echo '    For 4 cores:'
+	@echo '    > make build -j4'
+	@echo ''
+	@echo ''
+	@echo '  Build a Stan program:'
+	@echo ''
+	@echo '    Given a Stan program at foo/bar.stan, build an executable by typing:'
+	@echo '    > make foo/bar$(EXE)'
+	@echo ''
+	@echo '    This target will:'
+	@echo '    1. Build the Stan compiler and the print utility if not built.'
+	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
+	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
+	@echo ''
+	@echo ''
+	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
+	@echo ''
+	@echo '    1. Build the model:'
+	@echo '       > make examples/bernoulli/bernoulli$(EXE)'
+	@echo '    2. Run the model:'
+	@echo '       > examples'$(PATH_SEPARATOR)'bernoulli'$(PATH_SEPARATOR)'bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
+	@echo '    3. Look at the samples:'
+	@echo '       > bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
+	@echo ''
+	@echo ''
+	@echo '  Clean CmdStan:'
+	@echo ''
+	@echo '    Remove the built CmdStan tools:'
+	@echo '    > make clean-all'
+	@echo ''
+	@echo '--------------------------------------------------------------------------------'
+
+.PHONY: help-dev
+help-dev:
+	@echo '--------------------------------------------------------------------------------'
+	@echo 'CmdStan help for developers:'
 	@echo '  Current configuration:'
 	@echo '  - OS (Operating System):   ' $(OS)
 	@echo '  - CC (Compiler):           ' $(CC)
@@ -133,35 +176,13 @@ endif
 	@echo '  - BOOST                    ' $(BOOST)
 	@echo '  - GTEST                    ' $(GTEST)
 	@echo ''
-	@echo 'Build CmdStan utilities:'
-	@echo '  - build'
-	@echo ''
-	@echo '  This target will:'
-	@echo '  1. Build the Stan Compiler bin/stanc$(EXE).'
-	@echo '  2. Build the print utility bin/print$(EXE)'
-	@echo ''
-	@echo '  Before building CmdStan utilities the first time you need'
+	@echo '  If this copy of CmdStan has been cloned using git,'
+	@echo '  before building CmdStan utilities the first time you need'
 	@echo '  to initialize the Stan repository with:'
 	@echo '     make stan-update'
 	@echo ''
-	@echo 'Build a Stan model:'
-	@echo '  Given a Stan model at foo/bar.stan, the make target is:'
-	@echo '  - foo/bar$(EXE)'
 	@echo ''
-	@echo '  This target will:'
-	@echo '  1. Build the Stan compiler: bin/stanc$(EXE).'
-	@echo '  2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
-	@echo '  3. Compile the C++ code using $(CC) to generate foo/bar$(EXE)'
-	@echo ''
-	@echo '  Example - Sample from a normal: stan/example-models/basic_distributions/normal.stan'
-	@echo '    1. Build the model:'
-	@echo '       make stan/example-models/basic_distributions/normal$(EXE)'
-	@echo '    2. Run the model:'
-	@echo '       stan'$(PATH_SEPARATOR)'example-models'$(PATH_SEPARATOR)'basic_distributions'$(PATH_SEPARATOR)'normal$(EXE) sample'
-	@echo '    3. Look at the samples:'
-	@echo '       bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
-	@echo ''
-	@echo 'Dev-relevant targets:'
+	@echo 'Developer relevant targets:'
 	@echo '  Stan management targets:'
 	@echo '  - stan-update    : Initializes and updates the Stan repository'
 	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
@@ -181,18 +202,18 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+-include $(HOME)/.config/cmdstan/make.local    # define local variables
 -include make/local    # for local variables
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
 -include make/command  # bin/stanc, bin/print
--include $(STANAPI_HOME)make/manual
+-include $(STAN)make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/print$(EXE)
 	@echo ''
-	@echo ''
-	@echo '--- CmdStan built ---'
+	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
 ##
 # Clean up.

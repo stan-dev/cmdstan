@@ -61,9 +61,19 @@
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
+<<<<<<< HEAD
 #include <stan/interface_callbacks/writer/cout.hpp>
 #include <stan/interface_callbacks/writer/cerr.hpp>
 #include <stan/interface_callbacks/writer/fstream_csv.hpp>
+=======
+#include <stan/interface_callbacks/writer/csv.hpp>
+#include <stan/interface_callbacks/writer/filtered_values.hpp>
+#include <stan/interface_callbacks/writer/messages.hpp>
+#include <stan/interface_callbacks/writer/noop.hpp>
+#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/sum_values.hpp>
+#include <stan/interface_callbacks/writer/values.hpp>
+>>>>>>> develop
 
 #include <fstream>
 #include <iostream>
@@ -220,18 +230,7 @@ namespace stan {
                                                               (parser.arg("method")->arg("optimize"));
         return optimize::optimize(cont_params, model, base_rng, optimize_args, refresh,
                                   info, err, output_stream, iteration_interrupt);
-      }
 
-      //////////////////////////////////////////////////
-      //              Sampling Algorithms             //
-      //////////////////////////////////////////////////
-
-      if (parser.arg("method")->arg("sample")) {
-        stan::services::categorical_argument* sample_args = dynamic_cast<stan::services::categorical_argument*>
-                                                     (parser.arg("method")->arg("sample"));
-        sample::sample(cont_params, model, base_rng, sample_args, refresh,
-                       info, err, output_stream, diagnostic_stream,
-                       iteration_interrupt);
       }
 
       //////////////////////////////////////////////////
