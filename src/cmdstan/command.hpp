@@ -57,23 +57,12 @@
 #include <stan/services/sample/sample.hpp>
 #include <stan/services/optimize/do_bfgs_optimize.hpp>
 #include <stan/services/optimize/optimize.hpp>
+//#include <stan/services/variational/variational.hpp>
 
 // FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
-<<<<<<< HEAD
-#include <stan/interface_callbacks/writer/cout.hpp>
-#include <stan/interface_callbacks/writer/cerr.hpp>
-#include <stan/interface_callbacks/writer/fstream_csv.hpp>
-=======
-#include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/filtered_values.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
-#include <stan/interface_callbacks/writer/noop.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/interface_callbacks/writer/sum_values.hpp>
-#include <stan/interface_callbacks/writer/values.hpp>
->>>>>>> develop
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -87,16 +76,15 @@ namespace stan {
 
     template <class Model>
     int command(int argc, const char* argv[]) {
-
-      // BEGIN TEMP CALLBACKS
-      // FIXME: The below should all be callbacks created externally
+      
+      typedef
+        stan::interface_callbacks::writer::stream_writer<std::ostream>
+          ostream_writer;
 
       stan::interface_callbacks::interrupt::noop iteration_interrupt;
 
-      stan::interface_callbacks::writer::cout info; // Informative messages
-      stan::interface_callbacks::writer::cerr err;  // Error messages
-
-      // END TEMP CALLBACKS
+      ostream_writer info(std::cout); // Informative messages
+      ostream_writer err(std::cerr);  // Error messages
 
       argument_parser parser;
       parser.push_valid_arg(new arg_id());
@@ -115,20 +103,29 @@ namespace stan {
       if (parser.help_printed())
         return err_code;
 
-      // BEGIN TEMP CALLBACKS
-      // FIXME: The below should all be callbacks created externally
-
       // Sample output
       std::string output_file =
         dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value();
-      stan::interface_callbacks::writer::fstream_csv output_stream(output_file);
+      std::fstream output_stream;
+      output_stream.open(output_file.c_str(), std::fstream::out);
+      if (!output_stream.good()) {
+        info("Could not open the output file " + output_file);
+        return err_code;
+      }
+      
+      ostream_writer output_writer(output_stream);
 
       // Diagnostic output
       std::string diagnostic_file =
         dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value();
-      stan::interface_callbacks::writer::fstream_csv diagnostic_stream(diagnostic_file);
-
-      // END TEMP CALLBACKS
+      std::fstream diagnostic_stream;
+      diagnostic_stream.open(diagnostic_file.c_str(), std::fstream::out);
+      if (!(diagnostic_stream.good() || diagnostic_file == "")) {
+        info("Could not open the diagnostic file " + diagnostic_file);
+        return err_code;
+      }
+      
+      ostream_writer diagnostic_writer(diagnostic_stream);
 
       // Identification
       unsigned int id = dynamic_cast<stan::services::int_argument*>
@@ -195,19 +192,20 @@ namespace stan {
       parser.print(info);
       info();
 
-      services::io::write_stan(output_stream, "#");
-      services::io::write_model(output_stream, model.model_name(), "#");
-      parser.print(output_stream, "#");
+      services::io::write_stan(output_writer, "#");
+      services::io::write_model(output_writer, model.model_name(), "#");
+      parser.print(output_writer, "#");
 
-      services::io::write_stan(diagnostic_stream, "#");
-      services::io::write_model(diagnostic_stream, model.model_name(), "#");
-      parser.print(diagnostic_stream, "#");
+      services::io::write_stan(diagnostic_writer, "#");
+      services::io::write_model(diagnostic_writer, model.model_name(), "#");
+      parser.print(diagnostic_writer, "#");
 
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
 
       interface_callbacks::var_context_factory::dump_factory var_context_factory;
-      if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
+      if (!init::initialize_state<Model, rng_t, ostream_writer,
+                                  interface_callbacks::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, info, var_context_factory))
         return stan::services::error_codes::SOFTWARE;
 
@@ -218,18 +216,33 @@ namespace stan {
       if (parser.arg("method")->arg("diagnose")) {
         stan::services::list_argument* test = dynamic_cast<stan::services::list_argument*>
                                               (parser.arg("method")->arg("diagnose")->arg("test"));
-        return diagnose::diagnose(cont_params, model, test, info, output_stream);
+        return diagnose::diagnose(cont_params, model, test, info, output_writer);
       }
 
+      //////////////////////////////////////////////////
+      //             Sampling Algorithms              //
+      //////////////////////////////////////////////////
+      
+      if (parser.arg("method")->arg("sample")) {
+        stan::services::categorical_argument* sample_args
+          = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample"));
+        return sample::sample(cont_params, model, base_rng, sample_args, refresh,
+                              info, err, output_writer, diagnostic_writer,
+                              iteration_interrupt);
+        
+      }
+      
       //////////////////////////////////////////////////
       //           Optimization Algorithms            //
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("optimize")) {
-        stan::services::categorical_argument* optimize_args = dynamic_cast<stan::services::categorical_argument*>
-                                                              (parser.arg("method")->arg("optimize"));
+        stan::services::categorical_argument* optimize_args
+          = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("optimize"));
         return optimize::optimize(cont_params, model, base_rng, optimize_args, refresh,
-                                  info, err, output_stream, iteration_interrupt);
+                                  info, err, output_writer, iteration_interrupt);
 
       }
 
@@ -237,14 +250,17 @@ namespace stan {
       //           Variational Algorithms             //
       //////////////////////////////////////////////////
 
+      /*
       if (parser.arg("method")->arg("variational")) {
-        stan::services::categorical_argument* variational_args = dynamic_cast<stan::services::categorical_argument*>
-                                                     (parser.arg("method")->arg("variational"));
-        varitional::variational(cont_params, model, base_rng, sample_args, refresh,
-                                info, err, output_stream, diagnostic_stream,
-                                iteration_interrupt);
+        stan::services::categorical_argument* variational_args
+          = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("variational"));
+        return varitional::variational(cont_params, model, base_rng, sample_args, refresh,
+                                       info, err, output_writer, diagnostic_writer,
+                                       iteration_interrupt);
       }
-
+      */
+      
       return stan::services::error_codes::USAGE;
 
     }
