@@ -798,11 +798,7 @@ namespace stan {
           = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
 
         std::cout << std::endl;
-        std::cout << "This is Automatic Differentiation Variational Inference.";
-        std::cout << std::endl;
-
-        std::cout << std::endl;
-        std::cout << "(EXPERIMENTAL ALGORITHM: expect frequent updates to the"
+        std::cout << "(EXPERIMENTAL ALGORITHM: Expect frequent updates to the"
                   << " procedure.)";
         std::cout << std::endl;
 
