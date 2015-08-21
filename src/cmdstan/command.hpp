@@ -256,11 +256,10 @@ namespace stan {
           = dynamic_cast<stan::services::categorical_argument*>
               (parser.arg("method")->arg("variational"));
         return varitional::variational(cont_params, model, base_rng, sample_args, refresh,
-                                       info, err, output_writer, diagnostic_writer,
+                                       output_stream, diagnostic_stream,
                                        iteration_interrupt);
       }
       */
-      
       return stan::services::error_codes::USAGE;
 
     }
