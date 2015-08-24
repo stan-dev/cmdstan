@@ -779,6 +779,10 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("eval_elbo"))->value();
 
+        int tuning_iter = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("tuning_iter"))->value();
+
         int output_samples = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
                                ->arg("output_samples"))->value();
@@ -804,7 +808,7 @@ namespace stan {
 
         std::cout << std::endl;
         std::cout << "Gradient evaluation took " << deltaT
-                  << " seconds" << std::endl;
+                  << " seconds." << std::endl;
         std::cout << "1000 iterations under these settings should take "
                   << 1e3 * grad_samples * deltaT << " seconds." << std::endl;
         std::cout << "Adjust your expectations accordingly!";
@@ -837,7 +841,7 @@ namespace stan {
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(eta, tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, tol_rel_obj, max_iterations, tuning_iter);
         }
 
         if (algo->value() == "meanfield") {
@@ -866,7 +870,7 @@ namespace stan {
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(eta, tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, tol_rel_obj, max_iterations, tuning_iter);
         }
       }
 
