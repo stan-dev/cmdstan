@@ -771,7 +771,7 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("tol_rel_obj"))->value();
 
-        double eta = dynamic_cast<stan::services::real_argument*>
+        std::string eta = dynamic_cast<stan::services::string_argument*>
           (parser.arg("method")->arg("variational")
                                ->arg("eta"))->value();
 
