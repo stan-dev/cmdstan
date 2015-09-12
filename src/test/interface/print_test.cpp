@@ -1,4 +1,4 @@
-#include <cmdstan/print_helper.hpp>
+#include <cmdstan/stansummary_helper.hpp>
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
 
