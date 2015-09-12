@@ -7,3 +7,8 @@ bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a
 bin/print$(EXE) : bin/cmdstan/print.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+
+.PRECIOUS: bin/stansummary$(EXE)
+bin/stansummary$(EXE) : bin/cmdstan/stansummary.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)

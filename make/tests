@@ -124,4 +124,5 @@ test/interface/variational_output_test.o: src/test/test-models/variational_outpu
 test/interface/print_test.o: src/test/interface/matrix_output.csv bin/print$(EXE)
 test/interface/print_uninitialized_test.o: src/test/test-models/print_uninitialized$(EXE)
 test/interface/services/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
+test/interface/stansummary_test.o: src/test/interface/matrix_output.csv bin/stansummary$(EXE)
 test/interface/elapsed_time_test.o: src/test/test-models/test_model$(EXE)

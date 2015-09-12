@@ -211,7 +211,7 @@ endif
 -include $(STAN)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/print$(EXE)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
