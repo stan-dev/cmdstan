@@ -143,6 +143,8 @@ TEST(CommandPrint, functional_test__issue_342) {
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) 
     << "\"" << out.command << "\" quit with an error";
+  EXPECT_EQ(1, count_matches("deprecated", out.output))
+    << "expecting to find deprecated message";
 }
 
 TEST(CommandPrint, help_deprecated_message) {
