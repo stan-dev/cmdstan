@@ -144,3 +144,13 @@ TEST(CommandPrint, functional_test__issue_342) {
   ASSERT_FALSE(out.hasError) 
     << "\"" << out.command << "\" quit with an error";
 }
+
+TEST(CommandPrint, help_deprecated_message) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "print";
+
+  run_command_output out = run_command(command + " --help");
+  EXPECT_EQ(1, count_matches("deprecated", out.output))
+    << "expecting to find deprecated message";
+}
