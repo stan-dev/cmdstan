@@ -113,16 +113,11 @@
 #include <stan/services/mcmc/warmup.hpp>
 #include <stan/services/optimization/do_bfgs_optimize.hpp>
 
-// FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
 #include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/filtered_values.hpp>
 #include <stan/interface_callbacks/writer/messages.hpp>
-#include <stan/interface_callbacks/writer/noop.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/interface_callbacks/writer/sum_values.hpp>
-#include <stan/interface_callbacks/writer/values.hpp>
 
 #include <fstream>
 #include <iostream>
