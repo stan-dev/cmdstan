@@ -3,7 +3,6 @@
 #include <iomanip>
 #include <ios>
 #include <stan/mcmc/chains.hpp>
-#include <cmdstan/print_helper.hpp>
 #include <cmdstan/stansummary_helper.hpp>
 #include <fstream>
 
@@ -19,8 +18,7 @@
 int main(int argc, const char* argv[]) {
   
   if (argc == 1) {
-    print_usage();
-    print_deprecated();
+    stansummary_usage();
     return 0;
   }
   
@@ -37,8 +35,7 @@ int main(int argc, const char* argv[]) {
       continue;
     
     if (std::string("--help") == std::string(argv[i])) {
-      print_usage();
-      print_deprecated();
+      stansummary_usage();
       return 0;
     }
     
@@ -55,7 +52,6 @@ int main(int argc, const char* argv[]) {
   
   if (!filenames.size()) {
     std::cout << "No valid input files, exiting." << std::endl;
-    print_deprecated();    
     return 0;
   }
   
@@ -318,6 +314,10 @@ int main(int argc, const char* argv[]) {
     }
         
   }
-  print_deprecated();  
+      
   return 0;
+        
 }
+
+
+
