@@ -1,29 +1,36 @@
-\chapter{{\tt\bfseries print}: Output Analysis}\label{print.chapter}
+\chapter{{\tt\bfseries print}: Output Analysis (deprecated)}\label{print.chapter}
 
 \noindent
-\CmdStan is distributed with a print command that is able to read in
+\code{print} is deprecated, but is still available until CmdStan v3.0.
+See the next chapter for usage (replace \code{stansummary} with
+\code{print}).
+
+\chapter{{\tt\bfseries stansummary}: Output Analysis}\label{stansummary.chapter}
+
+\noindent
+\CmdStan is distributed with a posterior analysis utility that is able to read in
 the output of one or more Markov chains and summarize the posterior
 fits.  This operation mimics the \code{print(fit)} command in RStan,
 which itself was modeled on the print functions from R2WinBUGS and
 R2jags.
 
-\section{Building the Print Command}
+\section{Building the stansummary Command}
 
-\CmdStan's \code{print} command is built along with \code{stanc} into
+\CmdStan's \code{stansummary} command is built along with \code{stanc} into
 the \code{bin} directory. It can be compiled directly using the
 makefile as follows.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
-> make bin/print
+> make bin/stansummary
 \end{Verbatim}
 \end{quote}
 %
 
-\section{Running the Print Command}
+\section{Running the stansummary Command}
 
-The \code{print} command is executed on one or more \code{output.csv}
+The \code{stansummary} command is executed on one or more \code{output.csv}
 files. These files may be provided as command-line arguments
 separated by spaces.  That means that wildcards may be used, as they
 will be replaced by space-separated file names by the operating
@@ -42,14 +49,14 @@ output1.csv	output2.csv	output3.csv
 \end{Verbatim}
 %
 \begin{Verbatim}[fontshape=sl]
-> bin/print output*.csv
+> bin/stansummary output*.csv
 \end{Verbatim}
 \end{quote}
 %
-The result of \code{bin/print} is displayed in
-\reffigure{bin-print-eg}.%
+The result of \code{bin/stansummary} is displayed in
+\reffigure{bin-stansummary-eg}.%
 %
-\footnote{RStan's and PyStan's output analysis print may be different
+\footnote{RStan's and PyStan's output analysis stansummary may be different
   than that in the command-line version of Stan.}
 %
 \begin{figure}
@@ -75,7 +82,7 @@ The result of \code{bin/print} is displayed in
    convergence, R_hat=1).
 \end{Verbatim}
 \vspace*{-6pt}
-\caption{\small\it Example output from \code{bin/print}.  The model
+\caption{\small\it Example output from \code{bin/stansummary}.  The model
   parameters are \code{alpha} and \code{beta}.  The values for each
   quantity are the posterior means, standard deviations, and
   quantiles, along with Monte-Carlo standard error, effective sample
@@ -91,7 +98,7 @@ The result of \code{bin/print} is displayed in
   Hamiltonian simulation.  \code{n\_divergent\_\_} gives the number
   of leapfrog iterations with diverging error; because NUTS terminates
   at the first divergent iteration this should always be either 0 or 1.}
-\label{bin-print-eg.figure}
+\label{bin-stansummary-eg.figure}
 \end{figure}
 %\end{quote}
 %
@@ -104,7 +111,7 @@ posterior values.
 For Windows, the forward slash in paths need to be converted to backslashes.
 
 
-\subsection{Output of Print Command}
+\subsection{Output of stansummary Command}
 
 \subsubsection{\code{n\_divergent}}
 
@@ -122,11 +129,11 @@ a divergence is encountered, \code{n\_divergent} should be only 0 or
 
 \section{Command-line Options}
 
-In addition to the filenames, \code{print} includes three flags to
+In addition to the filenames, \code{stansummary} includes three flags to
 customize the output.
 
 \begin{description}
-\longcmd{help} {Prints usage information} {No help output by default}
+\longcmd{help} {stansummary usage information} {No help output by default}
 %
 \cmdarg{sig\_figs}{int}
 {Sets the number of significant figures displayed in the output}

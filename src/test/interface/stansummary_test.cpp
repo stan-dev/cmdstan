@@ -7,7 +7,7 @@ using cmdstan::test::get_path_separator;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
-TEST(CommandPrint, next_index_1d) {
+TEST(CommandStansummary, next_index_1d) {
   std::vector<int> dims(1);
   std::vector<int> index(1,1);
   dims[0] = 100;
@@ -29,7 +29,7 @@ TEST(CommandPrint, next_index_1d) {
   EXPECT_THROW(next_index(index, dims), std::domain_error);
 }
 
-TEST(CommandPrint, next_index_2d) {
+TEST(CommandStansummary, next_index_2d) {
   std::vector<int> dims(2);
   std::vector<int> index(2,1);
   dims[0] = 100;
@@ -65,7 +65,7 @@ TEST(CommandPrint, next_index_2d) {
 }
 
 
-TEST(CommandPrint, matrix_index_1d) {
+TEST(CommandStansummary, matrix_index_1d) {
   std::vector<int> dims(1);
   std::vector<int> index(1,1);
   dims[0] = 100;
@@ -85,7 +85,7 @@ TEST(CommandPrint, matrix_index_1d) {
   EXPECT_THROW(matrix_index(index, dims), std::domain_error);
 }
 
-TEST(CommandPrint, matrix_index_2d) {
+TEST(CommandStansummary, matrix_index_2d) {
   std::vector<int> dims(2);
   std::vector<int> index(2,1);
   dims[0] = 100;
@@ -130,10 +130,10 @@ TEST(CommandPrint, matrix_index_2d) {
   EXPECT_THROW(matrix_index(index, dims), std::domain_error);
 }
 
-TEST(CommandPrint, functional_test__issue_342) {
+TEST(CommandStansummary, functional_test__issue_342) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "print";
+  std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file 
     = "src" + path_separator 
     + "test" + path_separator
@@ -143,16 +143,4 @@ TEST(CommandPrint, functional_test__issue_342) {
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) 
     << "\"" << out.command << "\" quit with an error";
-  EXPECT_EQ(1, count_matches("deprecated", out.output))
-    << "expecting to find deprecated message";
-}
-
-TEST(CommandPrint, help_deprecated_message) {
-  std::string path_separator;
-  path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "print";
-
-  run_command_output out = run_command(command + " --help");
-  EXPECT_EQ(1, count_matches("deprecated", out.output))
-    << "expecting to find deprecated message";
 }

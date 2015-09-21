@@ -31,7 +31,7 @@ instructions of the prerequisites, see
 
 Building \CmdStan involves building executable programs for the \Stan
 compiler, \code{stanc}, and a basic posterior analsyis tool,
-\code{print}.  The build process utilizes the \code{make} command-line
+\code{stansummary}.  The build process utilizes the \code{make} command-line
 utility and works the same way across all supported platforms.
 %
 \begin{enumerate}
@@ -86,7 +86,7 @@ When \CmdStan is successfully built, the \code{make} program will report
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.7.0 built ---
+--- CmdStan v2.8.0 built ---
   \end{Verbatim}
 \end{quote}
 %
@@ -96,11 +96,11 @@ and there will be two executables in the \code{bin} folder:
   \item \code{stanc}, the \Stan compiler. The \Stan compiler
     translates a \Stan program into \Cpp code. See \refchapter{stanc}
     for details.
-  \item \code{print}, a posterior analysis tool. The \code{print}
+  \item \code{stansummary}, a posterior analysis tool. The \code{stansummary}
     command summarizes the comma-separated values files that are
     generated from \Stan program runs. For each parameter within the
-    \Stan program, \code{print} reports the mean, standard deviation,
-    quantiles, $\hat{R}$, and other values. See \refchapter{print} for
+    \Stan program, \code{stansummary} reports the mean, standard deviation,
+    quantiles, $\hat{R}$, and other values. See \refchapter{stansummary} for
     details.
 \end{itemize}
 
@@ -413,22 +413,22 @@ The output ends with timing details,%
 
 \subsubsection{Summarizing Sampler Output}
 
-The command-line program \code{bin/print} will display summary
+The command-line program \code{bin/stansummary} will display summary
 information about the run (for more information, see
-\refchapter{print}). To run \code{print} on the output file
+\refchapter{stansummary}). To run \code{stansummary} on the output file
 generated for \code{bernoulli} on Linux or Mac, type
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <cmdstan-home>/bin/print output.csv
+> <cmdstan-home>/bin/stansummary output.csv
 \end{Verbatim}
 \end{quote}
 %
-For Windows, use backslashes to call the \code{print.exe}.
+For Windows, use backslashes to call the \code{stansummary.exe}.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> <cmdstan-home>\bin\print.exe output.csv
+> <cmdstan-home>\bin\stansummary.exe output.csv
 \end{Verbatim}
 \end{quote}
 %
@@ -459,7 +459,7 @@ and R_hat is the potential scale reduction factor on split chains (at
 convergence, R_hat=1).
 \end{Verbatim}
 %
-In addition to the general information about the runs, \code{print}
+In addition to the general information about the runs, \code{stansummary}
 displays summary statistics for each parameter and generated
 quantity.
 
@@ -471,13 +471,13 @@ These quantities and their uses are described in detail in the
 introductory Markov chain Monte Carlo (MCMC) chapter of the language
 user's guide and reference manual.
 
-The command \code{bin/print} can be called with more than one csv file
+The command \code{bin/stansummary} can be called with more than one csv file
 by separating filenames with spaces. It will also take wildcards in
 specifying filenames. A typical usage of Stan from the command line
 would first create one or more Markov chains by calling the model
 executable, typically in parallel, writing the output CSV file for
 each into its own directory.  After all of the processes are
-finished, the results would be analyzed using \code{print} to assess
+finished, the results would be analyzed using \code{stansummary} to assess
 convergence and inspect the means and quantiles of the fitted
 variables.  Additionally, downstream inferences may be performed using
 the draws (e.g., to make decisions or predictions for unseen data).

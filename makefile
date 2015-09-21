@@ -37,7 +37,7 @@ LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.7.0
+CMDSTAN_VERSION := 2.8.0
 
 ##
 # Get information about the compiler used.
@@ -123,7 +123,8 @@ help:
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Build the Stan compiler bin/stanc$(EXE).'
-	@echo '    2. Build the print utility bin/print$(EXE)'
+	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
+	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make. '
 	@echo '    For 4 cores:'
@@ -148,7 +149,7 @@ help:
 	@echo '    2. Run the model:'
 	@echo '       > examples'$(PATH_SEPARATOR)'bernoulli'$(PATH_SEPARATOR)'bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
 	@echo '    3. Look at the samples:'
-	@echo '       > bin'$(PATH_SEPARATOR)'print$(EXE) output.csv'
+	@echo '       > bin'$(PATH_SEPARATOR)'stansummary$(EXE) output.csv'
 	@echo ''
 	@echo ''
 	@echo '  Clean CmdStan:'
@@ -192,7 +193,8 @@ endif
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
-	@echo '- bin/print$(EXE): Build the print utility.'
+	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
+	@echo '- bin/stansummary(EXE): Build the print utility.'
 	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
@@ -207,11 +209,11 @@ endif
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
--include make/command  # bin/stanc, bin/print
+-include make/command  # bin/stanc, bin/stansummary, bin/print
 -include $(STAN)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/print$(EXE)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
