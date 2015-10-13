@@ -766,9 +766,9 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("tol_rel_obj"))->value();
 
-        double eta_adagrad = dynamic_cast<stan::services::real_argument*>
+        double eta = dynamic_cast<stan::services::real_argument*>
           (parser.arg("method")->arg("variational")
-                               ->arg("eta_adagrad"))->value();
+                               ->arg("eta"))->value();
 
         int eval_elbo = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
@@ -830,7 +830,7 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
+                     eta,
                      base_rng,
                      eval_elbo,
                      output_samples,
@@ -860,7 +860,7 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
+                     eta,
                      base_rng,
                      eval_elbo,
                      output_samples,
