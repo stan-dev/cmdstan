@@ -766,13 +766,17 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("tol_rel_obj"))->value();
 
-        double eta_adagrad = dynamic_cast<stan::services::real_argument*>
+        std::string eta = dynamic_cast<stan::services::string_argument*>
           (parser.arg("method")->arg("variational")
-                               ->arg("eta_adagrad"))->value();
+                               ->arg("eta"))->value();
 
         int eval_elbo = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
                                ->arg("eval_elbo"))->value();
+
+        int tuning_iter = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")
+                               ->arg("tuning_iter"))->value();
 
         int output_samples = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
@@ -793,17 +797,13 @@ namespace stan {
           = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
 
         std::cout << std::endl;
-        std::cout << "This is Automatic Differentiation Variational Inference.";
-        std::cout << std::endl;
-
-        std::cout << std::endl;
-        std::cout << "(EXPERIMENTAL ALGORITHM: expect frequent updates to the"
+        std::cout << "(EXPERIMENTAL ALGORITHM: Expect frequent updates to the"
                   << " procedure.)";
         std::cout << std::endl;
 
         std::cout << std::endl;
         std::cout << "Gradient evaluation took " << deltaT
-                  << " seconds" << std::endl;
+                  << " seconds." << std::endl;
         std::cout << "1000 iterations under these settings should take "
                   << 1e3 * grad_samples * deltaT << " seconds." << std::endl;
         std::cout << "Adjust your expectations accordingly!";
@@ -828,16 +828,16 @@ namespace stan {
                                   rng_t>
             cmd_advi(model,
                      cont_params,
+                     base_rng,
+                     init,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
-                     base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, tol_rel_obj, max_iterations, tuning_iter);
         }
 
         if (algo->value() == "meanfield") {
@@ -858,16 +858,16 @@ namespace stan {
                                   rng_t>
             cmd_advi(model,
                      cont_params,
+                     base_rng,
+                     init,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
-                     base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, tol_rel_obj, max_iterations, tuning_iter);
         }
       }
 
