@@ -115,9 +115,8 @@
 
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
-#include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -129,6 +128,11 @@
 namespace stan {
   namespace services {
 
+    class null_fstream : public std::fstream {
+    public:
+      null_fstream() {}
+    };
+    
     template <class Model>
     int command(int argc, const char* argv[]) {
       std::vector<stan::services::argument*> valid_arguments;
@@ -205,6 +209,8 @@ namespace stan {
       if (output_file != "") {
         output_stream = new std::fstream(output_file.c_str(),
                                          std::fstream::out);
+      } else {
+        output_stream = new null_fstream();
       }
 
       // Diagnostic output
@@ -216,6 +222,8 @@ namespace stan {
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
                                              std::fstream::out);
+      } else {
+        diagnostic_stream = new null_fstream();
       }
 
       // Refresh rate
@@ -468,13 +476,14 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface_callbacks::writer::csv sample_writer(output_stream, "# ");
-        interface_callbacks::writer::csv diagnostic_writer(diagnostic_stream, "# ");
-        interface_callbacks::writer::messages message_writer(&std::cout, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::stream_writer diagnostic_writer(*diagnostic_stream, "# ");
+        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
 
         stan::io::mcmc_writer<Model,
-                              interface_callbacks::writer::csv, interface_callbacks::writer::csv,
-                              interface_callbacks::writer::messages>
+                              interface_callbacks::writer::stream_writer,
+                              interface_callbacks::writer::stream_writer,
+                              interface_callbacks::writer::stream_writer>
           writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
