@@ -95,7 +95,6 @@
 
 #include <stan/variational/advi.hpp>
 
-#include <stan/services/diagnose.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
