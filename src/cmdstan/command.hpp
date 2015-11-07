@@ -134,6 +134,9 @@ namespace stan {
     
     template <class Model>
     int command(int argc, const char* argv[]) {
+      stan::interface_callbacks::writer::stream_writer info(std::cout);
+      stan::interface_callbacks::writer::stream_writer err(std::cout);
+      
       std::vector<stan::services::argument*> valid_arguments;
       valid_arguments.push_back(new stan::services::arg_id());
       valid_arguments.push_back(new stan::services::arg_data());
@@ -143,7 +146,7 @@ namespace stan {
 
       stan::services::argument_parser parser(valid_arguments);
 
-      int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
+      int err_code = parser.parse_args(argc, argv, info, err);
 
       if (err_code != 0) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
@@ -225,6 +228,8 @@ namespace stan {
         diagnostic_stream = new null_fstream();
       }
 
+      stan::interface_callbacks::writer::stream_writer diagnostic(*diagnostic_stream);
+
       // Refresh rate
       int refresh = dynamic_cast<stan::services::int_argument*>(
                     parser.arg("output")->arg("refresh"))->value();
@@ -237,19 +242,17 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-      parser.print(&std::cout);
-      std::cout << std::endl;
-
       if (output_stream) {
         io::write_stan(output_stream, "#");
         io::write_model(output_stream, model.model_name(), "#");
-        parser.print(output_stream, "#");
+        parser.print(info);
+        info();
       }
 
       if (diagnostic_stream) {
         io::write_stan(diagnostic_stream, "#");
         io::write_model(diagnostic_stream, model.model_name(), "#");
-        parser.print(diagnostic_stream, "#");
+        parser.print(diagnostic, "#");
       }
 
       std::string init = dynamic_cast<stan::services::string_argument*>(

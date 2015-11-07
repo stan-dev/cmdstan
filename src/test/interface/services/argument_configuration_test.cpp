@@ -7,7 +7,7 @@
 #include <stan/services/arguments/arg_init.hpp>
 #include <stan/services/arguments/arg_random.hpp>
 #include <stan/services/arguments/arg_output.hpp>
-
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/utility.hpp>
 
 #include <vector>
@@ -64,13 +64,14 @@ std::string StanGmArgumentsConfiguration::command = "";
 TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   // Prepare arguments
   std::stringstream s;
-  
+  stan::interface_callbacks::writer::stream_writer w(s);
+
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_method());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
-  
+  probe.probe_args(w);
+
   // Check argument consistency
   bool expected_success = false;
   
@@ -112,7 +113,6 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       SCOPED_TRACE(command + argument);
       
       run_command_output out = run_command(command + argument);
-
       expected_output.clear();
       expected_output.seekg(std::ios_base::beg);
 
@@ -144,7 +144,7 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       output.seekg(std::ios_base::beg);
       output.str(out.output);
       std::string actual_line;
-      
+
       for (int i = 0; i < n_output; ++i) {
         std::string expected_line;
         std::getline(expected_output, expected_line);
@@ -168,8 +168,9 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
+  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
   stan::services::arg_method method;
-  method.print(&method_output, 0, "");
+  method.print(method_writer, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -189,11 +190,12 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   method_output.seekg(std::ios_base::beg);
 
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_id());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -283,12 +285,13 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_id());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -379,8 +382,9 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
+  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
   stan::services::arg_method method;
-  method.print(&method_output, 0, "");
+  method.print(method_writer, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -400,11 +404,12 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_data());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -494,12 +499,13 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_data());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -589,8 +595,9 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
+  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
   stan::services::arg_method method;
-  method.print(&method_output, 0, "");
+  method.print(method_writer, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -610,11 +617,12 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_init());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   // Check argument consistency
   bool expected_success = false;
   
@@ -700,12 +708,13 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_init());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -792,8 +801,9 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
+  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
   stan::services::arg_method method;
-  method.print(&method_output, 0, "");
+  method.print(method_writer, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -813,11 +823,12 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_random());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -903,12 +914,13 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_random());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -999,8 +1011,9 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
+  stan::interface_callbacks::writer::stream_writer method_writer(method_output);  
   stan::services::arg_method method;
-  method.print(&method_output, 0, "");
+  method.print(method_writer, 0, "");
   
   std::string l0;
   std::string method_argument("");
@@ -1020,11 +1033,12 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_output());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
@@ -1114,12 +1128,13 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
+  stan::interface_callbacks::writer::stream_writer w(s);
   
   std::vector<stan::services::argument*> valid_arguments;
   valid_arguments.push_back(new stan::services::arg_output());
   
   stan::services::argument_probe probe(valid_arguments);
-  probe.probe_args(s);
+  probe.probe_args(w);
   
   // Check argument consistency
   bool expected_success = false;
