@@ -260,7 +260,7 @@ namespace stan {
 
       interface_callbacks::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
-          (init, cont_params, model, base_rng, &std::cout,
+          (init, cont_params, model, base_rng, info,
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
 
@@ -352,7 +352,7 @@ namespace stan {
             lp = model.template log_prob<false, false>
               (cont_vector, disc_vector, &std::cout);
           } catch (const std::exception& e) {
-            io::write_error_msg(&std::cout, e);
+            io::write_error_msg(info, e);
             lp = -std::numeric_limits<double>::infinity();
           }
 
