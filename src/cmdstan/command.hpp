@@ -14,7 +14,6 @@
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/json_parser.hpp>
-#include <stan/io/mcmc_writer.hpp>
 
 #include <stan/services/arguments/arg_adapt.hpp>
 #include <stan/services/arguments/arg_adapt_delta.hpp>
@@ -80,6 +79,7 @@
 #include <stan/services/arguments/singleton_argument.hpp>
 #include <stan/services/arguments/unvalued_argument.hpp>
 #include <stan/services/arguments/valued_argument.hpp>
+#include <stan/services/sample/mcmc_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
@@ -95,11 +95,6 @@
 
 #include <stan/variational/advi.hpp>
 
-#include <stan/services/diagnose.hpp>
-#include <stan/services/init/init_adapt.hpp>
-#include <stan/services/init/init_nuts.hpp>
-#include <stan/services/init/init_static_hmc.hpp>
-#include <stan/services/init/init_windowed_adapt.hpp>
 #include <stan/services/init/initialize_state.hpp>
 #include <stan/services/io/do_print.hpp>
 #include <stan/services/io/write_error_msg.hpp>
@@ -107,22 +102,20 @@
 #include <stan/services/io/write_iteration_csv.hpp>
 #include <stan/services/io/write_model.hpp>
 #include <stan/services/io/write_stan.hpp>
-#include <stan/services/mcmc/print_progress.hpp>
-#include <stan/services/mcmc/run_markov_chain.hpp>
 #include <stan/services/mcmc/sample.hpp>
 #include <stan/services/mcmc/warmup.hpp>
-#include <stan/services/optimization/do_bfgs_optimize.hpp>
+#include <stan/services/optimize/do_bfgs_optimize.hpp>
+#include <stan/services/sample/init_adapt.hpp>
+#include <stan/services/sample/init_nuts.hpp>
+#include <stan/services/sample/init_static_hmc.hpp>
+#include <stan/services/sample/init_windowed_adapt.hpp>
+#include <stan/services/sample/generate_transitions.hpp>
+#include <stan/services/sample/progress.hpp>
 
-// FIXME: These belong to the interfaces and should be templated out here
 #include <stan/interface_callbacks/interrupt/noop.hpp>
 #include <stan/interface_callbacks/var_context_factory/dump_factory.hpp>
-#include <stan/interface_callbacks/writer/csv.hpp>
-#include <stan/interface_callbacks/writer/filtered_values.hpp>
-#include <stan/interface_callbacks/writer/messages.hpp>
-#include <stan/interface_callbacks/writer/noop.hpp>
 #include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/interface_callbacks/writer/sum_values.hpp>
-#include <stan/interface_callbacks/writer/values.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -134,8 +127,16 @@
 namespace stan {
   namespace services {
 
+    class null_fstream : public std::fstream {
+    public:
+      null_fstream() {}
+    };
+    
     template <class Model>
     int command(int argc, const char* argv[]) {
+      stan::interface_callbacks::writer::stream_writer info(std::cout);
+      stan::interface_callbacks::writer::stream_writer err(std::cout);
+      
       std::vector<stan::services::argument*> valid_arguments;
       valid_arguments.push_back(new stan::services::arg_id());
       valid_arguments.push_back(new stan::services::arg_data());
@@ -145,7 +146,7 @@ namespace stan {
 
       stan::services::argument_parser parser(valid_arguments);
 
-      int err_code = parser.parse_args(argc, argv, &std::cout, &std::cout);
+      int err_code = parser.parse_args(argc, argv, info, err);
 
       if (err_code != 0) {
         std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
@@ -210,6 +211,8 @@ namespace stan {
       if (output_file != "") {
         output_stream = new std::fstream(output_file.c_str(),
                                          std::fstream::out);
+      } else {
+        output_stream = new null_fstream();
       }
 
       // Diagnostic output
@@ -221,7 +224,11 @@ namespace stan {
       if (diagnostic_file != "") {
         diagnostic_stream = new std::fstream(diagnostic_file.c_str(),
                                              std::fstream::out);
+      } else {
+        diagnostic_stream = new null_fstream();
       }
+
+      stan::interface_callbacks::writer::stream_writer diagnostic(*diagnostic_stream);
 
       // Refresh rate
       int refresh = dynamic_cast<stan::services::int_argument*>(
@@ -235,19 +242,17 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
-      parser.print(&std::cout);
-      std::cout << std::endl;
-
       if (output_stream) {
         io::write_stan(output_stream, "#");
         io::write_model(output_stream, model.model_name(), "#");
-        parser.print(output_stream, "#");
+        parser.print(info);
+        info();
       }
 
       if (diagnostic_stream) {
         io::write_stan(diagnostic_stream, "#");
         io::write_model(diagnostic_stream, model.model_name(), "#");
-        parser.print(diagnostic_stream, "#");
+        parser.print(diagnostic, "#");
       }
 
       std::string init = dynamic_cast<stan::services::string_argument*>(
@@ -255,7 +260,7 @@ namespace stan {
 
       interface_callbacks::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
-          (init, cont_params, model, base_rng, &std::cout,
+          (init, cont_params, model, base_rng, info,
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
 
@@ -347,7 +352,7 @@ namespace stan {
             lp = model.template log_prob<false, false>
               (cont_vector, disc_vector, &std::cout);
           } catch (const std::exception& e) {
-            io::write_error_msg(&std::cout, e);
+            io::write_error_msg(info, e);
             lp = -std::numeric_limits<double>::infinity();
           }
 
@@ -399,7 +404,7 @@ namespace stan {
                          algo->arg("bfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
-          return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
+          return_code = optimize::do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
                                          save_iterations, refresh,
@@ -427,7 +432,7 @@ namespace stan {
                          algo->arg("lbfgs")->arg("tol_param"))->value();
           bfgs._conv_opts.maxIts = num_iterations;
 
-          return_code = optimization::do_bfgs_optimize(model,bfgs, base_rng,
+          return_code = optimize::do_bfgs_optimize(model,bfgs, base_rng,
                                          lp, cont_vector, disc_vector,
                                          output_stream, &std::cout,
                                          save_iterations, refresh,
@@ -473,13 +478,14 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        interface_callbacks::writer::csv sample_writer(output_stream, "# ");
-        interface_callbacks::writer::csv diagnostic_writer(diagnostic_stream, "# ");
-        interface_callbacks::writer::messages message_writer(&std::cout, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::stream_writer diagnostic_writer(*diagnostic_stream, "# ");
+        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
 
-        stan::io::mcmc_writer<Model,
-                              interface_callbacks::writer::csv, interface_callbacks::writer::csv,
-                              interface_callbacks::writer::messages>
+        stan::services::sample::mcmc_writer<Model,
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::stream_writer,
+                                            interface_callbacks::writer::stream_writer>
           writer(sample_writer, diagnostic_writer, message_writer, &std::cout);
 
         // Sampling parameters
@@ -573,7 +579,7 @@ namespace stan {
               typedef stan::mcmc::unit_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -582,7 +588,7 @@ namespace stan {
               typedef stan::mcmc::unit_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -591,7 +597,7 @@ namespace stan {
               typedef stan::mcmc::diag_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -600,7 +606,7 @@ namespace stan {
               typedef stan::mcmc::diag_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -609,7 +615,7 @@ namespace stan {
               typedef stan::mcmc::dense_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -618,7 +624,7 @@ namespace stan {
               typedef stan::mcmc::dense_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
               break;
             }
@@ -627,9 +633,9 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_adapt<sampler>(sampler_ptr, adapt, cont_params, &std::cout))
+              if (!sample::init_adapt<sampler>(sampler_ptr, adapt, cont_params, &std::cout))
                 return 0;
               break;
             }
@@ -638,9 +644,9 @@ namespace stan {
               typedef stan::mcmc::adapt_unit_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_adapt<sampler>(sampler_ptr, adapt, cont_params, &std::cout))
+              if (!sample::init_adapt<sampler>(sampler_ptr, adapt, cont_params, &std::cout))
                 return 0;
               break;
             }
@@ -649,9 +655,9 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_static_hmc<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
+              if (!sample::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
                 return 0;
               break;
             }
@@ -660,9 +666,9 @@ namespace stan {
               typedef stan::mcmc::adapt_diag_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
+              if (!sample::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
                 return 0;
               break;
             }
@@ -672,9 +678,9 @@ namespace stan {
                 sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_static_hmc<sampler>(sampler_ptr, algo))
+              if (!sample::init_static_hmc<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
+              if (!sample::init_windowed_adapt<sampler>(sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
                 return 0;
               break;
             }
@@ -683,9 +689,9 @@ namespace stan {
               typedef stan::mcmc::adapt_dense_e_nuts<Model, rng_t> sampler;
               sampler_ptr = new sampler(model, base_rng,
                                         &std::cout, &std::cout);
-              if (!init::init_nuts<sampler>(sampler_ptr, algo))
+              if (!sample::init_nuts<sampler>(sampler_ptr, algo))
                 return 0;
-              if (!init::init_windowed_adapt<sampler>
+              if (!sample::init_windowed_adapt<sampler>
                   (sampler_ptr, adapt, num_warmup, cont_params, &std::cout))
                 return 0;
               break;
@@ -771,9 +777,9 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("tol_rel_obj"))->value();
 
-        double eta_adagrad = dynamic_cast<stan::services::real_argument*>
+        double eta = dynamic_cast<stan::services::real_argument*>
           (parser.arg("method")->arg("variational")
-                               ->arg("eta_adagrad"))->value();
+                               ->arg("eta"))->value();
 
         int eval_elbo = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
@@ -835,7 +841,7 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
+                     eta,
                      base_rng,
                      eval_elbo,
                      output_samples,
@@ -865,7 +871,7 @@ namespace stan {
                      cont_params,
                      grad_samples,
                      elbo_samples,
-                     eta_adagrad,
+                     eta,
                      base_rng,
                      eval_elbo,
                      output_samples,

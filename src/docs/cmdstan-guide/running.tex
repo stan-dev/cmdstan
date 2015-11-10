@@ -106,7 +106,7 @@ DOS.
 \subsubsection{Combining Parallel Chains}
 
 \CmdStan has commands to analyze the output of multiple chains, each
-stored in their own file; see \refchapter{print}.  RStan also
+stored in their own file; see \refchapter{stansummary}.  RStan also
 has commands to read in multiple CSV files produced by \CmdStan's
 command-line sampler.
 
@@ -130,8 +130,8 @@ line.  Operations like these can also be scripted, using shell scripts
 (\code{.sh}) on Mac OS and Linux and DOS batch (\code{.bat}) files on
 Windows.  A sequence of several such commands can be executed from a
 single script file.  Such scripts might contain \code{stanc} commands
-(see \refchapter{stanc}) and \code{print} commands (see
-\refchapter{print}) can be executed from a single script file.
+(see \refchapter{stanc}) and \code{stansummary} commands (see
+\refchapter{stansummary}) can be executed from a single script file.
 At some point, it is worthwhile to move to something with stronger
 dependency control such as makefiles.
 
@@ -1015,7 +1015,7 @@ configuration.
   \hierlongcmd{\indentarrow}{\farg{\bfseries variational}}
     {Variational inference}
     {Valid subarguments: \code{algorithm, grad\_samples, elbo\_samples,
-    eta\_adagrad, iter, tol\_rel\_obj, eval\_elbo, output\_samples}}
+    eta, iter, tol\_rel\_obj, eval\_elbo, output\_samples}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Variational inference algorithm}
@@ -1032,9 +1032,9 @@ configuration.
       {Valid values: \ $0 < \mbox{\code{elbo\_samples}}$}
       {Defaults to \code{100}}
 %
-    \hiercmdarg{\indentarrow\indentarrow}{eta\_adagrad}{$$double$$}
+    \hiercmdarg{\indentarrow\indentarrow}{eta}{$$double$$}
       {Stepsize weighting parameter for adaptive stepsize sequence}
-      {Valid values: \ $0 < \mbox{\code{eta\_adagrad}} \leq 1.0$}
+      {Valid values: \ $0 < \mbox{\code{eta}} \leq 1.0$}
       {Defaults to \code{0.1}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
@@ -1765,7 +1765,7 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
                  algorithm=meanfield                    \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta_adagrad=<double>]             \
+                     [eta=<double>]             \
                      [iter=<int>]                       \
                      [tol_rel_obj=<double>]             \
                      [eval_elbo=<int>]                  \
@@ -1793,7 +1793,7 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
                  algorithm=fullrank                     \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta_adagrad=<double>]             \
+                     [eta=<double>]             \
                      [iter=<int>]                       \
                      [tol_rel_obj=<double>]             \
                      [eval_elbo=<int>]                  \
