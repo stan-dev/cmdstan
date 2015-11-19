@@ -797,9 +797,6 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("output_samples"))->value();
 
-        std::cout << "adapt_engaged: " << adapt_engaged << std::endl;
-        std::cout << "adapt_iterations: " << adapt_iterations << std::endl;
-
         // Check timing
         clock_t start_check = clock();
 
