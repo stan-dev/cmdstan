@@ -242,10 +242,13 @@ namespace stan {
 
       Eigen::VectorXd cont_params = Eigen::VectorXd::Zero(model.num_params_r());
 
+      parser.print(info);
+      info();
+      
       if (output_stream) {
         io::write_stan(output_stream, "#");
         io::write_model(output_stream, model.model_name(), "#");
-        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
+        interface_callbacks::writer::stream_writer sample_writer(*output_stream, "#");
         parser.print(sample_writer);
       }
 
