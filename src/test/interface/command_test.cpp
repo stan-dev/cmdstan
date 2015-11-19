@@ -286,6 +286,30 @@ TEST(StanUiCommand, timing_info) {
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
 }
 
+TEST(StanUiCommand, run_info) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("proper");
+  
+  std::string command = convert_model_path(model_path) + " sample num_samples=10 num_warmup=10 init=0 output refresh=0 file=test/output.csv";
+  run_command_output out = run_command(command);
+  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
+  
+  std::fstream output_csv_stream("test/output.csv");
+  std::stringstream output_sstream;
+  output_sstream << output_csv_stream.rdbuf();
+  output_csv_stream.close();
+  std::string output = output_sstream.str();
+  
+  EXPECT_EQ(1, count_matches("# method = sample", output));
+  EXPECT_EQ(1, count_matches(" num_samples = 10", output));
+  EXPECT_EQ(1, count_matches(" num_warmup = 10", output));
+  EXPECT_EQ(1, count_matches(" init = 0", output));
+}
+
+
 // 
 struct dummy_stepsize_adaptation {
   void set_mu(const double) {}
