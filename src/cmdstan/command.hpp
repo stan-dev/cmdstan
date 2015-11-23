@@ -131,12 +131,12 @@ namespace stan {
     public:
       null_fstream() {}
     };
-    
+
     template <class Model>
     int command(int argc, const char* argv[]) {
       stan::interface_callbacks::writer::stream_writer info(std::cout);
       stan::interface_callbacks::writer::stream_writer err(std::cout);
-      
+
       std::vector<stan::services::argument*> valid_arguments;
       valid_arguments.push_back(new stan::services::arg_id());
       valid_arguments.push_back(new stan::services::arg_data());
@@ -784,6 +784,14 @@ namespace stan {
           (parser.arg("method")->arg("variational")
                                ->arg("eta"))->value();
 
+        bool adapt_engaged = dynamic_cast<stan::services::bool_argument*>
+          (parser.arg("method")->arg("variational")->arg("adapt")
+                                                   ->arg("engaged"))->value();
+
+        int adapt_iterations = dynamic_cast<stan::services::int_argument*>
+          (parser.arg("method")->arg("variational")->arg("adapt")
+                                                   ->arg("iter"))->value();
+
         int eval_elbo = dynamic_cast<stan::services::int_argument*>
           (parser.arg("method")->arg("variational")
                                ->arg("eval_elbo"))->value();
@@ -842,16 +850,16 @@ namespace stan {
                                   rng_t>
             cmd_advi(model,
                      cont_params,
+                     base_rng,
                      grad_samples,
                      elbo_samples,
-                     eta,
-                     base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, adapt_engaged, adapt_iterations,
+            tol_rel_obj, max_iterations);
         }
 
         if (algo->value() == "meanfield") {
@@ -872,16 +880,16 @@ namespace stan {
                                   rng_t>
             cmd_advi(model,
                      cont_params,
+                     base_rng,
                      grad_samples,
                      elbo_samples,
-                     eta,
-                     base_rng,
                      eval_elbo,
                      output_samples,
                      &std::cout,
                      output_stream,
                      diagnostic_stream);
-          cmd_advi.run(tol_rel_obj, max_iterations);
+          cmd_advi.run(eta, adapt_engaged, adapt_iterations,
+            tol_rel_obj, max_iterations);
         }
       }
 
