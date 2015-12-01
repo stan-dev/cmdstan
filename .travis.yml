@@ -8,6 +8,7 @@ os:
   
 compiler:
   - clang
+  - gcc
 
 before_install:
   - git submodule update --init --recursive
@@ -17,4 +18,6 @@ before_script: echo "CC=$CXX" > make/local
 matrix:
   fast_finish: true
 
-script: ./runCmdStanTests.py src/test/interface
+script:
+  git submodule foreach 'echo $path `git rev-parse HEAD`'
+  ./runCmdStanTests.py src/test/interface
