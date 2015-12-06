@@ -5,6 +5,7 @@
 #include <test/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
+#include <stan/interface_callbacks/writer/stream_writer.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;
@@ -354,10 +355,13 @@ TYPED_TEST_CASE_P(StanUiCommandException);
 TYPED_TEST_P(StanUiCommandException, init_adapt) {
   sampler<TypeParam> throwing_sampler;
   Eigen::VectorXd cont_params;
+
+  stan::interface_callbacks::writer::stream_writer message_writer(std::cout);
   
   EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
                                                   0, 0, 0, 0, cont_params,
-                                                  &std::cout));
+                                                  &std::cout,
+                                                  message_writer));
 }
 
 REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
