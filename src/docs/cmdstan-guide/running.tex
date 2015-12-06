@@ -1014,13 +1014,18 @@ configuration.
 %
   \hierlongcmd{\indentarrow}{\farg{\bfseries variational}}
     {Variational inference}
-    {Valid subarguments: \code{algorithm, grad\_samples, elbo\_samples,
-    eta, iter, tol\_rel\_obj, eval\_elbo, output\_samples}}
+    {Valid subarguments: \code{algorithm, iter, grad\_samples, elbo\_samples,
+    eta, adapt, tol\_rel\_obj, eval\_elbo, output\_samples}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{algorithm}{$$list element$$}
       {Variational inference algorithm}
       {Valid values: \ \code{meanfield, fullrank}}
       {Defaults to \code{meanfield}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
+      {Maximum number of iterations}
+      {Valid values: \ $0 < \mbox{\code{iter}}$}
+      {Defaults to \code{10000}}
 %
     \hiercmdarg{\indentarrow\indentarrow}{grad\_samples}{$$int$$}
       {Number of samples for Monte Carlo estimate of gradients}
@@ -1034,14 +1039,24 @@ configuration.
 %
     \hiercmdarg{\indentarrow\indentarrow}{eta}{$$double$$}
       {Stepsize weighting parameter for adaptive stepsize sequence}
-      {Valid values: \ $0 < \mbox{\code{eta}} \leq 1.0$}
-      {Defaults to \code{0.1}}
+      {Valid values: \ $0 < \mbox{\code{eta}}$}
+      {Defaults to \code{1.0}}
 %
-    \hiercmdarg{\indentarrow\indentarrow}{iter}{$$int$$}
-      {Maximum number of iterations}
-      {Valid values: \ $0 < \mbox{\code{iter}}$}
-      {Defaults to \code{10000}}
+    \hierlongcmd{\indentarrow\indentarrow}{\textbf{adapt}}
+      {Warmup Adaptation}
+      {Valid subarguments: \code{engaged, iter}}
 %
+    \hiercmdarg{\indentarrow\indentarrow\indentarrow}{engaged}{$$boolean$$}
+        {Adaptation engaged?}
+        {Valid values: \ \code{0, 1}}
+        {Defaults to \code{1}}
+%
+    \hiercmdarg{\indentarrow\indentarrow\indentarrow}{iter}{$$int$$}
+        {Maximum number of adaptation iterations}
+        {Valid values: \  $0 < \mbox{\code{iter}}$}
+        {Defaults to \code{50}}
+%
+
     \hiercmdarg{\indentarrow\indentarrow}{tol\_rel\_obj}{$$double$$}
       {Convergence tolerance on the relative norm of the objective}
       {Valid values: \ $0 < \mbox{\code{tol\_rel\_obj}}$}
@@ -1763,10 +1778,13 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model variational                                \
                  algorithm=meanfield                    \
+                     [iter=<int>]                       \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta=<double>]             \
-                     [iter=<int>]                       \
+                     [eta=<double>]                     \
+                     [adapt                             \
+                      [engaged=<boolean>]               \
+                      [iter=<int>] ]                    \
                      [tol_rel_obj=<double>]             \
                      [eval_elbo=<int>]                  \
                      [output_samples=<int>]             \
@@ -1791,10 +1809,13 @@ algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > ./my_model variational                                \
                  algorithm=fullrank                     \
+                     [iter=<int>]                       \
                      [grad_samples=<int>]               \
                      [elbo_samples=<int>]               \
-                     [eta=<double>]             \
-                     [iter=<int>]                       \
+                     [eta=<double>]                     \
+                     [adapt                             \
+                      [engaged=<boolean>]               \
+                      [iter=<int>] ]                    \
                      [tol_rel_obj=<double>]             \
                      [eval_elbo=<int>]                  \
                      [output_samples=<int>]             \

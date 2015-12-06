@@ -86,7 +86,7 @@ When \CmdStan is successfully built, the \code{make} program will report
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.8.0 built ---
+--- CmdStan v2.9.0 built ---
   \end{Verbatim}
 \end{quote}
 %
@@ -604,7 +604,7 @@ that no uncertainty is reported.
 
 \subsection{Variational Inference}
 
-\CmdStan can also approximate the posterior distribution using variational
+\CmdStan can approximate the posterior distribution using variational
 inference. The executable does not need to be
 recompiled in order to switch to variational inference, and the
 data input format is the same. The following is a minimal call to
@@ -622,65 +622,72 @@ Executing this command prints the following.
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\footnotesize]
-method =
- variational
-   algorithm = meanfield (Default)
-     meanfield
-   iter = 10000 (Default)
-   grad_samples = 1 (Default)
-   elbo_samples = 100 (Default)
-   eta = 0.10000000000000001 (Default)
-   tol_rel_obj = 0.01 (Default)
-   eval_elbo = 100 (Default)
-   output_samples = 1000 (Default)
-id = 0 (Default)
-data
- file = bernoulli.data.R
-init = 2 (Default)
-random
- seed = 3959575278
-output
- file = output.csv (Default)
- diagnostic_file =  (Default)
- refresh = 100 (Default)
+ method = variational
+   variational
+     algorithm = meanfield (Default)
+       meanfield
+     iter = 10000 (Default)
+     grad_samples = 1 (Default)
+     elbo_samples = 100 (Default)
+     eta = 1 (Default)
+     adapt
+       engaged = 1 (Default)
+       iter = 50 (Default)
+     tol_rel_obj = 0.01 (Default)
+     eval_elbo = 100 (Default)
+     output_samples = 1000 (Default)
+ id = 0 (Default)
+ data
+   file = bernoulli.data.R
+ init = 2 (Default)
+ random
+   seed = 1196271396
+ output
+   file = output.csv (Default)
+   diagnostic_file =  (Default)
+   refresh = 100 (Default)
 
 This is Automatic Differentiation Variational Inference.
 
 (EXPERIMENTAL ALGORITHM: expect frequent updates to the procedure.)
 
-Gradient evaluation took 1.1e-05 seconds
-1000 iterations under these settings should take 0.011 seconds.
+Gradient evaluation took 6e-06 seconds
+1000 iterations under these settings should take 0.006 seconds.
 Adjust your expectations accordingly!
 
-iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes
-   0         -7             1.000            1.000
- 100       -6.3             0.544            1.000
- 200       -6.2             0.365            0.087
- 300       -6.4             0.280            0.087
- 400       -6.3             0.226            0.026
- 500       -6.2             0.191            0.026
- 600       -6.3             0.166            0.016
- 700       -6.1             0.149            0.026
- 800       -6.2             0.134            0.016
- 900       -6.1             0.123            0.017
-1000       -6.3             0.025            0.017
-1100       -6.2             0.019            0.017
-1200       -6.3             0.020            0.020
-1300       -6.1             0.021            0.020
-1400       -6.2             0.021            0.020
-1500       -6.3             0.021            0.020
-1600       -6.2             0.020            0.020
-1700       -6.3             0.019            0.019
-1800       -6.2             0.019            0.019
-1900       -6.2             0.018            0.019
-2000       -6.2             0.015            0.018
-2100       -6.3             0.013            0.014
-2200       -6.2             0.012            0.014
-2300       -6.3             0.011            0.012
-2400       -6.4             0.011            0.012
-2500       -6.2             0.012            0.014
-2600       -6.2             0.011            0.014
-2700       -6.3             0.010            0.012   MEAN ELBO CONVERGED
+Begin eta adaptation.
+Iteration:   1 / 250 [  0%]  (Adaptation)
+Iteration:  50 / 250 [ 20%]  (Adaptation)
+Iteration: 100 / 250 [ 40%]  (Adaptation)
+Iteration: 150 / 250 [ 60%]  (Adaptation)
+Iteration: 200 / 250 [ 80%]  (Adaptation)
+Success! Found best value [eta = 1] earlier than expected.
+
+Begin stochastic gradient ascent.
+  iter       ELBO   delta_ELBO_mean   delta_ELBO_med   notes
+   100         -6             1.000            1.000
+   200       -6.3             0.511            1.000
+   300       -6.2             0.344            0.021
+   400       -6.2             0.261            0.021
+   500       -6.2             0.211            0.014
+   600       -6.2             0.178            0.014
+   700       -6.3             0.154            0.012
+   800       -6.3             0.135            0.012
+   900       -6.2             0.121            0.012
+  1000       -6.4             0.112            0.012
+  1100       -6.3             0.015            0.012
+  1200       -6.2             0.014            0.012
+  1300       -6.1             0.014            0.012
+  1400       -6.2             0.015            0.013
+  1500       -6.3             0.015            0.012
+  1600       -6.3             0.014            0.012
+  1700       -6.3             0.013            0.012
+  1800       -6.3             0.013            0.012
+  1900       -6.2             0.013            0.013
+  2000       -6.3             0.011            0.011
+  2100       -6.2             0.008            0.009   MEAN ELBO CONVERGED   MEDIAN ELBO CONVERGED
+
+Drawing 1000 samples from the approximate posterior... COMPLETED.
 \end{Verbatim}
 \end{quote}
 %
@@ -688,14 +695,16 @@ The first part of the output reports on the configuration used. Here
 it indicates the default mean-field setting of the variational
 inference algorithm. It also indicates the default parameter sizes and
 tolerances for monitoring the algorithm's convergence. The second part
-of the output describes the progression of the algorithm. The evidence
+of the output describes the progression of the algorithm. An adaptation
+phase finds a good value for the step size scaling parameter $\eta$. The
+evidence
 lower bound (ELBO) is the variational objective function and is
 evaluated based on a Monte Carlo estimate. The variational inference
 algorithm in \Stan is stochastic, which makes it challenging to assess
 convergence. That is, while the algorithm appears to have converged in
 $\sim$100 iterations, the algorithm runs for another few thousand
-iterations until the mean change in ELBO drops below the default
-tolerance of 1e-2.
+iterations until mean change in ELBO drops below the default
+tolerance of 0.01.
 
 
 \subsubsection{Variational Inference Output}
@@ -707,7 +716,7 @@ output for sampling, first dumping the entire set of parameters used.
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 7
+# stan_version_minor = 8
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = variational
@@ -717,7 +726,10 @@ output for sampling, first dumping the entire set of parameters used.
 #     iter = 10000 (Default)
 #     grad_samples = 1 (Default)
 #     elbo_samples = 100 (Default)
-#     eta = 0.10000000000000001 (Default)
+#     eta = 1 (Default)
+#     adapt
+#       engaged = 1 (Default)
+#       iter = 50 (Default)
 #     tol_rel_obj = 0.01 (Default)
 #     eval_elbo = 100 (Default)
 #     output_samples = 1000 (Default)
@@ -726,26 +738,27 @@ output for sampling, first dumping the entire set of parameters used.
 #   file = bernoulli.data.R
 # init = 2 (Default)
 # random
-#   seed = 3959575278
+#   seed = 1196271396
 # output
 #   file = output.csv (Default)
 #   diagnostic_file =  (Default)
 #   refresh = 100 (Default)
 lp__,theta
--6.77173,0.223462
--6.74816,0.252055
--6.92751,0.180521
--7.25717,0.13987
--6.91783,0.182266
+# Stepsize adaptation complete.
+# eta = 1
+0,0.249604
+0,0.254227
+0,0.211049
 ...
 \end{Verbatim}
 \end{quote}
 %
-Note that everything is a comment other than a line for the header,
-and a line for the values. The header indicates the
-unnormalized log probability with \code{lp\_\_} based on the variational
-parameters. The ELBO is not stored unless a diagnostic
-option is given. See \refsection{stan-command-line-options} for more details.
+Note that everything is a comment other than a line for the header, the adapted
+value for the stepsize, and a line for the values. The header indicates the
+unnormalized log probability with \code{lp\_\_}. This is a legacy feature that
+we do not use for variational inference. The ELBO is not stored unless a
+diagnostic option is given. See \refsection{stan-command-line-options} for more
+details.
 The first line is special: it is the mean of the variational approximation.
 The rest of the output contains \code{output\_samples} number of samples
 drawn from the variational approximation.
