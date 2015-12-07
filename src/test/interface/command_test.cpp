@@ -341,7 +341,7 @@ struct sampler {
     return _z;
   }
   
-  void init_stepsize() {
+  void init_stepsize(stan::interface_callbacks::writer::base_writer& writer) {
     throw ExceptionType("throwing exception");
   }
 };
