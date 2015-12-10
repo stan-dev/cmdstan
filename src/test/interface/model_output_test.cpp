@@ -23,11 +23,11 @@ TEST(interface, check_model_output) {
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_FALSE(out.hasError);
 
-  EXPECT_TRUE(count_matches("\nz=", out.body) > 1)
+  EXPECT_TRUE(count_matches("\nz=", out.body) > 2)
     << "counted " << count_matches("\nz=", out.body) << " instances of \"z=\" in"
     << std::endl
     << out.body;
-  EXPECT_TRUE(count_matches("\ny=", out.body) > 1)
+  EXPECT_TRUE(count_matches("\ny=", out.body) > 2)
     << "counted " << count_matches("\ny=", out.body) << " instances of \"z=\" in"
     << std::endl
     << out.body;
