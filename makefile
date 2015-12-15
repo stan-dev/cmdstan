@@ -28,12 +28,6 @@ STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
 -include $(MATH)make/libraries
 
-.PHONY: tmp
-tmp:
-	@echo $(CVODE)
-	@echo $(LIBCVODE)
-	@echo $(SUNDIALS_CVODE)
-
 ##
 # Set default compiler options.
 ## 
