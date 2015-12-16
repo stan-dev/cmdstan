@@ -483,7 +483,7 @@ namespace stan {
 
         interface_callbacks::writer::stream_writer sample_writer(*output_stream, "# ");
         interface_callbacks::writer::stream_writer diagnostic_writer(*diagnostic_stream, "# ");
-        interface_callbacks::writer::stream_writer message_writer(std::cout, "# ");
+        interface_callbacks::writer::stream_writer message_writer(std::cout);
 
         stan::services::sample::mcmc_writer<Model,
                                             interface_callbacks::writer::stream_writer,

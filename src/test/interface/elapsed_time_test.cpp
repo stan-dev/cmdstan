@@ -19,8 +19,10 @@ TEST(CommandElapsedTime, PrintToScreen) {
   ASSERT_FALSE(out.hasError) 
     << "\"" << out.command << "\" quit with an error";
 
-  EXPECT_EQ(1, count_matches("#  Elapsed Time: ", out.output))
-    << "output stream should have one match for elapsed time";
+  EXPECT_EQ(1, count_matches("Elapsed Time: ", out.output))
+    << "output stream should have one match for elapsed time"
+    << std::endl
+    << out.output;
 }
 
 TEST(CommandElapsedTime, PrintToFile) {
@@ -39,5 +41,7 @@ TEST(CommandElapsedTime, PrintToFile) {
   ifstream.close();
                           
   EXPECT_EQ(1, count_matches("#  Elapsed Time: ", output_file))
-    << "output_file should have one match for elapsed time";
+    << "output_file should have one match for elapsed time"
+    << std::endl
+    << output_file;
 }
