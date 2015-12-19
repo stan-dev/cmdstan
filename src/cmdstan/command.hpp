@@ -292,20 +292,20 @@ namespace stan {
           int num_failed
             = stan::model::test_gradients<true, true>
             (model, cont_vector, disc_vector,
-             epsilon, error, std::cout, 0);
+             epsilon, error, info);
 
           if (output_stream) {
             num_failed
               = stan::model::test_gradients<true, true>
               (model, cont_vector, disc_vector,
-               epsilon, error, *output_stream, 0);
+               epsilon, error, sample_writer);
           }
 
           if (diagnostic_stream) {
             num_failed
               = stan::model::test_gradients<true, true>
               (model, cont_vector, disc_vector,
-               epsilon, error, *diagnostic_stream, 0);
+               epsilon, error, diagnostic_writer);
           }
 
           (void) num_failed; // FIXME: do something with the number failed
@@ -360,9 +360,10 @@ namespace stan {
           }
 
           std::cout << "initial log joint probability = " << lp << std::endl;
-          if (output_stream && save_iterations) {
-            io::write_iteration(sample_writer, model, base_rng,
-                                lp, cont_vector, disc_vector);
+          if (save_iterations) {
+            io::write_iteration(model, base_rng,
+                                lp, cont_vector, disc_vector,
+                                info, sample_writer);
           }
 
           double lastlp = lp * 1.1;
@@ -382,8 +383,9 @@ namespace stan {
             m++;
 
             if (save_iterations) {
-              io::write_iteration(sample_writer, model, base_rng,
-                                  lp, cont_vector, disc_vector);
+              io::write_iteration(model, base_rng,
+                                  lp, cont_vector, disc_vector,
+                                  info, sample_writer);
             }
           }
           return_code = stan::services::error_codes::OK;
@@ -444,8 +446,9 @@ namespace stan {
           return_code = stan::services::error_codes::CONFIG;
         }
 
-        io::write_iteration(sample_writer, model, base_rng,
-                            lp, cont_vector, disc_vector);
+        io::write_iteration(model, base_rng,
+                            lp, cont_vector, disc_vector,
+                            info, sample_writer);
         output_stream->close();
         diagnostic_stream->close();
         delete output_stream;
