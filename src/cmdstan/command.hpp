@@ -201,7 +201,7 @@ namespace stan {
         (parser.arg("id"))->value();
 
       stan::interface_callbacks::writer::stream_writer
-        sample_writer(*output_stream, "#"),
+        sample_writer(*output_stream, "# "),
         diagnostic_writer(*diagnostic_stream, "#");
 
       //////////////////////////////////////////////////
