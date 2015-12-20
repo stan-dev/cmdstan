@@ -833,12 +833,7 @@ namespace stan {
           names.push_back("lp__");
           model.constrained_param_names(names, true, true);
 
-          std::stringstream ss;
-          ss << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            ss << "," << names.at(i);
-          }
-          sample_writer(ss.str());
+          sample_writer(names);
 
           stan::variational::advi<Model,
                                   stan::variational::normal_fullrank,
@@ -859,13 +854,7 @@ namespace stan {
           std::vector<std::string> names;
           names.push_back("lp__");
           model.constrained_param_names(names, true, true);
-          
-          std::stringstream ss;
-          ss << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            ss << "," << names.at(i);
-          }
-          sample_writer(ss.str());
+          sample_writer(names);
           
           stan::variational::advi<Model,
                                   stan::variational::normal_meanfield,
