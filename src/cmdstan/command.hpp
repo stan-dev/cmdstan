@@ -202,7 +202,7 @@ namespace stan {
 
       stan::interface_callbacks::writer::stream_writer
         sample_writer(*output_stream, "# "),
-        diagnostic_writer(*diagnostic_stream, "#");
+        diagnostic_writer(*diagnostic_stream, "# ");
 
       //////////////////////////////////////////////////
       //            Random number generator           //
@@ -247,15 +247,15 @@ namespace stan {
       info();
       
       if (output_stream) {
-        io::write_stan(info, "#");
-        io::write_model(info, model.model_name(), "#");
+        io::write_stan(sample_writer);
+        io::write_model(sample_writer, model.model_name());
         parser.print(sample_writer);
       }
 
       if (diagnostic_stream) {
-        io::write_stan(diagnostic_writer, "#");
-        io::write_model(diagnostic_writer, model.model_name(), "#");
-        parser.print(diagnostic_writer, "#");
+        io::write_stan(diagnostic_writer);
+        io::write_model(diagnostic_writer, model.model_name());
+        parser.print(diagnostic_writer);
       }
 
       std::string init = dynamic_cast<stan::services::string_argument*>(

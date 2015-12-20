@@ -53,8 +53,6 @@ void test_optimize_prints(const std::string& base_cmd) {
   EXPECT_TRUE(count_matches("y=", cmd_output) >= 1);
   // generated quantities [only on saved iterations, should be num samples]
   EXPECT_TRUE(count_matches("w=", cmd_output) == 1);
-  std::cout << "cmd: " << cmd << std::endl
-            << cmd_output << std::endl;
 }
 
 TEST(StanUiCommand, printReallyPrints) {
