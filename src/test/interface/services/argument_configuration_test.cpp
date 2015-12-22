@@ -19,7 +19,6 @@ using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
 void clean_line(std::string& line) {
-  line.erase(0, 1);
   if (line.find("(Default)") != std::string::npos)
     line = line.substr(0, line.find("(Default)"));
   line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
