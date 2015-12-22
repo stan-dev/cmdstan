@@ -44,7 +44,6 @@ void test_sample_prints(const std::string& base_cmd) {
 
 void test_optimize_prints(const std::string& base_cmd) {
   std::string cmd(base_cmd);
-  // cmd += " num_samples=100 num_warmup=100";
   std::string cmd_output = run_command(cmd).output;
   // transformed data
   EXPECT_EQ(1, count_matches("x=", cmd_output)); 
@@ -280,7 +279,7 @@ TEST(StanUiCommand, timing_info) {
   output_sstream << output_csv_stream.rdbuf();
   output_csv_stream.close();
   std::string output = output_sstream.str();
-  
+
   EXPECT_EQ(1, count_matches("#  Elapsed Time:", output));
   EXPECT_EQ(1, count_matches(" seconds (Warm-up)", output));
   EXPECT_EQ(1, count_matches(" seconds (Sampling)", output));
@@ -360,7 +359,6 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   
   EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
                                                   0, 0, 0, 0, cont_params,
-                                                  &std::cout,
                                                   message_writer));
 }
 
