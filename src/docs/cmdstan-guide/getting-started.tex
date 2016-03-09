@@ -309,7 +309,7 @@ lines beginning with the pound sign (\Verb|#|)).
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 8
+# stan_version_minor = 9
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = sample (Default)
@@ -326,7 +326,7 @@ This is followed by a CSV header indicating the names of the values
 sampled.
 %
 \begin{Verbatim}[fontsize=\small]
-lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,n_divergent__,theta
+lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,theta
 \end{Verbatim}
 %
 The first column reports the unnormalized log probability of the
@@ -349,13 +349,17 @@ sampler-depedent parameters are described in the following table.
 \\
 \NUTS & \Verb| n_leapfrog__  | & Number of leapfrog calculations
 \\
-\NUTS & \Verb| n_divergent__  | & Number of divergent iterations
+\NUTS & \Verb| divergent__  | & 1 if trajectory diverged
+\\
+\NUTS & \Verb| E__ | & Hamiltonian value (energy)
 \\ \hline
 \HMC & \Verb| accept_stat__ | &  Metropolis acceptance probability
 \\
 \HMC & \Verb| stepsize__  | & Integrator step size
 \\
 \HMC & \Verb| int_time__  | & Total integration time
+\\
+\NUTS & \Verb| E__ | & Hamiltonian value (energy)
 \\
 \end{tabular}
 \end{center}
@@ -391,11 +395,11 @@ in the No-U-Turn sampling algorithm.}
 %
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
--7.22574,1,1.09068,1,1,0.383089
--6.95293,0.945991,1.09068,2,3,0.335074
--6.92373,0.938744,1.09068,1,1,0.181194
--6.83655,0.934833,1.09068,2,3,0.304882
--7.01732,1,1.09068,1,1,0.348244
+-6.78148,0.958918,0.997192,2,3,0,7.3034,0.283226
+-6.74932,0.99923,0.997192,2,3,0,6.77915,0.243658
+-6.88104,0.944956,0.997192,2,3,0,7.02671,0.317841
+-6.74805,1,0.997192,2,3,0,6.84913,0.249106
+-10.0366,0.49441,0.997192,2,3,0,10.1243,0.0398088
 ...
 \end{Verbatim}
 \end{quote}
@@ -444,14 +448,15 @@ Inference for Stan model: bernoulli_model
 Warmup took (0.014) seconds, 0.014 seconds total
 Sampling took (0.027) seconds, 0.027 seconds total
 
-                Mean     MCSE   StdDev     5%   50%   95%  N_Eff  N_Eff/s    R_hat
-lp__            -7.3  4.6e-02  7.4e-01   -8.7  -7.0  -6.8    255     9267  1.0e+00
-accept_stat__   0.94  2.7e-03  8.5e-02   0.76  0.98   1.0   1000    36395  1.0e+00
-stepsize__      0.79  1.1e-15  7.8e-16   0.79  0.79  0.79   0.50       18  1.0e+00
-treedepth__      1.9  2.2e-02  6.5e-01    1.0   2.0   3.0    844    30733  1.0e+00
-n_leapfrog__     3.1  6.4e-02  1.9e+00    1.0   3.0   7.0    897    32644  1.0e+00
-n_divergent__   0.00  0.0e+00  0.0e+00   0.00  0.00  0.00   1000    36395      nan
-theta           0.26  5.9e-03  1.2e-01  0.091  0.25  0.48    420    15292  1.0e+00
+               Mean     MCSE   StdDev     5%   50%   95%  N_Eff  N_Eff/s    R_hat
+lp__            -7.2  3.0e-02  6.6e-01   -8.5  -7.0  -6.7    479    29120  1.0e+00
+accept_stat__   0.91  4.5e-03  1.4e-01   0.61  0.97   1.0   1000    60846  1.0e+00
+stepsize__      1.00  3.8e-15  2.7e-15   1.00  1.00  1.00   0.50       30  1.0e+00
+treedepth__      1.7  1.6e-02  4.7e-01    1.0   2.0   2.0    812    49412  1.0e+00
+n_leapfrog__     2.4  3.3e-02  9.5e-01    1.0   3.0   3.0    813    49439  1.0e+00
+divergent__     0.00  0.0e+00  0.0e+00   0.00  0.00  0.00   1000    60846      nan
+E__              7.7  4.6e-02  1.0e+00    6.8   7.4   9.6    491    29856  1.0e+00
+theta           0.25  6.0e-03  1.1e-01  0.084  0.24  0.46    361    21985  1.0e+00
 
 Samples were drawn using hmc with nuts.
 For each parameter, N_Eff is a crude measure of effective sample size,
