@@ -326,7 +326,7 @@ This is followed by a CSV header indicating the names of the values
 sampled.
 %
 \begin{Verbatim}[fontsize=\small]
-lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,E__,theta
+lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,theta
 \end{Verbatim}
 %
 The first column reports the unnormalized log probability of the
@@ -351,7 +351,7 @@ sampler-depedent parameters are described in the following table.
 \\
 \NUTS & \Verb| divergent__  | & 1 if trajectory diverged
 \\
-\NUTS & \Verb| E__ | & Hamiltonian value (energy)
+\NUTS & \Verb| energy__ | & Hamiltonian value
 \\ \hline
 \HMC & \Verb| accept_stat__ | &  Metropolis acceptance probability
 \\
@@ -359,7 +359,7 @@ sampler-depedent parameters are described in the following table.
 \\
 \HMC & \Verb| int_time__  | & Total integration time
 \\
-\NUTS & \Verb| E__ | & Hamiltonian value (energy)
+\NUTS & \Verb| energy__ | & Hamiltonian value
 \\
 \end{tabular}
 \end{center}
@@ -455,7 +455,7 @@ stepsize__      1.00  3.8e-15  2.7e-15   1.00  1.00  1.00   0.50       30  1.0e+
 treedepth__      1.7  1.6e-02  4.7e-01    1.0   2.0   2.0    812    49412  1.0e+00
 n_leapfrog__     2.4  3.3e-02  9.5e-01    1.0   3.0   3.0    813    49439  1.0e+00
 divergent__     0.00  0.0e+00  0.0e+00   0.00  0.00  0.00   1000    60846      nan
-E__              7.7  4.6e-02  1.0e+00    6.8   7.4   9.6    491    29856  1.0e+00
+energy__         7.7  4.6e-02  1.0e+00    6.8   7.4   9.6    491    29856  1.0e+00
 theta           0.25  6.0e-03  1.1e-01  0.084  0.24  0.46    361    21985  1.0e+00
 
 Samples were drawn using hmc with nuts.

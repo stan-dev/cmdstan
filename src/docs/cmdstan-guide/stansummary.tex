@@ -74,7 +74,7 @@ stepsize__      0.16  5.1e-16  3.6e-16  0.16  0.16  0.16   0.50      6.7  1.0e+0
 treedepth__      2.9  4.1e-02  1.2e+00   1.0   3.0   5.0    829    11104  1.0e+00
 n_leapfrog__     8.0  2.1e-01  6.3e+00   1.0   7.0    19    870    11648  1.0e+00
 divergent__     0.00  0.0e+00  0.0e+00  0.00  0.00  0.00   1000    13388      nan
-E__               15  8.7e-02  1.5e+00    14    15    18    282     3775  1.0e+00
+energy__          15  8.7e-02  1.5e+00    14    15    18    282     3775  1.0e+00
 alpha             16  1.9e+00  2.0e+01   1.9   9.7    50    114     1524  1.0e+00
 beta             9.9  1.1e+00  1.2e+01   1.1   6.1    31    124     1664  1.0e+00
 
@@ -100,7 +100,7 @@ beta             9.9  1.1e+00  1.2e+01   1.1   6.1    31    124     1664  1.0e+0
   steps taken during the Hamiltonian simulation; \code{treedepth\_\_} should always
   be the binary log of \code{n\_leapfrog\_\_}.  \code{divergent\_\_} indicates
   whether or not the simulated Hamiltonian trajectory became unstable and
-  diverged.  Finally, \code{E\_\_} is value of the Hamiltonian (up to an additive
+  diverged.  Finally, \code{energy\_\_} is value of the Hamiltonian (up to an additive
   constant) at each sample, also known as the energy.
   }
 \label{bin-stansummary-eg.figure}
@@ -130,10 +130,10 @@ the samples may be biased -- common solutions are decreasing the
 step size (often by increasing the target average acceptance probability)
 or reparameterizing the model.
 
-\subsubsection{\code{E}}
+\subsubsection{\code{energy}}
 
-The energy, \code{E}, is used to diagnose the accuracy of any Hamiltonian
-Monte Carlo sampler.  If the standard deviation of \code{E} is much larger
+The energy, \code{energy}, is used to diagnose the accuracy of any Hamiltonian
+Monte Carlo sampler.  If the standard deviation of \code{energy} is much larger
 than $\sqrt{D / 2}$, where $D$ is the number of \emph{unconstrained}
 parameters, then the sampler is unlikely to be able to explore the
 posterior adequately.  This is usually due to heavy-tailed posteriors and
