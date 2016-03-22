@@ -67,14 +67,16 @@ The result of \code{bin/stansummary} is displayed in
    Warmup took (0.054) seconds, 0.054 seconds total
    Sampling took (0.059) seconds, 0.059 seconds total
 
-                   Mean     MCSE   StdDev    5%   50%   95%  N_Eff  N_Eff/s  R_hat
-   lp__             -14  6.2e-02  1.0e+00   -16   -14   -13    283     4773   1.00
-   accept_stat__   0.88  5.6e-03  1.8e-01  0.51  0.95   1.0   1000    16881   1.00
-   stepsize__      0.30  1.3e-15  8.9e-16  0.30  0.30  0.30   0.50      8.5   1.00
-   treedepth__      1.4  2.6e-02  8.0e-01  0.00   1.0   2.0    946    15978   1.00
-   n_divergent__    1.4  0.0e+00  0.0e+00  0.00   0.0   0.0   1000    16949   1.00
-   alpha             17  1.8e+00  2.5e+01   1.9   9.5    50    181     3054   1.00
-   beta              10  1.1e+00  1.4e+01   1.2   6.2    31    181     3057   1.00
+                Mean     MCSE   StdDev    5%   50%   95%  N_Eff  N_Eff/s    R_hat
+lp__             -14  7.0e-02  1.1e+00   -17   -14   -13    226     3022  1.0e+00
+accept_stat__   0.94  3.1e-03  9.7e-02  0.75  0.98   1.0   1000    13388  1.0e+00
+stepsize__      0.16  5.1e-16  3.6e-16  0.16  0.16  0.16   0.50      6.7  1.0e+00
+treedepth__      2.9  4.1e-02  1.2e+00   1.0   3.0   5.0    829    11104  1.0e+00
+n_leapfrog__     8.0  2.1e-01  6.3e+00   1.0   7.0    19    870    11648  1.0e+00
+divergent__     0.00  0.0e+00  0.0e+00  0.00  0.00  0.00   1000    13388      nan
+energy__          15  8.7e-02  1.5e+00    14    15    18    282     3775  1.0e+00
+alpha             16  1.9e+00  2.0e+01   1.9   9.7    50    114     1524  1.0e+00
+beta             9.9  1.1e+00  1.2e+01   1.1   6.1    31    124     1664  1.0e+00
 
    Samples were drawn using hmc with nuts.
    For each parameter, N_Eff is a crude measure of effective sample size,
@@ -88,16 +90,19 @@ The result of \code{bin/stansummary} is displayed in
   quantiles, along with Monte-Carlo standard error, effective sample
   size estimates (per second), and convergence diagnostic statistic.
   These values are all estimated from samples. In addition to the
-  parameters, the value \code{lp\_\_} is the total log probability
-  computed by the model (up to an additive constant).  The quantity
-  \code{accept\_stat\_\_} is the NUTS acceptance statistic used by
-  NUTS for slice and Metropolis rejection, \code{stepsize\_\_} the
-  step size used by NUTS in its Hamiltonian simulation, and
-  \code{treedepth\_\_} is the depth of tree used by NUTS, which is the
-  log (base 2) of the number of leapfrog steps taken during the
-  Hamiltonian simulation.  \code{n\_divergent\_\_} gives the number
-  of leapfrog iterations with diverging error; because NUTS terminates
-  at the first divergent iteration this should always be either 0 or 1.}
+  parameters, \code{bin/stansummary} also outputs \code{lp\_\_}, 
+  the total log probability density (up to an additive constant) at each sample,
+  as well as NUTS-specific values that can be helpful in diagnostics. 
+  The quantity \code{accept\_stat\_\_} is the average Metropolis acceptance 
+  probability over each simulated Hamiltonian trajectory and \code{stepsize\_\_} 
+  is the integrator step size used in each simulation.  \code{treedepth\_\_} is the 
+  depth of tree used by NUTS while \code{n\_leapfrog\_\_} is the number of leapfrog 
+  steps taken during the Hamiltonian simulation; \code{treedepth\_\_} should always
+  be the binary log of \code{n\_leapfrog\_\_}.  \code{divergent\_\_} indicates
+  whether or not the simulated Hamiltonian trajectory became unstable and
+  diverged.  Finally, \code{energy\_\_} is value of the Hamiltonian (up to an additive
+  constant) at each sample, also known as the energy.
+  }
 \label{bin-stansummary-eg.figure}
 \end{figure}
 %\end{quote}
@@ -113,19 +118,26 @@ For Windows, the forward slash in paths need to be converted to backslashes.
 
 \subsection{Output of stansummary Command}
 
-\subsubsection{\code{n\_divergent}}
+\subsubsection{\code{divergent}}
 
 \CmdStan uses a symplectic integrator to approximate the exact
-solution of the Hamiltonian dynamics and when the step size is too
+solution of the Hamiltonian dynamics, and when the step size is too
 large relative to the curvature of the log posterior this
-approximation can diverge and threaten the validity of the
-sampler. \code{n\_divergent} counts the number of iterations within a
-given sample that have diverged and any non-zero value suggests that
-the samples may be biased in which case the step size needs to be
-decreased. Note that, because sampling is immediately terminated once
-a divergence is encountered, \code{n\_divergent} should be only 0 or
-1.
+approximation becomes unstable and the trajectories can diverge and
+threaten the validity of the sampler; \code{divergent} indicates whether
+or not a given trajectory diverged.  If there are any divergences then 
+the samples may be biased -- common solutions are decreasing the
+step size (often by increasing the target average acceptance probability)
+or reparameterizing the model.
 
+\subsubsection{\code{energy}}
+
+The energy, \code{energy}, is used to diagnose the accuracy of any Hamiltonian
+Monte Carlo sampler.  If the standard deviation of \code{energy} is much larger
+than $\sqrt{D / 2}$, where $D$ is the number of \emph{unconstrained}
+parameters, then the sampler is unlikely to be able to explore the
+posterior adequately.  This is usually due to heavy-tailed posteriors and
+can sometime be remedied by reparameterizing the model.
 
 \section{Command-line Options}
 
