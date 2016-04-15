@@ -31,7 +31,7 @@ MATH ?= $(STAN)lib/stan_math/
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG -I$(CVODES)/include
+CFLAGS = -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -Wall -DEIGEN_NO_DEBUG  -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe 
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
