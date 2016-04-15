@@ -68,11 +68,6 @@ CMDSTAN_VERSION := 2.9.0
 %.o : %.cpp
 	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.hpp %.stan 
-	@echo ''
-	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
-
 ##
 # Tell make the default way to compile a .o file.
 ##
