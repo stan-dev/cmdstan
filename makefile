@@ -31,7 +31,7 @@ MATH ?= $(STAN)lib/stan_math/
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -Wall -pipe -DEIGEN_NO_DEBUG -I$(CVODE)/include
+CFLAGS = -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -Wall -DEIGEN_NO_DEBUG  -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -pipe 
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
@@ -71,7 +71,8 @@ CMDSTAN_VERSION := 2.9.0
 %$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LDLIBS)
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES) $(LDLIBS)
+
 
 ##
 # Tell make the default way to compile a .o file.
@@ -213,7 +214,7 @@ endif
 -include $(STAN)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) $(LIBCVODE)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 

@@ -67,9 +67,9 @@ ALL_TESTS = $(shell find src/test -type f -name '*_test.cpp')
 ALL_TEST_EXECUTABLES = $(patsubst src/%.cpp,%$(EXE),$(ALL_TESTS))
 
 .PRECIOUS: test/%.o
-test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODE)
+test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODES)
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODE)
+	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
 	$(WINE) $@ --gtest_output="xml:$(basename $@).xml"
 endif
