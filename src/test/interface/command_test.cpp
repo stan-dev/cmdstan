@@ -340,7 +340,9 @@ struct sampler {
     return _z;
   }
   
-  void init_stepsize(stan::interface_callbacks::writer::base_writer& writer) {
+  void
+  init_stepsize(stan::interface_callbacks::writer::base_writer& info_writer,
+                stan::interface_callbacks::writer::base_writer& error_writer) {
     throw ExceptionType("throwing exception");
   }
 };
@@ -356,10 +358,11 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   Eigen::VectorXd cont_params;
 
   stan::interface_callbacks::writer::stream_writer message_writer(std::cout);
+  stan::interface_callbacks::writer::stream_writer error_writer(std::cerr);
   
   EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
                                                   0, 0, 0, 0, cont_params,
-                                                  message_writer));
+                                                  message_writer, error_writer));
 }
 
 REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
