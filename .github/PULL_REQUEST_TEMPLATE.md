@@ -1,6 +1,6 @@
 #### Submisison Checklist
 
-- [ ] Run unit tests: `./runCmdStanTests.py src/test/unit`
+- [ ] Run tests: `./runCmdStanTests.py src/test`
 - [ ] Declare copyright holder and open-source license: see below
 
 #### Summary:
