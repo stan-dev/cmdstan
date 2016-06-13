@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <stan/services/error_codes.hpp>
-#include <stan/services/arguments/argument_probe.hpp>
-#include <stan/services/arguments/arg_method.hpp>
-#include <stan/services/arguments/arg_id.hpp>
-#include <stan/services/arguments/arg_data.hpp>
-#include <stan/services/arguments/arg_init.hpp>
-#include <stan/services/arguments/arg_random.hpp>
-#include <stan/services/arguments/arg_output.hpp>
+#include <stan/old_services/error_codes.hpp>
+#include <stan/old_services/arguments/argument_probe.hpp>
+#include <stan/old_services/arguments/arg_method.hpp>
+#include <stan/old_services/arguments/arg_id.hpp>
+#include <stan/old_services/arguments/arg_data.hpp>
+#include <stan/old_services/arguments/arg_init.hpp>
+#include <stan/old_services/arguments/arg_random.hpp>
+#include <stan/old_services/arguments/arg_output.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 #include <test/utility.hpp>
 

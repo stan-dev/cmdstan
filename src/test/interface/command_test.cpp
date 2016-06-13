@@ -1,4 +1,4 @@
-#include <stan/services/error_codes.hpp>
+#include <stan/old_services/error_codes.hpp>
 #include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
