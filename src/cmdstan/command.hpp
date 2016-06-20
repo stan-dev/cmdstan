@@ -116,6 +116,9 @@
 #include <stan/interface_callbacks/writer/base_writer.hpp>
 #include <stan/interface_callbacks/writer/stream_writer.hpp>
 
+#include <stan/services/diagnose/diagnose.hpp>
+#include <stan/io/empty_var_context.hpp>
+
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -257,7 +260,7 @@ namespace stan {
         io::write_model(diagnostic_writer, model.model_name());
         parser.print(diagnostic_writer);
       }
-
+      
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
 
@@ -267,52 +270,38 @@ namespace stan {
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
 
+
+      double init_radius = 2.0;
+      try {
+        init_radius = boost::lexical_cast<double>(init);
+      } catch (const boost::bad_lexical_cast& e) {
+      }
+      stan::io::empty_var_context init_context;
+      
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("diagnose")) {
-        std::vector<double> cont_vector(cont_params.size());
-        for (int i = 0; i < cont_params.size(); ++i)
-          cont_vector.at(i) = cont_params(i);
-        std::vector<int> disc_vector;
-
         stan::services::list_argument* test = dynamic_cast<stan::services::list_argument*>
-                              (parser.arg("method")->arg("diagnose")->arg("test"));
-
+          (parser.arg("method")->arg("diagnose")->arg("test"));
+        
         if (test->value() == "gradient") {
-          std::cout << std::endl << "TEST GRADIENT MODE" << std::endl;
-
           double epsilon = dynamic_cast<stan::services::real_argument*>
                            (test->arg("gradient")->arg("epsilon"))->value();
 
           double error = dynamic_cast<stan::services::real_argument*>
                          (test->arg("gradient")->arg("error"))->value();
-
-          int num_failed
-            = stan::model::test_gradients<true, true>
-            (model, cont_vector, disc_vector,
-             epsilon, error, info);
-
-          if (output_stream) {
-            num_failed
-              = stan::model::test_gradients<true, true>
-              (model, cont_vector, disc_vector,
-               epsilon, error, sample_writer);
-          }
-
-          if (diagnostic_stream) {
-            num_failed
-              = stan::model::test_gradients<true, true>
-              (model, cont_vector, disc_vector,
-               epsilon, error, diagnostic_writer);
-          }
-
-          (void) num_failed; // FIXME: do something with the number failed
-
-          return stan::services::error_codes::OK;
-
+          
+          return stan::services::diagnose::diagnose(model,
+                                                    init_context, 
+                                                    random_seed, id,
+                                                    init_radius,
+                                                    epsilon, error,
+                                                    info,
+                                                    sample_writer);
         }
+        return stan::services::error_codes::OK;
       }
 
       //////////////////////////////////////////////////
