@@ -276,7 +276,15 @@ namespace stan {
         init_radius = boost::lexical_cast<double>(init);
       } catch (const boost::bad_lexical_cast& e) {
       }
-      stan::io::empty_var_context init_context;
+      std::fstream* init_stream = 0;
+      if (init != "") {
+        init_stream = new std::fstream(init.c_str(),
+                                       std::fstream::in);
+      } else {
+        init_stream = new null_fstream();
+      }
+      stan::io::dump init_context(*init_stream);
+      delete init_stream;
       
       //////////////////////////////////////////////////
       //               Model Diagnostics              //
