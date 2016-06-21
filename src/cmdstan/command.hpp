@@ -232,6 +232,7 @@ namespace stan {
         random_seed = random_arg->value();
       }
 
+      // FIXME: remove after service methods in
       typedef boost::ecuyer1988 rng_t;  // (2**50 = 1T samples, 1000 chains)
       rng_t base_rng(random_seed);
 
@@ -239,7 +240,9 @@ namespace stan {
       static boost::uintmax_t DISCARD_STRIDE
         = static_cast<boost::uintmax_t>(1) << 50;
       base_rng.discard(DISCARD_STRIDE * (id - 1));
+      // FIXME: remove after service methods in
 
+      
 
       //////////////////////////////////////////////////
       //                Initialize Model              //
@@ -267,12 +270,13 @@ namespace stan {
       std::string init = dynamic_cast<stan::services::string_argument*>(
                          parser.arg("init"))->value();
 
+      // FIXME: remove after service methods in
       interface_callbacks::var_context_factory::dump_factory var_context_factory;
       if (!init::initialize_state<interface_callbacks::var_context_factory::dump_factory>
           (init, cont_params, model, base_rng, info,
            var_context_factory))
         return stan::services::error_codes::SOFTWARE;
-
+      // FIXME:: remove
 
       double init_radius = 2.0;
       try {
@@ -321,11 +325,6 @@ namespace stan {
 
       if (parser.arg("method")->arg("optimize")) {
         interface_callbacks::interrupt::noop callback;
-
-        std::vector<double> cont_vector(cont_params.size());
-        for (int i = 0; i < cont_params.size(); ++i)
-          cont_vector.at(i) = cont_params(i);
-        std::vector<int> disc_vector;
 
         stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
@@ -396,7 +395,6 @@ namespace stan {
                          algo->arg("lbfgs")->arg("tol_rel_grad"))->value();
           double tol_param = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_param"))->value();
-
 
           return_code = stan::services::optimize::lbfgs(model,
                                                         init_context,
