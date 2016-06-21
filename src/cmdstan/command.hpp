@@ -118,6 +118,7 @@
 
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
+#include <stan/services/optimize/lbfgs.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -420,65 +421,46 @@ namespace stan {
                                                        callback,
                                                        info,
                                                        sample_writer);
-
-          return return_code;
-          // typedef stan::optimization::BFGSLineSearch
-          //   <Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
-          // Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
-
-          // bfgs._ls_opts.alpha0 
-          // bfgs._conv_opts.tolAbsF = dynamic_cast<stan::services::real_argument*>(
-          //                algo->arg("bfgs")->arg("tol_obj"))->value();
-          // bfgs._conv_opts.tolRelF = dynamic_cast<stan::services::real_argument*>(
-          //                algo->arg("bfgs")->arg("tol_rel_obj"))->value();
-          // bfgs._conv_opts.tolAbsGrad = dynamic_cast<stan::services::real_argument*>(
-          //                algo->arg("bfgs")->arg("tol_grad"))->value();
-          // bfgs._conv_opts.tolRelGrad = dynamic_cast<stan::services::real_argument*>(
-          //                algo->arg("bfgs")->arg("tol_rel_grad"))->value();
-          // bfgs._conv_opts.tolAbsX = dynamic_cast<stan::services::real_argument*>(
-          //                algo->arg("bfgs")->arg("tol_param"))->value();
-          // bfgs._conv_opts.maxIts = num_iterations;
-
-          // return_code = optimize::do_bfgs_optimize(model,bfgs, base_rng,
-          //                                          lp, cont_vector, disc_vector,
-          //                                          sample_writer, info,
-          //                                          save_iterations, refresh,
-          //                                          callback);
         } else if (algo->value() == "lbfgs") {
           interface_callbacks::interrupt::noop callback;
-          typedef stan::optimization::BFGSLineSearch
-            <Model,stan::optimization::LBFGSUpdate<> > Optimizer;
 
-          Optimizer bfgs(model, cont_vector, disc_vector, &std::cout);
-
-          bfgs.get_qnupdate().set_history_size(dynamic_cast<services::int_argument*>(
-                         algo->arg("lbfgs")->arg("history_size"))->value());
-          bfgs._ls_opts.alpha0 = dynamic_cast<services::real_argument*>(
+          int history_size = dynamic_cast<services::int_argument*>(
+                         algo->arg("lbfgs")->arg("history_size"))->value();
+          double init_alpha = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("init_alpha"))->value();
-          bfgs._conv_opts.tolAbsF = dynamic_cast<services::real_argument*>(
+          double tol_obj = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_obj"))->value();
-          bfgs._conv_opts.tolRelF = dynamic_cast<services::real_argument*>(
+          double tol_rel_obj = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_rel_obj"))->value();
-          bfgs._conv_opts.tolAbsGrad = dynamic_cast<services::real_argument*>(
+          double tol_grad = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_grad"))->value();
-          bfgs._conv_opts.tolRelGrad = dynamic_cast<services::real_argument*>(
+          double tol_rel_grad = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_rel_grad"))->value();
-          bfgs._conv_opts.tolAbsX = dynamic_cast<services::real_argument*>(
+          double tol_param = dynamic_cast<services::real_argument*>(
                          algo->arg("lbfgs")->arg("tol_param"))->value();
-          bfgs._conv_opts.maxIts = num_iterations;
 
-          return_code = optimize::do_bfgs_optimize(model, bfgs, base_rng,
-                                                   lp, cont_vector, disc_vector,
-                                                   sample_writer, info,
-                                                   save_iterations, refresh,
-                                                   callback);
+
+          return_code = stan::services::optimize::lbfgs(model,
+                                                        init_context,
+                                                        random_seed,
+                                                        id,
+                                                        init_radius,
+                                                        history_size,
+                                                        init_alpha,
+                                                        tol_obj,
+                                                        tol_rel_obj,
+                                                        tol_grad,
+                                                        tol_rel_grad,
+                                                        tol_param,
+                                                        num_iterations,
+                                                        save_iterations,
+                                                        refresh,
+                                                        callback,
+                                                        info,
+                                                        sample_writer);
         } else {
           return_code = stan::services::error_codes::CONFIG;
         }
-
-        io::write_iteration(model, base_rng,
-                            lp, cont_vector, disc_vector,
-                            info, sample_writer);
         output_stream->close();
         diagnostic_stream->close();
         delete output_stream;
