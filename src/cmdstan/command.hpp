@@ -119,6 +119,7 @@
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
+#include <stan/services/optimize/newton.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -319,6 +320,8 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("optimize")) {
+        interface_callbacks::interrupt::noop callback;
+
         std::vector<double> cont_vector(cont_params.size());
         for (int i = 0; i < cont_params.size(); ++i)
           cont_vector.at(i) = cont_params(i);
@@ -334,63 +337,20 @@ namespace stan {
           = dynamic_cast<stan::services::bool_argument*>(parser.arg("method")
                                          ->arg("optimize")
                                          ->arg("save_iterations"))->value();
-        /*if (output_stream) {
-          std::vector<std::string> names;
-          names.push_back("lp__");
-          model.constrained_param_names(names, true, true);
 
-          (*output_stream) << names.at(0);
-          for (size_t i = 1; i < names.size(); ++i) {
-            (*output_stream) << "," << names.at(i);
-          }
-          (*output_stream) << std::endl;
-          }*/
-
-        double lp(0);
         int return_code = stan::services::error_codes::CONFIG;
         if (algo->value() == "newton") {
-          std::vector<double> gradient;
-          try {
-            lp = model.template log_prob<false, false>
-              (cont_vector, disc_vector, &std::cout);
-          } catch (const std::exception& e) {
-            io::write_error_msg(err, e);
-            lp = -std::numeric_limits<double>::infinity();
-          }
-
-          std::cout << "initial log joint probability = " << lp << std::endl;
-          if (save_iterations) {
-            io::write_iteration(model, base_rng,
-                                lp, cont_vector, disc_vector,
-                                info, sample_writer);
-          }
-
-          double lastlp = lp * 1.1;
-          int m = 0;
-          std::cout << "(lp - lastlp) / lp > 1e-8: "
-                    << ((lp - lastlp) / fabs(lp)) << std::endl;
-          while ((lp - lastlp) / fabs(lp) > 1e-8) {
-            lastlp = lp;
-            lp = stan::optimization::newton_step
-              (model, cont_vector, disc_vector);
-            std::cout << "Iteration ";
-            std::cout << std::setw(2) << (m + 1) << ". ";
-            std::cout << "Log joint probability = " << std::setw(10) << lp;
-            std::cout << ". Improved by " << (lp - lastlp) << ".";
-            std::cout << std::endl;
-            std::cout.flush();
-            m++;
-
-            if (save_iterations) {
-              io::write_iteration(model, base_rng,
-                                  lp, cont_vector, disc_vector,
-                                  info, sample_writer);
-            }
-          }
-          return_code = stan::services::error_codes::OK;
+          return_code = stan::services::optimize::newton(model,
+                                                         init_context,
+                                                         random_seed,
+                                                         id,
+                                                         init_radius,
+                                                         num_iterations,
+                                                         save_iterations,
+                                                         callback,
+                                                         info,
+                                                         sample_writer);
         } else if (algo->value() == "bfgs") {
-          interface_callbacks::interrupt::noop callback;
-
           double init_alpha = dynamic_cast<stan::services::real_argument*>(
                          algo->arg("bfgs")->arg("init_alpha"))->value();
           double tol_obj = dynamic_cast<services::real_argument*>(
@@ -422,8 +382,6 @@ namespace stan {
                                                        info,
                                                        sample_writer);
         } else if (algo->value() == "lbfgs") {
-          interface_callbacks::interrupt::noop callback;
-
           int history_size = dynamic_cast<services::int_argument*>(
                          algo->arg("lbfgs")->arg("history_size"))->value();
           double init_alpha = dynamic_cast<services::real_argument*>(
@@ -458,8 +416,6 @@ namespace stan {
                                                         callback,
                                                         info,
                                                         sample_writer);
-        } else {
-          return_code = stan::services::error_codes::CONFIG;
         }
         output_stream->close();
         diagnostic_stream->close();
