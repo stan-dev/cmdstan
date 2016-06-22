@@ -1,4 +1,6 @@
-<a href="http://mc-stan.org"><img src="https://github.com/stan-dev/stan/blob/master/logos/stanlogo-main.png?raw=true" alt="Stan Logo" /></a>
+<a href="http://mc-stan.org">
+<img src="https://raw.githubusercontent.com/stan-dev/logos/master/logo.png" width=200 alt="Stan Logo"/>
+</a>
 
 # CmdStan
 
