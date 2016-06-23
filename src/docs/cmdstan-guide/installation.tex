@@ -485,27 +485,31 @@ The most common options to set are the compiler options:
 \subsubsection{Changing Library Locations}
 
 The next set of variables allow for easy replacement of dependent
-libraries. \CmdStan depends on \Stan, Boost, and Eigen. Although
-\CmdStan is bundled with a particular verison of \Stan, other versions
-can be used. The same is true with Boost and Eigen.
+libraries. \CmdStan depends on \Stan, Boost, Eigen, and
+CVODES. Although \CmdStan is bundled with a particular verison of
+\Stan, other versions can be used. The same is true with Boost, Eigen,
+and CVODES.
 
 The \Stan developers typically replace the tagged version of \Stan in
 \code{<cmdstan-home>/stan} with an updated version and do not set
-these variables. That said, it is easy to point \CmdStan to other versions
-of these libraries in other directories.
+these variables. That said, it is easy to point \CmdStan to other
+versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the \Stan source
-    directory. The default is \Verb|STAN=stan/|. Note: the
+    directory. The default is \Verb|STAN=stan_2.9.0/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/lib/stan_math_2.9.0|.
+    default is \Verb|MATH=stan/lib/stan_math_2.9.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
-    \Verb|lib/boost_1.58.0| folder within \Verb|MATH|.
+    \Verb|lib/boost_1.60.0/| folder within \Verb|MATH|.
   \item \Verb|EIGEN|. The location of the Eigen library. If
     \Verb|EIGEN| is not explicitly set, this will default to the
-    \Verb|lib/eigen_3.4.0| folder within \Verb|MATH|.
+    \Verb|lib/eigen_3.2.8/| folder within \Verb|MATH|.
+  \item \Verb|CVODES|. The location of the CVODES library. If
+    \Verb|CVODES| is not explicity set, this will default to the
+    \Verb|lib/cvodes_2.8.2/| folder with \Verb|MATH|.
 \end{itemize}
 %
 
