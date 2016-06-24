@@ -120,6 +120,7 @@
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/newton.hpp>
+#include <stan/services/sample/fixed_param.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -139,6 +140,8 @@ namespace stan {
 
     template <class Model>
     int command(int argc, const char* argv[]) {
+      interface_callbacks::interrupt::noop interrupt;
+      
       stan::interface_callbacks::writer::stream_writer info(std::cout);
       stan::interface_callbacks::writer::stream_writer err(std::cout);
       
@@ -324,8 +327,6 @@ namespace stan {
       //////////////////////////////////////////////////
 
       if (parser.arg("method")->arg("optimize")) {
-        interface_callbacks::interrupt::noop callback;
-
         stan::services::list_argument* algo = dynamic_cast<stan::services::list_argument*>
                               (parser.arg("method")->arg("optimize")->arg("algorithm"));
 
@@ -346,7 +347,7 @@ namespace stan {
                                                          init_radius,
                                                          num_iterations,
                                                          save_iterations,
-                                                         callback,
+                                                         interrupt,
                                                          info,
                                                          sample_writer);
         } else if (algo->value() == "bfgs") {
@@ -377,7 +378,7 @@ namespace stan {
                                                        num_iterations,
                                                        save_iterations,
                                                        refresh,
-                                                       callback,
+                                                       interrupt,
                                                        info,
                                                        sample_writer);
         } else if (algo->value() == "lbfgs") {
@@ -411,7 +412,7 @@ namespace stan {
                                                         num_iterations,
                                                         save_iterations,
                                                         refresh,
-                                                        callback,
+                                                        interrupt,
                                                         info,
                                                         sample_writer);
         }
@@ -450,10 +451,7 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        stan::services::sample::mcmc_writer<Model,
-                                            interface_callbacks::writer::stream_writer,
-                                            interface_callbacks::writer::stream_writer,
-                                            interface_callbacks::writer::stream_writer>
+        stan::services::sample::mcmc_writer<Model>
           writer(sample_writer, diagnostic_writer, info);
 
         // Sampling parameters
@@ -497,22 +495,36 @@ namespace stan {
         }
 
         if (algo->value() == "fixed_param") {
-          sampler_ptr = new stan::mcmc::fixed_param_sampler();
+          return stan::services::sample::fixed_param(model,
+                                                     init_context,
+                                                     random_seed,
+                                                     id,
+                                                     init_radius,
+                                                     num_samples,
+                                                     num_thin,
+                                                     refresh,
+                                                     interrupt,
+                                                     info,
+                                                     err,
+                                                     sample_writer,
+                                                     diagnostic_writer);
+          // sampler_ptr = new stan::mcmc::fixed_param_sampler();
 
-          adapt_engaged = false;
+          // adapt_engaged = false;
 
-          if (num_warmup != 0) {
-            std::cout << "Warning: warmup will be skipped "
-                      << "for the fixed parameter sampler!"
-                      << std::endl;
-            num_warmup = 0;
-          }
+          // if (num_warmup != 0) {
+          //   std::cout << "Warning: warmup will be skipped "
+          //             << "for the fixed parameter sampler!"
+          //             << std::endl;
+          //   num_warmup = 0;
+          // }
 
         } else if (algo->value() == "rwm") {
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
 
         } else if (algo->value() == "hmc") {
+          /*
           int engine_index = 0;
 
           stan::services::list_argument* engine
@@ -664,26 +676,26 @@ namespace stan {
                         << std::endl;
               return 0;
           }
+          */
         }
-
+        /*
         // Headers
-        writer.write_sample_names(s, sampler_ptr, model);
-        writer.write_diagnostic_names(s, sampler_ptr, model);
+        writer.write_sample_names(s, *sampler_ptr, model);
+        writer.write_diagnostic_names(s, *sampler_ptr, model);
 
         std::string prefix = "";
         std::string suffix = "\n";
-        interface_callbacks::interrupt::noop startTransitionCallback;
 
         // Warm-Up
         clock_t start = clock();
 
 
-        mcmc::warmup<Model, rng_t>(sampler_ptr, num_warmup, num_samples, num_thin,
+        mcmc::warmup<Model, rng_t>(*sampler_ptr, num_warmup, num_samples, num_thin,
                                    refresh, save_warmup,
                                    writer,
                                    s, model, base_rng,
                                    prefix, suffix, std::cout,
-                                   startTransitionCallback,
+                                   interrupt,
                                    info, err);
 
         clock_t end = clock();
@@ -692,19 +704,19 @@ namespace stan {
         if (adapt_engaged) {
           dynamic_cast<stan::mcmc::base_adapter*>(sampler_ptr)
             ->disengage_adaptation();
-          writer.write_adapt_finish(sampler_ptr);
+          writer.write_adapt_finish(*sampler_ptr);
         }
 
         // Sampling
         start = clock();
 
         mcmc::sample<Model, rng_t>
-          (sampler_ptr, num_warmup, num_samples, num_thin,
+          (*sampler_ptr, num_warmup, num_samples, num_thin,
            refresh, true,
            writer,
            s, model, base_rng,
            prefix, suffix, std::cout,
-           startTransitionCallback,
+           interrupt,
            info, err);
 
         end = clock();
@@ -714,6 +726,8 @@ namespace stan {
 
         if (sampler_ptr)
           delete sampler_ptr;
+        */
+        return 0;
       }
 
       //////////////////////////////////////////////////
