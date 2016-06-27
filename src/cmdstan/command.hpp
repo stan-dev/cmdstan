@@ -508,17 +508,6 @@ namespace stan {
                                                      err,
                                                      sample_writer,
                                                      diagnostic_writer);
-          // sampler_ptr = new stan::mcmc::fixed_param_sampler();
-
-          // adapt_engaged = false;
-
-          // if (num_warmup != 0) {
-          //   std::cout << "Warning: warmup will be skipped "
-          //             << "for the fixed parameter sampler!"
-          //             << std::endl;
-          //   num_warmup = 0;
-          // }
-
         } else if (algo->value() == "rwm") {
           std::cout << algo->arg("rwm")->description() << std::endl;
           return 0;
