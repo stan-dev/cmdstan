@@ -108,7 +108,6 @@
 #include <stan/old_services/sample/init_nuts.hpp>
 #include <stan/old_services/sample/init_static_hmc.hpp>
 #include <stan/old_services/sample/init_windowed_adapt.hpp>
-#include <stan/old_services/sample/generate_transitions.hpp>
 #include <stan/old_services/sample/progress.hpp>
 
 #include <stan/interface_callbacks/interrupt/noop.hpp>
@@ -121,6 +120,7 @@
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/newton.hpp>
 #include <stan/services/sample/fixed_param.hpp>
+#include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -451,7 +451,7 @@ namespace stan {
                   << std::endl << std::endl;
         std::cout << std::endl;
 
-        stan::services::sample::mcmc_writer<Model>
+        stan::services::sample::mcmc_writer
           writer(sample_writer, diagnostic_writer, info);
 
         // Sampling parameters
@@ -513,6 +513,102 @@ namespace stan {
           return 0;
 
         } else if (algo->value() == "hmc") {
+          stan::services::list_argument* engine
+            = dynamic_cast<stan::services::list_argument*>
+            (algo->arg("hmc")->arg("engine"));
+          stan::services::list_argument* metric
+            = dynamic_cast<stan::services::list_argument*>
+            (algo->arg("hmc")->arg("metric"));
+          stan::services::categorical_argument* adapt
+            = dynamic_cast<stan::services::categorical_argument*>
+            (parser.arg("method")->arg("sample")->arg("adapt"));
+          bool adapt_engaged
+            = dynamic_cast<stan::services::bool_argument*>(adapt->arg("engaged"))
+            ->value();
+          int num_warmup = dynamic_cast<stan::services::int_argument*>(
+                          parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
+          int num_samples = dynamic_cast<stan::services::int_argument*>(
+                          parser.arg("method")->arg("sample")->arg("num_samples"))->value();
+          int num_thin = dynamic_cast<stan::services::int_argument*>(
+                       parser.arg("method")->arg("sample")->arg("thin"))->value();
+          bool save_warmup = dynamic_cast<stan::services::bool_argument*>(
+                       parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
+          stan::services::categorical_argument* hmc
+            = dynamic_cast<stan::services::categorical_argument*>
+            (algo->arg("hmc"));
+          double stepsize
+            = dynamic_cast<stan::services::real_argument*>
+            (hmc->arg("stepsize"))->value();
+          double stepsize_jitter
+            = dynamic_cast<stan::services::real_argument*>
+            (hmc->arg("stepsize_jitter"))->value();
+
+          if (engine->value() == "nuts"
+              && metric->value() == "dense_e"
+              && adapt_engaged == false) {
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>
+              (dynamic_cast<stan::services::categorical_argument*>
+               (algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))
+              ->value();
+
+            std::cout << "max_depth: " << max_depth << std::endl;
+
+            return stan::services::sample::hmc_nuts_dense_e(model,
+                                                            init_context,
+                                                            random_seed,
+                                                            id,
+                                                            init_radius,
+                                                            num_warmup,
+                                                            num_samples,
+                                                            num_thin,
+                                                            save_warmup,
+                                                            refresh,
+                                                            stepsize,
+                                                            stepsize_jitter,
+                                                            max_depth,
+                                                            interrupt,
+                                                            info,
+                                                            err,
+                                                            sample_writer,
+                                                            diagnostic_writer);
+          } else if (engine->value() == "nuts"
+                     && metric->value() == "dense_e"
+                     && adapt_engaged == true) {
+          } else if (engine->value() == "nuts"
+                     && metric->value() == "diag_e"
+                     && adapt_engaged == false) {
+          } else if (engine->value() == "nuts"
+                     && metric->value() == "diag_e"
+                     && adapt_engaged == true) {
+          } else if (engine->value() == "nuts"
+                     && metric->value() == "unit_e"
+                     && adapt_engaged == false) {
+          } else if (engine->value() == "nuts"
+                     && metric->value() == "unit_e"
+                     && adapt_engaged == true) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "dense_e"
+                     && adapt_engaged == false) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "dense_e"
+                     && adapt_engaged == true) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "diag_e"
+                     && adapt_engaged == false) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "diag_e"
+                     && adapt_engaged == true) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "unit_e"
+                     && adapt_engaged == false) {
+          } else if (engine->value() == "static"
+                     && metric->value() == "unit_e"
+                     && adapt_engaged == true) {
+          } else {
+            // something wrong
+          }
+          
           /*
           int engine_index = 0;
 
