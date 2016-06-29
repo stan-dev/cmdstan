@@ -121,6 +121,7 @@
 #include <stan/services/optimize/newton.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
+#include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -552,8 +553,6 @@ namespace stan {
                (algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))
               ->value();
 
-            std::cout << "max_depth: " << max_depth << std::endl;
-
             return stan::services::sample::hmc_nuts_dense_e(model,
                                                             init_context,
                                                             random_seed,
@@ -575,6 +574,56 @@ namespace stan {
           } else if (engine->value() == "nuts"
                      && metric->value() == "dense_e"
                      && adapt_engaged == true) {
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>
+              (dynamic_cast<stan::services::categorical_argument*>
+               (algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))
+              ->value();
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+
+            unsigned int init_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+            unsigned int term_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+            unsigned int window
+              = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+                                   
+            return stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                                  init_context,
+                                                                  random_seed,
+                                                                  id,
+                                                                  init_radius,
+                                                                  num_warmup,
+                                                                  num_samples,
+                                                                  num_thin,
+                                                                  save_warmup,
+                                                                  refresh,
+                                                                  stepsize,
+                                                                  stepsize_jitter,
+                                                                  max_depth,
+                                                                  delta,
+                                                                  gamma,
+                                                                  kappa,
+                                                                  t0,
+                                                                  init_buffer,
+                                                                  term_buffer,
+                                                                  window,
+                                                                  interrupt,
+                                                                  info,
+                                                                  err,
+                                                                  sample_writer,
+                                                                  diagnostic_writer);
           } else if (engine->value() == "nuts"
                      && metric->value() == "diag_e"
                      && adapt_engaged == false) {
