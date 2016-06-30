@@ -122,6 +122,16 @@
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_diag_e.hpp>
+#include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_unit_e.hpp>
+#include <stan/services/sample/hmc_nuts_unit_e_adapt.hpp>
+#include <stan/services/sample/hmc_static_dense_e.hpp>
+#include <stan/services/sample/hmc_static_dense_e_adapt.hpp>
+#include <stan/services/sample/hmc_static_diag_e.hpp>
+#include <stan/services/sample/hmc_static_diag_e_adapt.hpp>
+#include <stan/services/sample/hmc_static_unit_e.hpp>
+#include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 
 #include <fstream>
@@ -552,7 +562,6 @@ namespace stan {
               (dynamic_cast<stan::services::categorical_argument*>
                (algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))
               ->value();
-
             return stan::services::sample::hmc_nuts_dense_e(model,
                                                             init_context,
                                                             random_seed,
@@ -582,7 +591,6 @@ namespace stan {
             stan::services::categorical_argument* adapt
               = dynamic_cast<stan::services::categorical_argument*>
               (parser.arg("method")->arg("sample")->arg("adapt"));
-
             double delta
               = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
             double gamma
@@ -591,14 +599,12 @@ namespace stan {
               = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
             double t0
               = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
-
             unsigned int init_buffer
               = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
             unsigned int term_buffer
               = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
             unsigned int window
               = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
-                                   
             return stan::services::sample::hmc_nuts_dense_e_adapt(model,
                                                                   init_context,
                                                                   random_seed,
@@ -627,33 +633,397 @@ namespace stan {
           } else if (engine->value() == "nuts"
                      && metric->value() == "diag_e"
                      && adapt_engaged == false) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("nuts"));
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))
+              ->value();
+            return stan::services::sample::hmc_nuts_diag_e(model,
+                                                           init_context,
+                                                           random_seed,
+                                                           id,
+                                                           init_radius,
+                                                           num_warmup,
+                                                           num_samples,
+                                                           num_thin,
+                                                           save_warmup,
+                                                           refresh,
+                                                           stepsize,
+                                                           stepsize_jitter,
+                                                           max_depth,
+                                                           interrupt,
+                                                           info,
+                                                           err,
+                                                           sample_writer,
+                                                           diagnostic_writer);
           } else if (engine->value() == "nuts"
                      && metric->value() == "diag_e"
                      && adapt_engaged == true) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("nuts"));
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))
+              ->value();
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+            unsigned int init_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+            unsigned int term_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+            unsigned int window
+              = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+            
+            return stan::services::sample::hmc_nuts_diag_e_adapt(model,
+                                                                 init_context,
+                                                                 random_seed,
+                                                                 id,
+                                                                 init_radius,
+                                                                 num_warmup,
+                                                                 num_samples,
+                                                                 num_thin,
+                                                                 save_warmup,
+                                                                 refresh,
+                                                                 stepsize,
+                                                                 stepsize_jitter,
+                                                                 max_depth,
+                                                                 delta,
+                                                                 gamma,
+                                                                 kappa,
+                                                                 t0,
+                                                                 init_buffer,
+                                                                 term_buffer,
+                                                                 window,
+                                                                 interrupt,
+                                                                 info,
+                                                                 err,
+                                                                 sample_writer,
+                                                                 diagnostic_writer);
           } else if (engine->value() == "nuts"
                      && metric->value() == "unit_e"
                      && adapt_engaged == false) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("nuts"));
+
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))
+              ->value();
+            return stan::services::sample::hmc_nuts_unit_e(model,
+                                                           init_context,
+                                                           random_seed,
+                                                           id,
+                                                           init_radius,
+                                                           num_warmup,
+                                                           num_samples,
+                                                           num_thin,
+                                                           save_warmup,
+                                                           refresh,
+                                                           stepsize,
+                                                           stepsize_jitter,
+                                                           max_depth,
+                                                           interrupt,
+                                                           info,
+                                                           err,
+                                                           sample_writer,
+                                                           diagnostic_writer);
           } else if (engine->value() == "nuts"
                      && metric->value() == "unit_e"
                      && adapt_engaged == true) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("nuts"));
+            int max_depth
+              = dynamic_cast<stan::services::int_argument*>(base->arg("max_depth"))
+              ->value();
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+            return stan::services::sample::hmc_nuts_unit_e_adapt(model,
+                                                                 init_context,
+                                                                 random_seed,
+                                                                 id,
+                                                                 init_radius,
+                                                                 num_warmup,
+                                                                 num_samples,
+                                                                 num_thin,
+                                                                 save_warmup,
+                                                                 refresh,
+                                                                 stepsize,
+                                                                 stepsize_jitter,
+                                                                 max_depth,
+                                                                 delta,
+                                                                 gamma,
+                                                                 kappa,
+                                                                 t0,
+                                                                 interrupt,
+                                                                 info,
+                                                                 err,
+                                                                 sample_writer,
+                                                                 diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "dense_e"
                      && adapt_engaged == false) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+            
+            return stan::services::sample::hmc_static_dense_e(model,
+                                                              init_context,
+                                                              random_seed,
+                                                              id,
+                                                              init_radius,
+                                                              num_warmup,
+                                                              num_samples,
+                                                              num_thin,
+                                                              save_warmup,
+                                                              refresh,
+                                                              stepsize,
+                                                              stepsize_jitter,
+                                                              int_time,
+                                                              interrupt,
+                                                              info,
+                                                              err,
+                                                              sample_writer,
+                                                              diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "dense_e"
                      && adapt_engaged == true) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+
+            unsigned int init_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+            unsigned int term_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+            unsigned int window
+              = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+
+            return stan::services::sample::hmc_static_dense_e_adapt(model,
+                                                                    init_context,
+                                                                    random_seed,
+                                                                    id,
+                                                                    init_radius,
+                                                                    num_warmup,
+                                                                    num_samples,
+                                                                    num_thin,
+                                                                    save_warmup,
+                                                                    refresh,
+                                                                    stepsize,
+                                                                    stepsize_jitter,
+                                                                    int_time,
+                                                                    delta,
+                                                                    gamma,
+                                                                    kappa,
+                                                                    t0,
+                                                                    init_buffer,
+                                                                    term_buffer,
+                                                                    window,
+                                                                    interrupt,
+                                                                    info,
+                                                                    err,
+                                                                    sample_writer,
+                                                                    diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "diag_e"
                      && adapt_engaged == false) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+            
+            return stan::services::sample::hmc_static_diag_e(model,
+                                                             init_context,
+                                                             random_seed,
+                                                             id,
+                                                             init_radius,
+                                                             num_warmup,
+                                                             num_samples,
+                                                             num_thin,
+                                                             save_warmup,
+                                                             refresh,
+                                                             stepsize,
+                                                             stepsize_jitter,
+                                                             int_time,
+                                                             interrupt,
+                                                             info,
+                                                             err,
+                                                             sample_writer,
+                                                             diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "diag_e"
                      && adapt_engaged == true) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+
+            unsigned int init_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+            unsigned int term_buffer
+              = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+            unsigned int window
+              = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+
+            return stan::services::sample::hmc_static_diag_e_adapt(model,
+                                                                   init_context,
+                                                                   random_seed,
+                                                                   id,
+                                                                   init_radius,
+                                                                   num_warmup,
+                                                                   num_samples,
+                                                                   num_thin,
+                                                                   save_warmup,
+                                                                   refresh,
+                                                                   stepsize,
+                                                                   stepsize_jitter,
+                                                                   int_time,
+                                                                   delta,
+                                                                   gamma,
+                                                                   kappa,
+                                                                   t0,
+                                                                   init_buffer,
+                                                                   term_buffer,
+                                                                   window,
+                                                                   interrupt,
+                                                                   info,
+                                                                   err,
+                                                                   sample_writer,
+                                                                   diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "unit_e"
                      && adapt_engaged == false) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+            
+            return stan::services::sample::hmc_static_unit_e(model,
+                                                             init_context,
+                                                             random_seed,
+                                                             id,
+                                                             init_radius,
+                                                             num_warmup,
+                                                             num_samples,
+                                                             num_thin,
+                                                             save_warmup,
+                                                             refresh,
+                                                             stepsize,
+                                                             stepsize_jitter,
+                                                             int_time,
+                                                             interrupt,
+                                                             info,
+                                                             err,
+                                                             sample_writer,
+                                                             diagnostic_writer);
           } else if (engine->value() == "static"
                      && metric->value() == "unit_e"
                      && adapt_engaged == true) {
+            stan::services::categorical_argument* base
+              = dynamic_cast<stan::services::categorical_argument*>
+              (algo->arg("hmc")->arg("engine")->arg("static"));
+
+            double int_time
+              = dynamic_cast<stan::services::real_argument*>(base->arg("int_time"))
+              ->value();
+
+            stan::services::categorical_argument* adapt
+              = dynamic_cast<stan::services::categorical_argument*>
+              (parser.arg("method")->arg("sample")->arg("adapt"));
+
+            double delta
+              = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+            double gamma
+              = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+            double kappa
+              = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+            double t0
+              = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+            
+            return stan::services::sample::hmc_static_unit_e_adapt(model,
+                                                                   init_context,
+                                                                   random_seed,
+                                                                   id,
+                                                                   init_radius,
+                                                                   num_warmup,
+                                                                   num_samples,
+                                                                   num_thin,
+                                                                   save_warmup,
+                                                                   refresh,
+                                                                   stepsize,
+                                                                   stepsize_jitter,
+                                                                   int_time,
+                                                                   delta,
+                                                                   gamma,
+                                                                   kappa,
+                                                                   t0,
+                                                                   interrupt,
+                                                                   info,
+                                                                   err,
+                                                                   sample_writer,
+                                                                   diagnostic_writer);
           } else {
             // something wrong
           }
