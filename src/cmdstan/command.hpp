@@ -79,7 +79,7 @@
 #include <stan/old_services/arguments/singleton_argument.hpp>
 #include <stan/old_services/arguments/unvalued_argument.hpp>
 #include <stan/old_services/arguments/valued_argument.hpp>
-#include <stan/old_services/sample/mcmc_writer.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_unit_e_static_hmc.hpp>
 #include <stan/mcmc/hmc/static/adapt_diag_e_static_hmc.hpp>
