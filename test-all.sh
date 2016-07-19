@@ -13,7 +13,7 @@ echo 'CmdStan tests'
 echo ''
 echo '------------------------------------------------------------'
 echo 'Stan tests'
-pushd stan
+pushd stan/
 ./runTests.py src/test
 popd
 
@@ -21,7 +21,7 @@ popd
 echo ''
 echo '------------------------------------------------------------'
 echo 'Stan Math Library tests'
-pushd stan/lib/stan_math_2.7.0
+pushd stan/lib/stan_math_2.10.0/
 ./runTests.py test/unit
 ./runTests.py test/prob
 popd
