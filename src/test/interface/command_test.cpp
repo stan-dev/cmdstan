@@ -5,7 +5,7 @@
 #include <test/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;
@@ -341,8 +341,8 @@ struct sampler {
   }
   
   void
-  init_stepsize(stan::interface_callbacks::writer::base_writer& info_writer,
-                stan::interface_callbacks::writer::base_writer& error_writer) {
+  init_stepsize(stan::callbacks::writer::base_writer& info_writer,
+                stan::callbacks::writer::base_writer& error_writer) {
     throw ExceptionType("throwing exception");
   }
 };
@@ -357,8 +357,8 @@ TYPED_TEST_P(StanUiCommandException, init_adapt) {
   sampler<TypeParam> throwing_sampler;
   Eigen::VectorXd cont_params;
 
-  stan::interface_callbacks::writer::stream_writer message_writer(std::cout);
-  stan::interface_callbacks::writer::stream_writer error_writer(std::cerr);
+  stan::callbacks::writer::stream_writer message_writer(std::cout);
+  stan::callbacks::writer::stream_writer error_writer(std::cerr);
   
   EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
                                                   0, 0, 0, 0, cont_params,

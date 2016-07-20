@@ -9,7 +9,8 @@
 #include <cmdstan/arguments/arg_random.hpp>
 #include <stan/old_services/io/write_model.hpp>
 #include <stan/old_services/io/write_stan.hpp>
-#include <stan/callbacks/interrupt/noop.hpp>
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/noop_interrupt.hpp>
 #include <stan/callbacks/writer/base_writer.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
@@ -77,7 +78,7 @@ namespace cmdstan {
 
 
     stan::callbacks::writer::noop_writer init_writer;
-    stan::callbacks::interrupt::noop interrupt;
+    stan::callbacks::noop_interrupt interrupt;
 
     stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 

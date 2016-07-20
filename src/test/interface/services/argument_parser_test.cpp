@@ -4,7 +4,7 @@
 #include <stan/old_services/arguments/arg_init.hpp>
 #include <stan/old_services/arguments/arg_random.hpp>
 #include <stan/old_services/arguments/arg_output.hpp>
-#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 
 using stan::services::argument;
@@ -38,7 +38,7 @@ public:
   std::vector<argument*> valid_arguments;
   argument_parser* parser;
   int err_code;
-  stan::interface_callbacks::writer::noop_writer writer;
+  stan::callbacks::writer::noop_writer writer;
 };
 
  

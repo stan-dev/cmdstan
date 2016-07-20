@@ -18,7 +18,7 @@ namespace cmdstan {
       _subarguments.clear();
     }
 
-    void print(stan::interface_callbacks::writer::base_writer& w,
+    void print(stan::callbacks::writer::base_writer& w,
                const int depth,
                const std::string& prefix) {
       std::string indent(compute_indent(depth), ' ');
@@ -29,7 +29,7 @@ namespace cmdstan {
         (*it)->print(w, depth + 1, prefix);
     }
 
-    void print_help(stan::interface_callbacks::writer::base_writer& w,
+    void print_help(stan::callbacks::writer::base_writer& w,
                     const int depth,
                     const bool recurse) {
       std::string indent(indent_width * depth, ' ');
@@ -61,8 +61,8 @@ namespace cmdstan {
     }
 
     bool parse_args(std::vector<std::string>& args,
-                    stan::interface_callbacks::writer::base_writer& info,
-                    stan::interface_callbacks::writer::base_writer& err,
+                    stan::callbacks::writer::base_writer& info,
+                    stan::callbacks::writer::base_writer& err,
                     bool& help_flag) {
       bool good_arg = true;
       bool valid_arg = true;
@@ -116,7 +116,7 @@ namespace cmdstan {
     }
 
     virtual void probe_args(argument* base_arg,
-                            stan::interface_callbacks::writer::base_writer& w) {
+                            stan::callbacks::writer::base_writer& w) {
       for (std::vector<argument*>::iterator it = _subarguments.begin();
            it != _subarguments.end(); ++it) {
         (*it)->probe_args(base_arg, w);

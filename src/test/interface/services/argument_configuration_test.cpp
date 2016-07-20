@@ -7,7 +7,7 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <test/utility.hpp>
 
 #include <vector>
@@ -63,7 +63,7 @@ std::string StanGmArgumentsConfiguration::command = "";
 TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
 
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_method());
@@ -167,7 +167,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
+  stan::callbacks::writer::stream_writer method_writer(method_output);
   cmdstan::arg_method method;
   method.print(method_writer, 0, "");
   
@@ -189,7 +189,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   method_output.seekg(std::ios_base::beg);
 
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
   
@@ -284,7 +284,7 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
@@ -381,7 +381,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
+  stan::callbacks::writer::stream_writer method_writer(method_output);
   cmdstan::arg_method method;
   method.print(method_writer, 0, "");
   
@@ -403,7 +403,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
   
@@ -498,7 +498,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
@@ -594,7 +594,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
+  stan::callbacks::writer::stream_writer method_writer(method_output);
   cmdstan::arg_method method;
   method.print(method_writer, 0, "");
   
@@ -616,7 +616,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_init());
   
@@ -707,7 +707,7 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_init());
@@ -800,7 +800,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::interface_callbacks::writer::stream_writer method_writer(method_output);
+  stan::callbacks::writer::stream_writer method_writer(method_output);
   cmdstan::arg_method method;
   method.print(method_writer, 0, "");
   
@@ -822,7 +822,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
   
@@ -913,7 +913,7 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
@@ -1010,7 +1010,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   
   // Prepare arguments
   std::stringstream method_output;
-  stan::interface_callbacks::writer::stream_writer method_writer(method_output);  
+  stan::callbacks::writer::stream_writer method_writer(method_output);  
   cmdstan::arg_method method;
   method.print(method_writer, 0, "");
   
@@ -1032,7 +1032,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   method_output.seekg(std::ios_base::beg);
   
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());
   
@@ -1127,7 +1127,7 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   
   // Prepare arguments
   std::stringstream s;
-  stan::interface_callbacks::writer::stream_writer w(s);
+  stan::callbacks::writer::stream_writer w(s);
   
   std::vector<cmdstan::argument*> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());

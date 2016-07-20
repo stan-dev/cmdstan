@@ -1,7 +1,7 @@
 #ifndef CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 #define CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 
-#include <stan/interface_callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -30,23 +30,23 @@ namespace cmdstan {
       return _description;
     }
 
-    virtual void print(stan::interface_callbacks::writer::base_writer& w,
+    virtual void print(stan::callbacks::writer::base_writer& w,
                        const int depth,
                        const std::string& prefix) = 0;
 
-    virtual void print_help(stan::interface_callbacks::writer::base_writer& w,
+    virtual void print_help(stan::callbacks::writer::base_writer& w,
                             const int depth,
                             const bool recurse) = 0;
 
     virtual bool parse_args(std::vector<std::string>& args,
-                            stan::interface_callbacks::writer::base_writer& info,
-                            stan::interface_callbacks::writer::base_writer& err,
+                            stan::callbacks::writer::base_writer& info,
+                            stan::callbacks::writer::base_writer& err,
                             bool& help_flag) {
       return true;
     }
 
     virtual void probe_args(argument* base_arg,
-                            stan::interface_callbacks::writer::base_writer& w) {}
+                            stan::callbacks::writer::base_writer& w) {}
 
     virtual void find_arg(const std::string& name,
                           const std::string& prefix,

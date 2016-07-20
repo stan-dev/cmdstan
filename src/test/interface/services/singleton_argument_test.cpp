@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <stan/old_services/arguments/singleton_argument.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
-#include <stan/interface_callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer/noop_writer.hpp>
 
 template <typename T>
 T argument_value() {
@@ -75,8 +75,8 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::interface_callbacks::writer::stream_writer out(this->ss);
-  stan::interface_callbacks::writer::noop_writer err;
+  stan::callbacks::writer::stream_writer out(this->ss);
+  stan::callbacks::writer::noop_writer err;
 
   return_value = false;
   args.clear();
@@ -125,8 +125,8 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::interface_callbacks::writer::stream_writer out(this->ss);
-  stan::interface_callbacks::writer::noop_writer err;
+  stan::callbacks::writer::stream_writer out(this->ss);
+  stan::callbacks::writer::noop_writer err;
   
   return_value = false;
   args.clear();

@@ -8,7 +8,7 @@ namespace cmdstan {
 
   class valued_argument: public argument {
   public:
-    virtual void print(stan::interface_callbacks::writer::base_writer& w,
+    virtual void print(stan::callbacks::writer::base_writer& w,
                        const int depth,
                        const std::string& prefix) {
       std::string indent(compute_indent(depth), ' ');
@@ -20,7 +20,7 @@ namespace cmdstan {
       w(message);
     }
 
-    virtual void print_help(stan::interface_callbacks::writer::base_writer& w,
+    virtual void print_help(stan::callbacks::writer::base_writer& w,
                             const int depth,
                             const bool recurse = false) {
       std::string indent(indent_width * depth, ' ');

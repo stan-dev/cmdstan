@@ -13,11 +13,11 @@ namespace cmdstan {
     unvalued_argument()
       : _is_present(false) {}
 
-    void print(stan::interface_callbacks::writer::base_writer& w,
+    void print(stan::callbacks::writer::base_writer& w,
                const int depth,
                const std::string& prefix) {}
 
-    void print_help(stan::interface_callbacks::writer::base_writer& w,
+    void print_help(stan::callbacks::writer::base_writer& w,
                     const int depth,
                     const bool recurse = false) {
       std::string indent(indent_width * depth, ' ');
@@ -29,8 +29,8 @@ namespace cmdstan {
     }
 
     bool parse_args(std::vector<std::string>& args,
-                    stan::interface_callbacks::writer::base_writer& info,
-                    stan::interface_callbacks::writer::base_writer& err,
+                    stan::callbacks::writer::base_writer& info,
+                    stan::callbacks::writer::base_writer& err,
                     bool& help_flag) {
       if (args.size() == 0)
         return true;
