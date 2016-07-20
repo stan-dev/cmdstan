@@ -9,10 +9,10 @@
 #include <cmdstan/arguments/arg_random.hpp>
 #include <stan/old_services/io/write_model.hpp>
 #include <stan/old_services/io/write_stan.hpp>
-#include <stan/interface_callbacks/interrupt/noop.hpp>
-#include <stan/interface_callbacks/writer/base_writer.hpp>
-#include <stan/interface_callbacks/writer/noop_writer.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/interrupt/noop.hpp>
+#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
@@ -49,8 +49,8 @@ namespace cmdstan {
 
   template <class Model>
   int command(int argc, const char* argv[]) {
-    stan::interface_callbacks::writer::stream_writer info(std::cout);
-    stan::interface_callbacks::writer::stream_writer err(std::cout);
+    stan::callbacks::writer::stream_writer info(std::cout);
+    stan::callbacks::writer::stream_writer err(std::cout);
 
 
     // Read arguments
@@ -76,18 +76,18 @@ namespace cmdstan {
     info();
 
 
-    stan::interface_callbacks::writer::noop_writer init_writer;
-    stan::interface_callbacks::interrupt::noop interrupt;
+    stan::callbacks::writer::noop_writer init_writer;
+    stan::callbacks::interrupt::noop interrupt;
 
     stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value(),
                                std::fstream::out);
-    stan::interface_callbacks::writer::stream_writer sample_writer(output_stream, "# ");
+    stan::callbacks::writer::stream_writer sample_writer(output_stream, "# ");
 
     std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value(),
                                    std::fstream::out);
-    stan::interface_callbacks::writer::stream_writer diagnostic_writer(diagnostic_stream, "# ");
+    stan::callbacks::writer::stream_writer diagnostic_writer(diagnostic_stream, "# ");
 
 
     //////////////////////////////////////////////////
