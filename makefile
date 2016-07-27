@@ -24,8 +24,8 @@ AR = ar
 ##
 # Library locations
 ##
-STAN ?= stan/
-MATH ?= $(STAN)lib/stan_math/
+STAN ?= stan_2.11.0/
+MATH ?= $(STAN)lib/stan_math_2.11.0/
 -include $(MATH)make/libraries
 
 ##
@@ -37,7 +37,7 @@ LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.10.0
+CMDSTAN_VERSION := 2.11.0
 
 ##
 # Get information about the compiler used.
