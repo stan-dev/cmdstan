@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <fstream>

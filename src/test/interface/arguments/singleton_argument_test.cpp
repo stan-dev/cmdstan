@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/old_services/arguments/singleton_argument.hpp>
+#include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 
@@ -36,42 +36,42 @@ std::string argument_value<std::string>() {
 
 
 template <typename T>
-class StanServicesArgumentsSingleton : public ::testing::Test {
+class CmdStanArgumentsSingleton : public ::testing::Test {
 public:
-  StanServicesArgumentsSingleton() 
-    : arg(new stan::services::singleton_argument<T>("argument")) { }
+  CmdStanArgumentsSingleton() 
+    : arg(new cmdstan::singleton_argument<T>("argument")) { }
   
-  virtual ~StanServicesArgumentsSingleton() {
+  virtual ~CmdStanArgumentsSingleton() {
     delete(arg);
   }
   
-  stan::services::argument *arg;
+  cmdstan::argument *arg;
   std::stringstream ss;
 };
 
-TYPED_TEST_CASE_P(StanServicesArgumentsSingleton);
+TYPED_TEST_CASE_P(CmdStanArgumentsSingleton);
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, constructor) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, constructor) {
   // test fixture would have created the argument
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, name) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, name) {
   EXPECT_EQ("argument", this->arg->name());
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, description) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, description) {
   EXPECT_EQ("", this->arg->description());
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, print) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, print) {
   // FIXME: write test
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, print_help) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, print_help) {
   // FIXME: write test
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -118,10 +118,10 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args) {
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(0U, args.size());
   EXPECT_EQ(argument_value<TypeParam>(), 
-            static_cast<stan::services::singleton_argument<TypeParam>*>(this->arg)->value());
+            static_cast<cmdstan::singleton_argument<TypeParam>*>(this->arg)->value());
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args_unexpected) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -139,12 +139,12 @@ TYPED_TEST_P(StanServicesArgumentsSingleton, parse_args_unexpected) {
   EXPECT_EQ(1U, args.size());
 }
 
-TYPED_TEST_P(StanServicesArgumentsSingleton, argument_lookup) {
+TYPED_TEST_P(CmdStanArgumentsSingleton, argument_lookup) {
   // EXPECT_EQ(0, this->arg->arg(""));
   // EXPECT_EQ(0, this->arg->arg("foo"));
 }
 
-REGISTER_TYPED_TEST_CASE_P(StanServicesArgumentsSingleton,
+REGISTER_TYPED_TEST_CASE_P(CmdStanArgumentsSingleton,
                            constructor,
                            name,
                            description,
@@ -154,8 +154,8 @@ REGISTER_TYPED_TEST_CASE_P(StanServicesArgumentsSingleton,
                            parse_args_unexpected,
                            argument_lookup);
 
-INSTANTIATE_TYPED_TEST_CASE_P(real, StanServicesArgumentsSingleton, double);
-INSTANTIATE_TYPED_TEST_CASE_P(int, StanServicesArgumentsSingleton, int);
-INSTANTIATE_TYPED_TEST_CASE_P(bool, StanServicesArgumentsSingleton, bool);
-INSTANTIATE_TYPED_TEST_CASE_P(string, StanServicesArgumentsSingleton, std::string);
+INSTANTIATE_TYPED_TEST_CASE_P(real, CmdStanArgumentsSingleton, double);
+INSTANTIATE_TYPED_TEST_CASE_P(int, CmdStanArgumentsSingleton, int);
+INSTANTIATE_TYPED_TEST_CASE_P(bool, CmdStanArgumentsSingleton, bool);
+INSTANTIATE_TYPED_TEST_CASE_P(string, CmdStanArgumentsSingleton, std::string);
 

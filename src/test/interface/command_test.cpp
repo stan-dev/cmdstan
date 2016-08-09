@@ -1,4 +1,4 @@
-#include <stan/old_services/error_codes.hpp>
+#include <stan/services/error_codes.hpp>
 #include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
 #include <string>
@@ -346,35 +346,4 @@ struct sampler {
     throw ExceptionType("throwing exception");
   }
 };
-
-template<typename T>
-class StanUiCommandException : public ::testing::Test {
-
-};
-TYPED_TEST_CASE_P(StanUiCommandException);
-
-TYPED_TEST_P(StanUiCommandException, init_adapt) {
-  sampler<TypeParam> throwing_sampler;
-  Eigen::VectorXd cont_params;
-
-  stan::callbacks::writer::stream_writer message_writer(std::cout);
-  stan::callbacks::writer::stream_writer error_writer(std::cerr);
-  
-  EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
-                                                  0, 0, 0, 0, cont_params,
-                                                  message_writer, error_writer));
-}
-
-REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
-                           init_adapt);
-
-// exception types that can be thrown by Boost's math functions
-typedef ::testing::Types<std::domain_error,
-                         std::overflow_error,
-                         std::underflow_error,
-                         boost::math::rounding_error,
-                         boost::math::evaluation_error> BoostExceptionTypes;
-
-INSTANTIATE_TYPED_TEST_CASE_P(, StanUiCommandException, 
-                              BoostExceptionTypes);
 

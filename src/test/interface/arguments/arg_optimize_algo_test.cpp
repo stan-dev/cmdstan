@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
-#include <stan/old_services/arguments/arg_optimize_algo.hpp>
+#include <cmdstan/arguments/arg_optimize_algo.hpp>
 
-TEST(StanServicesArguments, arg_optimize_algo) {
-  stan::services::arg_optimize_algo arg;
+TEST(CmdStanArguments, arg_optimize_algo) {
+  cmdstan::arg_optimize_algo arg;
 
   EXPECT_EQ("algorithm", arg.name());
   EXPECT_EQ("Optimization algorithm", arg.description());

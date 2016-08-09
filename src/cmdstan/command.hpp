@@ -7,8 +7,8 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
-#include <stan/old_services/io/write_model.hpp>
-#include <stan/old_services/io/write_stan.hpp>
+#include <cmdstan/write_model.hpp>
+#include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/noop_interrupt.hpp>
 #include <stan/callbacks/writer/base_writer.hpp>
@@ -95,12 +95,12 @@ namespace cmdstan {
     //                Initialize Model              //
     //////////////////////////////////////////////////
     Model model(data_var_context, &std::cout);
-    stan::services::io::write_stan(sample_writer);
-    stan::services::io::write_model(sample_writer, model.model_name());
+    write_stan(sample_writer);
+    write_model(sample_writer, model.model_name());
     parser.print(sample_writer);
 
-    stan::services::io::write_stan(diagnostic_writer);
-    stan::services::io::write_model(diagnostic_writer, model.model_name());
+    write_stan(diagnostic_writer);
+    write_model(diagnostic_writer, model.model_name());
     parser.print(diagnostic_writer);
 
 
@@ -116,7 +116,6 @@ namespace cmdstan {
     } catch (const boost::bad_lexical_cast& e) {
     }
     stan::io::dump init_context(get_var_context(init));
-
 
     int return_code = stan::services::error_codes::CONFIG;
     if (parser.arg("method")->arg("diagnose")) {

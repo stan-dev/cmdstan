@@ -1,9 +1,9 @@
-#include <stan/old_services/arguments/unvalued_argument.hpp>
+#include <cmdstan/arguments/unvalued_argument.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 
-class test_arg_impl : public stan::services::unvalued_argument {
+class test_arg_impl : public cmdstan::unvalued_argument {
   std::string print_value() {
     return "";
   }
@@ -16,7 +16,7 @@ class test_arg_impl : public stan::services::unvalued_argument {
 };
 
 
-class StanServicesArgumentsUnvaluedArgument : public testing::Test {
+class CmdStanArgumentsUnvaluedArgument : public testing::Test {
 public:
   void SetUp () {
     arg = new test_arg_impl;
@@ -25,32 +25,32 @@ public:
     delete(arg);
   }
   
-  stan::services::argument *arg;
+  cmdstan::argument *arg;
   std::stringstream ss;
 };
 
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,Constructor) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,Constructor) {
   // test fixture would have created the argument.
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,name) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,name) {
   EXPECT_EQ("", arg->name());
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,description) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,description) {
   EXPECT_EQ("", arg->description());
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,print) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,print) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,print_help) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,print_help) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,parse_args) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -91,7 +91,7 @@ TEST_F(StanServicesArgumentsUnvaluedArgument,parse_args) {
   EXPECT_FALSE(static_cast<test_arg_impl*>(arg)->is_present());
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,parse_args_unexpected) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -110,7 +110,7 @@ TEST_F(StanServicesArgumentsUnvaluedArgument,parse_args_unexpected) {
   EXPECT_TRUE(static_cast<test_arg_impl*>(arg)->is_present());
 }
 
-TEST_F(StanServicesArgumentsUnvaluedArgument,arg) {
+TEST_F(CmdStanArgumentsUnvaluedArgument,arg) {
   EXPECT_EQ(0, arg->arg(""));
   EXPECT_EQ(0, arg->arg("foo"));
 }

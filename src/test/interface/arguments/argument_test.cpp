@@ -1,15 +1,15 @@
-#include <stan/old_services/arguments/argument.hpp>
+#include <cmdstan/arguments/argument.hpp>
 #include <gtest/gtest.h>
 #include <stan/callbacks/writer/base_writer.hpp>
 
-class test_arg_impl : public stan::services::argument {
+class test_arg_impl : public cmdstan::argument {
   void print(stan::callbacks::writer::base_writer& w,
              int depth, const std::string& prefix) {}
   void print_help(stan::callbacks::writer::base_writer& w,
                   int depth, bool recurse) {}
 };
 
-class StanServicesArgumentsArgument : public testing::Test {
+class CmdStanArgumentsArgument : public testing::Test {
 public:
   void SetUp () {
     arg = new test_arg_impl;
@@ -18,23 +18,23 @@ public:
     delete(arg);
   }
   
-  stan::services::argument *arg;
+  cmdstan::argument *arg;
 };
 
 
-TEST_F(StanServicesArgumentsArgument,Constructor) {
+TEST_F(CmdStanArgumentsArgument,Constructor) {
   // test fixture would have created the argument.
 }
 
-TEST_F(StanServicesArgumentsArgument,name) {
+TEST_F(CmdStanArgumentsArgument,name) {
   EXPECT_EQ("", arg->name());
 }
 
-TEST_F(StanServicesArgumentsArgument,description) {
+TEST_F(CmdStanArgumentsArgument,description) {
   EXPECT_EQ("", arg->description());
 }
 
-TEST_F(StanServicesArgumentsArgument,split_arg) {
+TEST_F(CmdStanArgumentsArgument,split_arg) {
   std::string arg_string;
   std::string name;
   std::string value;

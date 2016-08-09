@@ -1,9 +1,9 @@
-#include <stan/old_services/arguments/valued_argument.hpp>
+#include <cmdstan/arguments/valued_argument.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 #include <gtest/gtest.h>
 
-class test_arg_impl : public stan::services::valued_argument {
+class test_arg_impl : public cmdstan::valued_argument {
   std::string print_value() {
     return "";
   }
@@ -16,7 +16,7 @@ class test_arg_impl : public stan::services::valued_argument {
 };
 
 
-class StanServicesArgumentsValuedArgument : public testing::Test {
+class CmdStanArgumentsValuedArgument : public testing::Test {
 public:
   void SetUp () {
     arg = new test_arg_impl;
@@ -25,32 +25,32 @@ public:
     delete(arg);
   }
   
-  stan::services::argument *arg;
+  cmdstan::argument *arg;
   std::stringstream ss;
 };
 
 
-TEST_F(StanServicesArgumentsValuedArgument,Constructor) {
+TEST_F(CmdStanArgumentsValuedArgument,Constructor) {
   // test fixture would have created the argument.
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,name) {
+TEST_F(CmdStanArgumentsValuedArgument,name) {
   EXPECT_EQ("", arg->name());
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,description) {
+TEST_F(CmdStanArgumentsValuedArgument,description) {
   EXPECT_EQ("", arg->description());
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,print) {
+TEST_F(CmdStanArgumentsValuedArgument,print) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,print_help) {
+TEST_F(CmdStanArgumentsValuedArgument,print_help) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,parse_args) {
+TEST_F(CmdStanArgumentsValuedArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -78,7 +78,7 @@ TEST_F(StanServicesArgumentsValuedArgument,parse_args) {
   EXPECT_EQ(1U, args.size());
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,parse_args_unexpected) {
+TEST_F(CmdStanArgumentsValuedArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -96,7 +96,7 @@ TEST_F(StanServicesArgumentsValuedArgument,parse_args_unexpected) {
   EXPECT_EQ(1U, args.size());
 }
 
-TEST_F(StanServicesArgumentsValuedArgument,arg) {
+TEST_F(CmdStanArgumentsValuedArgument,arg) {
   EXPECT_EQ(0, arg->arg(""));
   EXPECT_EQ(0, arg->arg("foo"));
 }

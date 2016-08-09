@@ -1,44 +1,44 @@
-#include <stan/old_services/arguments/categorical_argument.hpp>
+#include <cmdstan/arguments/categorical_argument.hpp>
 #include <gtest/gtest.h>
-#include <stan/old_services/arguments/singleton_argument.hpp>
+#include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/writer/stream_writer.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
 
-class StanServicesArgumentsCategoricalArgument : public testing::Test {
+class CmdStanArgumentsCategoricalArgument : public testing::Test {
 public:
   void SetUp () {
-    arg = new stan::services::categorical_argument;
+    arg = new cmdstan::categorical_argument;
   }
   void TearDown() {
     delete(arg);
   }
   
-  stan::services::argument *arg;
+  cmdstan::argument *arg;
   std::stringstream ss;
 };
 
 
-TEST_F(StanServicesArgumentsCategoricalArgument,Constructor) {
+TEST_F(CmdStanArgumentsCategoricalArgument,Constructor) {
   // test fixture would have created the argument.
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,name) {
+TEST_F(CmdStanArgumentsCategoricalArgument,name) {
   EXPECT_EQ("", arg->name());
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,description) {
+TEST_F(CmdStanArgumentsCategoricalArgument,description) {
   EXPECT_EQ("", arg->description());
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,print) {
+TEST_F(CmdStanArgumentsCategoricalArgument,print) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,print_help) {
+TEST_F(CmdStanArgumentsCategoricalArgument,print_help) {
   // FIXME: write test
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,parse_args) {
+TEST_F(CmdStanArgumentsCategoricalArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -77,7 +77,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args) {
   EXPECT_EQ(0U, args.size());
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
+TEST_F(CmdStanArgumentsCategoricalArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
@@ -130,15 +130,15 @@ TEST_F(StanServicesArgumentsCategoricalArgument,parse_args_unexpected) {
   EXPECT_EQ(1U, args.size());
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
+TEST_F(CmdStanArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
   stan::callbacks::writer::stream_writer out(ss);
   stan::callbacks::writer::noop_writer err;
 
-  dynamic_cast<stan::services::categorical_argument*>(arg)
-    ->subarguments().push_back(new stan::services::singleton_argument<std::string>("foo"));
+  dynamic_cast<cmdstan::categorical_argument*>(arg)
+    ->subarguments().push_back(new cmdstan::singleton_argument<std::string>("foo"));
 
   return_value = false;
   args.clear();
@@ -189,7 +189,7 @@ TEST_F(StanServicesArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   
 }
 
-TEST_F(StanServicesArgumentsCategoricalArgument,arg) {
+TEST_F(CmdStanArgumentsCategoricalArgument,arg) {
   EXPECT_EQ(0, arg->arg(""));
   EXPECT_EQ(0, arg->arg("foo"));
 }

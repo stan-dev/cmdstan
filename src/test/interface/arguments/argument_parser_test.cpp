@@ -1,22 +1,23 @@
-#include <stan/old_services/arguments/argument_parser.hpp>
-#include <stan/old_services/arguments/arg_id.hpp>
-#include <stan/old_services/arguments/arg_data.hpp>
-#include <stan/old_services/arguments/arg_init.hpp>
-#include <stan/old_services/arguments/arg_random.hpp>
-#include <stan/old_services/arguments/arg_output.hpp>
+#include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/arguments/arg_id.hpp>
+#include <cmdstan/arguments/arg_data.hpp>
+#include <cmdstan/arguments/arg_init.hpp>
+#include <cmdstan/arguments/arg_random.hpp>
+#include <cmdstan/arguments/arg_output.hpp>
 #include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/services/error_codes.hpp>
 #include <gtest/gtest.h>
 
-using stan::services::argument;
-using stan::services::arg_id;
-using stan::services::arg_data;
-using stan::services::arg_init;
-using stan::services::arg_random;
-using stan::services::arg_output;
-using stan::services::argument_parser;
+using cmdstan::argument;
+using cmdstan::arg_id;
+using cmdstan::arg_data;
+using cmdstan::arg_init;
+using cmdstan::arg_random;
+using cmdstan::arg_output;
+using cmdstan::argument_parser;
 using stan::services::error_codes;
 
-class StanServicesArgumentsArgumentParser : public testing::Test {
+class CmdStanArgumentsArgumentParser : public testing::Test {
 public:
   void SetUp() {
     // copied setup from src/stan/common/command.hpp
@@ -42,7 +43,7 @@ public:
 };
 
  
-TEST_F(StanServicesArgumentsArgumentParser, default) {
+TEST_F(CmdStanArgumentsArgumentParser, default) {
   const char* argv[] = {};
   int argc = 0;
   
@@ -50,7 +51,7 @@ TEST_F(StanServicesArgumentsArgumentParser, default) {
   EXPECT_EQ(int(error_codes::USAGE), err_code);
 }
 
-TEST_F(StanServicesArgumentsArgumentParser, help) {
+TEST_F(CmdStanArgumentsArgumentParser, help) {
   const char* argv[] = {"model_name", "help"};
   int argc = 2;
   
@@ -58,7 +59,7 @@ TEST_F(StanServicesArgumentsArgumentParser, help) {
   EXPECT_EQ(int(error_codes::OK), err_code);
 }
 
-TEST_F(StanServicesArgumentsArgumentParser, unrecognized_argument) {
+TEST_F(CmdStanArgumentsArgumentParser, unrecognized_argument) {
   const char* argv[] = {"foo"};
   int argc = 1;
   
