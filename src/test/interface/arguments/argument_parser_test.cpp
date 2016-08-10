@@ -4,7 +4,7 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <gtest/gtest.h>
 
@@ -39,7 +39,7 @@ public:
   std::vector<argument*> valid_arguments;
   argument_parser* parser;
   int err_code;
-  stan::callbacks::writer::noop_writer writer;
+  stan::callbacks::noop_writer writer;
 };
 
  

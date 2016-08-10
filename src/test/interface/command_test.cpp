@@ -5,7 +5,7 @@
 #include <test/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;
@@ -341,8 +341,8 @@ struct sampler {
   }
   
   void
-  init_stepsize(stan::callbacks::writer::base_writer& info_writer,
-                stan::callbacks::writer::base_writer& error_writer) {
+  init_stepsize(stan::callbacks::writer& info_writer,
+                stan::callbacks::writer& error_writer) {
     throw ExceptionType("throwing exception");
   }
 };

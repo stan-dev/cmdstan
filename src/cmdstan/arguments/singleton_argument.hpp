@@ -54,8 +54,8 @@ namespace cmdstan {
     }
 
     bool parse_args(std::vector<std::string>& args,
-                    stan::callbacks::writer::base_writer& info,
-                    stan::callbacks::writer::base_writer& err,
+                    stan::callbacks::writer& info,
+                    stan::callbacks::writer& err,
                     bool& help_flag) {
       if (args.size() == 0)
         return true;
@@ -93,7 +93,7 @@ namespace cmdstan {
     }
 
     virtual void probe_args(argument* base_arg,
-                            stan::callbacks::writer::base_writer& w) {
+                            stan::callbacks::writer& w) {
       w("good");
       _value = _good_value;
       base_arg->print(w, 0, "");

@@ -11,9 +11,9 @@
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/noop_interrupt.hpp>
-#include <stan/callbacks/writer/base_writer.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
@@ -50,8 +50,8 @@ namespace cmdstan {
 
   template <class Model>
   int command(int argc, const char* argv[]) {
-    stan::callbacks::writer::stream_writer info(std::cout);
-    stan::callbacks::writer::stream_writer err(std::cout);
+    stan::callbacks::stream_writer info(std::cout);
+    stan::callbacks::stream_writer err(std::cout);
 
 
     // Read arguments
@@ -77,18 +77,18 @@ namespace cmdstan {
     info();
 
 
-    stan::callbacks::writer::noop_writer init_writer;
+    stan::callbacks::noop_writer init_writer;
     stan::callbacks::noop_interrupt interrupt;
 
     stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value(),
                                std::fstream::out);
-    stan::callbacks::writer::stream_writer sample_writer(output_stream, "# ");
+    stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
     std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value(),
                                    std::fstream::out);
-    stan::callbacks::writer::stream_writer diagnostic_writer(diagnostic_stream, "# ");
+    stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
 
 
     //////////////////////////////////////////////////

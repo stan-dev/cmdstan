@@ -1,11 +1,11 @@
 #include <cmdstan/arguments/argument.hpp>
 #include <gtest/gtest.h>
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 
 class test_arg_impl : public cmdstan::argument {
-  void print(stan::callbacks::writer::base_writer& w,
+  void print(stan::callbacks::writer& w,
              int depth, const std::string& prefix) {}
-  void print_help(stan::callbacks::writer::base_writer& w,
+  void print_help(stan::callbacks::writer& w,
                   int depth, bool recurse) {}
 };
 

@@ -1,7 +1,7 @@
 #ifndef CMDSTAN_ARGUMENTS_LIST_ARGUMENT_HPP
 #define CMDSTAN_ARGUMENTS_LIST_ARGUMENT_HPP
 
-#include <stan/callbacks/writer/base_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <cmdstan/arguments/valued_argument.hpp>
 #include <cmdstan/arguments/arg_fail.hpp>
 #include <iostream>
@@ -25,14 +25,14 @@ namespace cmdstan {
       _values.clear();
     }
 
-    void print(stan::callbacks::writer::base_writer& w,
+    void print(stan::callbacks::writer& w,
                int depth,
                const std::string& prefix) {
       valued_argument::print(w, depth, prefix);
       _values.at(_cursor)->print(w, depth + 1, prefix);
     }
 
-    void print_help(stan::callbacks::writer::base_writer& w,
+    void print_help(stan::callbacks::writer& w,
                     int depth,
                     bool recurse) {
       _default = _values.at(_default_cursor)->name();
@@ -47,8 +47,8 @@ namespace cmdstan {
     }
 
     bool parse_args(std::vector<std::string>& args,
-                    stan::callbacks::writer::base_writer& info,
-                    stan::callbacks::writer::base_writer& err,
+                    stan::callbacks::writer& info,
+                    stan::callbacks::writer& err,
                     bool& help_flag) {
       if (args.size() == 0)
         return true;
@@ -99,7 +99,7 @@ namespace cmdstan {
     }
 
     virtual void probe_args(argument* base_arg,
-                            stan::callbacks::writer::base_writer& w) {
+                            stan::callbacks::writer& w) {
       for (size_t i = 0; i < _values.size(); ++i) {
         _cursor = i;
 

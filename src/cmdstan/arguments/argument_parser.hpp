@@ -21,8 +21,8 @@ namespace cmdstan {
 
     int parse_args(int argc,
                    const char* argv[],
-                   stan::callbacks::writer::base_writer& info,
-                   stan::callbacks::writer::base_writer& err) {
+                   stan::callbacks::writer& info,
+                   stan::callbacks::writer& err) {
       if (argc == 1) {
         print_usage(info, argv[0]);
         return stan::services::error_codes::USAGE;
@@ -125,21 +125,21 @@ namespace cmdstan {
         ? stan::services::error_codes::OK : stan::services::error_codes::USAGE;
     }
 
-    void print(stan::callbacks::writer::base_writer& w,
+    void print(stan::callbacks::writer& w,
                const std::string& prefix = "") {
       for (size_t i = 0; i < _arguments.size(); ++i) {
         _arguments.at(i)->print(w, 0, prefix);
       }
     }
 
-    void print_help(stan::callbacks::writer::base_writer& w,
+    void print_help(stan::callbacks::writer& w,
                     bool recurse) {
       for (size_t i = 0; i < _arguments.size(); ++i) {
         _arguments.at(i)->print_help(w, 1, recurse);
       }
     }
 
-    void print_usage(stan::callbacks::writer::base_writer& w,
+    void print_usage(stan::callbacks::writer& w,
                      const char* executable) {
       std::string indent(2, ' ');
       int width = 12;

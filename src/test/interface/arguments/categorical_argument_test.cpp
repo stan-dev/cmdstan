@@ -1,8 +1,8 @@
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <gtest/gtest.h>
 #include <cmdstan/arguments/singleton_argument.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
 
 class CmdStanArgumentsCategoricalArgument : public testing::Test {
 public:
@@ -42,8 +42,8 @@ TEST_F(CmdStanArgumentsCategoricalArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::callbacks::writer::stream_writer out(ss);
-  stan::callbacks::writer::noop_writer err;
+  stan::callbacks::stream_writer out(ss);
+  stan::callbacks::noop_writer err;
   
   return_value = false;
   args.clear();
@@ -81,8 +81,8 @@ TEST_F(CmdStanArgumentsCategoricalArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::callbacks::writer::stream_writer out(ss);
-  stan::callbacks::writer::noop_writer err;
+  stan::callbacks::stream_writer out(ss);
+  stan::callbacks::noop_writer err;
 
   return_value = false;
   args.clear();
@@ -134,8 +134,8 @@ TEST_F(CmdStanArgumentsCategoricalArgument, parse_args_with_1_singleton) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::callbacks::writer::stream_writer out(ss);
-  stan::callbacks::writer::noop_writer err;
+  stan::callbacks::stream_writer out(ss);
+  stan::callbacks::noop_writer err;
 
   dynamic_cast<cmdstan::categorical_argument*>(arg)
     ->subarguments().push_back(new cmdstan::singleton_argument<std::string>("foo"));

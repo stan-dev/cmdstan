@@ -1,6 +1,6 @@
 #include <cmdstan/arguments/valued_argument.hpp>
-#include <stan/callbacks/writer/stream_writer.hpp>
-#include <stan/callbacks/writer/noop_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/noop_writer.hpp>
 #include <gtest/gtest.h>
 
 class test_arg_impl : public cmdstan::valued_argument {
@@ -54,8 +54,8 @@ TEST_F(CmdStanArgumentsValuedArgument,parse_args) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::callbacks::writer::stream_writer out(std::cout);
-  stan::callbacks::writer::noop_writer err;
+  stan::callbacks::stream_writer out(std::cout);
+  stan::callbacks::noop_writer err;
   
   return_value = false;
   args.clear();
@@ -82,8 +82,8 @@ TEST_F(CmdStanArgumentsValuedArgument,parse_args_unexpected) {
   bool return_value;
   std::vector<std::string> args;
   bool help_flag;
-  stan::callbacks::writer::stream_writer out(ss);
-  stan::callbacks::writer::noop_writer err;
+  stan::callbacks::stream_writer out(ss);
+  stan::callbacks::noop_writer err;
 
   return_value = false;
   args.clear();
