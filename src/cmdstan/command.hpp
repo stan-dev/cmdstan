@@ -82,11 +82,11 @@ namespace cmdstan {
 
     stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 
-    std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value(),
+    std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
-    std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value(),
+    std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value().c_str(),
                                    std::fstream::out);
     stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
 
