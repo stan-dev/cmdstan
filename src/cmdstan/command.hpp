@@ -129,6 +129,7 @@ namespace cmdstan {
                                                          random_seed, id,
                                                          init_radius,
                                                          epsilon, error,
+                                                         interrupt,
                                                          info,
                                                          init_writer,
                                                          sample_writer);
