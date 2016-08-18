@@ -221,7 +221,7 @@ build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) $(LIBCVODES)
 ##
 # Clean up.
 ##
-.PHONY: clean clean-manual clean-all clean-cvodes
+.PHONY: clean clean-manual clean-all
 
 clean: clean-manual
 	$(RM) -r test
@@ -231,11 +231,7 @@ clean: clean-manual
 clean-manual:
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-cvodes:
-	$(RM) $(wildcard $(CVODES)/lib/*)
-	$(RM) $(wildcard $(CVODES)/src/*/*.o)
-
-clean-all: clean clean-cvodes
+clean-all: clean clean-libraries
 	$(RM) -r bin
 
 ##
