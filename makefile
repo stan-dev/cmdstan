@@ -37,7 +37,7 @@ LDLIBS =
 LDLIBS_STANC = -Lbin -lstanc
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.10.0
+CMDSTAN_VERSION := 2.11.0
 
 ##
 # Get information about the compiler used.
@@ -231,8 +231,7 @@ clean: clean-manual
 clean-manual:
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-
-clean-all: clean
+clean-all: clean clean-libraries
 	$(RM) -r bin
 
 ##
