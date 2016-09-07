@@ -35,14 +35,14 @@ command line window, type:
 %
 This will build both \code{stanc} and \code{stansummary}. If your computer
 has multiple cores and sufficient ram, the build process can be parallelized
-by providing the \code{-j} option. For example, to build on 2 cores, type:
+by providing the \code{-j} option. For example, to build on 4 cores, type:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd <cmdstan-home>
-> make -j2 build
+> make -j4 build
 \end{Verbatim}
 \end{quote}
 %
-\emph{Warning:} \ The \code{make} program may take 10+ minutes and
+\textbf{Warning:} \ The \code{make} program may take 10+ minutes and
 consume 2+ GB of memory to build \CmdStan.
