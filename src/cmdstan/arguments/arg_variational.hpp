@@ -2,7 +2,6 @@
 #define CMDSTAN_ARGUMENTS_VARIATIONAL_HPP
 
 #include <cmdstan/arguments/categorical_argument.hpp>
-
 #include <cmdstan/arguments/arg_variational_algo.hpp>
 #include <cmdstan/arguments/arg_variational_iter.hpp>
 #include <cmdstan/arguments/arg_variational_num_samples.hpp>
@@ -11,9 +10,15 @@
 #include <cmdstan/arguments/arg_tolerance.hpp>
 #include <cmdstan/arguments/arg_variational_eval_elbo.hpp>
 #include <cmdstan/arguments/arg_variational_output_samples.hpp>
+#include <stan/services/experimental/advi/defaults.hpp>
 
 namespace cmdstan {
-
+  using stan::services::experimental::advi::gradient_samples;
+  using stan::services::experimental::advi::elbo_samples;
+  using stan::services::experimental::advi::tol_rel_obj;
+  using stan::services::experimental::advi::eval_elbo;
+  using stan::services::experimental::advi::output_draws;
+  
   class arg_variational: public categorical_argument {
   public:
     arg_variational() {
@@ -23,22 +28,24 @@ namespace cmdstan {
       _subarguments.push_back(new arg_variational_algo());
       _subarguments.push_back(new arg_variational_iter());
       _subarguments.push_back(new arg_variational_num_samples("grad_samples",
-                                                              "Number of samples for Monte Carlo estimate of gradients", 1));
+                                                              gradient_samples::description(),
+                                                              gradient_samples::default_value()));
       _subarguments.push_back(new arg_variational_num_samples
                               ("elbo_samples",
-                               "Number of samples for Monte Carlo estimate "
-                               "of ELBO (objective function)",
-                               100));
+                               elbo_samples::description(),
+                               elbo_samples::default_value()));
       _subarguments.push_back(new arg_variational_eta());
       _subarguments.push_back(new arg_variational_adapt());
       _subarguments.push_back(new arg_tolerance("tol_rel_obj",
-                                                "Convergence tolerance on the relative norm of the objective", 1e-2));
+                                                tol_rel_obj::description(),
+                                                tol_rel_obj::default_value()));
       _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
-                                                            "Evaluate ELBO every Nth iteration", 100));
+                                                            eval_elbo::description(),
+                                                            eval_elbo::default_value()));
       _subarguments.push_back(new arg_variational_output_samples
                               ("output_samples",
-                               "Number of posterior samples to draw and save",
-                               1000));
+                               output_draws::description(),
+                               output_draws::default_value()));
     }
   };
 

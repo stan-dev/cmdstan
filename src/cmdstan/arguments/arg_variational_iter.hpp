@@ -2,19 +2,23 @@
 #define STAN_VARIATIONAL_ITER_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
+#include <stan/services/experimental/advi/defaults.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace cmdstan {
 
+  using stan::services::experimental::advi::max_iterations;
+  
   class arg_variational_iter: public int_argument {
   public:
     arg_variational_iter(): int_argument() {
       _name = "iter";
-      _description = "Maximum number of iterations";
+      _description = max_iterations::description();
       _validity = "0 < iter";
-      _default = "10000";
-      _default_value = 10000;
+      _default = boost::lexical_cast<std::string>(max_iterations::default_value());
+      _default_value = max_iterations::default_value();
       _constrained = true;
-      _good_value = 10000.0;
+      _good_value = max_iterations::default_value();
       _bad_value = -1.0;
       _value = _default_value;
     }
