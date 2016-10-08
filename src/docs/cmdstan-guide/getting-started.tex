@@ -1,23 +1,25 @@
 \chapter{Getting Started}
 
 \noindent
-This chapter is designed to help users get acquanited with the
+This chapter is designed to help users get acquainted with the
 \CmdStan interface. Later chapters are devoted to expanding on the
 material in this chapter with full reference documentation. See the
 \Stan user's manual for details about the \Stan language.
 
 \section{Installation}
 
-Installation of \CmdStan is simple, just download and unpack the source.
-\CmdStan requires:
+Installation of \CmdStan is simple. \CmdStan requires:
 \begin{itemize}
-  \item The \CmdStan source and all its libraries. Everything is
-    included in the release tarball or zip file.
-  \item The \code{make} utility.
-  \item A \Cpp compiler.
+\item The \CmdStan source code and all its libraries. \\
+  This is included in the release tarball or zip file as a single
+  download.
+\item The \code{make} utility program. \\
+  This is not strictly necessary, but will make the build process
+  easy. The rest of the documentation assumes \code{make} is available.
+\item A \Cpp compiler.
 \end{itemize}
 
-For information about supported versions of Windows, Mac, and Linux
+\noindent For information about supported versions of Windows, Mac, and Linux
 platforms see \refappendix{install}. For step-by-step installation
 instructions of the prerequisites, see
 \begin{itemize}
@@ -29,10 +31,18 @@ instructions of the prerequisites, see
 
 \section{Building \CmdStan}
 
-Building \CmdStan involves building executable programs for the \Stan
-compiler, \code{stanc}, and a basic posterior analsyis tool,
-\code{stansummary}.  The build process utilizes the \code{make} command-line
-utility and works the same way across all supported platforms.
+Building \CmdStan involves building two executable programs:
+%
+\begin{itemize}
+\item \code{stanc}: the \Stan compiler (translates \Stan language to \Cpp)
+\item \code{stansummary}: a basic posterior analysis tool
+\end{itemize}
+%
+The build process utilizes the \code{make} command-line
+utility and these instructions are applicable for any of our supported
+platforms.
+
+Steps to build \CmdStan:
 %
 \begin{enumerate}
   \item Open a command-line terminal window and change directories to
@@ -59,38 +69,39 @@ make               test-all.sh
       \end{Verbatim}
     \end{quote}
     %
-  \item \emph{Optional:} \ Set local \code{make} variables by editing
+  \item \emph{Optional:} \, Set local \code{make} variables by editing
     the file \verb+~/.config/cmdstan/make.local+ or
     \verb+<cmdstan-home>/make/local+. See \refappendix{make-options}
     for a list of available options.  For most installations, this
-    step can be skipped. Setting local \code{make} variables here will
-    persist between builds.
+    step can be skipped; the default configuration should work for
+    most users.
     %
   \item Use make to build \CmdStan. When multiple CPU cores are
     available on the system, the call to make can be parallelized.  It
     can either be specified directly when calling \code{make} with the
     \code{-j{\slshape N}} option, where \code{{\slshape N}} is the
-    number of CPU cores. For instance, to run on 2 cores, use
+    number of CPU cores. For instance, to run on 4 cores, use
     %
     \begin{quote}
       \begin{Verbatim}[fontshape=sl]
-> make build -j2
+> make build -j4
       \end{Verbatim}
     \end{quote}
     %
-    \emph{Warning:} \ The \code{make} program may take 10+ minutes and
+    \textbf{Warning:} \ The \code{make} program may take 10+ minutes and
     consume 2+ GB of memory to build \CmdStan.
 \end{enumerate}
 %
-When \CmdStan is successfully built, the \code{make} program will report
+When \CmdStan is successfully built, the \code{make} program will
+report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.11.0 built ---
+--- CmdStan v2.12.0 built ---
   \end{Verbatim}
 \end{quote}
 %
-and there will be two executables in the \code{bin} folder:
+and there will be two executables in the \code{<cmdstan-home>/bin/} folder:
 %
 \begin{itemize}
   \item \code{stanc}, the \Stan compiler. The \Stan compiler
@@ -169,8 +180,10 @@ Before building any Stan program, change directories to \code{<cmdstan-home>}.
 
 \subsection{Compiling a \Stan Program}
 
-A single call to \code{make} will translate a \Stan program to \Cpp,
-then compile the \Cpp code to an executable for the command line.
+A single call to \code{make} is all that's necessary to translate a
+\Stan program to an executable for the command line. (This call will
+first translate the \Stan program to \Cpp, then compile the \Cpp code
+to an executable.)
 
 A \Stan program must be in a file with the file extension
 \code{.stan}. To create an executable from a \Stan program,
@@ -179,8 +192,8 @@ argument. For Mac and Linux, it is the name of the \Stan program with
 the \code{.stan} omitted. For Windows, replace \code{.stan} with
 \code{.exe}.
 
-To build the Bernoulli example, use
-the following command for Mac and Linux:
+To build the Bernoulli example, use the following command for Mac and
+Linux:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -199,10 +212,11 @@ at the end of the target:
 The generated \Cpp code (\code{bernoulli.hpp}) and the compiled
 executable will be placed in the same directory as the \Stan program.
 
-\emph{Note:} to build a \Stan program, you must be in the
-\code{<cmdstan-home>} directory. The path to the \Stan program must not
-contain a space. If using relative paths, the relative path must not
-contain a space.
+\textbf{Note:} you must start in the \code{<cmdstan-home>}
+directory. The \Stan program can be in a different path, but the path
+to the \Stan program must not contain a space. (This is a limitation
+that's introduced by \code{make}.) Relative paths are ok; the relative
+path must not contain a space.
 
 \subsection{Sampling from the \Stan Program}
 
@@ -309,7 +323,7 @@ lines beginning with the pound sign (\Verb|#|)).
 \begin{quote}
 \begin{Verbatim}[fontsize=\small]
 # stan_version_major = 2
-# stan_version_minor = 9
+# stan_version_minor = 12
 # stan_version_patch = 0
 # model = bernoulli_model
 # method = sample (Default)

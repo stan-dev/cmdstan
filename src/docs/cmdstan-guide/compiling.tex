@@ -29,6 +29,7 @@ There are a number of example models distributed with \CmdStan which
 unpack into the path \code{examples}.  To build the simple example
 \nolinkurl{examples/bernoulli/bernoulli.stan}, the following call to
 \code{make} suffices.
+
 %
 The following call will build an executable form of the Bernoulli
 estimator. On Windows, replace \code{bernoulli} with \code{bernoulli.exe}.
@@ -43,6 +44,14 @@ This will translate the model \code{bernoulli.stan} to a \Cpp file,
 \code{bernoulli.hpp}, and compile a \CmdStan program using the
 generated \Cpp file, putting the executable in
 \nolinkurl{examples/bernoulli/bernoulli(.exe)}.
+
+\Stan programs do not need to be in the \code{<cmdstan-home>}
+directory. The current limitation is that the target executable name
+can not have spaces -- this includes the path to the
+executable. Spaces in the full path can be avoided by using relative
+paths. For Windows users, if using the full path, include the drive
+letter and use forward slashes,
+e.g. \verb+make c:/cmdstan/bernoulli/bernoulli.exe+.
 
 \subsection{Dependencies in {\tt\bfseries make}}
 
