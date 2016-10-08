@@ -7,7 +7,7 @@
 
 namespace cmdstan {
 
-  stan::services::experimental::advi::adapt_iterations;
+  using stan::services::experimental::advi::adapt_iterations;
   
   class arg_variational_adapt_iter: public int_argument {
   public:

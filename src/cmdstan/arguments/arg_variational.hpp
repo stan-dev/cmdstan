@@ -28,23 +28,23 @@ namespace cmdstan {
       _subarguments.push_back(new arg_variational_algo());
       _subarguments.push_back(new arg_variational_iter());
       _subarguments.push_back(new arg_variational_num_samples("grad_samples",
-                                                              gradient_samples::description(),
+                                                              gradient_samples::description().c_str(),
                                                               gradient_samples::default_value()));
       _subarguments.push_back(new arg_variational_num_samples
                               ("elbo_samples",
-                               elbo_samples::description(),
+                               elbo_samples::description().c_str(),
                                elbo_samples::default_value()));
       _subarguments.push_back(new arg_variational_eta());
       _subarguments.push_back(new arg_variational_adapt());
       _subarguments.push_back(new arg_tolerance("tol_rel_obj",
-                                                tol_rel_obj::description(),
+                                                tol_rel_obj::description().c_str(),
                                                 tol_rel_obj::default_value()));
       _subarguments.push_back(new arg_variational_eval_elbo("eval_elbo",
-                                                            eval_elbo::description(),
+                                                            eval_elbo::description().c_str(),
                                                             eval_elbo::default_value()));
       _subarguments.push_back(new arg_variational_output_samples
                               ("output_samples",
-                               output_draws::description(),
+                               output_draws::description().c_str(),
                                output_draws::default_value()));
     }
   };
