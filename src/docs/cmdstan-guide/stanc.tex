@@ -27,9 +27,9 @@ To change the default compiler or the optimization level, see
 The \stanc compiler converts \Stan programs to \Cpp concepts. The
 first stage of compilation involves parsing the text of the \Stan
 program.  If the parser is successful, the second stage of compilation
-generates \Cpp code.  If the parser fails, it will provide a
-diagnostic error message indicating the location in the input where
-the failure occurred and reason for the failure.
+generates \Cpp code.  If the parser fails, it will provide an error
+message indicating the location in the input where the failure
+occurred and reason for the failure.
 
 The following example illustrates a fully qualified call to \stanc
 to build the simple Bernoulli model. 
@@ -57,7 +57,7 @@ For Windows:
 \end{Verbatim}
 \end{quote}
 %
-The caret (\Verb|^|) is a continuation on Windows.
+(The caret (\Verb|^|) is a line continuation on Windows.)
 
 This call specifies the name of the model, here {\tt bernoulli}.
 This will determine the name of the class implementing the model in
