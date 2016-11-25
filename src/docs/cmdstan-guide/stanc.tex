@@ -122,15 +122,11 @@ either directly or indirectly by defining
 {\tt ALLOW\_UNDEFINED=--allow\_undefined} in the {\tt make/local} file,
 then you can declare a function signature in the functions block of
 your Stan program without defining it. In that case, \stanc will 
-generate a \Cpp header file that will not compile unless you edit the 
-generated \Cpp header file to add a {\tt \#include} statement pointing
-to another \Cpp header file that defines a function with the same name
-and signature in the same namespace. This namespace is the same as the
-{\tt class\_name} argument to \stanc documented above but with
-{\tt \_namespace} postfixed to the end of the {\tt class\_name}. After
-making that change, you do not need to run \stanc again; you merely 
-need to compile the \Cpp by calling {\tt make} followed by the path
-to the Stan program with the {\tt .stan} extension omitted.
+generate a \Cpp file that will not compile unless you write a
+{\tt USER\_HEADER.hpp} file in the same directory as the Stan program
+that defines a function with the same name and signature in a namespace
+that is formed by concatenating the {\tt class\_name} argument to 
+\stanc documented above to the string {\tt \_namespace}.
 
 For more details about how to write \Cpp code using the Stan Math
 Library, see \url{https://arxiv.org/abs/1509.07164}. As an example,
@@ -168,12 +164,12 @@ successfully but would not compile when you call
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make examples/bernoulli/bernoulli # on Windows postfix .exe 
+> make examples/bernoulli/bernoulli # on Windows add .exe 
 \end{Verbatim}
 \end{quote}
 %
 To compile, you need to write a file such as 
-{\tt examples/bernoulli/make\_odds.hpp} with the following lines
+{\tt examples/bernoulli/USER\_HEADER.hpp} with the following lines
 %
 \begin{quote}
 \begin{Verbatim}
@@ -195,20 +191,5 @@ in the Stan Math Library, then you would need to prefix the
 function calls with {\tt stan::math::}. The {\tt pstream\_\_}
 argument is mandatory in the signature but need not be used
 if your function does not print any output. To see the 
-necessary boilerplate look at the generated lines in the
+necessary boilerplate look at the corresponding lines in the
 generated \Cpp file.
-
-Next, you need to edit {\tt examples/bernoulli/bernoulli.hpp}
-and add a line that says {\tt \#include 'make\_odds.hpp'} at
-the very top. If your header file were in a different directory
-than {\tt examples/bernoulli/}, then you would need to specify
-{\tt \#include 'full/path/to/make\_odds.hpp'}. Finally, call
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> make examples/bernoulli/bernoulli # on Windows postfix .exe 
-\end{Verbatim}
-\end{quote}
-%
-and your \Cpp program should compile without reparsing your
-Stan program.

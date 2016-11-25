@@ -8,7 +8,8 @@ CMDSTAN_MAIN := src/cmdstan/main.cpp
 $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan bin/stanc$(EXE) bin/stansummary$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES) $(LDLIBS)
+	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES) $(LDLIBS)
 
 .PRECIOUS: %.hpp
 %.hpp : %.stan $(MODEL_HEADER) bin/stanc$(EXE)
