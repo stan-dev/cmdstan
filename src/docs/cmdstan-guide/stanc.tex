@@ -108,5 +108,107 @@ Specify the name of the file into which the generated \Cpp is written.
 \\[2pt]
 Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.hpp}
 %
+\item[\tt {-}-{\slshape allow\_undefined}]
+\mbox{ } \\ 
+Do not throw a parser error if there is a function in the Stan program
+that is declared but not defined in the functions block.
+%
 \end{description}
 
+\section{Using External \Cpp Code}
+
+If the {\tt allow\_undefined} flag is specified in the call to \stanc, 
+either directly or indirectly by defining 
+{\tt ALLOW\_UNDEFINED=--allow\_undefined} in the {\tt make/local} file,
+then you can declare a function signature in the functions block of
+your Stan program without defining it. In that case, \stanc will 
+generate a \Cpp header file that will not compile unless you edit the 
+generated \Cpp header file to add a {\tt \#include} statement pointing
+to another \Cpp header file that defines a function with the same name
+and signature in the same namespace. This namespace is the same as the
+{\tt class\_name} argument to \stanc documented above but with
+{\tt \_namespace} postfixed to the end of the {\tt class\_name}. After
+making that change, you do not need to run \stanc again; you merely 
+need to compile the \Cpp by calling {\tt make} followed by the path
+to the Stan program with the {\tt .stan} extension omitted.
+
+For more details about how to write \Cpp code using the Stan Math
+Library, see \url{https://arxiv.org/abs/1509.07164}. As an example,
+consider the following variant of the Bernoulli example
+%
+\begin{quote}
+\begin{Verbatim}
+functions {
+  real make_odds(real theta);
+}
+data {
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N];
+}
+parameters {
+  real<lower=0,upper=1> theta;
+}
+model {
+  theta ~ beta(1,1);
+  for (n in 1:N)
+    y[n] ~ bernoulli(theta);
+}
+generated quantities {
+  real odds;
+  odds = make_odds(theta);
+}
+\end{Verbatim}
+\end{quote}
+%
+Here the {\tt make\_odds} function is declared but not defined,
+which would ordinarily result in a parser error. However, if you
+put {\tt ALLOW\_UNDEFINED=--allow\_undefined} into the
+{\tt make/local} file, then the above Stan program will parse
+successfully but would not compile when you call
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make examples/bernoulli/bernoulli # on Windows postfix .exe 
+\end{Verbatim}
+\end{quote}
+%
+To compile, you need to write a file such as 
+{\tt examples/bernoulli/make\_odds.hpp} with the following lines
+%
+\begin{quote}
+\begin{Verbatim}
+namespace bernoulli_model_namespace {
+
+  template <typename T0__>
+  inline
+  typename boost::math::tools::promote_args<T0__>::type
+  make_odds(const T0__& theta, std::ostream* pstream__) {
+    return theta / (1 - theta);
+  }
+
+}
+\end{Verbatim}
+\end{quote}
+%
+If the function were more complicated and involved functions
+in the Stan Math Library, then you would need to prefix the
+function calls with {\tt stan::math::}. The {\tt pstream\_\_}
+argument is mandatory in the signature but need not be used
+if your function does not print any output. To see the 
+necessary boilerplate look at the generated lines in the
+generated \Cpp file.
+
+Next, you need to edit {\tt examples/bernoulli/bernoulli.hpp}
+and add a line that says {\tt \#include 'make\_odds.hpp'} at
+the very top. If your header file were in a different directory
+than {\tt examples/bernoulli/}, then you would need to specify
+{\tt \#include 'full/path/to/make\_odds.hpp'}. Finally, call
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make examples/bernoulli/bernoulli # on Windows postfix .exe 
+\end{Verbatim}
+\end{quote}
+%
+and your \Cpp program should compile without reparsing your
+Stan program.
