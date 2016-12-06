@@ -150,11 +150,15 @@ customize the output.
 \cmdarg{sig\_figs}{int}
 {Sets the number of significant figures displayed in the output}
 {Valid values: 0 \textless sig\_figs}
-{default = \code{2} }
+{default = \code{2}}
 %
 \cmdarg{autocorr}{int}
 {Calculates and then displays the autocorrelation of the specified chain}
 {Valid values: Any integer matching a chain index}
 {No autocorrelation output by default}
 %
+\cmdarg{csv\_file}{string}
+       {Writes output as a csv file with comments written as \#}
+       {Valid values: Any valid filename}
+       {Appends output to the file if it exists}
 \end{description}
