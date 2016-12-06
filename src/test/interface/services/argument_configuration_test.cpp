@@ -418,15 +418,15 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   std::stringstream output;
   
   while (s.good()) {
-    
     std::getline(s, l1);
     if (!s.good()) continue;
     
-    if      (l1 == "good") expected_success = true;
-    else if (l1 == "bad") expected_success = false;
+    if (l1 == "good") {
+      l1 = "../src/test/test-models/test_model.init.R";
+      expected_success = true;
+    } else if (l1 == "bad") expected_success = false;
     else if (l1 != "") expected_output << l1 << std::endl;
     else {
-      
       int n_output = 0;
       
       std::string l2;
