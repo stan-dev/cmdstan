@@ -591,7 +591,17 @@ lines need to be added to \code{make/local}.
 %
 {\it Note:} \ Make sure to do the above changes before compiling for the first
 time - otherwise Stan will be compiled with \code{g++} and you won't see any
-performance gains.  
+performance gains.
+
+\subsection{Additional compiler options}
+
+By default, Intel's compiler trades off accuracy for speed. This,
+unfortunately, isn't ideal behavior for the inference algorithms
+and may cause divergent transitions. Add these flags to \code{make/local}
+to force more accurate floating point computations:
+\begin{itemize}
+  \item \Verb|CFLAGS += fp-model precise -fp-model source|
+\end{itemize}
 
 
 \section{Optional Components for Developers}
