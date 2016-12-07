@@ -388,7 +388,7 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   std::string l0;
   std::string method_argument("");
   int n_method_output = 0;
-  
+
   while (method_output.good()) {
     std::getline(method_output, l0);
     if (!method_output.good()) continue;
@@ -420,11 +420,9 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   while (s.good()) {
     std::getline(s, l1);
     if (!s.good()) continue;
-    
-    if (l1 == "good") {
-      l1 = "../src/test/test-models/test_model.init.R";
-      expected_success = true;
-    } else if (l1 == "bad") expected_success = false;
+
+    if (l1 == "good") expected_success = true;
+    else if (l1 == "bad") expected_success = false;
     else if (l1 != "") expected_output << l1 << std::endl;
     else {
       int n_output = 0;
@@ -436,6 +434,9 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
         std::getline(expected_output, l2);
         if (!expected_output.good()) continue;
         clean_line(l2);
+        // replace "file=good" with "file=<real file>"
+        if (l2 == "file=good")
+          l2 = "file=../src/test/test-models/test_model.init.R";
         argument += " " + l2;
         ++n_output;
       }
@@ -477,7 +478,10 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
         
         std::getline(output, actual_line);
         
-        EXPECT_EQ(expected_line, actual_line);
+        EXPECT_EQ(expected_line, actual_line)
+          << "expected-success = " << expected_success << std::endl
+          << "l2 = " << l2 << std::endl
+          << "l1 = " << l1 << std::endl;
       }
       
       expected_output.clear();
