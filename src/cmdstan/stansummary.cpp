@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]) {
   // Parse any arguments specifying filenames
   std::ifstream ifstream;
   std::vector<std::string> filenames;
-  
+  bool write_csv = false;
   for (int i = 1; i < argc; i++) {
     
     if (std::string(argv[i]).find("--autocorr=") != std::string::npos)
@@ -33,6 +33,11 @@ int main(int argc, const char* argv[]) {
     
     if (std::string(argv[i]).find("--sig_figs=") != std::string::npos)
       continue;
+
+    if (std::string(argv[i]).find("--csv_file=") != std::string::npos) {
+      write_csv = true;
+      continue;
+    }
     
     if (std::string("--help") == std::string(argv[i])) {
       stansummary_usage();
@@ -47,7 +52,6 @@ int main(int argc, const char* argv[]) {
     } else {
       std::cout << "File " << argv[i] << " not found" << std::endl;
     }
-    
   }
   
   if (!filenames.size()) {
@@ -137,7 +141,7 @@ int main(int argc, const char* argv[]) {
   for (int k = 1; k < argc; k++)
     if (std::string(argv[k]).find("--sig_figs=") != std::string::npos)
       sig_figs = atoi(std::string(argv[k]).substr(11).c_str());
-  
+
   // Compute column widths
   Eigen::VectorXi column_widths(n);
   Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> formats(n);
@@ -312,9 +316,173 @@ int main(int argc, const char* argv[]) {
       }
   
     }
-        
   }
+
+  if (write_csv) {
+    std::string csv_filename = "";
+    for (int k = 1; k < argc; k++)
+      if (std::string(argv[k]).find("--csv_file=") != std::string::npos)
+        csv_filename = std::string(argv[k]).substr(11).c_str();
+    std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
+    
+    // Header output
+    csv_file << "name";
+    for (int i = 0; i < n; i++)
+      csv_file << "," << headers(i);
+    csv_file << std::endl;
+
+    // Value output
+    for (int i = skip; i < chains.num_params(); i++) {
+      if (!is_matrix(chains.param_name(i))) {
+        csv_file << "\"" << chains.param_name(i) << "\"";
+        for (int j = 0; j < n; j++) {
+          csv_file << "," << values(i, j);
+        }
+        csv_file << std::endl;
+      } else {
+        std::vector<int> dims = dimensions(chains, i);
+        std::vector<int> index(dims.size(), 1);
+        int max = 1;
+        for (size_t j = 0; j < dims.size(); j++)
+          max *= dims[j];
       
+        for (int k = 0; k < max; k++) {
+          int param_index = i + matrix_index(index, dims);
+          csv_file << "\"" << chains.param_name(param_index) << "\"";
+          for (int j = 0; j < n; j++)
+            csv_file << "," << values(param_index, j);
+          csv_file << std::endl;
+          if (k < max-1)
+            next_index(index, dims);
+        }
+        i += max-1;
+      }
+    }
+
+
+    // comments
+    // Initial output
+    csv_file << "# Inference for Stan model: " << model_name << std::endl
+             << "# " << chains.num_chains() << " chains: each with iter=(" << chains.num_kept_samples(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      csv_file << "," << chains.num_kept_samples(chain);
+    csv_file << ")";
+  
+    // Timing output
+    csv_file << "; warmup=(" << chains.warmup(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      csv_file << "," << chains.warmup(chain);
+    csv_file << ")";
+                          
+    csv_file << "; thin=(" << thin(0);
+  
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      csv_file << "," << thin(chain);
+    csv_file << ")";
+                          
+    csv_file << "; " << chains.num_samples() << " iterations saved."
+             << std::endl << "#" << std::endl;
+
+    std::string warmup_unit = "seconds";
+  
+    if (total_warmup_time / 3600 > 1) {
+      total_warmup_time /= 3600;
+      warmup_unit = "hours";
+    } else if (total_warmup_time / 60 > 1) {
+      total_warmup_time /= 60;
+      warmup_unit = "minutes";
+    }
+  
+    csv_file << "# Warmup took ("
+             << std::fixed
+             << std::setprecision(compute_precision(warmup_times(0), sig_figs, false))
+             << warmup_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      csv_file << ", " << std::fixed
+               << std::setprecision(compute_precision(warmup_times(chain), sig_figs, false))
+               << warmup_times(chain);
+    csv_file << ") seconds, ";
+    csv_file << std::fixed
+             << std::setprecision(compute_precision(total_warmup_time, sig_figs, false))
+             << total_warmup_time << " " << warmup_unit << " total" << std::endl;
+
+    std::string sampling_unit = "seconds";
+  
+    if (total_sampling_time / 3600 > 1) {
+      total_sampling_time /= 3600;
+      sampling_unit = "hours";
+    } else if (total_sampling_time / 60 > 1) {
+      total_sampling_time /= 60;
+      sampling_unit = "minutes";
+    }
+
+    csv_file << "# Sampling took ("
+             << std::fixed
+             << std::setprecision(compute_precision(sampling_times(0), sig_figs, false))
+             << sampling_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      csv_file << ", " << std::fixed
+               << std::setprecision(compute_precision(sampling_times(chain), sig_figs, false))
+               << sampling_times(chain);
+    csv_file << ") seconds, ";
+    csv_file << std::fixed
+             << std::setprecision(compute_precision(total_sampling_time, sig_figs, false))
+             << total_sampling_time << " " << sampling_unit << " total" << std::endl;
+    csv_file << "#" << std::endl;
+
+    /// Footer output
+    csv_file << "# Samples were drawn using " << stan_csv.metadata.algorithm
+             << " with " << stan_csv.metadata.engine << "." << std::endl
+             << "# For each parameter, N_Eff is a crude measure of effective sample size," << std::endl
+             << "# and R_hat is the potential scale reduction factor on split chains (at " << std::endl
+             << "# convergence, R_hat=1)." << std::endl;
+  
+    // Print autocorrelation, if desired
+    for (int k = 1; k < argc; k++) {
+    
+      if (std::string(argv[k]).find("--autocorr=") != std::string::npos) {
+        const int c = atoi(std::string(argv[k]).substr(11).c_str());
+      
+        if (c < 0 || c >= chains.num_chains()) {
+          csv_file << "# Bad chain index " << c << ", aborting autocorrelation display." << std::endl;
+          break;
+        }
+      
+        Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
+      
+        for (int i = 0; i < chains.num_params(); i++) {
+          autocorr.row(i) = chains.autocorrelation(c, i);
+        }
+      
+        // Format and print header
+        csv_file << "# Displaying the autocorrelations for chain " << c << ":" << std::endl;
+        const int n_autocorr = autocorr.row(0).size();
+      
+        int lag_width = 1;
+        int number = n_autocorr; 
+        while ( number != 0) { number /= 10; lag_width++; }
+
+        csv_file << "# " << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
+        for (int i = 0; i < chains.num_params(); ++i) {
+          csv_file << std::setw(max_name_length + 1) << std::right << chains.param_name(i);
+        }
+        csv_file << std::endl;
+
+        // Print body  
+        for (int n = 0; n < n_autocorr; ++n) {
+          csv_file << "# " << std::setw(lag_width) << std::right << n;
+          for (int i = 0; i < chains.num_params(); ++i) {
+            csv_file << std::setw(max_name_length + 1) << std::right << autocorr(i, n);
+          }
+          csv_file << std::endl;
+        }
+  
+      }
+    }
+    
+    csv_file.close();
+  }
+  
   return 0;
         
 }
