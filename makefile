@@ -24,8 +24,8 @@ AR = ar
 ##
 # Library locations
 ##
-STAN ?= stan/
-MATH ?= $(STAN)lib/stan_math/
+STAN ?= stan_2.13.1/
+MATH ?= $(STAN)lib/stan_math_2.13.0/
 -include $(MATH)make/libraries
 
 ##
@@ -39,7 +39,7 @@ STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.12.0
+CMDSTAN_VERSION := 2.13.1
 
 ##
 # Get information about the compiler used.
