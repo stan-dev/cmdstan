@@ -160,8 +160,9 @@ generated quantities {
 Here the {\tt make\_odds} function is declared but not defined,
 which would ordinarily result in a parser error. However, if you
 put \Verb|STANCFLAGS = --allow_undefined| into the
-{\tt make/local} file, then the above Stan program will parse
-successfully but would not compile when you call
+{\tt make/local} file or into the {\tt stanc} call, then the above 
+Stan program will parse successfully but would not compile when you 
+call
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
@@ -169,9 +170,8 @@ successfully but would not compile when you call
 \end{Verbatim}
 \end{quote}
 %
-To compile, you need to write a file such as {\tt
-  examples/bernoulli/user\_header.hpp} (the default) with the
-following lines
+To compile successfully, you need to write a file such as {\tt
+examples/bernoulli/make\_odds.hpp} with the following lines
 %
 \begin{quote}
 \begin{Verbatim}
@@ -188,6 +188,20 @@ namespace bernoulli_model_namespace {
 \end{Verbatim}
 \end{quote}
 %
+Thus, the following {\tt make} invocation should work
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> STANCFLAGS=--allow_undefined \
+USER_HEADER=examples/bernoulli/make_odds.hpp \
+make examples/bernoulli/bernoulli # on Windows add .exe 
+\end{Verbatim}
+\end{quote}
+%
+or you could put \Verb|STANCFLAGS| and \Verb|USER_HEADER|
+into the {\tt make/local} file instead of specifying them
+on the command-line.
+
 If the function were more complicated and involved functions
 in the Stan Math Library, then you would need to prefix the
 function calls with {\tt stan::math::}. The {\tt pstream\_\_}
