@@ -482,6 +482,24 @@ The most common options to set are the compiler options:
     \Verb|s|.
 \end{itemize}
 
+\subsubsection{{\tt stanc} Options}
+
+There are two options for controlling \stanc:
+%
+\begin{itemize}
+\item \Verb|STANCFLAGS|. These flags are passed to \stanc.  To allow
+  functions in Stan programs that are declared, but undefined, use
+  \Verb|STANCFLAGS = --allow_undefined| and update \Verb|USER_HEADER|
+  appropriately.
+\item \Verb|USER_HEADER|. If \Verb|--allow_undefined| is passed to
+  \stanc, the value of this variable is the additional include that is
+  passed to the \Cpp linker when compiling the program. The file in
+  \Verb|USER_HEADER| must have a definition of the function if the function
+  is used and not defined in the Stan program. This defaults to
+  \Verb|user_header.hpp| in the directory of the Stan program being compiled.
+\end{itemize}
+%
+
 \subsubsection{Changing Library Locations}
 
 The next set of variables allow for easy replacement of dependent
