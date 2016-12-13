@@ -24,7 +24,7 @@ AR = ar
 ##
 # Library locations
 ##
-STAN ?= stan/
+STAN ?= stan_2.13.1/
 MATH ?= $(STAN)lib/stan_math/
 -include $(MATH)make/libraries
 
