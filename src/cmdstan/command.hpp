@@ -165,6 +165,11 @@ namespace stan {
 
       std::fstream data_stream(data_file.c_str(),
                                std::fstream::in);
+      if (data_file != "" && (data_stream.rdstate() & std::ifstream::failbit)) {
+        std::cout << std::endl;
+        std::cout << "Can't open specified data file, \"" << data_file << "\"" << std::endl;
+        return stan::services::error_codes::NOINPUT;
+      }
       stan::io::dump data_var_context(data_stream);
       data_stream.close();
       

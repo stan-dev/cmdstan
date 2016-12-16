@@ -206,6 +206,9 @@ void stansummary_usage() {
             << "(Defaults to 2)"
             << std::endl
             << std::endl;
+  std::cout << "  --csv_file=<filename>\tWrite output as csv file "
+            << std::endl
+            << std::endl;
 }
 
 

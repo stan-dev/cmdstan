@@ -35,9 +35,11 @@ CFLAGS = -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOS
 CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS = 
 LDLIBS_STANC = -Lbin -lstanc
+STANCFLAGS ?=
+USER_HEADER ?= $(dir $<)user_header.hpp
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.12.0
+CMDSTAN_VERSION := 2.13.1
 
 ##
 # Get information about the compiler used.
@@ -66,12 +68,13 @@ CMDSTAN_VERSION := 2.12.0
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.c) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
 
 %$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES) $(LDLIBS)
+	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
+	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES) $(LDLIBS)
 
 
 ##
@@ -141,6 +144,15 @@ help:
 	@echo '    1. Build the Stan compiler and the print utility if not built.'
 	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
+	@echo ''
+	@echo '  Additional make options:'
+	@echo '    STANCFLAGS: defaults to "". These are extra options passed to bin/stanc$(EXE)'
+	@echo '      when generating C++ code. If you want to allow undefined functions in the'
+	@echo '      Stan program, either add this to make/local or the command line:'
+	@echo '          STANCFLAGS = --allow_undefined'
+	@echo '    USER_HEADER: when STANCFLAGS has --allow_undefined, this is the name of the'
+	@echo '      header file that is included. This defaults to "user_header.hpp" in the'
+	@echo '      directory of the Stan program.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
