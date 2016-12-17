@@ -71,7 +71,7 @@ algorithms are in the \Stan library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org/stan.html}
 \item License: BSD
-\item Tested Version: 2.12.0
+\item Tested Version: 2.13.1
 \end{itemize}
 %
 The \Stan source code is distributed with \CmdStan.
@@ -85,7 +85,7 @@ Library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org}
 \item License: BSD
-\item Tested Version: 2.12.0
+\item Tested Version: 2.13.1
 \end{itemize}
 %
 The \Stan Math Library source code is distributed with \CmdStan
@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.12.0.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.13.1.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
@@ -450,7 +450,7 @@ with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.12.0.tar.gz
+> tar -xzf cmdstan-2.13.1.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -482,6 +482,24 @@ The most common options to set are the compiler options:
     \Verb|s|.
 \end{itemize}
 
+\subsubsection{{\tt stanc} Options}
+
+There are two options for controlling \stanc:
+%
+\begin{itemize}
+\item \Verb|STANCFLAGS|. These flags are passed to \stanc.  To allow
+  functions in Stan programs that are declared, but undefined, use
+  \Verb|STANCFLAGS = --allow_undefined| and update \Verb|USER_HEADER|
+  appropriately.
+\item \Verb|USER_HEADER|. If \Verb|--allow_undefined| is passed to
+  \stanc, the value of this variable is the additional include that is
+  passed to the \Cpp linker when compiling the program. The file in
+  \Verb|USER_HEADER| must have a definition of the function if the function
+  is used and not defined in the Stan program. This defaults to
+  \Verb|user_header.hpp| in the directory of the Stan program being compiled.
+\end{itemize}
+%
+
 \subsubsection{Changing Library Locations}
 
 The next set of variables allow for easy replacement of dependent
@@ -497,10 +515,10 @@ versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the \Stan source
-    directory. The default is \Verb|STAN=stan_2.12.0/|. Note: the
+    directory. The default is \Verb|STAN=stan_2.13.1/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.12.0/|.
+    default is \Verb|MATH=stan/l../stan_math_2.13.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
     \Verb|lib/boost_1.60.0/| folder within \Verb|MATH|.
@@ -591,7 +609,17 @@ lines need to be added to \code{make/local}.
 %
 {\it Note:} \ Make sure to do the above changes before compiling for the first
 time - otherwise Stan will be compiled with \code{g++} and you won't see any
-performance gains.  
+performance gains.
+
+\subsection{Additional compiler options}
+
+By default, Intel's compiler trades off accuracy for speed. This,
+unfortunately, isn't ideal behavior for the inference algorithms
+and may cause divergent transitions. Add these flags to \code{make/local}
+to force more accurate floating point computations:
+\begin{itemize}
+  \item \Verb|CFLAGS += -fp-model precise -fp-model source|
+\end{itemize}
 
 
 \section{Optional Components for Developers}
