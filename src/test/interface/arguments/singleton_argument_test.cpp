@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 
 template <typename T>
 T argument_value() {
@@ -38,13 +38,13 @@ std::string argument_value<std::string>() {
 template <typename T>
 class CmdStanArgumentsSingleton : public ::testing::Test {
 public:
-  CmdStanArgumentsSingleton() 
+  CmdStanArgumentsSingleton()
     : arg(new cmdstan::singleton_argument<T>("argument")) { }
-  
+
   virtual ~CmdStanArgumentsSingleton() {
     delete(arg);
   }
-  
+
   cmdstan::argument *arg;
   std::stringstream ss;
 };
@@ -76,13 +76,13 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args) {
   std::vector<std::string> args;
   bool help_flag;
   stan::callbacks::stream_writer out(this->ss);
-  stan::callbacks::noop_writer err;
+  stan::callbacks::writer err;
 
   return_value = false;
   args.clear();
   help_flag = false;
   return_value = this->arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(0U, args.size());
@@ -92,7 +92,7 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args) {
   args.push_back("help");
   help_flag = false;
   return_value = this->arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
   EXPECT_EQ(0U, args.size());
@@ -102,7 +102,7 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args) {
   args.push_back("help-all");
   help_flag = false;
   return_value = this->arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
   EXPECT_EQ(0U, args.size());
@@ -113,11 +113,11 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args) {
   args.push_back("argument=" + argument_string<TypeParam>());
   help_flag = false;
   return_value = this->arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(0U, args.size());
-  EXPECT_EQ(argument_value<TypeParam>(), 
+  EXPECT_EQ(argument_value<TypeParam>(),
             static_cast<cmdstan::singleton_argument<TypeParam>*>(this->arg)->value());
 }
 
@@ -126,14 +126,14 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, parse_args_unexpected) {
   std::vector<std::string> args;
   bool help_flag;
   stan::callbacks::stream_writer out(this->ss);
-  stan::callbacks::noop_writer err;
-  
+  stan::callbacks::writer err;
+
   return_value = false;
   args.clear();
   args.push_back("foo=bar");
   help_flag = false;
   return_value = this->arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1U, args.size());
@@ -158,4 +158,3 @@ INSTANTIATE_TYPED_TEST_CASE_P(real, CmdStanArgumentsSingleton, double);
 INSTANTIATE_TYPED_TEST_CASE_P(int, CmdStanArgumentsSingleton, int);
 INSTANTIATE_TYPED_TEST_CASE_P(bool, CmdStanArgumentsSingleton, bool);
 INSTANTIATE_TYPED_TEST_CASE_P(string, CmdStanArgumentsSingleton, std::string);
-

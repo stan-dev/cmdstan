@@ -4,7 +4,7 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <gtest/gtest.h>
 
@@ -27,7 +27,7 @@ public:
     valid_arguments.push_back(new arg_init());
     valid_arguments.push_back(new arg_random());
     valid_arguments.push_back(new arg_output());
-    
+
     parser = new argument_parser(valid_arguments);
   }
   void TearDown() {
@@ -35,18 +35,18 @@ public:
       delete valid_arguments.at(i);
     delete(parser);
   }
-  
+
   std::vector<argument*> valid_arguments;
   argument_parser* parser;
   int err_code;
-  stan::callbacks::noop_writer writer;
+  stan::callbacks::writer writer;
 };
 
- 
+
 TEST_F(CmdStanArgumentsArgumentParser, default) {
   const char* argv[] = {};
   int argc = 0;
-  
+
   err_code = parser->parse_args(argc, argv, writer, writer);
   EXPECT_EQ(int(error_codes::USAGE), err_code);
 }
@@ -54,7 +54,7 @@ TEST_F(CmdStanArgumentsArgumentParser, default) {
 TEST_F(CmdStanArgumentsArgumentParser, help) {
   const char* argv[] = {"model_name", "help"};
   int argc = 2;
-  
+
   err_code = parser->parse_args(argc, argv, writer, writer);
   EXPECT_EQ(int(error_codes::OK), err_code);
 }
@@ -62,7 +62,7 @@ TEST_F(CmdStanArgumentsArgumentParser, help) {
 TEST_F(CmdStanArgumentsArgumentParser, unrecognized_argument) {
   const char* argv[] = {"foo"};
   int argc = 1;
-  
+
   err_code = parser->parse_args(argc, argv, writer, writer);
   EXPECT_EQ(int(error_codes::USAGE), err_code);
 }

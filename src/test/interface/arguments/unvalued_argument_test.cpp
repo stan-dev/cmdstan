@@ -1,6 +1,6 @@
 #include <cmdstan/arguments/unvalued_argument.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/noop_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <gtest/gtest.h>
 
 class test_arg_impl : public cmdstan::unvalued_argument {
@@ -24,7 +24,7 @@ public:
   void TearDown() {
     delete(arg);
   }
-  
+
   cmdstan::argument *arg;
   std::stringstream ss;
 };
@@ -55,36 +55,36 @@ TEST_F(CmdStanArgumentsUnvaluedArgument,parse_args) {
   std::vector<std::string> args;
   bool help_flag;
   stan::callbacks::stream_writer out(ss);
-  stan::callbacks::noop_writer err;
-  
+  stan::callbacks::writer err;
+
   return_value = false;
   args.clear();
   help_flag = false;
   return_value = arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(0U, args.size());
-  
-  
+
+
   return_value = false;
   args.clear();
   args.push_back("help");
   help_flag = false;
   return_value = arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
   EXPECT_EQ(0U, args.size());
   EXPECT_FALSE(static_cast<test_arg_impl*>(arg)->is_present());
-  
-  
+
+
   return_value = false;
   args.clear();
   args.push_back("help-all");
   help_flag = false;
   return_value = arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_TRUE(help_flag);
   EXPECT_EQ(0U, args.size());
@@ -96,14 +96,14 @@ TEST_F(CmdStanArgumentsUnvaluedArgument,parse_args_unexpected) {
   std::vector<std::string> args;
   bool help_flag;
   stan::callbacks::stream_writer out(ss);
-  stan::callbacks::noop_writer err;
+  stan::callbacks::writer err;
 
   return_value = false;
   args.clear();
   args.push_back("foo=bar");
   help_flag = false;
   return_value = arg->parse_args(args,out,err,help_flag);
-  
+
   EXPECT_TRUE(return_value);
   EXPECT_FALSE(help_flag);
   EXPECT_EQ(1U, args.size());
