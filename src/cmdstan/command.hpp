@@ -10,9 +10,7 @@
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/noop_interrupt.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/noop_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
@@ -84,8 +82,8 @@ namespace cmdstan {
     info();
 
 
-    stan::callbacks::noop_writer init_writer;
-    stan::callbacks::noop_interrupt interrupt;
+    stan::callbacks::writer init_writer;
+    stan::callbacks::interrupt interrupt;
 
     stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 
