@@ -36,6 +36,8 @@
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -43,6 +45,11 @@ namespace cmdstan {
 
   stan::io::dump get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
+    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
+      std::stringstream msg;
+      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
     stan::io::dump var_context(stream);
     stream.close();
     return var_context;
