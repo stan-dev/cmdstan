@@ -5,7 +5,7 @@
 #include <test/utility.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
-#include <stan/interface_callbacks/writer/stream_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;
@@ -341,40 +341,9 @@ struct sampler {
   }
   
   void
-  init_stepsize(stan::interface_callbacks::writer::base_writer& info_writer,
-                stan::interface_callbacks::writer::base_writer& error_writer) {
+  init_stepsize(stan::callbacks::writer& info_writer,
+                stan::callbacks::writer& error_writer) {
     throw ExceptionType("throwing exception");
   }
 };
-
-template<typename T>
-class StanUiCommandException : public ::testing::Test {
-
-};
-TYPED_TEST_CASE_P(StanUiCommandException);
-
-TYPED_TEST_P(StanUiCommandException, init_adapt) {
-  sampler<TypeParam> throwing_sampler;
-  Eigen::VectorXd cont_params;
-
-  stan::interface_callbacks::writer::stream_writer message_writer(std::cout);
-  stan::interface_callbacks::writer::stream_writer error_writer(std::cerr);
-  
-  EXPECT_FALSE(stan::services::sample::init_adapt(&throwing_sampler,
-                                                  0, 0, 0, 0, cont_params,
-                                                  message_writer, error_writer));
-}
-
-REGISTER_TYPED_TEST_CASE_P(StanUiCommandException,
-                           init_adapt);
-
-// exception types that can be thrown by Boost's math functions
-typedef ::testing::Types<std::domain_error,
-                         std::overflow_error,
-                         std::underflow_error,
-                         boost::math::rounding_error,
-                         boost::math::evaluation_error> BoostExceptionTypes;
-
-INSTANTIATE_TYPED_TEST_CASE_P(, StanUiCommandException, 
-                              BoostExceptionTypes);
 
