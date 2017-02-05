@@ -70,13 +70,6 @@ CMDSTAN_VERSION := 2.14.0
 %.o : %.cpp
 	$(COMPILE.c) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
 
-%$(EXE) : %.hpp %.stan 
-	@echo ''
-	@echo '--- Linking C++ model ---'
-	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES) $(LDLIBS)
-
-
 ##
 # Tell make the default way to compile a .o file.
 ##
