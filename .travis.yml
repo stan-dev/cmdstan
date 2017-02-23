@@ -4,7 +4,6 @@ sudo: false
 
 os:
   - linux
-  - osx
   
 compiler:
   - clang
@@ -18,9 +17,6 @@ before_script:
 
 matrix:
   fast_finish: true
-  exclude:
-    - os: osx
-      compiler: gcc
 
 script:
   - git submodule foreach 'echo $path `git rev-parse HEAD`'
