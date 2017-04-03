@@ -32,7 +32,7 @@ int main(int argc, const char* argv[]) {
   std::ifstream ifstream;
   std::vector<std::string> filenames;
 
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; ++i) {
     ifstream.open(argv[i]);
 
     if (ifstream.good()) {
@@ -58,7 +58,7 @@ int main(int argc, const char* argv[]) {
   ifstream.close();
 
   for (std::vector<std::string>::size_type chain = 1;
-       chain < filenames.size(); chain++) {
+       chain < filenames.size(); ++chain) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
     chains.add(stan_csv);
@@ -70,7 +70,7 @@ int main(int argc, const char* argv[]) {
   std::vector<std::string> bad_n_eff_names;
   std::vector<std::string> bad_rhat_names;
 
-  for (int i = 0; i < chains.num_params(); i++) {
+  for (int i = 0; i < chains.num_params(); ++i) {
     int max_limit = 10;
 
     if (chains.param_name(i) == std::string("treedepth__")) {
