@@ -118,6 +118,7 @@ endif
 ##
 test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail))
 test/interface/csv_header_consistency_test.o: src/test/test-models/csv_header_consistency$(EXE)
+test/interface/diagnose_test.o: bin/diagnose$(EXE)
 test/interface/elapsed_time_test.o: src/test/test-models/test_model$(EXE)
 test/interface/fixed_param_sampler_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
 test/interface/model_output_test.o: src/test/test-models/printer$(EXE)

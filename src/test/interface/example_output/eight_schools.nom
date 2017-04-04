@@ -1,0 +1,4 @@
+7 of 1000 (0.7%) transitions ended with a divergence.  These divergent transitions indicate that HMC is not fully able to explore the posterior distribution.  Try rerunning with adapt delta set to a larger value and see if the divergences vanish.  If increasing adapt delta towards 1 does not remove the divergences then you will likely need to reparameterize your model.
+
+The E-BFMI, 0.26, is below the nominal threshold of 0.3 which suggests that HMC may have trouble exploring the target distribution.  You should consider any reparameterizations if possible.
+

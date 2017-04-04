@@ -1,0 +1,2 @@
+5 of 1000 (0.5%) transitions hit the maximum treedepth limit of 10, or 2^10 leapfrog steps. Trajectories that are prematurely terminated due to this limit will result in slow exploration and you should increase the limit to ensure optimal performance.
+
