@@ -75,10 +75,11 @@ int main(int argc, const char* argv[]) {
 
     if (chains.param_name(i) == std::string("treedepth__")) {
       int max = chains.samples(i).maxCoeff();
-      if (chains.samples(i).maxCoeff() >= max_limit) {
+      if (max >= max_limit) {
         int n_max = 0;
-        for (size_t n = 0; n < chains.samples(i).size(); ++n)
-          if (chains.samples(i)(n) == max) ++n_max;
+        Eigen::VectorXd t_samples = chains.samples(i);
+        for (size_t n = 0; n < t_samples.size(); ++n)
+          if (t_samples(n) == max) ++n_max;
 
         std::cout << n_max << " of " << num_samples << " ("
                   << std::setprecision(2)
