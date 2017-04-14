@@ -1,21 +1,21 @@
 \chapter{Overview}
 
 \noindent
-\CmdStan is the command-line interface for \Stan. The next two
+\CmdStan is the command-line interface for Stan. The next two
 chapters describes tools that are built as part of \CmdStan
 installation: \code{stanc} and \code{stansummary}. The process of building a
-\CmdStan executable from a \Stan program is as follows:
+\CmdStan executable from a Stan program is as follows:
 %
 \begin{enumerate}
-  \item A \Stan program is written to file with a \code{.stan}
+  \item A Stan program is written to file with a \code{.stan}
     extension.
-  \item \code{stanc} is used to translate the \Stan program into a
+  \item \code{stanc} is used to translate the Stan program into a
     \Cpp file. This \Cpp file is not a full program that can be
-    compiled to executable directly, but a translation from the \Stan
+    compiled to executable directly, but a translation from the Stan
     language into a \Cpp concept. Each interface will generate identical
-    \Cpp for the same \Stan program.
+    \Cpp for the same Stan program.
   \item A \CmdStan exectuable is generated from the \CmdStan source
-    and the generated \Cpp. Each \Stan program will have its own
+    and the generated \Cpp. Each Stan program will have its own
     \CmdStan executable. The options to the \CmdStan executable are
     described in \refchapter{stan-cmd}.
 \end{enumerate}

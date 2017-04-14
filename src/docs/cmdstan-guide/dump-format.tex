@@ -242,11 +242,11 @@ row_vector[N] d[P,M];
 There is no declaration in a dump file that distinguishes integer
 versus continuous values.  If a value in a dump file's definition of a
 variable contains a decimal point (e.g., \code{132.3}) or uses
-scientific notation (e.g., \code{1.323e2}), \Stan assumes that the
+scientific notation (e.g., \code{1.323e2}), Stan assumes that the
 values are real.
 
 For a single value, if there is no decimal point, it may be assigned
-to an \code{int} or \code{real} variable in \Stan.  An array value may
+to an \code{int} or \code{real} variable in Stan.  An array value may
 only be assigned to an \code{int} array if there is no decimal point
 or scientific notation in any of the values.  This convention is
 compatible with the way \R writes data.
@@ -260,7 +260,7 @@ y <-
 \end{Verbatim}
 \end{quote}
 % 
-This definition can be used for a \Stan variable \code{y} declared as
+This definition can be used for a Stan variable \code{y} declared as
 \code{real} or as \code{int}.  Assigning an integer value to a real
 variable automatically promotes the integer value to a real value.
 
@@ -285,9 +285,9 @@ y <-
 \end{quote}
 %
 Even though this is a round value, the occurrence of the decimal
-point in the value, \code{2.0}, causes \Stan to infer that \code{y} is
+point in the value, \code{2.0}, causes Stan to infer that \code{y} is
 real valued.  This dump file may only be used for variables \code{y}
-declared as real in \Stan.
+declared as real in Stan.
 
 \subsection{Scientific Notation}
 
@@ -418,8 +418,8 @@ by the following (mildly templated) Backus-Naur form grammar.
 }
 \noindent
 The template parameters \code{T} will be set to either \code{int} or
-\code{real}.  Because \Stan allows promotion of integer values to real
+\code{real}.  Because Stan allows promotion of integer values to real
 values, an integer sequence specification in the dump data format may
-be assigned to either an integer- or real-based variable in \Stan.
+be assigned to either an integer- or real-based variable in Stan.
 
 
