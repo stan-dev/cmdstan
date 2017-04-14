@@ -1,10 +1,10 @@
 \chapter{Compiling \CmdStan Exectuables}\label{compiling.chapter}
 
 \noindent
-Preparing a \Stan program to be run involves two steps,
+Preparing a Stan program to be run involves two steps,
 %
 \begin{enumerate}
-\item translating the \Stan program to \Cpp, and
+\item translating the Stan program to \Cpp, and
 \item compiling the resulting \Cpp to an executable.
 \end{enumerate}
 %
@@ -45,7 +45,7 @@ This will translate the model \code{bernoulli.stan} to a \Cpp file,
 generated \Cpp file, putting the executable in
 \nolinkurl{examples/bernoulli/bernoulli(.exe)}.
 
-\Stan programs do not need to be in the \code{<cmdstan-home>}
+Stan programs do not need to be in the \code{<cmdstan-home>}
 directory. The current limitation is that the target executable name
 can not have spaces -- this includes the path to the
 executable. Spaces in the full path can be avoided by using relative
@@ -61,7 +61,7 @@ If the \code{make} target to build the Bernoulli estimator is invoked
 a second time, it will see that it is up to date, and will not
 recompile the program.
 
-If the file containing the \Stan program is updated, the next call to
+If the file containing the Stan program is updated, the next call to
 \code{make} will rebuild the \CmdStan executable.
 
 

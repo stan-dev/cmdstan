@@ -6,7 +6,7 @@ CMDSTAN_MAIN := src/cmdstan/main.cpp
 
 
 .PRECIOUS: %.hpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan bin/stanc$(EXE) bin/stansummary$(EXE) $(LIBCVODES)
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan bin/stanc$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 ifneq (,$(findstring allow_undefined,$(STANCFLAGS)))

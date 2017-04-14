@@ -39,7 +39,7 @@ STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.14.0
+CMDSTAN_VERSION := 2.15.0
 
 ##
 # Get information about the compiler used.
@@ -129,6 +129,7 @@ help:
 	@echo '    1. Build the Stan compiler bin/stanc$(EXE).'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
+	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make. '
 	@echo '    For 4 cores:'
@@ -208,6 +209,7 @@ endif
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary(EXE): Build the print utility.'
+	@echo '- bin/diagnostic(EXE): Build the diagnostic utility.'
 	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
@@ -222,11 +224,11 @@ endif
 -include make/libstan  # libstan.a
 -include make/models   # models
 -include make/tests
--include make/command  # bin/stanc, bin/stansummary, bin/print
+-include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 -include $(STAN)make/manual
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) $(LIBCVODES)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 

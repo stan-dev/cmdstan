@@ -12,3 +12,8 @@ bin/print$(EXE) : bin/cmdstan/print.o
 bin/stansummary$(EXE) : bin/cmdstan/stansummary.o
 	@mkdir -p $(dir $@)
 	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+
+.PRECIOUS: bin/diagnose$(EXE)
+bin/diagnose$(EXE) : bin/cmdstan/diagnose.o
+	@mkdir -p $(dir $@)
+	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
