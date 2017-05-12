@@ -99,7 +99,9 @@ namespace cmdstan {
     //////////////////////////////////////////////////
     //                Initialize Model              //
     //////////////////////////////////////////////////
-    Model model(data_var_context, &std::cout);
+    unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
+    boost::ecuyer1988 rng(random_seed);
+    Model model(data_var_context, rng, &std::cout);
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     parser.print(sample_writer);
@@ -111,7 +113,6 @@ namespace cmdstan {
 
     int refresh = dynamic_cast<int_argument*>(parser.arg("output")->arg("refresh"))->value();
     unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
-    unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
 
     std::string init = dynamic_cast<string_argument*>(parser.arg("init"))->value();
     double init_radius = 2.0;
