@@ -100,8 +100,7 @@ namespace cmdstan {
     //                Initialize Model              //
     //////////////////////////////////////////////////
     unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
-    boost::ecuyer1988 rng(random_seed);
-    Model model(data_var_context, rng, &std::cout);
+    Model model(data_var_context, random_seed, &std::cout);
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     parser.print(sample_writer);

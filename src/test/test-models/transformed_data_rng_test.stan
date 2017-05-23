@@ -5,7 +5,7 @@ transformed data {
   vector[N] y;
   for (n in 1:N)
     y[n] = normal_rng(0, 1);
-  print(y);
+  print("y values: ",y);
 }
 parameters {
   real mu;
