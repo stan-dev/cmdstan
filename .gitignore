@@ -41,3 +41,5 @@ make/local
 
 # built manual
 src/docs/**/*.pdf
+
+output.csv
