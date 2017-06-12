@@ -186,10 +186,11 @@ first translate the Stan program to \Cpp, then compile the \Cpp code
 to an executable.)
 
 A Stan program must be in a file with the file extension
-\code{.stan}. To create an executable from a Stan program,
-\code{make} will be called with the name of the executable as its
-argument. For Mac and Linux, it is the name of the Stan program with
-the \code{.stan} omitted. For Windows, replace \code{.stan} with
+\code{.stan}. To create an executable from a Stan program, \code{make}
+will be called with the name of the executable as its argument. For
+Mac and Linux, it is the name of the Stan program with the
+\code{.stan} omitted. For Windows, replace .stan with .exe, and make
+sure that the path is given with slashes and not backslashes.
 \code{.exe}.
 
 To build the Bernoulli example, use the following command for Mac and
@@ -202,7 +203,7 @@ Linux:
 \end{quote}
 %
 For Windows, the command is the same with the addition of \code{.exe}
-at the end of the target:
+at the end of the target (note: use forward slashes):
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make examples/bernoulli/bernoulli.exe
@@ -959,4 +960,3 @@ and on Windows with
 %% matrices) or may be misformulated.  In a future version of Stan, we
 %% plan to rank such messages by severity and turn this one off by
 %% default so as not to needlessly worry users.
-
