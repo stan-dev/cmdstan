@@ -4,7 +4,7 @@
 This chapter is designed to help users get acquainted with the
 \CmdStan interface. Later chapters are devoted to expanding on the
 material in this chapter with full reference documentation. See the
-\Stan user's manual for details about the \Stan language.
+Stan user's manual for details about the Stan language.
 
 \section{Installation}
 
@@ -34,7 +34,7 @@ instructions of the prerequisites, see
 Building \CmdStan involves building two executable programs:
 %
 \begin{itemize}
-\item \code{stanc}: the \Stan compiler (translates \Stan language to \Cpp)
+\item \code{stanc}: the Stan compiler (translates Stan language to \Cpp)
 \item \code{stansummary}: a basic posterior analysis tool
 \end{itemize}
 %
@@ -97,20 +97,20 @@ report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.14.0 built ---
+--- CmdStan v2.15.0 built ---
   \end{Verbatim}
 \end{quote}
 %
 and there will be two executables in the \code{<cmdstan-home>/bin/} folder:
 %
 \begin{itemize}
-  \item \code{stanc}, the \Stan compiler. The \Stan compiler
-    translates a \Stan program into \Cpp code. See \refchapter{stanc}
+  \item \code{stanc}, the Stan compiler. The Stan compiler
+    translates a Stan program into \Cpp code. See \refchapter{stanc}
     for details.
   \item \code{stansummary}, a posterior analysis tool. The \code{stansummary}
     command summarizes the comma-separated values files that are
-    generated from \Stan program runs. For each parameter within the
-    \Stan program, \code{stansummary} reports the mean, standard deviation,
+    generated from Stan program runs. For each parameter within the
+    Stan program, \code{stansummary} reports the mean, standard deviation,
     quantiles, $\hat{R}$, and other values. See \refchapter{stansummary} for
     details.
 \end{itemize}
@@ -178,17 +178,17 @@ using an R-like syntax (see \refchapter{dump} for more information).
 
 Before building any Stan program, change directories to \code{<cmdstan-home>}.
 
-\subsection{Compiling a \Stan Program}
+\subsection{Compiling a Stan Program}
 
 A single call to \code{make} is all that's necessary to translate a
-\Stan program to an executable for the command line. (This call will
-first translate the \Stan program to \Cpp, then compile the \Cpp code
+Stan program to an executable for the command line. (This call will
+first translate the Stan program to \Cpp, then compile the \Cpp code
 to an executable.)
 
-A \Stan program must be in a file with the file extension
-\code{.stan}. To create an executable from a \Stan program,
+A Stan program must be in a file with the file extension
+\code{.stan}. To create an executable from a Stan program,
 \code{make} will be called with the name of the executable as its
-argument. For Mac and Linux, it is the name of the \Stan program with
+argument. For Mac and Linux, it is the name of the Stan program with
 the \code{.stan} omitted. For Windows, replace \code{.stan} with
 \code{.exe}.
 
@@ -210,15 +210,15 @@ at the end of the target:
 \end{quote}
 
 The generated \Cpp code (\code{bernoulli.hpp}) and the compiled
-executable will be placed in the same directory as the \Stan program.
+executable will be placed in the same directory as the Stan program.
 
 \textbf{Note:} you must start in the \code{<cmdstan-home>}
-directory. The \Stan program can be in a different path, but the path
-to the \Stan program must not contain a space. (This is a limitation
+directory. The Stan program can be in a different path, but the path
+to the Stan program must not contain a space. (This is a limitation
 that's introduced by \code{make}.) Relative paths are ok; the relative
 path must not contain a space.
 
-\subsection{Sampling from the \Stan Program}
+\subsection{Sampling from the Stan Program}
 
 The program can be executed from the directory in which it resides.
 %
@@ -317,7 +317,7 @@ chain being written to a file in comma-separated value (CSV) format.
 The default name of the output file is \nolinkurl{output.csv}.
 
 The first part of the output file records the version of the
-underlying \Stan library and the configuration as comments (i.e.,
+underlying Stan library and the configuration as comments (i.e.,
 lines beginning with the pound sign (\Verb|#|)).
 %
 \begin{quote}
@@ -507,7 +507,7 @@ the draws (e.g., to make decisions or predictions for unseen data).
 from the posterior distribution. The executable does not need to be
 recompiled in order to switch from sampling to optimization, and the
 data input format is the same. The following is a minimal call to
-\Stan's optimizer using defaults for everything but the location of the
+Stan's optimizer using defaults for everything but the location of the
 data file. See \refsection{stan-command-line-options} for more
 details.
 %
@@ -627,7 +627,7 @@ that no uncertainty is reported.
 inference. The executable does not need to be
 recompiled in order to switch to variational inference, and the
 data input format is the same. The following is a minimal call to
-\Stan's variational inference algorithm using defaults for everything but the
+Stan's variational inference algorithm using defaults for everything but the
 location of the data file. See \refsection{stan-command-line-options} for more
 details.
 %
@@ -719,7 +719,7 @@ phase finds a good value for the step size scaling parameter $\eta$. The
 evidence
 lower bound (ELBO) is the variational objective function and is
 evaluated based on a Monte Carlo estimate. The variational inference
-algorithm in \Stan is stochastic, which makes it challenging to assess
+algorithm in Stan is stochastic, which makes it challenging to assess
 convergence. That is, while the algorithm appears to have converged in
 $\sim$100 iterations, the algorithm runs for another few thousand
 iterations until mean change in ELBO drops below the default
@@ -914,9 +914,9 @@ and on Windows with
 
 %% \subsection{Compile-time Errors}
 
-%% \Stan tries to report errors and warnings in order to help users
+%% Stan tries to report errors and warnings in order to help users
 %% correctly formulate and debug models. Compile-time errors occur when
-%% \Stan programs are not syntaxtically valid. These errors prevent \Cpp
+%% Stan programs are not syntaxtically valid. These errors prevent \Cpp
 %% code from being generated and must be addressed before proceeding. See
 %% the user's guide for more details.
 
@@ -956,7 +956,7 @@ and on Windows with
 
 %% If this message occurs repeatedly, the model may have a poorly
 %% conditioned constraint (typically with covariance or correlation
-%% matrices) or may be misformulated.  In a future version of \Stan, we
+%% matrices) or may be misformulated.  In a future version of Stan, we
 %% plan to rank such messages by severity and turn this one off by
 %% default so as not to needlessly worry users.
 

@@ -37,9 +37,9 @@ The only two absolute requirements for running \CmdStan are the
 
 \subsection{\CmdStan Source}
 
-In order to compile \Stan program, the \CmdStan source code is
+In order to compile Stan program, the \CmdStan source code is
 required.  The \CmdStan source code distribution includes \CmdStan's
-source code, \Stan's source code, documentation, build scripts, unit
+source code, Stan's source code, documentation, build scripts, unit
 tests, documentation and source for the required libraries, Stan Math
 Library, Boost, and Eigen, and the source for an optional testing
 library, Google Test.
@@ -66,33 +66,33 @@ http://mc-stan.org/source-repos.html
 \subsubsection{Stan Library Source}
 
 The source code for Stan's parse and implementation of inference
-algorithms are in the \Stan library.
+algorithms are in the Stan library.
 %
 \begin{itemize}
 \item Home: \url{http://mc-stan.org/stan.html}
 \item License: BSD
-\item Tested Version: 2.14.0
+\item Tested Version: 2.15.0
 \end{itemize}
 %
-The \Stan source code is distributed with \CmdStan.
+The Stan source code is distributed with \CmdStan.
 
 \subsubsection{Stan Math Library Source}
 
-\Stan's mathematical functions and inference algorithm rely on the
-reverse-mode automatic differentiation implemented in the \Stan Math
+Stan's mathematical functions and inference algorithm rely on the
+reverse-mode automatic differentiation implemented in the Stan Math
 Library.
 %
 \begin{itemize}
 \item Home: \url{http://mc-stan.org}
 \item License: BSD
-\item Tested Version: 2.14.0
+\item Tested Version: 2.15.0
 \end{itemize}
 %
-The \Stan Math Library source code is distributed with \CmdStan
+The Stan Math Library source code is distributed with \CmdStan
 
 \subsubsection{Boost C++ Library Source}
 
-\Stan's parser and some of its mathematical functions and template
+Stan's parser and some of its mathematical functions and template
 metaprogramming facilities are implemented with the Boost \Cpp
 Library.
 %
@@ -107,7 +107,7 @@ The Boost source code is distributed with \CmdStan.
 
 \subsubsection{Eigen Matrix and Linear Algebra Library Source}
 
-\Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
+Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
 algebra library.  
 %
 \begin{itemize}
@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.14.0.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.15.0.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
@@ -450,7 +450,7 @@ with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.14.0.tar.gz
+> tar -xzf cmdstan-2.15.0.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -459,7 +459,7 @@ with
 
 \subsection{Setting a Variable}
 \CmdStan uses \code{make} for building the \CmdStan tools and
-compiling \Stan programs as executables. Users can customize how the
+compiling Stan programs as executables. Users can customize how the
 tools are built by editing \code{make/local} inside the
 \code{<cmdstan-home>} directory.
 
@@ -475,7 +475,7 @@ variables, write \Verb|<variable>+=<value>|.
 The most common options to set are the compiler options:
 %
 \begin{itemize}
-  \item \Verb|CC|. The compiler used to build \CmdStan and the \Stan
+  \item \Verb|CC|. The compiler used to build \CmdStan and the Stan
     executables. The default is \Verb|CC=g++|.
   \item \Verb|O|. The optimization level for the compiler. The default
     is \Verb|O=3|. Both \gpp and \clang recognize \Verb|0,1,2,3|, and
@@ -503,22 +503,22 @@ There are two options for controlling \stanc:
 \subsubsection{Changing Library Locations}
 
 The next set of variables allow for easy replacement of dependent
-libraries. \CmdStan depends on \Stan, Boost, Eigen, and
+libraries. \CmdStan depends on Stan, Boost, Eigen, and
 CVODES. Although \CmdStan is bundled with a particular verison of
-\Stan, other versions can be used. The same is true with Boost, Eigen,
+Stan, other versions can be used. The same is true with Boost, Eigen,
 and CVODES.
 
-The \Stan developers typically replace the tagged version of \Stan in
+The Stan developers typically replace the tagged version of Stan in
 \code{<cmdstan-home>/stan} with an updated version and do not set
 these variables. That said, it is easy to point \CmdStan to other
 versions of these libraries in other directories.
 %
 \begin{itemize}
-  \item \Verb|STAN|. The location of the \Stan source
-    directory. The default is \Verb|STAN=stan_2.14.0/|. Note: the
+  \item \Verb|STAN|. The location of the Stan source
+    directory. The default is \Verb|STAN=stan_2.15.0/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.13.0/|.
+    default is \Verb|MATH=stan/l../stan_math_2.15.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
     \Verb|lib/boost_1.60.0/| folder within \Verb|MATH|.
@@ -542,7 +542,7 @@ These are the additional options and typically do not need to be set.
     programs. The default value is dependent on the operating system.
   \item \Verb|LDLIBS|. The libraries used for linking \CmdStan
     programs. The default value is dependent on the operating system.
-  \item \Verb|LDLIBS_STANC|. The libraries used for linking the \Stan
+  \item \Verb|LDLIBS_STANC|. The libraries used for linking the Stan
     compiler, \code{stanc}. The default is the value of \Verb|LDLIBS|.
   \item \Verb|BIT|. The bitness of the executable. This variable only
     applies to Windows. The default is \Verb|BIT=64|. If building on a
@@ -569,7 +569,7 @@ for the changes to take place. The easiest way to do this is to type:
   \end{Verbatim}
 \end{quote}
 %
-Then rebuild \CmdStan and the \Stan programs of interest.
+Then rebuild \CmdStan and the Stan programs of interest.
 
 
 \section{MKL Compiler Instructions}
@@ -680,7 +680,7 @@ License: BSD
 Tested Version(s): 1.7.0
 \end{itemize}
 %
-The Google Test framework is distributed with \Stan.
+The Google Test framework is distributed with Stan.
 
 
 \section{Tips for Mac OS X}
@@ -786,7 +786,7 @@ the installation approximately 3.5GB].
 Once it is downloaded, just click on the \code{.mpkg} file and then
 follow the installer instructions.  The installer will add the command
 to the \code{PATH} environment variable so that the \code{pdflatex}
-used by \Stan is available from the command line.
+used by Stan is available from the command line.
 
 
 %% \subsection{Lucida Console Font}

@@ -167,7 +167,7 @@ written.
 \subsection{Variational Inference}
 
 \CmdStan can fit a variational approximation to the posterior. The approximation
-is a Gaussian in the unconstrained variable space. \Stan implements two
+is a Gaussian in the unconstrained variable space. Stan implements two
 variational algorithms. The \code{algorithm=meanfield} option uses a fully
 factorized Gaussian for the approximation. The \code{algorithm=fullrank} option
 uses a Gaussian with a full-rank covariance matrix for the approximation.
@@ -199,7 +199,7 @@ uses a Gaussian with a full-rank covariance matrix for the approximation.
 \CmdStan has a basic diagnostic feature that will calculate gradients of
 the initial state and compare them with those calculated with finite
 differences.  If there are discrepancies, there is a problem with the
-model or initial states (or a bug in \Stan).  To run on the different
+model or initial states (or a bug in Stan).  To run on the different
 platforms, use one of the following.
 
 \subsubsection{Mac OS and Linux}
@@ -596,9 +596,9 @@ memoryless windows; often fast parameters will be adapted here
 as well.  Lastly the fast parameters are allowed to adapt to the final
 update of the slow parameters.
 
-Currently all \Stan sampling algorithms utilize dual averaging to
+Currently all Stan sampling algorithms utilize dual averaging to
 optimize the step size (this optimization during adaptation of the
-sampler should not be confused with running \Stan's optimization method).
+sampler should not be confused with running Stan's optimization method).
 This optimization procedure is extremely flexible and for completeness
 we have exposed each option, using the notation of
 \citep{Hoffman-Gelman:2011, Hoffman-Gelman:2014}.  In practice the
@@ -776,18 +776,18 @@ For more information on the NUTS algorithm see \citep{Hoffman-Gelman:2011, Hoffm
 
 \subsubsection{Euclidean Metric}
 
-All HMC implementations in \Stan utilize quadratic kinetic energy
+All HMC implementations in Stan utilize quadratic kinetic energy
 functions which are specified up to the choice of a symmetric,
 positive-definite matrix known as a \textit{mass matrix} or, more
 formally, a \textit{metric} \citep{Betancourt-Stein:2011}.
 
 If the metric is constant then the resulting implementation is known
-as \textit{Euclidean} HMC.  \Stan allows for three Euclidean HMC
+as \textit{Euclidean} HMC.  Stan allows for three Euclidean HMC
 implementations: a unit metric, a diagonal metric, and a dense
 metric.  These can be specified with the values \code{unit\_e},
 \code{diag\_e}, and \code{dense\_e}, respectively.
 
-Future versions of \Stan will also include dynamic metrics associated
+Future versions of Stan will also include dynamic metrics associated
 with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
 %
 \begin{description}
@@ -1210,7 +1210,7 @@ generated quantities are ignored.
 
 The hierarchical structure of the command-line options can be
 intimidating, and here we provide an example workflow to help ease the
-introduction to new users, especially those used to \Stan 1.3 or
+introduction to new users, especially those used to Stan 1.3 or
 earlier releases.  The examples in this section are for Mac OS and
 Linux; on Windows, just remove the \code{./} before the executable and
 change the line-continuation character from Unix's
@@ -1239,7 +1239,7 @@ Failed to parse arguments, terminating Stan
 %
 The problem is that we forgot to specify a method.
 
-All \Stan arguments have default values, except for the method.  This
+All Stan arguments have default values, except for the method.  This
 is the only argument that must be specified by the user and a model
 will not run without it (not to say that the model will run without error,
 for example a model that requires data will eventually fail unless an input file
