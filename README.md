@@ -12,6 +12,8 @@
 * a full first- and higher-order automatic differentiation library based on C++ template overloads, and
 * a supporting fully-templated matrix, linear algebra, and probability special function library.
 
+[![DOI](https://zenodo.org/badge/16967338.svg)](https://zenodo.org/badge/latestdoi/16967338)
+
 ### Home Page
 Stan's home page, with links to everything you'll need to use Stan is:
 

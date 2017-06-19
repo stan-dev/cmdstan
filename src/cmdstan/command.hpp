@@ -10,8 +10,10 @@
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/logger.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
@@ -57,7 +59,8 @@ namespace cmdstan {
   int command(int argc, const char* argv[]) {
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
-
+    stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
+                                          std::cerr, std::cerr);
 
     // Read arguments
     std::vector<argument*> valid_arguments;
@@ -135,7 +138,7 @@ namespace cmdstan {
                                                          init_radius,
                                                          epsilon, error,
                                                          interrupt,
-                                                         info,
+                                                         logger,
                                                          init_writer,
                                                          sample_writer);
       }
@@ -153,7 +156,7 @@ namespace cmdstan {
                                                        num_iterations,
                                                        save_iterations,
                                                        interrupt,
-                                                       info,
+                                                       logger,
                                                        init_writer,
                                                        sample_writer);
       } else if (algo->value() == "bfgs") {
@@ -179,7 +182,7 @@ namespace cmdstan {
                                                      save_iterations,
                                                      refresh,
                                                      interrupt,
-                                                     info,
+                                                     logger,
                                                      init_writer,
                                                      sample_writer);
       } else if (algo->value() == "lbfgs") {
@@ -207,7 +210,7 @@ namespace cmdstan {
                                                       save_iterations,
                                                       refresh,
                                                       interrupt,
-                                                      info,
+                                                      logger,
                                                       init_writer,
                                                       sample_writer);
       }
@@ -233,8 +236,7 @@ namespace cmdstan {
                                                           num_thin,
                                                           refresh,
                                                           interrupt,
-                                                          info,
-                                                          err,
+                                                          logger,
                                                           init_writer,
                                                           sample_writer,
                                                           diagnostic_writer);
@@ -263,8 +265,7 @@ namespace cmdstan {
                                                                  stepsize_jitter,
                                                                  max_depth,
                                                                  interrupt,
-                                                                 info,
-                                                                 err,
+                                                                 logger,
                                                                  init_writer,
                                                                  sample_writer,
                                                                  diagnostic_writer);
@@ -298,8 +299,7 @@ namespace cmdstan {
                                                                        term_buffer,
                                                                        window,
                                                                        interrupt,
-                                                                       info,
-                                                                       err,
+                                                                       logger,
                                                                        init_writer,
                                                                        sample_writer,
                                                                        diagnostic_writer);
@@ -320,8 +320,7 @@ namespace cmdstan {
                                                                 stepsize_jitter,
                                                                 max_depth,
                                                                 interrupt,
-                                                                info,
-                                                                err,
+                                                                logger,
                                                                 init_writer,
                                                                 sample_writer,
                                                                 diagnostic_writer);
@@ -356,8 +355,7 @@ namespace cmdstan {
                                                                       term_buffer,
                                                                       window,
                                                                       interrupt,
-                                                                      info,
-                                                                      err,
+                                                                      logger,
                                                                       init_writer,
                                                                       sample_writer,
                                                                       diagnostic_writer);
@@ -378,8 +376,7 @@ namespace cmdstan {
                                                                 stepsize_jitter,
                                                                 max_depth,
                                                                 interrupt,
-                                                                info,
-                                                                err,
+                                                                logger,
                                                                 init_writer,
                                                                 sample_writer,
                                                                 diagnostic_writer);
@@ -408,8 +405,7 @@ namespace cmdstan {
                                                                       kappa,
                                                                       t0,
                                                                       interrupt,
-                                                                      info,
-                                                                      err,
+                                                                      logger,
                                                                       init_writer,
                                                                       sample_writer,
                                                                       diagnostic_writer);
@@ -430,8 +426,7 @@ namespace cmdstan {
                                                                    stepsize_jitter,
                                                                    int_time,
                                                                    interrupt,
-                                                                   info,
-                                                                   err,
+                                                                   logger,
                                                                    init_writer,
                                                                    sample_writer,
                                                                    diagnostic_writer);
@@ -466,8 +461,7 @@ namespace cmdstan {
                                                                          term_buffer,
                                                                          window,
                                                                          interrupt,
-                                                                         info,
-                                                                         err,
+                                                                         logger,
                                                                          init_writer,
                                                                          sample_writer,
                                                                          diagnostic_writer);
@@ -488,8 +482,7 @@ namespace cmdstan {
                                                                   stepsize_jitter,
                                                                   int_time,
                                                                   interrupt,
-                                                                  info,
-                                                                  err,
+                                                                  logger,
                                                                   init_writer,
                                                                   sample_writer,
                                                                   diagnostic_writer);
@@ -524,8 +517,7 @@ namespace cmdstan {
                                                                         term_buffer,
                                                                         window,
                                                                         interrupt,
-                                                                        info,
-                                                                        err,
+                                                                        logger,
                                                                         init_writer,
                                                                         sample_writer,
                                                                         diagnostic_writer);
@@ -546,8 +538,7 @@ namespace cmdstan {
                                                                   stepsize_jitter,
                                                                   int_time,
                                                                   interrupt,
-                                                                  info,
-                                                                  err,
+                                                                  logger,
                                                                   init_writer,
                                                                   sample_writer,
                                                                   diagnostic_writer);
@@ -576,8 +567,7 @@ namespace cmdstan {
                                                                         kappa,
                                                                         t0,
                                                                         interrupt,
-                                                                        info,
-                                                                        err,
+                                                                        logger,
                                                                         init_writer,
                                                                         sample_writer,
                                                                         diagnostic_writer);
@@ -611,7 +601,7 @@ namespace cmdstan {
                                                                    eval_elbo,
                                                                    output_samples,
                                                                    interrupt,
-                                                                   info,
+                                                                   logger,
                                                                    init_writer,
                                                                    sample_writer,
                                                                    diagnostic_writer);
@@ -631,7 +621,7 @@ namespace cmdstan {
                                                                     eval_elbo,
                                                                     output_samples,
                                                                     interrupt,
-                                                                    info,
+                                                                    logger,
                                                                     init_writer,
                                                                     sample_writer,
                                                                     diagnostic_writer);
