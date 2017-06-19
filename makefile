@@ -39,7 +39,7 @@ STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.15.0
+CMDSTAN_VERSION := 2.16.0
 
 ##
 # Get information about the compiler used.
