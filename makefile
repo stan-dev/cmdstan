@@ -55,8 +55,8 @@ include $(MATH)make/detect_cc
 ##
 # These includes should update the following variables
 # based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
+#   - CXXFLAGS
+#   - GTEST_CXXFLAGS
 #   - EXE
 ##
 include $(MATH)make/detect_os
@@ -104,7 +104,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -114,7 +114,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
