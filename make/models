@@ -10,9 +10,9 @@ $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 ifneq (,$(findstring allow_undefined,$(STANCFLAGS)))
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(USER_HEADER) $(LIBCVODES) $(LDLIBS)
+	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(USER_HEADER) $(LIBCVODES)
 else
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES) $(LDLIBS)
+	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES)
 endif
 
 .PRECIOUS: %.hpp
