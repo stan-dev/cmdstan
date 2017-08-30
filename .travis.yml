@@ -32,10 +32,12 @@ matrix:
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
+          PARALLEL=2
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
+          PARALLEL=1
 
 script:
   - git submodule foreach 'echo $path `git rev-parse HEAD`'
-  - ./runCmdStanTests.py -j2 src/test/interface
+  - ./runCmdStanTests.py -j$PARALLEL src/test/interface
