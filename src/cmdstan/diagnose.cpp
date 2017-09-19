@@ -78,7 +78,7 @@ int main(int argc, const char* argv[]) {
       if (max >= max_limit) {
         int n_max = 0;
         Eigen::VectorXd t_samples = chains.samples(i);
-        for (size_t n = 0; n < t_samples.size(); ++n)
+        for (long n = 0; n < t_samples.size(); ++n)
           if (t_samples(n) == max) ++n_max;
 
         std::cout << n_max << " of " << num_samples << " ("
@@ -119,7 +119,7 @@ int main(int argc, const char* argv[]) {
       e_mean += e_samples(0);
       e_var += e_samples(0) * (e_samples(0) - e_mean);
 
-      for (size_t n = 1; n < e_samples.size(); ++n) {
+      for (long n = 1; n < e_samples.size(); ++n) {
         double e = e_samples(n);
 
         double delta_e_sq = (e - e_samples(n - 1)) * (e - e_samples(n - 1));
@@ -160,7 +160,7 @@ int main(int argc, const char* argv[]) {
     std::cout << "The following parameters had fewer than 0.001 effective"
               << " samples per transition:" << std::endl;
     std::cout << "  ";
-    for (int n = 0; n < bad_n_eff_names.size() - 1; ++n)
+    for (size_t n = 0; n < bad_n_eff_names.size() - 1; ++n)
       std::cout << bad_n_eff_names.at(n) << ", ";
     std::cout << bad_n_eff_names.back() << std::endl;
 
@@ -174,7 +174,7 @@ int main(int argc, const char* argv[]) {
     std::cout << "The following parameters had split R-hat less than 1.1:"
               << std::endl;
     std::cout << "  ";
-    for (int n = 0; n < bad_rhat_names.size() - 1; ++n)
+    for (size_t n = 0; n < bad_rhat_names.size() - 1; ++n)
       std::cout << bad_rhat_names.at(n) << ", ";
     std::cout << bad_rhat_names.back() << std::endl;
 
