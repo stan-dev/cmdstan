@@ -26,20 +26,22 @@ AR = ar
 ##
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
--include $(MATH)make/libraries
+include $(MATH)make/libraries
 
 ##
 # Set default compiler options.
 ## 
-CFLAGS = -I src -I $(STAN)src -isystem $(MATH) -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -Wall -DEIGEN_NO_DEBUG  -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DFUSION_MAX_VECTOR_SIZE=12 -DNO_FPRINTF_OUTPUT -pipe 
-CFLAGS_GTEST = -DGTEST_USE_OWN_TR1_TUPLE
-LDLIBS = 
+include $(MATH)make/default_compiler_options
+CXXFLAGS += -I src -I $(STAN)src -isystem $(MATH) -DEIGEN_NO_DEBUG -DFUSION_MAX_VECTOR_SIZE=12
 LDLIBS_STANC = -Lbin -lstanc
 STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
-EXE = 
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.16.0
+CMDSTAN_VERSION := 2.17.0
+
+-include make/local
+
+CXX = $(CC)
 
 ##
 # Get information about the compiler used.
@@ -47,34 +49,34 @@ CMDSTAN_VERSION := 2.16.0
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
--include $(STAN)make/detect_cc
+include $(MATH)make/detect_cc
 
 # OS is set automatically by this script
 ##
 # These includes should update the following variables
 # based on the OS:
-#   - CFLAGS
-#   - CFLAGS_GTEST
+#   - CXXFLAGS
+#   - GTEST_CXXFLAGS
 #   - EXE
 ##
--include $(STAN)make/detect_os
+include $(MATH)make/detect_os
 
 ##
 # Get information about the version of make.
 ##
--include $(STAN)make/detect_make
+-include $(MATH)make/detect_make
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.c) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
 
 %$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.c) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES) $(LDLIBS)
+	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES)
 
 
 ##
@@ -82,14 +84,14 @@ CMDSTAN_VERSION := 2.16.0
 ##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
 
 
 ##
@@ -102,7 +104,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -112,7 +114,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(CC) $(CFLAGS) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi

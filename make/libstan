@@ -7,9 +7,7 @@ bin/libstanc.a : $(TEMPLATE_INSTANTIATION)
 
 $(TEMPLATE_INSTANTIATION) : bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
-
+	$(COMPILE.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
 ##
 # Generate dependencies for libraries

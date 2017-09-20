@@ -1,19 +1,19 @@
 .PRECIOUS: bin/stanc$(EXE)
 bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS) $(LDLIBS_STANC)
+	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 .PRECIOUS: bin/print$(EXE)
 bin/print$(EXE) : bin/cmdstan/print.o
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
 .PRECIOUS: bin/stansummary$(EXE)
 bin/stansummary$(EXE) : bin/cmdstan/stansummary.o
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
 .PRECIOUS: bin/diagnose$(EXE)
 bin/diagnose$(EXE) : bin/cmdstan/diagnose.o
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS)
+	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<

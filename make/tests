@@ -4,7 +4,7 @@
 ##
 LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
-CFLAGS_GTEST += -I $(GTEST)/include -I $(GTEST)
+GTEST_CXXFLAGS += -I $(GTEST)/include -I $(GTEST)
 
 ##
 # target path_separator for use in some tests that need to
@@ -38,7 +38,7 @@ test/dummy.cpp:
 	@echo "int main() {return 0;}" >> $@
 
 %.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.c) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
+	$(COMPILE.cc) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
 
 ##
 # Build the google test library.
@@ -47,11 +47,11 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
 
 test/%.o : src/test/%.cpp 
 	@mkdir -p $(dir $@)
-	$(COMPILE.c) -O$O $(CFLAGS_GTEST) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
 
 ##
 # TEST_TARGETS is the set of all src/test subdirectories excluding src/test.
@@ -69,7 +69,7 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%.cpp,%$(EXE),$(ALL_TESTS))
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBCVODES)
 	@mkdir -p $(dir $@)
-	$(LINK.c) -O$O $(GTEST_MAIN) $< $(CFLAGS_GTEST) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBCVODES)
+	$(LINK.cc) -O$O $(GTEST_MAIN) $< $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LIBCVODES)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
 	$(WINE) $@ --gtest_output="xml:$(basename $@).xml"
 endif
