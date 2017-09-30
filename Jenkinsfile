@@ -18,7 +18,10 @@ pipeline {
             steps { sh './runCmdStanTests.py src/test/interface' }
         }
         stage('Manual') {
-            steps { sh 'make manual' }
+            steps {
+                sh 'make manual'
+                archiveArtifacts 'doc/*'
+            }
         }
     }
     post {
