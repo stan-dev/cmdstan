@@ -5,7 +5,6 @@
 #include <cmdstan/arguments/arg_data.hpp>
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
-#include <cmdstan/arguments/arg_metric_file.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
@@ -68,7 +67,6 @@ namespace cmdstan {
     valid_arguments.push_back(new arg_id());
     valid_arguments.push_back(new arg_data());
     valid_arguments.push_back(new arg_init());
-    valid_arguments.push_back(new arg_metric_file());
     valid_arguments.push_back(new arg_random());
     valid_arguments.push_back(new arg_output());
     argument_parser parser(valid_arguments);
@@ -126,9 +124,6 @@ namespace cmdstan {
     } catch (const boost::bad_lexical_cast& e) {
     }
     stan::io::dump init_context(get_var_context(init));
-
-    string_argument* metric_file = dynamic_cast<string_argument*>(parser.arg("metric_file"));
-    stan::io::dump metric_context(get_var_context(metric_file->value()));
 
     int return_code = stan::services::error_codes::CONFIG;
     if (parser.arg("method")->arg("diagnose")) {
@@ -227,7 +222,6 @@ namespace cmdstan {
       list_argument* algo = dynamic_cast<list_argument*>(parser.arg("method")->arg("sample")->arg("algorithm"));
       categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
       bool adapt_engaged = dynamic_cast<bool_argument*>(adapt->arg("engaged"))->value();
-      bool metric_supplied = !metric_file->is_default();
 
       if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
         info("Must use algorithm=fixed_param for model that has no parameters.");
@@ -249,6 +243,9 @@ namespace cmdstan {
       } else if (algo->value() == "hmc") {
         list_argument* engine = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("engine"));
         list_argument* metric = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("metric"));
+        string_argument* metric_file = dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"));
+        stan::io::dump metric_context(get_var_context(metric_file->value()));
+        bool metric_supplied = !metric_file->is_default();
         categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
 
         categorical_argument* hmc = dynamic_cast<categorical_argument*>(algo->arg("hmc"));

@@ -789,6 +789,17 @@ metric.  These can be specified with the values \code{unit\_e},
 
 Future versions of Stan will also include dynamic metrics associated
 with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
+
+By default, the metric is estimated during warmup. However, when using a
+\code{diag\_e} and \code{dense\_e} or metric, the metric can instead be
+specified with the \code{metric\_file} argument. If provided, the
+\code{metric\_file} should contain a single variable, \code{inv\_metric},
+which for a \code{diag\_e} metric should be a vector
+of positive values, one for each parameter in the system. For a \code{dense\_e}
+metric, \code{inv\_metric} should be a positive-definite square matrix with
+number of rows and columns equal to the number of parameters in the model.
+The file pointed at by \code{metric\_file} should have the same format as
+the input data. This option can be used with and without adaptation enabled.
 %
 \begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
@@ -804,6 +815,11 @@ with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
 %
           \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{dense\_e}}
             {Euclidean manifold with dense metric}
+
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric\_file}{$$string$$}
+          {Input file with precomputed Euclidean metric}
+          {Valid values: \  Valid path}
+          {Defaults to empty path}
 \end{description}
 %
 
@@ -1499,6 +1515,11 @@ sample
         dense_e
           Euclidean manifold with dense metric
 
+      metric_file=<string>
+        Input file with precomputed Euclidean metric
+        Valid values: Path to existing file
+        Defaults to ""
+
       stepsize=<double>
         Step size for discrete evolution
         Valid values: 0 < stepsize
@@ -1578,6 +1599,7 @@ for Stan.  The full set of configuration options is in
                      engine=nuts                        \
                        [max_depth=<int>]                \
                      [metric={unit_e,diag_e,dense_e}]   \
+                     [metric_file=<string>]             \
                      [stepsize=<double>]                \
                      [stepsize_jitter=<double>]         \
                  [num_samples=<int>]                    \
@@ -1639,6 +1661,7 @@ interdependence.
                      engine=static                      \
                        [int_time=<double>]              \
                      [metric={unit_e,diag_e,dense_e}]   \
+                     [metric_file=<string>]             \
                      [stepsize=<double>]                \
                      [stepsize_jitter=<double>]         \
                  [num_samples=<int>]                    \
