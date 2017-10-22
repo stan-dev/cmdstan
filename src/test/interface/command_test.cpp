@@ -4,6 +4,7 @@
 #include <string>
 #include <test/utility.hpp>
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
@@ -308,6 +309,132 @@ TEST(StanUiCommand, run_info) {
   EXPECT_EQ(1, count_matches(" num_warmup = 10", output));
   EXPECT_EQ(1, count_matches(" init = 0", output));
 }
+
+
+TEST(StanUiCommand, random_seed_default) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+  
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  std::vector<std::string> lines;
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random1;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random1.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random1));
+      EXPECT_EQ(1, count_matches("]", random1));
+      break;
+    }
+  }
+  cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random2;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random2.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random2));
+      EXPECT_EQ(1, count_matches("]", random2));
+      break;
+    }
+  }
+  EXPECT_NE(random1,random2);
+}
+
+TEST(StanUiCommand, random_seed_specified_same) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+  
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=12345 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  std::vector<std::string> lines;
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random1;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random1.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random1));
+      EXPECT_EQ(1, count_matches("]", random1));
+      break;
+    }
+  }
+  cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random2;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random2.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random2));
+      EXPECT_EQ(1, count_matches("]", random2));
+      break;
+    }
+  }
+  EXPECT_EQ(random1,random2);
+}
+
+TEST(StanUiCommand, random_seed_specified_different) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+  
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=12345 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  std::vector<std::string> lines;
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random1;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random1.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random1));
+      EXPECT_EQ(1, count_matches("]", random1));
+      break;
+    }
+  }
+  command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=45678 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  cmd_output = run_command(command).output;
+  EXPECT_EQ(1, count_matches("y values:", cmd_output));
+  split(lines, cmd_output, boost::is_any_of("\n"));
+  std::string random2;
+  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
+    if (boost::starts_with(*it,"y values:")) {
+      random2.assign(*it,9,std::string::npos);
+      EXPECT_EQ(1, count_matches("[", random2));
+      EXPECT_EQ(1, count_matches("]", random2));
+      break;
+    }
+  }
+  EXPECT_NE(random1,random2);
+}
+
 
 
 // 
