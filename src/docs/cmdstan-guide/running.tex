@@ -789,6 +789,53 @@ metric.  These can be specified with the values \code{unit\_e},
 
 Future versions of Stan will also include dynamic metrics associated
 with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
+
+By default, the metric is estimated during warmup.
+However, when using a \code{diag\_e} or \code{dense\_e} metric, an initial guess
+for the metric can be specified with the \code{metric\_file} argument.
+If provided, the \code{metric\_file} should contain a single variable,
+\code{inv\_metric}, which for a \code{diag\_e} metric should be a vector
+of positive values, one for each parameter in the system. For a \code{dense\_e}
+metric, \code{inv\_metric} should be a positive-definite square matrix with
+number of rows and columns equal to the number of parameters in the model.
+The file pointed at by \code{metric\_file} should use the data dump format (the
+same format the input data uses). For examples of specifying a vector in the
+data dump format (as is needed for specifying a \code{diag\_e} metric),
+see \refsection{sequence-variables}. For examples of specifying a matrix in the
+data dump format (as is needed for specifying a \code{dense\_e} metric),
+see \refsection{array-variables}.
+
+The \code{metric\_file} option can be used with and without adaptation enabled.
+
+If adaptation is enabled, the provided metric will be used as the initial
+guess in the adaptation process. If the initial guess is good, then adaptation
+should not change it much. If the metric is no good, then the adaptation will
+override the initial guess. An example of running the sampler with adaptation
+enabled without specifying a stepsize is
+
+\begin{quote}
+  \begin{Verbatim}[fontshape=sl]
+    > ./model sample algorithm=hmc  \
+              metric_file=model.metric.data.R  \
+              data file=model.data.R init=model.init.R
+  \end{Verbatim}
+\end{quote}
+
+If adaptation is disabled, both a \code{metric\_file} and \code{stepsize}
+should be provided to the sampler. Disabling adaptation disables both metric
+and stepsize adaptation, so a stepsize should be provided along with a metric
+to enable efficient sampling. An example of providing a \code{metric\_file}
+and \code{stepsize} with adaptation disabled is
+
+\begin{quote}
+  \begin{Verbatim}[fontshape=sl]
+    > ./model sample adapt engaged=0 algorithm=hmc  \
+              metric_file=model.metric.data.R  \
+              stepsize=0.1 data file=model.data.R  \
+              init=model.init.R
+  \end{Verbatim}
+\end{quote}
+
 %
 \begin{description}
         \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric}{$$list element$$}
@@ -804,6 +851,11 @@ with \textit{Riemannian} HMC \citep{GirolamiCalderhead:2011, Betancourt:2012}.
 %
           \hiershortcmd{\indentarrow\indentarrow\indentarrow\indentarrow\indentarrow}{\farg{dense\_e}}
             {Euclidean manifold with dense metric}
+
+        \hiercmdarg{\indentarrow\indentarrow\indentarrow\indentarrow}{metric\_file}{$$string$$}
+          {Input file with precomputed Euclidean metric}
+          {Valid values: \  Valid path}
+          {Defaults to empty path}
 \end{description}
 %
 
@@ -1499,6 +1551,11 @@ sample
         dense_e
           Euclidean manifold with dense metric
 
+      metric_file=<string>
+        Input file with precomputed Euclidean metric
+        Valid values: Path to existing file
+        Defaults to ""
+
       stepsize=<double>
         Step size for discrete evolution
         Valid values: 0 < stepsize
@@ -1578,6 +1635,7 @@ for Stan.  The full set of configuration options is in
                      engine=nuts                        \
                        [max_depth=<int>]                \
                      [metric={unit_e,diag_e,dense_e}]   \
+                     [metric_file=<string>]             \
                      [stepsize=<double>]                \
                      [stepsize_jitter=<double>]         \
                  [num_samples=<int>]                    \
@@ -1639,6 +1697,7 @@ interdependence.
                      engine=static                      \
                        [int_time=<double>]              \
                      [metric={unit_e,diag_e,dense_e}]   \
+                     [metric_file=<string>]             \
                      [stepsize=<double>]                \
                      [stepsize_jitter=<double>]         \
                  [num_samples=<int>]                    \
