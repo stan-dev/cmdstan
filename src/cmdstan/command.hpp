@@ -243,13 +243,16 @@ namespace cmdstan {
       } else if (algo->value() == "hmc") {
         list_argument* engine = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("engine"));
         list_argument* metric = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("metric"));
+        string_argument* metric_file = dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"));
+        stan::io::dump metric_context(get_var_context(metric_file->value()));
+        bool metric_supplied = !metric_file->is_default();
         categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
 
         categorical_argument* hmc = dynamic_cast<categorical_argument*>(algo->arg("hmc"));
         double stepsize = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
         double stepsize_jitter= dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
 
-        if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false) {
+        if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
                                                                  init_context,
@@ -269,7 +272,28 @@ namespace cmdstan {
                                                                  init_writer,
                                                                  sample_writer,
                                                                  diagnostic_writer);
-        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == true) {
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == true) {
+          int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
+          return_code = stan::services::sample::hmc_nuts_dense_e(model,
+                                                                 init_context,
+                                                                 metric_context,
+                                                                 random_seed,
+                                                                 id,
+                                                                 init_radius,
+                                                                 num_warmup,
+                                                                 num_samples,
+                                                                 num_thin,
+                                                                 save_warmup,
+                                                                 refresh,
+                                                                 stepsize,
+                                                                 stepsize_jitter,
+                                                                 max_depth,
+                                                                 interrupt,
+                                                                 logger,
+                                                                 init_writer,
+                                                                 sample_writer,
+                                                                 diagnostic_writer);
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == true && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
           double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
@@ -303,7 +327,42 @@ namespace cmdstan {
                                                                        init_writer,
                                                                        sample_writer,
                                                                        diagnostic_writer);
-        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == false) {
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == true && metric_supplied == true) {
+          int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
+          double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+          double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+          double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+          double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+          unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+          unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+          unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+          return_code = stan::services::sample::hmc_nuts_dense_e_adapt(model,
+                                                                       init_context,
+                                                                       metric_context,
+                                                                       random_seed,
+                                                                       id,
+                                                                       init_radius,
+                                                                       num_warmup,
+                                                                       num_samples,
+                                                                       num_thin,
+                                                                       save_warmup,
+                                                                       refresh,
+                                                                       stepsize,
+                                                                       stepsize_jitter,
+                                                                       max_depth,
+                                                                       delta,
+                                                                       gamma,
+                                                                       kappa,
+                                                                       t0,
+                                                                       init_buffer,
+                                                                       term_buffer,
+                                                                       window,
+                                                                       interrupt,
+                                                                       logger,
+                                                                       init_writer,
+                                                                       sample_writer,
+                                                                       diagnostic_writer);
+        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == false && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
           int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e(model,
@@ -324,7 +383,29 @@ namespace cmdstan {
                                                                 init_writer,
                                                                 sample_writer,
                                                                 diagnostic_writer);
-        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == true) {
+        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == false && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
+          int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
+          return_code = stan::services::sample::hmc_nuts_diag_e(model,
+                                                                init_context,
+                                                                metric_context,
+                                                                random_seed,
+                                                                id,
+                                                                init_radius,
+                                                                num_warmup,
+                                                                num_samples,
+                                                                num_thin,
+                                                                save_warmup,
+                                                                refresh,
+                                                                stepsize,
+                                                                stepsize_jitter,
+                                                                max_depth,
+                                                                interrupt,
+                                                                logger,
+                                                                init_writer,
+                                                                sample_writer,
+                                                                diagnostic_writer);
+        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == true && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
           int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
           double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
@@ -336,6 +417,42 @@ namespace cmdstan {
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e_adapt(model,
                                                                       init_context,
+                                                                      random_seed,
+                                                                      id,
+                                                                      init_radius,
+                                                                      num_warmup,
+                                                                      num_samples,
+                                                                      num_thin,
+                                                                      save_warmup,
+                                                                      refresh,
+                                                                      stepsize,
+                                                                      stepsize_jitter,
+                                                                      max_depth,
+                                                                      delta,
+                                                                      gamma,
+                                                                      kappa,
+                                                                      t0,
+                                                                      init_buffer,
+                                                                      term_buffer,
+                                                                      window,
+                                                                      interrupt,
+                                                                      logger,
+                                                                      init_writer,
+                                                                      sample_writer,
+                                                                      diagnostic_writer);
+        } else if (engine->value() == "nuts" && metric->value() == "diag_e" && adapt_engaged == true && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
+          int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
+          double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+          double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+          double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+          double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+          unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+          unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+          unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+          return_code = stan::services::sample::hmc_nuts_diag_e_adapt(model,
+                                                                      init_context,
+                                                                      metric_context,
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
@@ -409,7 +526,7 @@ namespace cmdstan {
                                                                       init_writer,
                                                                       sample_writer,
                                                                       diagnostic_writer);
-        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == false) {
+        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_dense_e(model,
@@ -430,7 +547,29 @@ namespace cmdstan {
                                                                    init_writer,
                                                                    sample_writer,
                                                                    diagnostic_writer);
-        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == true) {
+        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
+          double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+          return_code = stan::services::sample::hmc_static_dense_e(model,
+                                                                   init_context,
+                                                                   metric_context,
+                                                                   random_seed,
+                                                                   id,
+                                                                   init_radius,
+                                                                   num_warmup,
+                                                                   num_samples,
+                                                                   num_thin,
+                                                                   save_warmup,
+                                                                   refresh,
+                                                                   stepsize,
+                                                                   stepsize_jitter,
+                                                                   int_time,
+                                                                   interrupt,
+                                                                   logger,
+                                                                   init_writer,
+                                                                   sample_writer,
+                                                                   diagnostic_writer);
+        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == true && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
@@ -465,7 +604,43 @@ namespace cmdstan {
                                                                          init_writer,
                                                                          sample_writer,
                                                                          diagnostic_writer);
-        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == false) {
+        } else if (engine->value() == "static" && metric->value() == "dense_e" && adapt_engaged == true && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
+          double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+          double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+          double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+          double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+          double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+          unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+          unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+          unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+          return_code = stan::services::sample::hmc_static_dense_e_adapt(model,
+                                                                         init_context,
+                                                                         metric_context,
+                                                                         random_seed,
+                                                                         id,
+                                                                         init_radius,
+                                                                         num_warmup,
+                                                                         num_samples,
+                                                                         num_thin,
+                                                                         save_warmup,
+                                                                         refresh,
+                                                                         stepsize,
+                                                                         stepsize_jitter,
+                                                                         int_time,
+                                                                         delta,
+                                                                         gamma,
+                                                                         kappa,
+                                                                         t0,
+                                                                         init_buffer,
+                                                                         term_buffer,
+                                                                         window,
+                                                                         interrupt,
+                                                                         logger,
+                                                                         init_writer,
+                                                                         sample_writer,
+                                                                         diagnostic_writer);
+        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == false && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_diag_e(model,
@@ -486,7 +661,29 @@ namespace cmdstan {
                                                                   init_writer,
                                                                   sample_writer,
                                                                   diagnostic_writer);
-        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == true) {
+        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == false && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
+          double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+          return_code = stan::services::sample::hmc_static_diag_e(model,
+                                                                  init_context,
+                                                                  metric_context,
+                                                                  random_seed,
+                                                                  id,
+                                                                  init_radius,
+                                                                  num_warmup,
+                                                                  num_samples,
+                                                                  num_thin,
+                                                                  save_warmup,
+                                                                  refresh,
+                                                                  stepsize,
+                                                                  stepsize_jitter,
+                                                                  int_time,
+                                                                  interrupt,
+                                                                  logger,
+                                                                  init_writer,
+                                                                  sample_writer,
+                                                                  diagnostic_writer);
+        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == true && metric_supplied == false) {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
@@ -498,6 +695,42 @@ namespace cmdstan {
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_static_diag_e_adapt(model,
                                                                         init_context,
+                                                                        random_seed,
+                                                                        id,
+                                                                        init_radius,
+                                                                        num_warmup,
+                                                                        num_samples,
+                                                                        num_thin,
+                                                                        save_warmup,
+                                                                        refresh,
+                                                                        stepsize,
+                                                                        stepsize_jitter,
+                                                                        int_time,
+                                                                        delta,
+                                                                        gamma,
+                                                                        kappa,
+                                                                        t0,
+                                                                        init_buffer,
+                                                                        term_buffer,
+                                                                        window,
+                                                                        interrupt,
+                                                                        logger,
+                                                                        init_writer,
+                                                                        sample_writer,
+                                                                        diagnostic_writer);
+        } else if (engine->value() == "static" && metric->value() == "diag_e" && adapt_engaged == true && metric_supplied == true) {
+          categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
+          double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
+          double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+          double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+          double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+          double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+          unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+          unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+          unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+          return_code = stan::services::sample::hmc_static_diag_e_adapt(model,
+                                                                        init_context,
+                                                                        metric_context,
                                                                         random_seed,
                                                                         id,
                                                                         init_radius,
