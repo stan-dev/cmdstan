@@ -1,4 +1,4 @@
-\chapter{{\tt\bfseries diagnose}: Output Sanity Checking}\label{diagnose.chapter}
+\chapter{{\tt\bfseries diagnose}: Diagnosing Biased Hamiltonian Monte Carlo Inferences}\label{diagnose.chapter}
 
 \noindent
 \CmdStan is distributed with a utility that is able to read in and
@@ -14,9 +14,10 @@ following potential problems:
 \end{itemize}
 
 The meanings of several of these problems are discussed in
-\url{http://mc-stan.org/misc/warnings.html#runtime-warnings}.
+\url{http://mc-stan.org/misc/warnings.html#runtime-warnings}
+and \url{https://arxiv.org/abs/1701.02434}.
 
-% This section cribbed from a similar section in stansummary
+
 \section{Building the {\tt\bfseries diagnose} Command}
 
 \CmdStan's \code{diagnose} command is built along with \code{stanc} into
@@ -33,7 +34,6 @@ makefile as follows.
 
 \section{Running the {\tt\bfseries diagnose} Command}
 
-% This paragraph is cribbed from a similar section in stansummary
 The \code{diagnose} command is executed on one or more output files,
 which are provided as command-line arguments separated by spaces. As
 an example, the ``eight schools'' model from Stan's example models and
@@ -105,6 +105,11 @@ If there are no apparent problems with the output files passed to
 \caption{Example output from \code{bin/diagnose}.}
 \label{bin-diagnose-eg.figure}
 \end{figure}
+
+The online references (\url{http://mc-stan.org/misc/warnings.html#runtime-warnings}
+and \url{https://arxiv.org/abs/1701.02434}) contain suggestions for
+other diagnostic warning; however the correct resolution is
+necessarily model specific, hence all suggestions general guidelines only.
 
 %%% Local Variables:
 %%% mode: latex
