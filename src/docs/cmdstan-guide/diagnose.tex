@@ -1,0 +1,117 @@
+\chapter{{\tt\bfseries diagnose}: Diagnosing Biased Hamiltonian Monte Carlo Inferences}\label{diagnose.chapter}
+
+\noindent
+\CmdStan is distributed with a utility that is able to read in and
+analyze the output of one or more Markov chains to check for the
+following potential problems:
+
+\begin{itemize}
+\item Transitions that hit the maximum treedepth
+\item Divergent transitions
+\item Low E-BFMI values
+\item Low effective sample sizes
+\item High $\hat{R}$ values
+\end{itemize}
+
+The meanings of several of these problems are discussed in
+\url{http://mc-stan.org/misc/warnings.html#runtime-warnings}
+and \url{https://arxiv.org/abs/1701.02434}.
+
+
+\section{Building the {\tt\bfseries diagnose} Command}
+
+\CmdStan's \code{diagnose} command is built along with \code{stanc} into
+the \code{bin} directory. It can be compiled directly using the
+makefile as follows.
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> cd <cmdstan-home>
+> make bin/diagnose
+\end{Verbatim}
+\end{quote}
+%
+
+\section{Running the {\tt\bfseries diagnose} Command}
+
+The \code{diagnose} command is executed on one or more output files,
+which are provided as command-line arguments separated by spaces. As
+an example, the ``eight schools'' model from Stan's example models and
+its corresponding data will be used.%
+%
+\footnote{The model and associated data files are here:
+  \begin{itemize}
+  \item
+    \url{https://github.com/stan-dev/example-models/blob/master/misc/eight_schools/eight_schools.stan}
+  \item
+    \url{https://github.com/stan-dev/example-models/blob/master/misc/eight_schools/eight_schools.data.R}
+  \end{itemize}
+}
+The model is run with four chains and the random seed 12345, leaving
+the output files \code{eight\_schools1.csv}, \code{eight\_schools2.csv},
+etc. The \code{diagnose} command is then run as follows:
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> bin/diagnose eight_schools*.csv
+\end{Verbatim}
+\end{quote}
+The result of \code{bin/diagnose} is displayed in
+\reffigure{bin-diagnose-eg}, indicating two problems, one with
+divergent transitions, and one indicating a low E-BFMI, and possible
+ways to solve these problems. The first problem indicates that the
+parameter \code{delta} of the sampling algorithm needs to be
+increased. Since the contents of \code{eight\_schools1.csv} contains
+the lines
+\begin{quote}
+\begin{Verbatim}
+#     adapt
+#       engaged = 1 (Default)
+#       gamma = 0.050000000000000003 (Default)
+#       delta = 0.80000000000000004 (Default)
+\end{Verbatim}
+\end{quote}
+this suggests that \code{delta} should be increased beyond
+0.8. Following section~\ref{detailed-command-arguments.section}, this
+suggests that the model perhaps should be rerun as follows:
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> for i in {1..4}
+  do
+    ./eight_schools sample adapt delta=0.9 \
+       random seed=12345 id=$i data \
+       file=eight_schools.data.R \
+       output file=eight_schools$i.csv &
+  done
+\end{Verbatim}
+\end{quote}
+
+If there are no apparent problems with the output files passed to
+\code{bin/diagnose}, it prints nothing.
+
+\begin{figure}
+\begin{Verbatim}[fontsize=\footnotesize]
+  95 of 4000 (2.4%) transitions ended with a divergence.  These
+  divergent transitions indicate that HMC is not fully able to explore
+  the posterior distribution.  Try rerunning with adapt delta set to a
+  larger value and see if the divergences vanish.  If increasing adapt
+  delta towards 1 does not remove the divergences then you will likely
+  need to reparameterize your model.
+
+  The E-BFMI, 0.27, is below the nominal threshold of 0.3 which
+  suggests that HMC may have trouble exploring the target
+  distribution.  You should consider any reparameterizations if
+  possible.
+\end{Verbatim}
+\caption{Example output from \code{bin/diagnose}.}
+\label{bin-diagnose-eg.figure}
+\end{figure}
+
+The online references (\url{http://mc-stan.org/misc/warnings.html#runtime-warnings}
+and \url{https://arxiv.org/abs/1701.02434}) contain suggestions for
+other diagnostic warning; however the correct resolution is
+necessarily model specific, hence all suggestions general guidelines only.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "cmdstan-guide"
+%%% End:
