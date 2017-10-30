@@ -18,8 +18,10 @@ pipeline {
         disableConcurrentBuilds()
     }
     parameters {
-        string(defaultValue: '', name: 'stan_pr')
-        string(defaultValue: '', name: 'math_pr')
+        string(defaultValue: '', name: 'stan_pr',
+          description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
+        string(defaultValue: '', name: 'math_pr',
+          description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
     stages {
         stage('Clean & Setup') {
