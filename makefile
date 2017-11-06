@@ -249,6 +249,7 @@ clean-manual:
 
 clean-all: clean clean-libraries
 	$(RM) -r bin
+	$(RM) $(STAN)src/stan/model/model_header.hpp.gch
 
 ##
 # Submodule related tasks
