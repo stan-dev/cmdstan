@@ -108,7 +108,7 @@ The Boost source code is distributed with \CmdStan.
 \subsubsection{Eigen Matrix and Linear Algebra Library Source}
 
 Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
-algebra library.  
+algebra library.
 %
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
@@ -247,7 +247,7 @@ version 2, minor version 7, and patch level 0.  Download the latest
 \end{quote}
 %
 to any non-temporary folder.  (If in doubt, select \code{My Documents}
-on Windows XP or \code{Documents} on Windows 7.)  
+on Windows XP or \code{Documents} on Windows 7.)
 
 Change to the download directory (aka folder) using one of the
 following commands, replacing \code{<username>} with
@@ -273,7 +273,7 @@ The full path (including quotes) will work from anywhere,
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd Documents
 \end{Verbatim}
-\end{quote} 
+\end{quote}
 or use the full path, including quotes, from anywhere,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.17.0.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.17.0.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -325,7 +325,7 @@ Lion, and Mountain Lion.
 The easiest (but not the only) way to install a \Cpp development
 environment on a Mac is to use Apple's Xcode development environment.
 
-From the Xcode home page, 
+From the Xcode home page,
 %
 \begin{quote}
 \url{https://developer.apple.com/xcode/}
@@ -340,9 +340,9 @@ Open the Xcode application, click top-level menu
 \code{Preferences}, click top-row button \code{Downloads},
 click button for \code{Components}, click on the \code{Install}
 button to the right of the \code{Command Line Tools} entry, then
-wait for it to finish installing.  
+wait for it to finish installing.
 
-Click the top-level menu item \code{Xcode}, then click item 
+Click the top-level menu item \code{Xcode}, then click item
 \code{Quit Xcode} to quit.
 
 To test, open the Terminal application and enter
@@ -411,11 +411,11 @@ tools (or upgrade an older version), use the commands
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> sudo apt-get install g++ 
-> sudo apt-get install make 
+> sudo apt-get install g++
+> sudo apt-get install make
 \end{Verbatim}
 \end{quote}
-% 
+%
 A password will likely be required by the superuser command \code{sudo}.
 
 
@@ -481,6 +481,8 @@ The most common options to set are the compiler options:
     is \Verb|O=3|. Both \gpp and \clang recognize \Verb|0,1,2,3|, and
     \Verb|s|.
 \end{itemize}
+
+These should be set along with other compiler flags in \code{make/local}.
 
 \subsubsection{{\tt stanc} Options}
 
@@ -591,7 +593,7 @@ For non-commercial development, see
 \subsection{Compiling with MKL}
 
 In order to use Intel's math kernel library (MKL) for \Cpp, a few
-lines need to be added to \code{make/local}. 
+lines need to be added to \code{make/local}.
 \begin{itemize}
   \item \Verb|CC = icc|. Set the compiler to icc.
   \item \Verb|MKLROOT = /apps/intel/2013/mkl|. Create a new variable
@@ -627,7 +629,7 @@ to force more accurate floating point computations:
 \CmdStan is developed using the following set of tools.  The various
 command examples in this manual have assumed they can be found on
 the command path.  The makefile allows precise locations to be plugged
-in. 
+in.
 
 \subsection{GNU Make Build Tool}
 
@@ -658,7 +660,7 @@ using scripts in the form of makefiles to run with GNU Make.
 \CmdStan uses the Git version control system for its software, libraries,
 and documentations.  Git is required to interact with the most recent
 versions of code in the version control repository.
-% 
+%
 \begin{itemize}
 \item Home: \url{http://git-scm.com/}
 \item License: GPL2
@@ -669,7 +671,7 @@ versions of code in the version control repository.
 \subsubsection{Google Test C++ Testing Framework}
 
 \CmdStan's unit testing is based on the Google's googletest \Cpp testing
-framework.  
+framework.
 %
 \begin{itemize}
 \item
