@@ -454,20 +454,6 @@ with
 \end{Verbatim}
 \end{quote}
 
-\subsection{Running \CmdStan Tests}
-
-Google test uses pthread by default. If the library is not available on your
-system, it's still easy to run the tests. Add this to your \code{make/local}
-file:
-\begin{quote}
-\begin{Verbatim}[fontshape=sl,fontsize=\small]
-GTEST_CXXFLAGS += -DGTEST_HAS_PTHREAD=0
-\end{Verbatim}
-\end{quote}
-
-
-
-
 
 \section{{\tt make} Options}\label{make-options.appendix}
 

@@ -1,6 +1,19 @@
-# Makefile for CmdStan.
-# This makefile relies heavily on the make defaults for
-# make 3.81.
+##
+# CmdStan users: if you need to customize make options,
+#   you should add variables to a new file called
+#   make/local (no file extension)
+#
+# A typical option might be:
+#   CXX = clang++
+#
+# Users should only need to set these variables:
+# - CXX: The compiler to use. Expecting g++ or clang++.
+# - O: Optimization level. Valid values are {s, 0, 1, 2, 3}.
+#      Default is 3.
+# - O_STANC: Optimization level for compiling stanc.
+#      Valid values are {s, 0, 1, 2, 3}. Default is 0
+# - STANCFLAGS: Extra options for calling stanc
+# - AR: archiver (must specify for cross-compiling)
 ##
 
 # The default target of this Makefile is...
@@ -9,14 +22,6 @@ help:
 ## Disable implicit rules.
 .SUFFIXES:
 
-##
-# Users should only need to set these variables for use.
-# - CXX: The compiler to use. Expecting g++ or clang++.
-# - O: Optimization level. Valid values are {0, 1, 2, 3}.
-# - OS_TYPE: {mac, win, linux}
-# - AR: archiver (must specify for cross-compiling)
-# - STANCFLAGS: Extra options for calling stanc
-##
 
 ##
 # Library locations
