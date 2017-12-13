@@ -15,6 +15,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/stan_csv_reader.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
@@ -32,9 +33,11 @@
 #include <stan/services/sample/hmc_static_diag_e_adapt.hpp>
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
+#include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <Eigen/Dense>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -53,6 +56,33 @@ namespace cmdstan {
     stan::io::dump var_context(stream);
     stream.close();
     return var_context;
+  }
+
+  // whatever draws are, need to convert to
+  // const std::vector<std::vector<double> >& draws,
+  std::vector<std::vector<double>>  get_draws_csv(const std::string file) {
+    std::fstream stream(file.c_str(), std::fstream::in);
+    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
+      std::stringstream msg;
+      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+    stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(stream, &std::cout);
+    stream.close();
+    // object stan_csv.samples
+    // num rows == num_samples
+    int nrows = stan_csv.samples.rows();
+    int ncols = stan_csv.samples.cols();
+    std::vector<std::vector<double>> draws(nrows);
+    int idx = 0;
+    for (int i = 0; i < nrows; ++i) {
+      std::vector<double> tmp(ncols);
+      for (int j = 0; j < ncols; ++j) {
+        tmp[j] = stan_csv.samples(idx++);
+      }
+      draws[i] = tmp;
+    }
+    return draws;
   }
 
   template <class Model>
@@ -84,7 +114,6 @@ namespace cmdstan {
     parser.print(info);
     info();
 
-
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
@@ -112,7 +141,6 @@ namespace cmdstan {
     write_model(diagnostic_writer, model.model_name());
     parser.print(diagnostic_writer);
 
-
     int refresh = dynamic_cast<int_argument*>(parser.arg("output")->arg("refresh"))->value();
     unsigned int id = dynamic_cast<int_argument*>(parser.arg("id"))->value();
 
@@ -126,7 +154,29 @@ namespace cmdstan {
     stan::io::dump init_context(get_var_context(init));
 
     int return_code = stan::services::error_codes::CONFIG;
-    if (parser.arg("method")->arg("diagnose")) {
+    if (parser.arg("method")->arg("gen_quantities")) {
+
+    // need to be able to read samples from cmdstan csv output file
+    // or get samples from R dump file as matrix of reals -
+    // e.g.: dput(as.matrix(lm_fit), file="lm_draws.R")
+      string_argument* draws_file = dynamic_cast<string_argument*>(parser.arg("method")->arg("gen_quantities")->arg("draws_file"));
+      // if no draws file, quit with error message
+      if (draws_file->is_default()) {
+        info("Must specify argument draws_file which is a set of draws from the fitted model.");
+        return_code = stan::services::error_codes::CONFIG;
+      } else {
+        // if filename ends in ".csv" parse .csv file
+        // else if filename ends in ".R", dumpfile format, parse dump
+        // else error message
+        std::vector<std::vector<double>> draws(get_draws_csv(draws_file->value()));
+        stan::services::standalone_generate(model,
+                                            draws,
+                                            random_seed,
+                                            interrupt,
+                                            logger,
+                                            sample_writer);
+      }   
+    } else if (parser.arg("method")->arg("diagnose")) {
       list_argument* test = dynamic_cast<list_argument*>(parser.arg("method")->arg("diagnose")->arg("test"));
 
       if (test->value() == "gradient") {

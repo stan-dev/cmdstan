@@ -6,6 +6,7 @@
 #include <cmdstan/arguments/arg_optimize.hpp>
 #include <cmdstan/arguments/arg_variational.hpp>
 #include <cmdstan/arguments/arg_diagnose.hpp>
+#include <cmdstan/arguments/arg_gen_quantities.hpp>
 
 namespace cmdstan {
 
@@ -19,6 +20,7 @@ namespace cmdstan {
       _values.push_back(new arg_optimize());
       _values.push_back(new arg_variational());
       _values.push_back(new arg_diagnose());
+      _values.push_back(new arg_gen_quantities());
 
       _default_cursor = 0;
       _cursor = _default_cursor;
