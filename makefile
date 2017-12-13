@@ -10,38 +10,36 @@ help:
 .SUFFIXES:
 
 ##
-# Users should only need to set these three variables for use.
-# - CC: The compiler to use. Expecting g++ or clang++.
+# Users should only need to set these variables for use.
+# - CXX: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
+# - OS_TYPE: {mac, win, linux}
 # - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
+# - STANCFLAGS: Extra options for calling stanc
 ##
-CC = g++
-O = 3
-O_STANC = 0
-AR = ar
 
 ##
 # Library locations
 ##
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
-include $(MATH)make/libraries
 
-##
-# Set default compiler options.
-## 
-include $(MATH)make/default_compiler_options
-CXXFLAGS += -I src -I $(STAN)src -isystem $(MATH) -DEIGEN_NO_DEBUG -DFUSION_MAX_VECTOR_SIZE=12
+-include $(MATH)make/default_compiler_options
+CXXFLAGS += -I src -isystem $(STAN)src -isystem $(MATH)
+CXXFLAGS += -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+CXXFLAGS += -DEIGEN_NO_DEBUG -DFUSION_MAX_VECTOR_SIZE=12
 LDLIBS_STANC = -Lbin -lstanc
 STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 PATH_SEPARATOR = /
 CMDSTAN_VERSION := 2.17.0
 
--include make/local
+-include $(HOME)/.config/cmdstan/make.local  # define local variables
+-include make/local                       # overwrite local variables
 
 CXX = $(CC)
+
+-include $(MATH)make/libraries
 
 ##
 # Get information about the compiler used.
@@ -49,17 +47,23 @@ CXX = $(CC)
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
-include $(MATH)make/detect_cc
+-include $(MATH)make/detect_cc
 
-# OS is set automatically by this script
+# OS_TYPE is set automatically by this script
 ##
 # These includes should update the following variables
 # based on the OS:
-#   - CXXFLAGS
+#   - CFLAGS
 #   - GTEST_CXXFLAGS
 #   - EXE
 ##
-include $(MATH)make/detect_os
+-include $(MATH)make/detect_os
+
+include make/libstan  # libstan.a
+include make/models   # models
+include make/tests
+include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
+-include $(STAN)make/manual
 
 ##
 # Tell make the default way to compile a .o file.
@@ -175,18 +179,18 @@ help-dev:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan help for developers:'
 	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):   ' $(OS)
-	@echo '  - CC (Compiler):           ' $(CC)
-	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
-	@echo '  - O (Optimization Level):  ' $(O)
-	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - OS_TYPE (Operating System): ' $(OS_TYPE)
+	@echo '  - CXX (Compiler):             ' $(CXX)
+	@echo '  - Compiler version:           ' $(CC_MAJOR).$(CC_MINOR)
+	@echo '  - O (Optimization Level):     ' $(O)
+	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
-	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
+	@echo '  - TEMPLATE_DEPTH:             ' $(TEMPLATE_DEPTH)
 endif
 	@echo '  Library configuration:'
-	@echo '  - EIGEN                    ' $(EIGEN)
-	@echo '  - BOOST                    ' $(BOOST)
-	@echo '  - GTEST                    ' $(GTEST)
+	@echo '  - EIGEN                       ' $(EIGEN)
+	@echo '  - BOOST                       ' $(BOOST)
+	@echo '  - GTEST                       ' $(GTEST)
 	@echo ''
 	@echo '  If this copy of CmdStan has been cloned using git,'
 	@echo '  before building CmdStan utilities the first time you need'
@@ -215,14 +219,6 @@ endif
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
-
--include $(HOME)/.config/cmdstan/make.local    # define local variables
--include make/local    # for local variables
--include make/libstan  # libstan.a
--include make/models   # models
--include make/tests
--include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
--include $(STAN)make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
