@@ -454,6 +454,20 @@ with
 \end{Verbatim}
 \end{quote}
 
+\subsection{Running \CmdStan Tests}
+
+Google test uses pthread by default. If the library is not available on your
+system, it's still easy to run the tests. Add this to your \code{make/local}
+file:
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+GTEST_CXXFLAGS += -DGTEST_HAS_PTHREAD=0
+\end{Verbatim}
+\end{quote}
+
+
+
+
 
 \section{{\tt make} Options}\label{make-options.appendix}
 
@@ -475,8 +489,8 @@ variables, write \Verb|<variable>+=<value>|.
 The most common options to set are the compiler options:
 %
 \begin{itemize}
-  \item \Verb|CC|. The compiler used to build \CmdStan and the Stan
-    executables. The default is \Verb|CC=g++|.
+  \item \Verb|CXX|. The compiler used to build \CmdStan and the Stan
+    executables. The default is \Cpp compiler on the system.
   \item \Verb|O|. The optimization level for the compiler. The default
     is \Verb|O=3|. Both \gpp and \clang recognize \Verb|0,1,2,3|, and
     \Verb|s|.
@@ -538,7 +552,7 @@ These are the additional options and typically do not need to be set.
 \begin{itemize}
   \item \Verb|O_STANC|. The optimization level for building
     \code{stanc}. The default is \Verb|O_STANC=0|.
-  \item \Verb|CFLAGS|. The compiler flags for building \CmdStan
+  \item \Verb|CXXFLAGS|. The compiler flags for building \CmdStan
     programs. The default value is dependent on the operating system.
   \item \Verb|LDLIBS|. The libraries used for linking \CmdStan
     programs. The default value is dependent on the operating system.
@@ -593,11 +607,11 @@ For non-commercial development, see
 In order to use Intel's math kernel library (MKL) for \Cpp, a few
 lines need to be added to \code{make/local}. 
 \begin{itemize}
-  \item \Verb|CC = icc|. Set the compiler to icc.
+  \item \Verb|CXX = icc|. Set the compiler to icc.
   \item \Verb|MKLROOT = /apps/intel/2013/mkl|. Create a new variable
     with the location of the MKL path.
   \item
-    \Verb|CFLAGS += -I $(MKLROOT)/include -DEIGEN_USE_MKL_ALL|. This
+    \Verb|CXXFLAGS += -I $(MKLROOT)/include -DEIGEN_USE_MKL_ALL|. This
     tells Eigen to use MKL and where to find the necessary header
     files.
   \item \Verb|LDLIBS += -L$(MKLROOT)/lib/intel64 -lmkl_intel_lp64| and
@@ -618,7 +632,7 @@ unfortunately, isn't ideal behavior for the inference algorithms
 and may cause divergent transitions. Add these flags to \code{make/local}
 to force more accurate floating point computations:
 \begin{itemize}
-  \item \Verb|CFLAGS += -fp-model precise -fp-model source|
+  \item \Verb|CXXFLAGS += -fp-model precise -fp-model source|
 \end{itemize}
 
 
