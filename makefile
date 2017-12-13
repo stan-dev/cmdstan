@@ -11,16 +11,13 @@ help:
 
 ##
 # Users should only need to set these three variables for use.
+# Please set them in a test file called make/local with no extension.
 # - CC: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {0, 1, 2, 3}.
 # - AR: archiver (must specify for cross-compiling)
 # - OS: {mac, win, linux}. 
-##
-CC = g++
-O = 3
-O_STANC = 0
-AR = ar
-
+#
+#
 ##
 # Library locations
 ##
