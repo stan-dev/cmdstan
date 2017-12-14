@@ -6,6 +6,15 @@ LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 GTEST_CXXFLAGS += -I $(GTEST)/include -I $(GTEST)
 
+##########################
+## FIXME(DL): Remove when os_linux is updated in math
+
+ifeq ($(OS_TYPE), linux)
+  GTEST_CXXFLAGS += -DGTEST_HAS_PTHREAD=0
+endif
+
+##########################
+
 ##
 # target path_separator for use in some tests that need to
 # call executables.
