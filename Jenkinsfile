@@ -37,11 +37,7 @@ pipeline {
     stages {
         stage('Kill previous builds') {
             when { not { branch 'develop' } }
-            steps {
-                script {
-                    utils.killOldBuilds()
-                }
-            }
+            steps { script { utils.killOldBuilds() } }
         }
         stage('Clean & Setup') {
             agent any
@@ -70,12 +66,14 @@ pipeline {
                 }
                 stage('Non-windows interface tests') {
                     agent any
-                    steps {
-                        sh runTests("./")
-                        warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-                        warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                    steps { sh runTests("./") }
+                    post {
+                        always {
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            deleteDir()
+                        }
                     }
-                    post { always { deleteDir() } }
                 }
                 stage('Manual') {
                     agent any
