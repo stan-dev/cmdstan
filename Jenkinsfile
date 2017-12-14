@@ -1,3 +1,8 @@
+@Library('StanUtils')
+import org.stan.Utils
+
+def utils = new org.stan.Utils()
+
 def checkout_pr(String repo, String pr) {
     prNumber = pr.tokenize('-').last()
     if (repo == "math") {
@@ -30,6 +35,14 @@ pipeline {
           description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
     stages {
+        stage('Kill previous builds') {
+            when { not { branch 'develop' } }
+            steps {
+                script {
+                    utils.killOldBuilds()
+                }
+            }
+        }
         stage('Clean & Setup') {
             agent any
             steps {
