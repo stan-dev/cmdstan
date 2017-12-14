@@ -47,7 +47,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION) -Wno-unused-variable
 
 test/%.o : src/test/%.cpp 
 	@mkdir -p $(dir $@)
