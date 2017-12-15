@@ -58,8 +58,6 @@ namespace cmdstan {
     return var_context;
   }
 
-  // whatever draws are, need to convert to
-  // const std::vector<std::vector<double> >& draws,
   std::vector<std::vector<double>>  get_draws_csv(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
@@ -67,22 +65,34 @@ namespace cmdstan {
       msg << "Can't open specified file, \"" << file << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
-    stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(stream, &std::cout);
+    stan::io::stan_csv draws_csv = stan::io::stan_csv_reader::parse(stream, &std::cout);
     stream.close();
-    // object stan_csv.samples
-    // num rows == num_samples
-    int nrows = stan_csv.samples.rows();
-    int ncols = stan_csv.samples.cols();
+    // convert EigenMatrixXd to vec?
+    int nrows = draws_csv.samples.rows();
+    int ncols = draws_csv.samples.cols();
     std::vector<std::vector<double>> draws(nrows);
     int idx = 0;
     for (int i = 0; i < nrows; ++i) {
       std::vector<double> tmp(ncols);
       for (int j = 0; j < ncols; ++j) {
-        tmp[j] = stan_csv.samples(idx++);
+        tmp[j] = draws_csv.samples(idx++);
       }
       draws[i] = tmp;
     }
     return draws;
+  }
+
+  std::vector<std::vector<double>>  get_draws_Rdump(const std::string file) {
+    std::fstream stream(file.c_str(), std::fstream::in);
+    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
+      std::stringstream msg;
+      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+    stan::io::dump draws_var_context(stream);
+    stream.close();
+    // what is the name of this object in the draws_var_context object?
+    // how do we know what Nrow and Ncol are?
   }
 
   template <class Model>
