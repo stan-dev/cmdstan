@@ -55,7 +55,7 @@ LDLIBS_STANC = -Lbin -lstanc
 STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.17.0
+CMDSTAN_VERSION := 2.17.1
 
 -include $(HOME)/.config/cmdstan/make.local  # define local variables
 -include make/local                       # overwrite local variables
