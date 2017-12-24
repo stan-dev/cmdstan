@@ -36,7 +36,11 @@ pipeline {
     }
     stages {
         stage('Kill previous builds') {
-            when { not { branch 'develop' } }
+            when {
+                not { branch 'develop' }
+                not { branch 'master' }
+                not { branch 'downstream tests' }
+            }
             steps { script { utils.killOldBuilds() } }
         }
         stage('Clean & Setup') {
