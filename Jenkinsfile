@@ -12,6 +12,7 @@ def checkout_pr(String repo, String pr) {
     }
     sh """
         cd ${dir}
+        git clean -xffd
         git fetch https://github.com/stan-dev/${repo} +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
         git checkout refs/remotes/origin/pr/${prNumber}/merge
     """
@@ -48,6 +49,7 @@ pipeline {
             steps {
                 retry(3) { checkout scm }
                 sh 'git clean -xffd'
+                sh 'make stan-revert'
                 script {
                     if (params.stan_pr != '') {
                         checkout_pr("stan", params.stan_pr)
