@@ -61,19 +61,24 @@ TEST(StanUiCommand, metric_file_test) {
                 " stepsize=" + stepsize + " output file=test/output.csv";
 
               run_command_output out = run_command(command);
-              EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
+              if(adapt == "1" && num_warmup == "0") {
+                EXPECT_EQ(int(stan::services::error_codes::CONFIG),
+                          out.err_code);
+              } else {
+                EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
 
-              std::fstream output_csv_stream("test/output.csv");
-              std::stringstream output_sstream;
-              output_sstream << output_csv_stream.rdbuf();
-              output_csv_stream.close();
-              std::string output = output_sstream.str();
+                std::fstream output_csv_stream("test/output.csv");
+                std::stringstream output_sstream;
+                output_sstream << output_csv_stream.rdbuf();
+                output_csv_stream.close();
+                std::string output = output_sstream.str();
 
-              EXPECT_EQ(1, count_matches(expected_output[model][metric],
-                                         output));
-              if(adapt == "0")
-                EXPECT_EQ(1, count_matches("# Step size = " + stepsize,
+                EXPECT_EQ(1, count_matches(expected_output[model][metric],
                                            output));
+                if(adapt == "0")
+                  EXPECT_EQ(1, count_matches("# Step size = " + stepsize,
+                                             output));
+              }
             }
           }
         }
