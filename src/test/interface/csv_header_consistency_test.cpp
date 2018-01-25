@@ -21,7 +21,7 @@ TEST(interface,csv_header_consistency) {
 
   std::string command
     = path
-    + " sample num_warmup=0 num_samples=1"
+    + " sample num_warmup=1 num_samples=1"
     + " output file=" + samples;
 
   run_command_output out = run_command(command);
