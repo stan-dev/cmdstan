@@ -63,7 +63,6 @@ pipeline {
             post { always { deleteDir() }}
         }
         stage('Parallel tests') {
-            failFast true
             parallel {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
