@@ -810,8 +810,9 @@ The \code{metric\_file} option can be used with and without adaptation enabled.
 If adaptation is enabled, the provided metric will be used as the initial
 guess in the adaptation process. If the initial guess is good, then adaptation
 should not change it much. If the metric is no good, then the adaptation will
-override the initial guess. An example of running the sampler with adaptation
-enabled without specifying a stepsize is
+override the initial guess. If adaptation is enabled, \code{num\_warmup} must be
+set to a value greater than zero. An example of running the sampler with
+adaptation enabled without specifying a stepsize is
 
 \begin{quote}
   \begin{Verbatim}[fontshape=sl]
