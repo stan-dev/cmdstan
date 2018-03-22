@@ -178,7 +178,7 @@ if __name__ == "__main__":
             continue
         pass_= time_step(model, run, exe, data, args.overwrite)
         if not pass_:
-            fails.append(m)
+            fails.append(model)
     if fails:
         print("Failures:")
         print("\n".join(fails))
