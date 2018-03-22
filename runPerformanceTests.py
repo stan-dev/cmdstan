@@ -106,6 +106,8 @@ def csv_summary(csv_file):
                 d[headers[i]].append(float(row[i]))
     res = {}
     for k, v in d.items():
+        if k.endswith("__"):
+            continue
         mean = avg(v)
         res[k + "_avg"] = mean
         res[k + "_stddev"] = stdev(v, mean)
@@ -118,13 +120,13 @@ def run(exe, data, overwrite=False):
            .format(exe, data, tmp))
     summary = csv_summary(tmp)
     with open(tmp, "w+") as f:
-        lines = ["{} {}\n".format(k, v) for k, v in summary.items()]
+        lines = ["{} {}\n".format(k, round(v)) for k, v in summary.items()]
         f.writelines(lines)
 
     if overwrite:
         shexec("mv {} {}".format(tmp, gold))
     else:
-        if shexec("diff {} {}".format(gold, tmp)) != 0:
+        if 0 != subprocess.call("diff {} {}".format(gold, tmp), shell=True):
             print("FAIL: {} not matched by output.".format(gold))
             return False
     return True
