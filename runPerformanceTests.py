@@ -118,7 +118,7 @@ def parse_summary(f):
     d = {}
     for line in f:
         param, avg, stdev = line.split()
-        d[param] = (avg, stdev)
+        d[param] = (float(avg), float(stdev))
     return d
 
 def run(exe, data, overwrite=False):
@@ -136,10 +136,16 @@ def run(exe, data, overwrite=False):
         gold_summary = {}
         with open(gold) as gf:
             gold_summary = parse_summary(gf)
+
+        # just printing for diagnostic purposes
+        subprocess.call("diff {} {}".format(gold, tmp), shell=True)
+
         for k, (mean, stdev) in gold_summary.items():
+            if stdev == 0: #XXX Uh...
+                continue
             # Test (mu_est - mu_true) / sigma_true < 0.25 ?
             err = summary[k][0] - mean
-            if err / stdev < 0.25:
+            if (err / stdev) > 0.25:
                 print("FAIL: {} not within ({} - {}) / {} < 0.25"
                       .format(gold, summary[k][0], mean, stdev))
                 return False
@@ -165,8 +171,14 @@ if __name__ == "__main__":
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
     time_step("make_all_models", make, executables, args.j or 4)
+    fails = []
     for model, exe in zip(models, executables):
         data = find_data_for_model(model)
         if not data:
             continue
-        time_step(model, run, exe, data, args.overwrite)
+        pass_= time_step(model, run, exe, data, args.overwrite)
+        if not pass_:
+            fails.append(m)
+    if fails:
+        print("Failures:")
+        print("\n".join(fails))
