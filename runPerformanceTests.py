@@ -144,7 +144,7 @@ if __name__ == "__main__":
     models = filter(model_name_re.match, models)
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
-    time_step("make_all_models", make, executables, args.j)
+    time_step("make_all_models", make, executables, args.j or 4)
     for model, exe in zip(models, executables):
         data = find_data_for_model(model)
         if not data:
