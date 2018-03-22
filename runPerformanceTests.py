@@ -11,6 +11,7 @@ from time import time
 
 TIME_FILE = "times.csv"
 PERF_MODEL_DIRS = ("examples/example-models/bugs_examples/vol1",)
+GOLD_OUTPUT_DIR = "tests/golds/"
 
 def find_files(pattern, dirs):
     res = []
@@ -84,8 +85,9 @@ bad_models = frozenset(
     ])
 
 def run(exe, data, overwrite=False):
-    gold = exe + ".csv"
-    tmp = exe + "_tmp.csv"
+
+    gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".csv")
+    tmp = gold + ".tmp"
     shexec("{} sample data file={} random seed=1234 output file={}"
            .format(exe, data, gold if overwrite else tmp))
     if not overwrite:
