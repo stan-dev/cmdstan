@@ -12,7 +12,6 @@ from functools import wraps
 from time import time
 
 TIME_FILE = "times.csv"
-PERF_MODEL_DIRS = ("examples/example-models/bugs_examples/vol1",)
 GOLD_OUTPUT_DIR = "tests/golds/"
 
 def find_files(pattern, dirs):
@@ -133,6 +132,7 @@ def run(exe, data, overwrite=False):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
+    parser.add_argument("directories", nargs="+")
     parser.add_argument("--overwrite", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
     parser.add_argument("-j", dest="j", action="store")
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     args = parse_args()
     with open(TIME_FILE, "w+") as f: f.write("function, time\n")
 
-    models = find_files("*.stan", PERF_MODEL_DIRS)
+    models = find_files("*.stan", args.directories)
     models = filter(model_name_re.match, models)
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
