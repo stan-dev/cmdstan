@@ -145,7 +145,7 @@ def run(exe, data, overwrite=False):
                 continue
             # Test (mu_est - mu_true) / sigma_true < 0.25 ?
             err = summary[k][0] - mean
-            if (err / stdev) > 0.25:
+            if err > 0.0001 and (err / stdev) > 0.25:
                 print("FAIL: {} param {} not within ({} - {}) / {} < 0.25"
                       .format(gold, k, summary[k][0], mean, stdev))
         #if 0 != subprocess.call("diff {} {}".format(gold, tmp), shell=True):
