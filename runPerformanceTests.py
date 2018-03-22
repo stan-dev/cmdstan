@@ -10,6 +10,7 @@ from difflib import SequenceMatcher
 from fnmatch import fnmatch
 from functools import wraps
 from time import time
+import xml.etree.ElementTree as ET
 
 TIME_FILE = "times.csv"
 GOLD_OUTPUT_DIR = "tests/golds/"
@@ -44,9 +45,7 @@ def time_step(name, fn, *args, **kwargs):
     start = time()
     res = fn(*args, **kwargs)
     end = time()
-    with open(TIME_FILE, "a") as f:
-        f.write("{}, {}\n".format(name, end-start))
-    return res
+    return end-start, res
 
 def shexec(command):
     returncode = subprocess.call(command, shell=True)
@@ -137,8 +136,9 @@ def run(exe, data, overwrite=False):
         with open(gold) as gf:
             gold_summary = parse_summary(gf)
 
-        # just printing for diagnostic purposes
+        # just printing for diagnostic purposes. XXX could make this prettier
         subprocess.call("diff {} {}".format(gold, tmp), shell=True)
+        fails = []
 
         for k, (mean, stdev) in gold_summary.items():
             if stdev == 0: #XXX Uh...
@@ -147,6 +147,22 @@ def run(exe, data, overwrite=False):
             if err > 0.0001 and (err / stdev) > 0.5:
                 print("FAIL: {} param {} not within ({} - {}) / {} < 0.5"
                       .format(gold, k, summary[k][0], mean, stdev))
+                fails.append((k, mean, stdev, summary[k][0]))
+        return fails
+
+def test_results_xml(tests):
+    failures = str(sum(1 if x[-1] else 0 for x in tests))
+    time_ = str(sum(x[1] for x in tests))
+    root = ET.Element("testsuite", failures=failures, name="Performance Tests",
+                      tests=str(len(tests)), time=str(time_))
+    for model, time_, fails in tests:
+        time_ = str(time_)
+        testcase = ET.SubElement(root, "testcase", classname=model, time=time_)
+        for fail in fails:
+            testcase = ET.SubElement(root, "failure", type="param mismatch")
+            testcase.text = ("param {} got mean {}, gold has mean {} and stdev {}"
+                             .format(fail[0], fail[4], fail[1], fail[2]))
+    return ET.ElementTree(root)
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
@@ -165,8 +181,11 @@ if __name__ == "__main__":
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
     time_step("make_all_models", make, executables, args.j or 4)
+    tests = []
     for model, exe in zip(models, executables):
         data = find_data_for_model(model)
         if not data:
             continue
-        time_step(model, run, exe, data, args.overwrite)
+        time_, fails = time_step(model, run, exe, data, args.overwrite)
+        tests.append((model, time_, fails))
+    test_results_xml(tests).write("performance.xml")
