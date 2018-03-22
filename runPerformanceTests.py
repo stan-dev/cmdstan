@@ -146,13 +146,10 @@ def run(exe, data, overwrite=False):
             # Test (mu_est - mu_true) / sigma_true < 0.25 ?
             err = summary[k][0] - mean
             if (err / stdev) > 0.25:
-                print("FAIL: {} not within ({} - {}) / {} < 0.25"
-                      .format(gold, summary[k][0], mean, stdev))
-                return False
+                print("FAIL: {} param {} not within ({} - {}) / {} < 0.25"
+                      .format(gold, k, summary[k][0], mean, stdev))
         #if 0 != subprocess.call("diff {} {}".format(gold, tmp), shell=True):
         #    print("FAIL: {} not matched by output.".format(gold))
-        #    return False
-    return True
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
@@ -171,14 +168,8 @@ if __name__ == "__main__":
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
     time_step("make_all_models", make, executables, args.j or 4)
-    fails = []
     for model, exe in zip(models, executables):
         data = find_data_for_model(model)
         if not data:
             continue
-        pass_= time_step(model, run, exe, data, args.overwrite)
-        if not pass_:
-            fails.append(model)
-    if fails:
-        print("Failures:")
-        print("\n".join(fails))
+        time_step(model, run, exe, data, args.overwrite)
