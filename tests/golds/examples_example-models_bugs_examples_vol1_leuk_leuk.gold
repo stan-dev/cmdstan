@@ -1,104 +1,52 @@
-S_placebo.2_stddev 0.0
-dL0.14_avg 0.0
-dL0.6_avg 0.0
-S_placebo.1_stddev 0.0
-S_treat.7_avg 1.0
-dL0.13_avg 0.0
-S_treat.5_stddev 0.0
-S_treat.1_avg 1.0
-dL0.2_avg 0.0
-S_treat.16_stddev 0.0
-dL0.11_stddev 0.0
-S_treat.8_stddev 0.0
-S_placebo.14_avg 0.0
-dL0.13_stddev 0.0
-S_treat.13_stddev 0.0
-S_treat.7_stddev 0.0
-S_treat.6_stddev 0.0
-S_treat.6_avg 1.0
-dL0.9_stddev 0.0
-S_placebo.1_avg 1.0
-dL0.4_stddev 0.0
-S_placebo.16_stddev 0.0
-S_treat.14_avg 1.0
-dL0.15_avg 0.0
-S_placebo.7_stddev 0.0
-S_placebo.5_stddev 0.0
-S_treat.2_avg 1.0
-S_placebo.13_stddev 0.0
-S_placebo.15_avg 0.0
-dL0.17_stddev 2.0
-S_placebo.9_stddev 0.0
-S_treat.1_stddev 0.0
-S_placebo.16_avg 0.0
-dL0.1_stddev 0.0
-S_placebo.6_stddev 0.0
-dL0.15_stddev 0.0
-S_placebo.7_avg 1.0
-S_placebo.9_avg 0.0
-S_treat.17_stddev 0.0
-S_placebo.17_stddev 0.0
-S_placebo.3_avg 1.0
-S_treat.8_avg 1.0
-dL0.9_avg 0.0
-S_treat.4_avg 1.0
-dL0.11_avg 0.0
-S_treat.16_avg 1.0
-S_placebo.11_stddev 0.0
-S_placebo.4_avg 1.0
-S_placebo.4_stddev 0.0
-beta_stddev 6.0
-S_placebo.11_avg 0.0
-S_placebo.12_avg 0.0
-S_placebo.3_stddev 0.0
-dL0.14_stddev 0.0
-S_treat.17_avg 0.0
-S_treat.2_stddev 0.0
-dL0.6_stddev 0.0
-dL0.7_avg 0.0
-dL0.3_stddev 0.0
-S_treat.3_avg 1.0
-S_treat.14_stddev 0.0
-S_treat.15_stddev 0.0
-S_treat.9_avg 1.0
-S_placebo.8_stddev 0.0
-S_placebo.10_avg 0.0
-S_treat.12_avg 1.0
-S_treat.5_avg 1.0
-dL0.16_stddev 1.0
-S_treat.15_avg 1.0
-S_treat.10_stddev 0.0
-S_placebo.17_avg 0.0
-S_placebo.13_avg 0.0
-S_treat.10_avg 1.0
-S_treat.3_stddev 0.0
-S_placebo.5_avg 1.0
-dL0.12_avg 0.0
-S_placebo.14_stddev 0.0
-dL0.4_avg 0.0
-dL0.12_stddev 0.0
-beta_avg 2.0
-S_placebo.6_avg 1.0
-S_treat.12_stddev 0.0
-S_placebo.2_avg 1.0
-dL0.10_stddev 0.0
-S_placebo.15_stddev 0.0
-dL0.8_avg 0.0
-dL0.3_avg 0.0
-S_treat.13_avg 1.0
-dL0.5_stddev 0.0
-S_treat.11_stddev 0.0
-S_treat.9_stddev 0.0
-dL0.17_avg 0.0
-dL0.16_avg 0.0
-dL0.2_stddev 0.0
-S_treat.4_stddev 0.0
-dL0.10_avg 0.0
-dL0.5_avg 0.0
-S_placebo.10_stddev 0.0
-S_placebo.8_avg 0.0
-dL0.1_avg 0.0
-dL0.7_stddev 0.0
-dL0.8_stddev 0.0
-S_placebo.12_stddev 0.0
-S_treat.11_avg 1.0
+dL0.2 0.03884783323 0.0264862602051
+S_treat.15 0.634984471 0.325180477378
+S_treat.14 0.662446532 0.287777678669
+S_treat.17 0.4750127722 0.455499337315
+S_treat.16 0.564729187 0.408905794271
+S_treat.11 0.73267193 0.222841707859
+S_treat.10 0.770580889 0.186760274035
+S_treat.13 0.687811712 0.266308189558
+S_treat.12 0.710767499 0.239678463675
+S_placebo.3 0.81677475 0.179875227794
+S_placebo.2 0.855110686 0.149586271626
+S_placebo.1 0.927665009 0.0774768512569
+dL0.17 0.394924850425 2.25655400613
+dL0.16 0.26055948681 1.09322329196
+dL0.15 0.0933677831298 0.276892426471
+dL0.14 0.0823439495359 0.196799939006
+dL0.13 0.071396748442 0.181453673996
+dL0.12 0.0667931847312 0.130070813366
+dL0.11 0.10853506342 0.185971544628
+dL0.10 0.08577418136 0.127897014046
+S_placebo.7 0.532182253 0.348599843051
+S_placebo.9 0.380360786 0.307358241314
+S_placebo.8 0.414113135 0.303884467513
+S_placebo.6 0.56447486 0.327901060747
+S_treat.5 0.912970703 0.0488439849758
+S_treat.4 0.934470792 0.0331353000638
+S_treat.7 0.865997621 0.0883238051924
+S_treat.6 0.877600632 0.077878642355
+S_treat.1 0.983007694 0.00588958673735
+S_placebo.5 0.670788373 0.289773763359
+S_treat.3 0.954513874 0.0217108667758
+S_treat.2 0.964710899 0.0153772191506
+S_placebo.4 0.743231618 0.235805795299
+S_treat.9 0.802117906 0.149770884516
+S_treat.8 0.817983556 0.131440305993
+S_placebo.17 0.044056861338 0.0483435230491
+S_placebo.16 0.0858336346 0.0943873287767
+beta 1.538687077 6.13514305171
+S_placebo.14 0.166366264 0.188049826221
+S_placebo.13 0.1953871054 0.210174776962
+S_placebo.12 0.2248643511 0.239240055185
+S_placebo.11 0.2565719578 0.24487971554
+S_placebo.10 0.3197077501 0.286938343423
+dL0.9 0.0418857451282 0.0559885514481
+dL0.8 0.120368371 0.112889496012
+dL0.7 0.0284505201565 0.031069797205
+dL0.6 0.08295540072 0.0756532384913
+dL0.5 0.049002215444 0.0401997547869
+dL0.4 0.044568452576 0.0324786942601
+dL0.3 0.0219315935919 0.0173809357051
+S_placebo.15 0.1395330778 0.163033830151
+dL0.1 0.035499430617 0.020806207172

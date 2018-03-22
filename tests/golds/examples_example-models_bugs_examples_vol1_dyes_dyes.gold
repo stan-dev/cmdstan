@@ -1,26 +1,13 @@
-tau_between_stddev 0.0
-sigmasq_between_stddev 328341376.0
-mu.6_stddev 18139.0
-sigma_between_stddev 16736.0
-sigma_between_avg 47.0
-sigmasq_between_avg 2698.0
-tau_between_avg 0.0
-mu.2_avg 1528.0
-mu.3_avg 1555.0
-theta_stddev 16350.0
-mu.5_avg 1581.0
-tau_within_stddev 0.0
-tau_within_avg 0.0
-mu.3_stddev 13413.0
-mu.1_avg 1511.0
-mu.4_avg 1506.0
-mu.4_stddev 13710.0
-mu.6_avg 1486.0
-sigma_within_avg 52.0
-sigmasq_within_avg 2766.0
-mu.1_stddev 13854.0
-sigmasq_within_stddev 25714106.0
-theta_avg 1528.0
-sigma_within_stddev 2051.0
-mu.5_stddev 18636.0
-mu.2_stddev 12198.0
+tau_within 0.00039573807 4.36149293638e-07
+sigma_within 51.9758704 2051.40514046
+sigmasq_within 2766.329855 25714105.9812
+sigma_between 46.57110535 16736.1333726
+sigmasq_between 2697.8466916 328341376.01
+theta 1528.10758 16350.4661304
+mu.4 1506.01272 13710.0615734
+mu.5 1580.97688 18635.7576499
+mu.6 1485.95888 18138.5858848
+tau_between 0.000876495577 3.45288249911e-05
+mu.1 1510.50759 13854.0856209
+mu.2 1527.87951 12198.2162317
+mu.3 1554.73107 13412.6885305

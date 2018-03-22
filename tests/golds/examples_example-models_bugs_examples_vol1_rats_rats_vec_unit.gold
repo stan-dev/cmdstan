@@ -1,258 +1,129 @@
-beta.29_stddev 2.0
-alpha.5_stddev 246.0
-beta.20_stddev 2.0
-beta.21_stddev 2.0
-alpha_z.6_stddev 2.0
-beta_z.4_avg -2.0
-beta.26_stddev 2.0
-beta_z.12_avg -0.0
-alpha.28_avg 243.0
-alpha_z.7_avg -1.0
-beta_z.5_stddev 7.0
-beta.16_avg 6.0
-beta.19_avg 6.0
-beta_z.25_stddev 8.0
-beta_z.30_stddev 8.0
-alpha_z.25_avg -1.0
-alpha.6_stddev 212.0
-alpha.4_avg 232.0
-alpha.12_avg 228.0
-beta_z.25_avg 1.0
-beta.14_stddev 2.0
-beta.27_avg 6.0
-beta_z.16_avg -0.0
-beta_z.14_stddev 9.0
-beta_z.2_avg 2.0
-beta_z.7_avg -0.0
-beta.28_stddev 2.0
-alpha_z.26_stddev 2.0
-beta.3_stddev 2.0
-beta.7_avg 6.0
-beta.20_avg 6.0
-beta_z.4_stddev 8.0
-alpha_z.10_stddev 3.0
-beta_z.17_stddev 8.0
-alpha_z.21_avg 0.0
-alpha.24_avg 245.0
-alpha_z.3_avg 1.0
-alpha.18_stddev 236.0
-beta.24_avg 6.0
-alpha_z.29_avg -2.0
-alpha_z.28_stddev 2.0
-alpha.14_avg 268.0
-beta.25_stddev 2.0
-beta.25_avg 7.0
-alpha.12_stddev 242.0
-beta.6_stddev 2.0
-beta_z.10_stddev 8.0
-alpha.6_avg 250.0
-beta_z.23_stddev 7.0
-beta.12_stddev 2.0
-sigmasq_beta_stddev 0.0
-beta.19_stddev 2.0
-alpha_z.20_stddev 2.0
-beta.7_stddev 2.0
-beta_z.9_stddev 8.0
-beta_z.20_stddev 7.0
-alpha_z.8_stddev 2.0
-beta.30_avg 6.0
-alpha.21_stddev 202.0
-beta_z.8_avg 0.0
-beta.29_avg 6.0
-beta.14_avg 7.0
-beta_z.21_avg 0.0
-beta.13_stddev 2.0
-alpha_z.22_stddev 3.0
-alpha_z.17_avg -1.0
-beta.5_stddev 2.0
-alpha_z.18_avg -0.0
-alpha.2_avg 248.0
-beta.18_avg 6.0
-alpha_z.9_avg 3.0
-beta.16_stddev 2.0
-mu_alpha_stddev 0.0
-beta.13_avg 6.0
-alpha.25_avg 234.0
-alpha_z.30_stddev 2.0
-beta.18_stddev 2.0
-alpha.10_stddev 235.0
-alpha_z.19_stddev 2.0
-beta_z.29_stddev 9.0
-beta_z.15_stddev 8.0
-beta_z.17_avg 0.0
-beta.2_avg 7.0
-beta.17_avg 6.0
-alpha.1_stddev 229.0
-alpha.3_stddev 212.0
-beta.24_stddev 2.0
-alpha.27_stddev 213.0
-beta_z.14_avg 1.0
-beta.23_stddev 2.0
-beta.3_avg 6.0
-alpha0_stddev 0.0
-alpha.16_avg 245.0
-sigmasq_alpha_stddev 127329.0
-alpha.11_stddev 206.0
-mu_alpha_avg 2.0
-sigma_y_avg 6.0
-alpha.24_stddev 217.0
-beta.5_avg 7.0
-alpha.10_avg 219.0
-alpha_z.14_stddev 3.0
-beta_z.26_avg 1.0
-alpha.30_stddev 245.0
-alpha_z.2_avg 0.0
-alpha_z.21_stddev 2.0
-alpha.27_avg 254.0
-beta.28_avg 6.0
-beta_z.27_avg -1.0
-beta_z.8_stddev 7.0
-beta_z.3_stddev 8.0
-alpha_z.6_avg 1.0
-alpha_z.15_avg 0.0
-alpha.17_avg 232.0
-sigma_beta_stddev 0.0
-alpha_z.8_avg 0.0
-alpha.22_stddev 220.0
-sigma_beta_avg 1.0
-alpha.23_avg 229.0
-beta_z.19_avg 0.0
-alpha_z.4_stddev 2.0
-beta.8_avg 6.0
-beta.9_stddev 2.0
-beta.8_stddev 2.0
-beta_z.11_avg 1.0
-alpha.15_avg 243.0
-alpha_z.9_stddev 5.0
-alpha_z.1_avg -0.0
-alpha_z.4_avg -1.0
-beta_z.7_stddev 9.0
-alpha.3_avg 252.0
-alpha_z.24_stddev 2.0
-alpha_z.19_avg 1.0
-alpha_z.14_avg 2.0
-alpha.28_stddev 240.0
-alpha_z.29_stddev 3.0
-beta.21_avg 6.0
-alpha.20_stddev 234.0
-alpha_z.26_avg 1.0
-alpha.29_avg 218.0
-beta_z.13_avg -0.0
-alpha_z.18_stddev 2.0
-alpha.7_avg 229.0
-alpha.2_stddev 242.0
-beta.1_avg 6.0
-alpha_z.7_stddev 3.0
-alpha_z.17_stddev 2.0
-alpha_z.2_stddev 2.0
-alpha_z.16_stddev 2.0
-beta_z.12_stddev 8.0
-alpha_z.22_avg -1.0
-alpha.7_stddev 247.0
-alpha.25_stddev 220.0
-beta.10_stddev 2.0
-beta.6_avg 6.0
-alpha.30_avg 242.0
-beta_z.6_avg -0.0
-sigma_alpha_avg 15.0
-alpha.13_avg 242.0
-alpha.20_avg 242.0
-beta_z.2_stddev 8.0
-alpha_z.11_avg 1.0
-alpha.4_stddev 227.0
-beta.15_avg 5.0
-beta.17_stddev 2.0
-alpha.13_stddev 225.0
-alpha_z.15_stddev 2.0
-alpha_z.16_avg 0.0
-alpha.14_stddev 212.0
-alpha_z.13_stddev 2.0
-beta.4_stddev 2.0
-beta_z.1_stddev 8.0
-alpha.8_avg 248.0
-beta_z.29_avg -1.0
-alpha_z.12_avg -1.0
-sigma_alpha_stddev 131.0
-alpha_z.13_avg 0.0
-beta_z.22_avg -1.0
-beta.9_avg 7.0
-beta_z.1_avg -0.0
-alpha.9_stddev 230.0
-alpha.9_avg 283.0
-alpha_z.23_stddev 2.0
-alpha.1_avg 240.0
-beta_z.28_stddev 7.0
-alpha.5_avg 232.0
-beta.23_avg 6.0
-alpha_z.25_stddev 2.0
-beta_z.10_avg -1.0
-alpha.16_stddev 213.0
-beta.10_avg 6.0
-sigmasq_beta_avg 0.0
-beta.2_stddev 2.0
-beta_z.24_stddev 8.0
-sigmasq_alpha_avg 220.0
-alpha.15_stddev 233.0
-alpha.17_stddev 211.0
-alpha_z.1_stddev 2.0
-alpha_z.11_stddev 2.0
-alpha_z.5_stddev 2.0
-alpha.21_avg 249.0
-beta_z.6_stddev 8.0
-mu_beta_avg 0.0
-beta.12_avg 6.0
-alpha.23_stddev 228.0
-beta_z.5_avg 1.0
-beta_z.19_stddev 8.0
-alpha.26_avg 254.0
-alpha_z.5_avg -1.0
-beta_z.28_avg -1.0
-beta_z.9_avg 2.0
-sigmasq_y_avg 37.0
-mu_beta_stddev 0.0
-alpha_z.10_avg -2.0
-beta_z.18_avg -1.0
-alpha.22_avg 225.0
-alpha_z.12_stddev 3.0
-beta.15_stddev 2.0
-beta_z.24_avg -1.0
-beta_z.30_avg -0.0
-beta.27_stddev 2.0
-alpha.8_stddev 234.0
-beta_z.26_stddev 8.0
-beta_z.11_stddev 9.0
-alpha_z.20_avg -0.0
-beta_z.20_avg -0.0
-alpha.18_avg 241.0
-alpha_z.3_stddev 2.0
-alpha.19_stddev 233.0
-alpha_z.24_avg 0.0
-alpha0_avg 1.0
-beta_z.22_stddev 8.0
-sigma_y_stddev 7.0
-beta_z.16_stddev 8.0
-beta_z.3_avg 1.0
-beta_z.18_stddev 7.0
-alpha.11_avg 258.0
-beta.4_avg 5.0
-alpha_z.23_avg -1.0
-beta.30_stddev 2.0
-beta_z.27_stddev 8.0
-sigmasq_y_stddev 1079.0
-alpha_z.27_stddev 2.0
-beta.26_avg 7.0
-alpha.29_stddev 240.0
-beta.11_avg 7.0
-alpha_z.27_avg 1.0
-beta.22_stddev 2.0
-alpha.19_avg 254.0
-alpha.26_stddev 237.0
-beta_z.23_avg -1.0
-beta_z.21_stddev 8.0
-alpha_z.28_avg 0.0
-alpha_z.30_avg -0.0
-beta_z.13_stddev 8.0
-beta.22_avg 6.0
-beta.11_stddev 2.0
-beta.1_stddev 2.0
-beta_z.15_avg -1.0
+sigmasq_y 37.2974281 1078.79431159
+sigma_y 6.08867861 7.13199672823
+alpha_z.28 0.038956957652 2.0605782087
+mu_alpha 2.42408913 0.0202451698064
+sigma_beta 0.522986855 0.272474865132
+beta_z.30 -0.101204188494 7.97951536257
+mu_beta 0.0618386093 3.77239723e-05
+alpha_z.4 -0.6921995481 2.13653769607
+alpha_z.5 -0.7375264917 2.29636849842
+alpha_z.6 0.50284244486 2.01045006718
+alpha_z.7 -0.952841634 2.51745680268
+alpha_z.1 -0.17570816398 1.96708880825
+alpha_z.2 0.373219078116 2.1129523598
+alpha_z.3 0.6954327095 2.08922316606
+alpha_z.8 0.412592523571 2.06123066579
+alpha_z.9 2.8313222 5.45462768684
+alpha.9 283.315968 230.096700771
+alpha.8 248.371697 233.66926364
+alpha_z.18 -0.129916789831 1.93512773153
+alpha_z.19 0.7905516913 2.33516413899
+alpha_z.16 0.193497315406 1.96978677358
+alpha_z.17 -0.70925182827 2.16780164971
+alpha_z.14 1.788212365 3.30623690548
+alpha.2 247.80062 241.551962466
+alpha_z.12 -0.992606362 2.50744134715
+alpha.4 232.419924 226.948569638
+alpha_z.10 -1.602882001 3.15084902572
+alpha_z.11 1.098878568 2.40619189737
+beta_z.22 -0.639981978148 8.35941309411
+beta_z.23 -0.82460254569 7.22608885758
+beta_z.20 -0.250218808613 7.1999453486
+beta_z.21 0.425457167183 7.83224753105
+beta_z.26 0.70187992827 8.06304688469
+beta_z.27 -0.570084075788 7.76152967264
+beta_z.24 -0.550194325096 8.30677134204
+beta_z.25 1.42299792984 8.3195519835
+beta_z.28 -0.66709060741 7.28705068314
+beta_z.29 -0.990045047323 9.01098726901
+beta.2 7.05796572 2.10203985192
+beta.3 6.47380644 1.85155970077
+beta.1 6.0582612 1.8417948746
+beta.6 6.1650512 1.79382162237
+beta.7 5.99226583 2.10005485074
+beta.4 5.33424205 1.96262918619
+beta.5 6.56827586 1.79316197556
+beta.8 6.4217082 1.5542195307
+beta.9 7.05711864 2.03870263223
+beta_z.3 0.561181941338 8.03924366068
+beta_z.2 1.693773063 8.2770555078
+beta_z.1 -0.243519117176 7.76670905155
+beta_z.7 -0.3693754835 9.11019580167
+beta_z.6 -0.0364079746916 7.83302068943
+beta_z.5 0.74150332974 7.40270148429
+beta_z.4 -1.650699732 8.26017656696
+beta_z.9 1.6920612283 8.2507838161
+beta_z.8 0.458845613909 6.94298883334
+sigmasq_beta 0.2821273439 0.329964551372
+beta_z.17 0.167855871937 7.84479493528
+beta_z.16 -0.499464791599 7.67205141394
+beta_z.15 -1.481775767 7.92255669331
+beta_z.14 0.98215701246 8.91550549488
+alpha.28 242.970641 240.362263426
+beta_z.12 -0.128806594004 7.87222665521
+beta_z.11 1.19793238043 8.54822346627
+beta_z.10 -0.644068360414 7.56275149655
+alpha.24 245.001821 216.945918681
+alpha.25 234.37712 220.465246013
+alpha.26 254.032319 237.229150436
+alpha.27 254.412145 212.681721314
+alpha.20 241.556228 233.930219344
+alpha.21 248.502272 201.827411937
+beta_z.19 0.418877762052 8.25989308085
+beta_z.18 -0.63857927607 7.17088471855
+sigma_alpha 14.68484265 130.937490344
+alpha_z.30 -0.0645648891752 2.10461449519
+alpha.22 225.277934 220.128080796
+alpha.30 241.502295 245.043553432
+sigmasq_alpha 219.783132 127328.76223
+alpha_z.27 0.8308269406 2.20651701497
+alpha_z.26 0.80463125586 2.31170673935
+alpha_z.25 -0.55682166857 2.02050389278
+alpha_z.24 0.178840373205 1.89254812232
+alpha_z.23 -0.96209091 2.39220130573
+alpha_z.22 -1.187702775 2.71335901474
+alpha_z.21 0.4215425087 1.98284299147
+alpha_z.20 -0.0596516284006 2.02479958449
+beta_z.13 -0.020949583 8.35345526557
+alpha_z.29 -1.694938229 3.46987316984
+alpha.29 217.950578 239.799224542
+beta.18 5.85475474 1.71907758211
+beta.19 6.39982723 1.90454654888
+beta.10 5.85047465 1.80037001456
+beta.11 6.80052878 2.06023583059
+beta.12 6.11582891 1.72391482382
+beta.13 6.17274027 1.87963599837
+beta.14 6.68912238 2.03011550011
+beta.15 5.4200797 1.91257724404
+beta.16 5.92779016 1.80217724747
+beta.17 6.27019627 1.85364974873
+beta.25 6.91540308 1.87263180587
+beta.24 5.9006466 1.92522199941
+beta.27 5.89054929 1.85459236975
+beta.26 6.54619639 1.89614086984
+beta.21 6.40572193 1.78272093942
+beta.20 6.05594687 1.72173947277
+beta.23 5.75745888 1.72909227804
+beta.22 5.85389516 1.96966896645
+alpha.23 228.535071 227.722532105
+beta.29 5.67678672 2.00181990048
+alpha.3 252.465373 212.297431853
+alpha.15 242.77704 232.530441578
+alpha.14 268.238317 211.677580258
+alpha.17 232.17421 211.03663675
+alpha_z.15 0.02686461572 1.99120151592
+alpha.11 258.271572 205.64188375
+alpha.10 219.265653 234.879993551
+alpha.13 242.471509 224.870575877
+alpha.12 228.076658 241.6796528
+alpha.5 231.747981 245.664234253
+alpha.19 253.84559 233.431101698
+alpha.18 240.545733 235.706183672
+alpha_z.13 0.003270508564 1.84844115391
+alpha.7 228.667472 246.947996087
+alpha.6 249.666022 211.500182976
+alpha0 1.063639773 0.0395858672387
+beta.30 6.13138919 1.83345532255
+alpha.16 245.201793 212.917257977
+alpha.1 239.878348 228.8089199
+beta.28 5.84130813 1.65737347056

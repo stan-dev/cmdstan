@@ -108,9 +108,18 @@ def csv_summary(csv_file):
         if k.endswith("__"):
             continue
         mean = avg(v)
-        res[k + "_avg"] = mean
-        res[k + "_stddev"] = stdev(v, mean)
+        res[k] = (mean, stdev(v, mean))
     return res
+
+def format_summary_lines(summary):
+    return ["{} {} {}\n".format(k, avg, stdev) for k, (avg, stdev) in summary.items()]
+
+def parse_summary(f):
+    d = {}
+    for line in f:
+        param, avg, stdev = line.split()
+        d[param] = (avg, stdev)
+    return d
 
 def run(exe, data, overwrite=False):
     gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".gold")
@@ -119,15 +128,24 @@ def run(exe, data, overwrite=False):
            .format(exe, data, tmp))
     summary = csv_summary(tmp)
     with open(tmp, "w+") as f:
-        lines = ["{} {}\n".format(k, round(v)) for k, v in summary.items()]
-        f.writelines(lines)
+        f.writelines(format_summary_lines(summary))
 
     if overwrite:
         shexec("mv {} {}".format(tmp, gold))
     else:
-        if 0 != subprocess.call("diff {} {}".format(gold, tmp), shell=True):
-            print("FAIL: {} not matched by output.".format(gold))
-            return False
+        gold_summary = {}
+        with open(gold) as gf:
+            gold_summary = parse_summary(gf)
+        for k, (mean, stdev) in gold_summary.items():
+            # Test (mu_est - mu_true) / sigma_true < 0.25 ?
+            err = summary[k][0] - mean
+            if err / stdev < 0.25:
+                print("FAIL: {} not within ({} - {}) / {} < 0.25"
+                      .format(gold, summary[k][0], mean, stdev))
+                return False
+        #if 0 != subprocess.call("diff {} {}".format(gold, tmp), shell=True):
+        #    print("FAIL: {} not matched by output.".format(gold))
+        #    return False
     return True
 
 def parse_args():

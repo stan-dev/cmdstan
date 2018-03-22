@@ -1,26 +1,13 @@
-theta.6_avg 7.0
-theta.12_stddev 10.0
-theta.5_avg 6.0
-theta.3_avg 2.0
-theta.1_avg 0.0
-theta.5_stddev 9.0
-theta.2_avg 1.0
-theta.7_avg 6.0
-theta.2_stddev 2.0
-theta.7_stddev 10.0
-theta.10_stddev 14.0
-theta.4_avg 3.0
-theta.13_avg 17.0
-theta.12_avg 16.0
-theta.1_stddev 1.0
-theta.3_stddev 3.0
-theta.8_stddev 16.0
-theta.4_stddev 3.0
-theta.13_stddev 16.0
-theta.11_stddev 27.0
-theta.10_avg 12.0
-theta.6_stddev 12.0
-theta.8_avg 9.0
-theta.11_avg 12.0
-theta.9_stddev 16.0
-theta.9_avg 9.0
+theta.11 11.57001437 27.3103446595
+theta.10 11.93172031 14.4866043257
+theta.13 16.9698373 16.2024906744
+theta.12 15.7948387 10.2626511603
+theta.9 8.98025804 16.1433960669
+theta.8 8.93039921 16.0441605447
+theta.1 0.326456274504 1.28574429514
+theta.3 2.34326443 2.71505752868
+theta.2 1.369713789 2.1311741576
+theta.5 5.51716876 9.09448158256
+theta.4 2.90587212 2.55306881529
+theta.7 6.43547568 10.3530514713
+theta.6 6.74761792 11.5018543146

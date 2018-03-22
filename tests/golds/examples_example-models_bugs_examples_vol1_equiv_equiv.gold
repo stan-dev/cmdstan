@@ -1,38 +1,19 @@
-delta.1_stddev 0.0
-pi_stddev 0.0
-sigmasq2_avg 0.0
-delta.9_stddev 0.0
-delta.2_avg 0.0
-sigma2_avg 0.0
-delta.7_stddev 0.0
-equiv_avg 1.0
-delta.5_stddev 0.0
-phi_avg -0.0
-delta.2_stddev 0.0
-sigma2_stddev 0.0
-sigmasq2_stddev 0.0
-mu_stddev 0.0
-sigmasq1_avg 0.0
-sigma1_avg 0.0
-delta.10_avg -0.0
-delta.6_stddev 0.0
-delta.8_stddev 0.0
-sigma1_stddev 0.0
-equiv_stddev 0.0
-sigmasq1_stddev 0.0
-delta.10_stddev 0.0
-delta.7_avg -0.0
-delta.9_avg -0.0
-delta.3_avg 0.0
-delta.8_avg -0.0
-delta.5_avg 0.0
-delta.3_stddev 0.0
-pi_avg -0.0
-mu_avg 1.0
-theta_avg 1.0
-delta.4_avg 0.0
-delta.1_avg 0.0
-delta.4_stddev 0.0
-theta_stddev 0.0
-delta.6_avg -0.0
-phi_stddev 0.0
+phi -0.006311586892 0.0896591358181
+delta.4 0.0560720492771 0.200153801971
+theta 0.995115547 0.0887099108087
+delta.3 0.0490277959687 0.17826428052
+equiv 0.998 0.0631506453174
+mu 1.44035002 0.0874473176143
+sigmasq2 0.020940753716 0.00803033279016
+sigmasq1 0.01388795438 0.00314495194301
+delta.10 -0.022538870103 0.188576426385
+delta.9 -0.0825645847414 0.204337389089
+delta.8 -0.065819783894 0.204018663918
+delta.7 -0.124061429742 0.24372404182
+delta.6 -0.173008404247 0.281715721723
+delta.5 0.157387525045 0.238448417735
+pi -0.17834451347 0.0873191726562
+sigma1 0.1123960675 0.0397088916798
+delta.2 0.110227603908 0.235114145472
+delta.1 0.0571644469407 0.190819382402
+sigma2 0.1354126969 0.08239189829

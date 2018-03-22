@@ -1,2024 +1,1012 @@
-theta.494_avg 0.0
-theta.643_avg 0.0
-theta.884_stddev 20.0
-theta.544_avg 0.0
-theta.117_stddev 18.0
-theta.84_avg -1.0
-theta.503_avg 0.0
-theta.295_stddev 23.0
-theta.259_stddev 21.0
-theta.69_avg 0.0
-theta.840_avg 1.0
-theta.234_avg -0.0
-theta.390_avg -0.0
-theta.423_avg -0.0
-theta.703_stddev 23.0
-theta.766_avg 1.0
-theta.518_stddev 22.0
-theta.342_stddev 19.0
-theta.244_avg -0.0
-theta.923_avg 1.0
-theta.31_stddev 19.0
-theta.112_avg -1.0
-theta.642_stddev 22.0
-theta.370_avg -0.0
-theta.741_stddev 26.0
-theta.504_stddev 22.0
-theta.208_stddev 21.0
-theta.435_stddev 22.0
-theta.972_stddev 22.0
-theta.358_avg -0.0
-theta.846_avg 1.0
-theta.474_avg 0.0
-theta.141_avg -0.0
-theta.551_stddev 23.0
-theta.844_stddev 25.0
-theta.654_stddev 21.0
-theta.101_avg -1.0
-theta.764_avg 1.0
-theta.582_avg 0.0
-theta.671_stddev 20.0
-theta.366_stddev 18.0
-theta.531_stddev 23.0
-theta.525_avg 0.0
-theta.855_avg 1.0
-theta.960_stddev 23.0
-theta.552_stddev 25.0
-theta.600_stddev 21.0
-alpha.3_stddev 0.0
-theta.81_stddev 22.0
-theta.501_stddev 21.0
-theta.252_avg -0.0
-theta.878_avg 1.0
-theta.649_avg 0.0
-theta.951_avg 1.0
-theta.179_stddev 20.0
-theta.287_stddev 26.0
-theta.13_stddev 20.0
-theta.847_stddev 22.0
-theta.54_avg -0.0
-theta.178_avg -0.0
-theta.380_stddev 20.0
-theta.461_avg 0.0
-theta.650_avg 0.0
-theta.237_avg -0.0
-theta.564_avg 0.0
-theta.303_stddev 19.0
-theta.789_stddev 22.0
-theta.510_stddev 24.0
-theta.986_stddev 22.0
-theta.821_avg 1.0
-theta.633_avg 0.0
-theta.248_avg -0.0
-theta.916_avg 1.0
-theta.510_avg 0.0
-theta.937_stddev 22.0
-theta.419_avg -0.0
-theta.988_avg 1.0
-theta.459_avg 0.0
-theta.953_avg 1.0
-theta.714_stddev 26.0
-theta.201_stddev 24.0
-theta.987_avg 1.0
-theta.463_avg 0.0
-theta.979_avg 1.0
-theta.566_avg 0.0
-mean_alpha_stddev 0.0
-theta.733_avg 1.0
-theta.726_avg 1.0
-theta.700_avg 0.0
-theta.413_avg -0.0
-theta.882_avg 1.0
-theta.809_avg 1.0
-theta.610_stddev 22.0
-theta.355_stddev 23.0
-theta.779_stddev 26.0
-theta.157_stddev 19.0
-theta.528_avg 0.0
-theta.811_stddev 25.0
-theta.273_stddev 24.0
-theta.944_avg 1.0
-theta.568_avg 0.0
-theta.894_stddev 23.0
-theta.83_stddev 24.0
-a.2_stddev 0.0
-theta.496_avg 0.0
-theta.717_avg 1.0
-theta.536_stddev 19.0
-theta.964_avg 1.0
-theta.743_avg 1.0
-theta.733_stddev 22.0
-theta.210_avg -0.0
-theta.505_stddev 20.0
-theta.570_avg 0.0
-theta.864_avg 1.0
-theta.406_stddev 23.0
-theta.673_stddev 21.0
-theta.247_stddev 21.0
-theta.176_stddev 22.0
-theta.697_stddev 21.0
-theta.540_avg 0.0
-theta.129_stddev 22.0
-theta.274_stddev 21.0
-theta.312_avg 0.0
-theta.715_avg 1.0
-theta.863_avg 1.0
-theta.613_avg -0.0
-theta.201_avg -0.0
-theta.756_stddev 22.0
-theta.254_stddev 21.0
-theta.859_stddev 22.0
-theta.277_stddev 25.0
-theta.178_stddev 24.0
-theta.930_stddev 25.0
-theta.97_avg -1.0
-theta.436_stddev 22.0
-theta.744_stddev 19.0
-theta.852_stddev 23.0
-theta.61_stddev 21.0
-theta.86_avg -1.0
-theta.836_avg 1.0
-theta.642_avg 0.0
-theta.250_avg -0.0
-theta.555_avg 0.0
-theta.330_avg 0.0
-theta.772_stddev 25.0
-theta.920_avg 1.0
-theta.313_stddev 21.0
-theta.879_avg 1.0
-theta.602_avg 0.0
-theta.284_stddev 21.0
-a.4_avg 0.0
-theta.875_stddev 25.0
-theta.679_stddev 21.0
-theta.753_avg 1.0
-theta.767_stddev 23.0
-theta.91_avg -1.0
-theta.224_avg -0.0
-theta.352_stddev 22.0
-theta.734_avg 1.0
-theta.601_stddev 20.0
-theta.322_avg 0.0
-theta.635_avg 0.0
-theta.796_stddev 26.0
-theta.268_avg 0.0
-theta.593_avg 0.0
-theta.483_avg 0.0
-theta.138_avg -0.0
-theta.471_stddev 25.0
-theta.344_stddev 23.0
-theta.73_avg 0.0
-theta.449_stddev 22.0
-theta.121_stddev 19.0
-theta.50_avg -0.0
-theta.163_stddev 18.0
-theta.812_avg 1.0
-theta.103_avg -1.0
-theta.230_stddev 22.0
-theta.930_avg 1.0
-theta.669_stddev 21.0
-theta.70_avg 0.0
-theta.929_stddev 25.0
-theta.775_avg 1.0
-theta.58_stddev 23.0
-theta.606_avg -0.0
-theta.58_avg -0.0
-theta.174_avg -0.0
-theta.548_avg 0.0
-theta.514_avg 0.0
-theta.602_stddev 24.0
-a.5_stddev 0.0
-theta.60_stddev 21.0
-theta.16_stddev 20.0
-theta.537_stddev 22.0
-theta.86_stddev 18.0
-theta.17_avg -1.0
-theta.867_avg 1.0
-theta.137_stddev 23.0
-theta.249_avg -0.0
-theta.253_stddev 20.0
-theta.883_stddev 24.0
-theta.52_avg -0.0
-theta.516_stddev 21.0
-theta.826_avg 1.0
-theta.246_stddev 22.0
-theta.523_avg 0.0
-theta.222_avg -0.0
-theta.867_stddev 24.0
-theta.38_avg -1.0
-theta.777_avg 1.0
-theta.814_stddev 25.0
-theta.437_stddev 25.0
-theta.386_stddev 21.0
-theta.754_stddev 22.0
-theta.548_stddev 21.0
-theta.807_stddev 25.0
-theta.427_stddev 23.0
-theta.145_stddev 21.0
-theta.576_avg 0.0
-theta.442_avg 0.0
-theta.578_stddev 23.0
-theta.84_stddev 20.0
-theta.62_stddev 22.0
-theta.739_avg 1.0
-theta.300_avg 0.0
-theta.605_stddev 18.0
-theta.888_stddev 26.0
-theta.23_avg -1.0
-theta.779_avg 1.0
-theta.939_avg 1.0
-theta.123_stddev 23.0
-theta.331_stddev 22.0
-theta.170_stddev 23.0
-theta.377_stddev 25.0
-theta.760_avg 1.0
-theta.358_stddev 20.0
-theta.584_avg 0.0
-theta.350_avg -1.0
-theta.412_stddev 21.0
-theta.507_avg 0.0
-theta.828_stddev 23.0
-theta.151_stddev 23.0
-theta.146_stddev 20.0
-theta.703_avg 1.0
-theta.781_avg 1.0
-theta.663_avg 0.0
-theta.253_avg -0.0
-theta.559_stddev 22.0
-theta.604_avg -0.0
-theta.579_stddev 23.0
-theta.281_avg 0.0
-theta.457_stddev 26.0
-theta.277_avg 0.0
-theta.166_stddev 22.0
-theta.711_avg 1.0
-theta.700_stddev 23.0
-theta.78_avg -1.0
-theta.96_stddev 24.0
-theta.855_stddev 25.0
-theta.458_stddev 23.0
-theta.786_avg 1.0
-theta.916_stddev 24.0
-theta.669_avg 0.0
-theta.411_avg -0.0
-theta.424_stddev 23.0
-theta.476_avg 0.0
-theta.122_avg -1.0
-theta.832_stddev 24.0
-theta.777_stddev 23.0
-theta.880_stddev 25.0
-theta.612_stddev 20.0
-theta.2_avg -2.0
-theta.240_avg -0.0
-theta.273_avg 0.0
-theta.537_avg 0.0
-theta.496_stddev 22.0
-theta.735_stddev 21.0
-theta.320_stddev 22.0
-theta.957_avg 1.0
-theta.238_avg -0.0
-theta.832_avg 1.0
-theta.905_avg 1.0
-theta.764_stddev 25.0
-theta.481_avg 0.0
-theta.722_avg 1.0
-theta.857_stddev 23.0
-theta.438_avg 0.0
-theta.709_avg 1.0
-theta.481_stddev 24.0
-theta.318_avg 0.0
-theta.198_avg -0.0
-theta.105_avg -1.0
-theta.562_avg 0.0
-theta.924_avg 1.0
-theta.72_avg 0.0
-theta.881_stddev 23.0
-theta.220_avg -0.0
-theta.914_avg 1.0
-theta.674_avg 0.0
-theta.875_avg 1.0
-theta.459_stddev 19.0
-theta.457_avg 0.0
-theta.112_stddev 18.0
-theta.370_stddev 20.0
-theta.408_stddev 20.0
-theta.63_avg 0.0
-theta.827_stddev 23.0
-theta.597_avg 0.0
-theta.830_avg 1.0
-theta.889_avg 1.0
-theta.513_stddev 23.0
-theta.124_avg -1.0
-theta.962_stddev 29.0
-theta.720_avg 1.0
-theta.816_avg 1.0
-theta.640_stddev 25.0
-theta.623_avg 0.0
-theta.439_stddev 21.0
-theta.74_avg 0.0
-theta.942_stddev 25.0
-theta.491_stddev 20.0
-theta.55_stddev 21.0
-theta.382_stddev 22.0
-theta.789_avg 1.0
-theta.8_avg -1.0
-theta.617_avg 0.0
-theta.337_stddev 22.0
-theta.683_avg 0.0
-theta.719_avg 1.0
-theta.356_stddev 22.0
-theta.801_avg 1.0
-theta.519_stddev 22.0
-theta.782_avg 1.0
-theta.990_avg 1.0
-theta.218_stddev 22.0
-theta.326_avg 0.0
-theta.861_avg 1.0
-theta.126_avg -1.0
-theta.115_stddev 21.0
-theta.581_stddev 21.0
-theta.614_avg 0.0
-theta.380_avg -0.0
-theta.515_stddev 21.0
-theta.805_stddev 29.0
-theta.732_avg 1.0
-theta.451_avg 0.0
-theta.831_stddev 26.0
-theta.172_avg -0.0
-theta.127_stddev 18.0
-theta.650_stddev 24.0
-theta.705_avg 1.0
-theta.527_avg 0.0
-theta.354_stddev 17.0
-theta.302_avg 0.0
-theta.521_avg 0.0
-theta.795_stddev 26.0
-theta.99_avg -1.0
-theta.235_avg -0.0
-theta.116_avg -1.0
-theta.324_avg 0.0
-theta.918_avg 1.0
-theta.433_stddev 23.0
-theta.771_avg 1.0
-theta.542_avg 0.0
-theta.285_avg 0.0
-theta.372_avg -0.0
-theta.951_stddev 24.0
-theta.452_stddev 21.0
-theta.486_stddev 25.0
-theta.130_avg -0.0
-theta.825_stddev 23.0
-theta.144_avg -0.0
-theta.600_avg 0.0
-theta.498_stddev 22.0
-theta.711_stddev 26.0
-theta.982_stddev 24.0
-theta.299_stddev 20.0
-theta.959_avg 1.0
-theta.482_avg 0.0
-theta.303_avg 0.0
-theta.981_avg 1.0
-theta.535_avg 0.0
-theta.893_stddev 21.0
-theta.213_stddev 22.0
-theta.341_stddev 19.0
-theta.164_avg -0.0
-theta.410_stddev 22.0
-theta.95_avg -1.0
-theta.466_avg 0.0
-theta.374_avg -0.0
-theta.488_stddev 24.0
-theta.956_avg 1.0
-theta.136_avg -0.0
-theta.276_stddev 22.0
-theta.922_stddev 21.0
-theta.371_stddev 21.0
-theta.826_stddev 25.0
-theta.394_avg -0.0
-theta.563_avg 0.0
-theta.345_avg -1.0
-theta.226_avg -0.0
-theta.720_stddev 23.0
-theta.292_avg 0.0
-theta.184_stddev 21.0
-theta.413_stddev 24.0
-theta.56_avg -0.0
-theta.429_avg -0.0
-theta.705_stddev 23.0
-theta.863_stddev 23.0
-theta.109_avg -1.0
-theta.501_avg 0.0
-theta.517_avg 0.0
-theta.681_stddev 22.0
-theta.430_avg 0.0
-theta.304_avg 0.0
-theta.176_avg -0.0
-theta.522_stddev 21.0
-theta.48_stddev 20.0
-theta.247_avg -0.0
-theta.808_stddev 23.0
-theta.350_stddev 22.0
-theta.653_stddev 22.0
-theta.681_avg 0.0
-theta.453_avg 0.0
-theta.15_avg -1.0
-theta.902_stddev 23.0
-theta.870_stddev 24.0
-theta.629_stddev 22.0
-theta.701_stddev 23.0
-theta.656_avg 0.0
-theta.447_stddev 21.0
-theta.950_avg 1.0
-theta.200_stddev 20.0
-theta.194_stddev 21.0
-theta.619_stddev 21.0
-theta.80_stddev 19.0
-theta.864_stddev 24.0
-theta.940_stddev 25.0
-theta.4_avg -1.0
-theta.952_stddev 22.0
-theta.824_avg 1.0
-theta.799_avg 1.0
-theta.306_avg 0.0
-theta.648_avg 0.0
-theta.249_stddev 21.0
-theta.400_avg -0.0
-theta.353_stddev 21.0
-theta.935_avg 1.0
-theta.431_avg 0.0
-theta.529_stddev 23.0
-theta.541_stddev 26.0
-theta.285_stddev 20.0
-theta.258_stddev 25.0
-theta.348_avg -1.0
-theta.414_stddev 20.0
-theta.308_avg 0.0
-theta.508_avg 0.0
-theta.562_stddev 24.0
-theta.34_stddev 22.0
-theta.652_stddev 20.0
-theta.994_stddev 22.0
-theta.784_avg 1.0
-theta.76_stddev 20.0
-theta.698_avg 0.0
-theta.293_stddev 23.0
-theta.474_stddev 23.0
-theta.317_stddev 21.0
-theta.310_avg 0.0
-theta.866_stddev 26.0
-theta.536_avg 0.0
-theta.590_stddev 22.0
-theta.275_avg 0.0
-alpha.5_avg -2.0
-theta.387_avg -0.0
-theta.851_stddev 24.0
-theta.622_stddev 19.0
-theta.730_stddev 24.0
-theta.880_avg 1.0
-theta.815_stddev 25.0
-theta.320_avg 0.0
-theta.730_avg 1.0
-mean_alpha_avg -1.0
-theta.359_stddev 21.0
-theta.424_avg -0.0
-theta.804_stddev 23.0
-theta.40_stddev 20.0
-theta.307_stddev 22.0
-theta.300_stddev 22.0
-theta.19_avg -1.0
-theta.898_avg 1.0
-theta.442_stddev 19.0
-theta.59_stddev 20.0
-theta.138_stddev 21.0
-theta.160_avg -0.0
-theta.415_stddev 19.0
-theta.713_avg 1.0
-theta.580_stddev 24.0
-theta.860_stddev 22.0
-theta.890_stddev 22.0
-theta.381_avg -0.0
-theta.834_avg 1.0
-theta.595_avg 0.0
-theta.980_stddev 21.0
-theta.966_stddev 28.0
-theta.696_avg 0.0
-theta.422_avg -0.0
-theta.19_stddev 19.0
-theta.627_avg 0.0
-theta.108_stddev 18.0
-theta.856_avg 1.0
-theta.814_avg 1.0
-theta.140_stddev 19.0
-theta.973_stddev 24.0
-theta.755_avg 1.0
-theta.65_stddev 21.0
-theta.820_stddev 24.0
-theta.57_avg -0.0
-theta.462_avg 0.0
-theta.91_stddev 20.0
-theta.567_avg 0.0
-theta.877_avg 1.0
-theta.913_stddev 23.0
-theta.555_stddev 19.0
-theta.85_stddev 19.0
-theta.772_avg 1.0
-theta.617_stddev 23.0
-theta.455_avg 0.0
-theta.768_avg 1.0
-theta.111_avg -1.0
-theta.736_avg 1.0
-theta.661_avg 0.0
-theta.961_stddev 22.0
-theta.509_stddev 20.0
-theta.683_stddev 23.0
-theta.625_avg 0.0
-theta.104_stddev 21.0
-theta.546_stddev 24.0
-theta.212_avg -1.0
-theta.311_stddev 21.0
-theta.266_stddev 26.0
-theta.202_stddev 21.0
-theta.940_avg 1.0
-theta.328_avg 0.0
-theta.76_avg 0.0
-theta.480_stddev 22.0
-theta.159_stddev 21.0
-theta.838_stddev 26.0
-theta.225_stddev 22.0
-theta.145_avg -0.0
-theta.337_avg -1.0
-theta.148_stddev 19.0
-theta.198_stddev 21.0
-theta.51_avg -0.0
-theta.869_stddev 25.0
-theta.248_stddev 22.0
-theta.93_stddev 24.0
-theta.587_stddev 23.0
-theta.850_stddev 23.0
-theta.934_avg 1.0
-theta.686_avg 0.0
-theta.182_stddev 22.0
-theta.565_avg 0.0
-theta.343_avg -1.0
-theta.774_avg 1.0
-theta.704_stddev 19.0
-theta.828_avg 1.0
-theta.963_stddev 22.0
-theta.891_stddev 25.0
-theta.405_stddev 25.0
-theta.42_stddev 22.0
-theta.589_stddev 22.0
-theta.727_stddev 23.0
-theta.640_avg 0.0
-theta.952_avg 1.0
-theta.6_avg -1.0
-theta.196_stddev 23.0
-theta.280_stddev 24.0
-theta.654_avg 0.0
-theta.598_avg 0.0
-theta.941_stddev 24.0
-theta.808_avg 1.0
-theta.771_stddev 24.0
-alpha.2_stddev 0.0
-theta.998_avg 1.0
-theta.266_avg 0.0
-theta.596_stddev 21.0
-theta.251_avg -0.0
-theta.94_stddev 20.0
-theta.159_avg -0.0
-theta.933_stddev 23.0
-theta.981_stddev 23.0
-theta.965_stddev 24.0
-theta.367_avg -0.0
-theta.871_stddev 26.0
-theta.271_avg 0.0
-theta.162_avg -0.0
-theta.643_stddev 22.0
-theta.749_stddev 23.0
-theta.151_avg -0.0
-theta.492_stddev 22.0
-alpha.1_avg -3.0
-theta.464_avg 0.0
-theta.282_stddev 23.0
-theta.696_stddev 22.0
-theta.660_stddev 19.0
-theta.511_stddev 19.0
-theta.384_stddev 18.0
-theta.725_avg 1.0
-theta.921_avg 1.0
-theta.240_stddev 23.0
-theta.835_avg 1.0
-theta.294_avg 0.0
-theta.191_stddev 23.0
-theta.484_stddev 24.0
-theta.884_avg 1.0
-theta.409_avg -0.0
-theta.784_stddev 24.0
-theta.270_stddev 22.0
-theta.385_avg -0.0
-theta.200_avg -0.0
-theta.734_stddev 25.0
-theta.561_avg 0.0
-theta.192_stddev 19.0
-theta.497_stddev 19.0
-theta.357_avg -0.0
-theta.938_stddev 24.0
-theta.657_avg 0.0
-theta.114_stddev 20.0
-theta.288_stddev 24.0
-theta.692_avg 0.0
-theta.502_stddev 21.0
-theta.205_stddev 23.0
-theta.487_stddev 24.0
-theta.363_stddev 20.0
-theta.820_avg 1.0
-theta.661_stddev 22.0
-theta.347_stddev 21.0
-theta.971_stddev 24.0
-theta.885_stddev 25.0
-theta.504_avg 0.0
-theta.214_stddev 24.0
-theta.93_avg -1.0
-theta.942_avg 1.0
-theta.636_stddev 22.0
-theta.294_stddev 21.0
-theta.5_stddev 21.0
-theta.833_avg 1.0
-theta.570_stddev 23.0
-a.1_stddev 0.0
-theta.690_avg 0.0
-theta.629_avg 0.0
-theta.65_avg 0.0
-theta.63_stddev 21.0
-theta.516_avg 0.0
-theta.614_stddev 21.0
-theta.142_stddev 23.0
-theta.239_avg -0.0
-theta.970_stddev 23.0
-a.3_stddev 0.0
-theta.298_avg 0.0
-theta.464_stddev 22.0
-theta.27_avg -1.0
-theta.682_stddev 21.0
-theta.454_stddev 23.0
-theta.607_avg -0.0
-theta.15_stddev 23.0
-theta.983_avg 1.0
-theta.186_avg -0.0
-theta.468_stddev 21.0
-theta.170_avg -0.0
-theta.265_stddev 21.0
-theta.853_stddev 22.0
-theta.314_stddev 25.0
-theta.120_avg -1.0
-theta.912_stddev 22.0
-theta.748_avg 1.0
-theta.493_stddev 20.0
-theta.985_avg 1.0
-theta.907_avg 1.0
-theta.788_stddev 22.0
-theta.550_avg 0.0
-theta.53_avg -0.0
-theta.815_avg 1.0
-theta.901_stddev 23.0
-theta.341_avg -1.0
-theta.767_avg 1.0
-theta.184_avg -0.0
-theta.900_avg 1.0
-theta.559_avg 0.0
-theta.895_stddev 25.0
-theta.799_stddev 23.0
-theta.495_avg 0.0
-theta.49_stddev 21.0
-theta.480_avg 0.0
-theta.390_stddev 23.0
-theta.645_avg 0.0
-theta.499_stddev 24.0
-theta.564_stddev 23.0
-theta.154_stddev 20.0
-theta.68_avg 0.0
-theta.443_avg 0.0
-theta.460_avg 0.0
-theta.545_stddev 26.0
-theta.935_stddev 21.0
-theta.47_stddev 20.0
-theta.241_stddev 22.0
-theta.132_avg -0.0
-theta.949_avg 1.0
-theta.340_stddev 20.0
-theta.973_avg 1.0
-theta.761_avg 1.0
-theta.355_avg -0.0
-theta.216_avg -0.0
-theta.736_stddev 22.0
-theta.694_stddev 23.0
-theta.672_avg 0.0
-theta.568_stddev 23.0
-theta.592_avg 0.0
-theta.625_stddev 26.0
-theta.486_avg 0.0
-theta.79_stddev 20.0
-theta.117_avg -1.0
-theta.721_avg 1.0
-theta.874_stddev 20.0
-theta.136_stddev 22.0
-theta.958_avg 1.0
-theta.414_avg -0.0
-theta.839_avg 1.0
-theta.134_avg -0.0
-theta.797_stddev 23.0
-theta.651_avg 0.0
-theta.477_avg 0.0
-theta.932_avg 1.0
-theta.298_stddev 25.0
-theta.287_avg 0.0
-theta.770_avg 1.0
-theta.802_stddev 24.0
-theta.581_avg 0.0
-theta.845_avg 1.0
-theta.347_avg -1.0
-theta.168_avg -0.0
-theta.214_avg -0.0
-theta.748_stddev 23.0
-theta.695_stddev 22.0
-theta.917_avg 1.0
-theta.641_stddev 22.0
-theta.361_avg -0.0
-theta.709_stddev 23.0
-theta.514_stddev 22.0
-theta.646_avg 0.0
-theta.436_avg 0.0
-theta.187_stddev 20.0
-theta.67_stddev 23.0
-theta.805_avg 1.0
-theta.25_avg -1.0
-theta.469_stddev 19.0
-theta.283_avg 0.0
-theta.904_avg 1.0
-theta.506_stddev 24.0
-theta.869_avg 1.0
-theta.335_stddev 22.0
-theta.360_stddev 22.0
-theta.77_avg -1.0
-theta.429_stddev 21.0
-theta.707_stddev 24.0
-theta.113_stddev 21.0
-theta.539_avg 0.0
-theta.945_avg 1.0
-theta.10_stddev 19.0
-theta.644_avg 0.0
-theta.206_avg -0.0
-theta.305_avg 0.0
-theta.684_avg 0.0
-theta.434_avg 0.0
-theta.428_avg -0.0
-theta.188_stddev 25.0
-theta.392_avg -0.0
-theta.62_avg 0.0
-theta.54_stddev 20.0
-theta.231_avg -0.0
-theta.831_avg 1.0
-theta.563_stddev 23.0
-theta.969_stddev 25.0
-theta.515_avg 0.0
-theta.38_stddev 19.0
-theta.448_stddev 22.0
-theta.368_avg -0.0
-theta.954_avg 1.0
-theta.569_avg 0.0
-theta.554_avg 0.0
-theta.598_stddev 22.0
-theta.529_avg 0.0
-theta.858_avg 1.0
-theta.534_avg 0.0
-theta.35_avg -1.0
-theta.857_avg 1.0
-theta.965_avg 1.0
-theta.819_stddev 24.0
-theta.262_avg 0.0
-theta.886_avg 1.0
-theta.206_stddev 21.0
-theta.404_stddev 21.0
-theta.64_avg 0.0
-theta.354_avg -0.0
-theta.978_avg 1.0
-theta.794_stddev 24.0
-theta.426_avg -0.0
-theta.3_stddev 20.0
-theta.744_avg 1.0
-theta.731_stddev 23.0
-theta.286_stddev 24.0
-theta.199_stddev 21.0
-theta.727_avg 1.0
-theta.127_avg -1.0
-theta.959_stddev 23.0
-beta_stddev 0.0
-theta.552_avg 0.0
-theta.535_stddev 24.0
-theta.999_stddev 25.0
-theta.267_stddev 24.0
-theta.665_stddev 23.0
-alpha.3_avg -0.0
-theta.620_avg 0.0
-theta.580_avg 0.0
-theta.532_avg 0.0
-theta.180_avg -0.0
-theta.960_avg 1.0
-a.4_stddev 0.0
-theta.917_stddev 25.0
-theta.638_avg 0.0
-theta.150_stddev 20.0
-theta.543_avg 0.0
-theta.356_avg -0.0
-theta.655_stddev 22.0
-theta.334_stddev 21.0
-theta.947_stddev 22.0
-theta.36_stddev 23.0
-theta.607_stddev 20.0
-theta.278_avg 0.0
-theta.121_avg -1.0
-theta.694_avg 0.0
-theta.667_avg 0.0
-theta.134_stddev 22.0
-theta.553_stddev 22.0
-theta.28_avg -0.0
-theta.702_avg 0.0
-theta.718_avg 1.0
-theta.383_avg -0.0
-theta.666_stddev 23.0
-theta.585_stddev 20.0
-theta.32_avg -1.0
-theta.574_avg 0.0
-theta.195_avg -0.0
-theta.776_stddev 24.0
-theta.242_stddev 20.0
-theta.837_stddev 24.0
-theta.357_stddev 24.0
-theta.234_stddev 18.0
-theta.389_stddev 22.0
-theta.193_stddev 21.0
-theta.311_avg 0.0
-theta.418_stddev 22.0
-theta.807_avg 1.0
-theta.307_avg 0.0
-theta.169_stddev 21.0
-theta.59_avg -0.0
-theta.334_avg 0.0
-theta.28_stddev 23.0
-a.3_avg 1.0
-theta.23_stddev 20.0
-theta.888_avg 1.0
-theta.975_avg 1.0
-theta.750_avg 1.0
-theta.218_avg -0.0
-theta.153_avg -0.0
-theta.798_stddev 24.0
-theta.304_stddev 21.0
-theta.189_stddev 24.0
-theta.445_avg 0.0
-theta.913_avg 1.0
-theta.95_stddev 19.0
-theta.588_avg 0.0
-theta.594_avg 0.0
-theta.16_avg -1.0
-theta.332_avg 0.0
-theta.549_avg 0.0
-theta.224_stddev 21.0
-theta.188_avg -0.0
-theta.787_stddev 23.0
-theta.283_stddev 23.0
-theta.573_stddev 21.0
-theta.586_avg 0.0
-theta.68_stddev 20.0
-theta.257_stddev 23.0
-theta.166_avg -0.0
-theta.566_stddev 23.0
-theta.532_stddev 24.0
-theta.902_avg 1.0
-theta.183_stddev 25.0
-theta.822_avg 1.0
-theta.417_stddev 22.0
-theta.865_avg 1.0
-theta.651_stddev 22.0
-theta.164_stddev 22.0
-theta.343_stddev 20.0
-theta.22_avg -1.0
-theta.524_stddev 22.0
-theta.471_avg 0.0
-theta.381_stddev 23.0
-theta.35_stddev 22.0
-theta.688_avg 0.0
-theta.144_stddev 22.0
-theta.314_avg 0.0
-theta.926_avg 1.0
-theta.876_stddev 22.0
-theta.56_stddev 20.0
-theta.420_avg -0.0
-theta.106_stddev 22.0
-theta.250_stddev 22.0
-theta.887_avg 1.0
-theta.768_stddev 23.0
-theta.463_stddev 21.0
-theta.204_avg -0.0
-theta.843_avg 1.0
-theta.55_avg -0.0
-theta.778_avg 1.0
-theta.446_avg 0.0
-theta.738_avg 1.0
-theta.60_avg -0.0
-theta.397_stddev 20.0
-theta.291_stddev 25.0
-theta.21_stddev 18.0
-theta.391_stddev 22.0
-theta.684_stddev 21.0
-theta.368_stddev 22.0
-theta.491_avg 0.0
-theta.79_avg -1.0
-theta.723_avg 1.0
-theta.57_stddev 22.0
-theta.39_avg -1.0
-theta.196_avg -0.0
-theta.305_stddev 23.0
-theta.745_stddev 22.0
-theta.444_stddev 23.0
-theta.262_stddev 21.0
-theta.379_avg -0.0
-theta.896_avg 1.0
-theta.453_stddev 23.0
-theta.927_stddev 23.0
-theta.590_avg 0.0
-theta.440_avg 0.0
-theta.954_stddev 24.0
-theta.751_avg 1.0
-alpha.5_stddev 0.0
-theta.856_stddev 23.0
-theta.22_stddev 20.0
-theta.624_avg 0.0
-theta.237_stddev 21.0
-theta.383_stddev 21.0
-theta.645_stddev 26.0
-theta.309_stddev 21.0
-theta.845_stddev 26.0
-theta.125_avg -1.0
-theta.970_avg 1.0
-theta.712_avg 1.0
-theta.233_avg -0.0
-theta.301_avg 0.0
-theta.538_stddev 21.0
-theta.378_stddev 20.0
-theta.583_avg 0.0
-theta.173_stddev 21.0
-theta.672_stddev 22.0
-theta.202_avg -0.0
-theta.469_avg 0.0
-theta.775_stddev 23.0
-theta.663_stddev 22.0
-theta.36_avg -1.0
-theta.928_avg 1.0
-theta.39_stddev 19.0
-theta.874_avg 1.0
-theta.129_avg -1.0
-theta.264_avg 0.0
-theta.680_avg 0.0
-theta.659_avg 0.0
-theta.18_stddev 20.0
-theta.174_stddev 20.0
-theta.335_avg 0.0
-theta.637_stddev 23.0
-theta.364_avg -0.0
-theta.993_avg 1.0
-theta.638_stddev 22.0
-theta.77_stddev 21.0
-theta.458_avg 0.0
-theta.312_stddev 21.0
-theta.556_stddev 20.0
-theta.221_stddev 21.0
-theta.921_stddev 22.0
-theta.110_stddev 23.0
-theta.693_avg 0.0
-theta.989_avg 1.0
-a.5_avg -1.0
-theta.157_avg -0.0
-theta.34_avg -1.0
-theta.449_avg 0.0
-theta.133_stddev 18.0
-theta.289_avg 0.0
-theta.577_avg 0.0
-theta.800_avg 1.0
-theta.545_avg 0.0
-theta.947_avg 1.0
-theta.12_avg -1.0
-theta.348_stddev 18.0
-theta.245_avg -0.0
-theta.759_avg 1.0
-theta.306_stddev 23.0
-theta.984_stddev 25.0
-theta.977_avg 1.0
-theta.915_stddev 26.0
-theta.6_stddev 22.0
-theta.175_stddev 20.0
-theta.710_avg 1.0
-theta.181_stddev 22.0
-theta.373_stddev 24.0
-theta.140_avg -0.0
-theta.119_avg -1.0
-theta.512_avg 0.0
-theta.678_avg 0.0
-theta.757_avg 1.0
-theta.837_avg 1.0
-theta.430_stddev 20.0
-theta.41_avg -0.0
-theta.639_stddev 23.0
-theta.842_stddev 25.0
-theta.854_stddev 23.0
-theta.668_stddev 20.0
-theta.628_avg 0.0
-theta.860_avg 1.0
-theta.780_avg 1.0
-theta.817_avg 1.0
-theta.765_avg 1.0
-theta.576_stddev 22.0
-theta.774_stddev 26.0
-theta.279_avg 0.0
-theta.92_stddev 18.0
-theta.428_stddev 19.0
-theta.11_stddev 17.0
-theta.659_stddev 24.0
-theta.402_stddev 22.0
-theta.367_stddev 23.0
-theta.622_avg 0.0
-theta.936_stddev 24.0
-theta.447_avg 0.0
-theta.9_stddev 20.0
-theta.211_avg -1.0
-theta.473_avg 0.0
-theta.103_stddev 20.0
-theta.928_stddev 24.0
-theta.848_avg 1.0
-theta.125_stddev 21.0
-theta.339_avg -1.0
-theta.182_avg -0.0
-theta.778_stddev 24.0
-theta.209_stddev 23.0
-theta.743_stddev 23.0
-theta.995_avg 1.0
-theta.887_stddev 23.0
-theta.689_stddev 21.0
-theta.416_stddev 23.0
-theta.616_stddev 23.0
-theta.217_stddev 19.0
-alpha.1_stddev 0.0
-theta.755_stddev 26.0
-theta.284_avg 0.0
-theta.30_avg -0.0
-theta.450_stddev 23.0
-theta.47_avg -0.0
-theta.971_avg 1.0
-theta.407_avg -0.0
-theta.818_avg 1.0
-theta.557_avg 0.0
-theta.24_stddev 20.0
-theta.793_avg 1.0
-theta.101_stddev 20.0
-theta.911_avg 1.0
-theta.412_avg -0.0
-theta.810_avg 1.0
-theta.660_avg 0.0
-theta.534_stddev 22.0
-theta.975_stddev 22.0
-theta.813_stddev 27.0
-theta.301_stddev 21.0
-theta.699_avg 0.0
-theta.345_stddev 19.0
-theta.195_stddev 21.0
-theta.632_stddev 25.0
-theta.374_stddev 20.0
-theta.45_avg -0.0
-theta.752_avg 1.0
-theta.677_avg 0.0
-theta.377_avg -0.0
-theta.441_stddev 22.0
-theta.475_avg 0.0
-theta.746_avg 1.0
-theta.128_stddev 21.0
-theta.203_stddev 22.0
-theta.242_avg -0.0
-theta.75_stddev 23.0
-theta.983_stddev 21.0
-theta.870_avg 1.0
-theta.739_stddev 22.0
-theta.186_stddev 23.0
-theta.497_avg 0.0
-theta.647_stddev 25.0
-theta.655_avg 0.0
-theta.391_avg -0.0
-theta.521_stddev 20.0
-theta.246_avg -0.0
-theta.670_stddev 22.0
-theta.241_avg -0.0
-theta.958_stddev 27.0
-theta.894_avg 1.0
-theta.943_avg 1.0
-theta.843_stddev 24.0
-theta.139_stddev 19.0
-theta.882_stddev 22.0
-theta.131_stddev 22.0
-theta.119_stddev 18.0
-theta.71_avg 0.0
-theta.765_stddev 24.0
-theta.573_avg 0.0
-theta.547_stddev 23.0
-theta.844_avg 1.0
-theta.324_stddev 22.0
-theta.245_stddev 22.0
-theta.359_avg -0.0
-theta.704_avg 1.0
-theta.714_avg 1.0
-theta.437_avg 0.0
-theta.20_avg -1.0
-theta.8_stddev 19.0
-theta.451_stddev 26.0
-theta.296_avg 0.0
-theta.821_stddev 20.0
-theta.149_stddev 21.0
-theta.763_avg 1.0
-theta.691_avg 0.0
-theta.87_avg -1.0
-theta.918_stddev 23.0
-theta.88_stddev 21.0
-theta.441_avg 0.0
-theta.269_avg 0.0
-theta.547_avg 0.0
-theta.530_stddev 21.0
-theta.967_avg 1.0
-theta.109_stddev 20.0
-theta.847_avg 1.0
-theta.282_avg 0.0
-theta.571_avg 0.0
-theta.309_avg 0.0
-theta.349_avg -1.0
-theta.156_stddev 19.0
-theta.889_stddev 22.0
-theta.113_avg -1.0
-theta.906_stddev 21.0
-theta.2_stddev 19.0
-theta.626_stddev 22.0
-theta.446_stddev 21.0
-theta.478_stddev 25.0
-theta.785_avg 1.0
-theta.438_stddev 23.0
-theta.626_avg 0.0
-theta.288_avg 0.0
-theta.798_avg 1.0
-theta.407_stddev 20.0
-theta.468_avg 0.0
-theta.66_avg 0.0
-theta.533_stddev 24.0
-theta.69_stddev 21.0
-theta.102_avg -1.0
-theta.401_avg -0.0
-theta.251_stddev 22.0
-theta.192_avg -0.0
-theta.676_avg 0.0
-theta.352_avg -1.0
-theta.690_stddev 21.0
-theta.399_avg -0.0
-theta.215_avg -0.0
-theta.674_stddev 21.0
-theta.754_avg 1.0
-theta.770_stddev 23.0
-theta.656_stddev 23.0
-theta.51_stddev 21.0
-theta.323_avg 0.0
-theta.652_avg 0.0
-theta.161_avg -0.0
-theta.541_avg 0.0
-theta.346_stddev 20.0
-theta.155_avg -0.0
-theta.258_avg 0.0
-theta.577_stddev 23.0
-theta.797_avg 1.0
-theta.494_stddev 23.0
-theta.197_avg -0.0
-theta.123_avg -1.0
-theta.702_stddev 23.0
-theta.243_avg -0.0
-theta.10_avg -1.0
-theta.554_stddev 28.0
-theta.550_stddev 21.0
-theta.20_stddev 22.0
-theta.757_stddev 24.0
-theta.171_stddev 23.0
-theta.261_avg 0.0
-theta.302_stddev 22.0
-theta.877_stddev 25.0
-theta.215_stddev 19.0
-theta.393_avg -0.0
-theta.539_stddev 20.0
-theta.997_avg 1.0
-theta.560_stddev 24.0
-theta.435_avg 0.0
-theta.49_avg -0.0
-theta.398_stddev 22.0
-theta.948_avg 1.0
-theta.675_stddev 22.0
-theta.825_avg 1.0
-theta.931_avg 1.0
-theta.520_avg 0.0
-theta.135_stddev 21.0
-theta.976_avg 1.0
-theta.426_stddev 23.0
-theta.596_avg 0.0
-theta.742_avg 1.0
-theta.795_avg 1.0
-theta.715_stddev 24.0
-theta.161_stddev 22.0
-theta.938_avg 1.0
-theta.948_stddev 27.0
-theta.802_avg 1.0
-theta.506_avg 0.0
-theta.666_avg 0.0
-theta.172_stddev 20.0
-theta.261_stddev 22.0
-theta.395_avg -0.0
-theta.909_avg 1.0
-theta.993_stddev 21.0
-theta.329_avg 0.0
-theta.212_stddev 20.0
-theta.255_stddev 21.0
-theta.670_avg 0.0
-theta.522_avg 0.0
-theta.861_stddev 25.0
-theta.83_avg -1.0
-theta.72_stddev 23.0
-theta.525_stddev 21.0
-theta.933_avg 1.0
-theta.211_stddev 19.0
-theta.682_avg 0.0
-theta.723_stddev 22.0
-theta.219_avg -0.0
-theta.934_stddev 23.0
-theta.264_stddev 20.0
-theta.400_stddev 19.0
-theta.518_avg 0.0
-theta.823_stddev 22.0
-theta.994_avg 1.0
-theta.297_stddev 21.0
-theta.668_avg 0.0
-theta.992_stddev 24.0
-theta.708_avg 1.0
-theta.256_stddev 21.0
-theta.115_avg -1.0
-theta.213_avg -1.0
-theta.618_avg 0.0
-theta.612_avg -0.0
-theta.910_avg 1.0
-theta.372_stddev 21.0
-theta.849_stddev 22.0
-theta.850_avg 1.0
-theta.716_avg 1.0
-theta.231_stddev 22.0
-theta.158_avg -0.0
-theta.699_stddev 23.0
-theta.167_avg -0.0
-theta.455_stddev 23.0
-theta.560_avg 0.0
-theta.106_avg -1.0
-theta.338_stddev 19.0
-theta.859_avg 1.0
-theta.90_avg -1.0
-theta.295_avg 0.0
-theta.185_stddev 23.0
-theta.322_stddev 23.0
-theta.737_stddev 22.0
-theta.105_stddev 21.0
-theta.280_avg 0.0
-theta.728_avg 1.0
-theta.636_avg 0.0
-theta.872_avg 1.0
-theta.275_stddev 23.0
-theta.890_avg 1.0
-theta.662_avg 0.0
-theta.728_stddev 19.0
-theta.111_stddev 21.0
-theta.914_stddev 22.0
-theta.624_stddev 21.0
-theta.31_avg -0.0
-theta.444_avg 0.0
-theta.990_stddev 23.0
-theta.46_stddev 22.0
-theta.227_stddev 23.0
-theta.589_avg 0.0
-theta.881_avg 1.0
-theta.230_avg -0.0
-theta.293_avg 0.0
-theta.1000_stddev 24.0
-theta.752_stddev 24.0
-theta.279_stddev 23.0
-theta.433_avg 0.0
-theta.675_avg 0.0
-theta.595_stddev 21.0
-theta.922_avg 1.0
-theta.611_avg -0.0
-theta.470_stddev 24.0
-theta.852_avg 1.0
-theta.260_stddev 21.0
-theta.489_avg 0.0
-theta.575_stddev 21.0
-theta.1000_avg 1.0
-theta.892_avg 1.0
-theta.872_stddev 26.0
-theta.809_stddev 24.0
-theta.364_stddev 20.0
-theta.478_avg 0.0
-theta.24_avg -1.0
-theta.439_avg 0.0
-theta.87_stddev 21.0
-theta.836_stddev 24.0
-theta.592_stddev 20.0
-theta.505_avg 0.0
-theta.792_stddev 23.0
-theta.706_stddev 24.0
-theta.44_stddev 23.0
-theta.492_avg 0.0
-theta.209_avg -0.0
-theta.502_avg 0.0
-theta.232_avg -0.0
-theta.623_stddev 26.0
-theta.376_stddev 20.0
-theta.154_avg -1.0
-theta.404_avg -0.0
-theta.964_stddev 23.0
-theta.816_stddev 22.0
-theta.411_stddev 22.0
-theta.490_stddev 24.0
-theta.351_stddev 20.0
-theta.731_avg 1.0
-theta.575_avg 0.0
-theta.780_stddev 27.0
-theta.37_avg -1.0
-theta.769_avg 1.0
-theta.620_stddev 23.0
-theta.460_stddev 21.0
-theta.608_avg -0.0
-theta.228_stddev 20.0
-theta.923_stddev 21.0
-theta.829_avg 1.0
-theta.361_stddev 23.0
-theta.141_stddev 22.0
-theta.7_stddev 22.0
-theta.276_avg 0.0
-theta.641_avg 0.0
-theta.81_avg -1.0
-theta.325_avg 0.0
-theta.177_stddev 22.0
-theta.64_stddev 25.0
-theta.375_stddev 21.0
-theta.976_stddev 25.0
-theta.120_stddev 19.0
-theta.503_stddev 22.0
-theta.593_stddev 23.0
-theta.527_stddev 24.0
-theta.974_avg 1.0
-theta.431_stddev 19.0
-theta.70_stddev 24.0
-theta.100_stddev 23.0
-theta.526_avg 0.0
-theta.766_stddev 25.0
-theta.418_avg -0.0
-theta.78_stddev 22.0
-theta.862_avg 1.0
-theta.996_stddev 22.0
-theta.697_avg 0.0
-theta.896_stddev 23.0
-theta.333_avg 0.0
-theta.52_stddev 18.0
-theta.158_stddev 23.0
-theta.611_stddev 20.0
-theta.316_avg 0.0
-theta.818_stddev 21.0
-theta.759_stddev 21.0
-theta.448_avg 0.0
-theta.98_stddev 21.0
-theta.616_avg 0.0
-theta.217_avg -0.0
-theta.104_avg -1.0
-theta.713_stddev 22.0
-theta.67_avg 0.0
-theta.177_avg -0.0
-theta.190_avg -0.0
-theta.604_stddev 20.0
-theta.11_avg -1.0
-theta.286_avg 0.0
-theta.721_stddev 24.0
-theta.822_stddev 25.0
-theta.66_stddev 23.0
-theta.634_stddev 22.0
-theta.278_stddev 20.0
-theta.199_avg -0.0
-theta.116_stddev 20.0
-theta.432_avg 0.0
-theta.169_avg -0.0
-theta.606_stddev 23.0
-theta.608_stddev 22.0
-alpha.4_avg -1.0
-theta.801_stddev 29.0
-theta.899_avg 1.0
-theta.238_stddev 24.0
-theta.574_stddev 21.0
-theta.333_stddev 23.0
-theta.579_avg 0.0
-theta.290_stddev 22.0
-theta.330_stddev 25.0
-theta.365_stddev 20.0
-theta.791_avg 1.0
-theta.740_avg 1.0
-theta.904_stddev 25.0
-theta.146_avg -0.0
-theta.911_stddev 24.0
-theta.290_avg 0.0
-theta.71_stddev 20.0
-theta.838_avg 1.0
-theta.165_avg -0.0
-theta.678_stddev 19.0
-theta.968_stddev 22.0
-theta.33_stddev 19.0
-theta.806_avg 1.0
-theta.585_avg 0.0
-theta.955_stddev 28.0
-theta.152_avg -0.0
-theta.851_avg 1.0
-theta.726_stddev 21.0
-theta.219_stddev 21.0
-alpha.2_avg -1.0
-theta.992_avg 1.0
-theta.968_avg 1.0
-theta.758_avg 1.0
-theta.193_avg -0.0
-theta.401_stddev 22.0
-theta.979_stddev 22.0
-theta.110_avg -1.0
-theta.500_avg 0.0
-theta.819_avg 1.0
-theta.7_avg -1.0
-theta.725_stddev 23.0
-theta.417_avg -0.0
-theta.485_avg 0.0
-theta.43_avg -0.0
-theta.926_stddev 20.0
-theta.403_stddev 22.0
-theta.509_avg 0.0
-theta.927_avg 1.0
-theta.162_stddev 20.0
-theta.520_stddev 24.0
-theta.932_stddev 22.0
-theta.131_avg -0.0
-theta.268_stddev 25.0
-theta.834_stddev 24.0
-theta.397_avg -0.0
-theta.557_stddev 23.0
-theta.482_stddev 22.0
-theta.425_stddev 21.0
-theta.634_avg 0.0
-theta.5_avg -1.0
-theta.396_stddev 22.0
-theta.419_stddev 22.0
-theta.977_stddev 24.0
-theta.434_stddev 23.0
-theta.925_avg 1.0
-theta.706_avg 1.0
-theta.29_avg -0.0
-theta.803_stddev 20.0
-theta.313_avg 0.0
-theta.941_avg 1.0
-theta.74_stddev 25.0
-theta.376_avg -0.0
-theta.906_avg 1.0
-theta.920_stddev 21.0
-theta.467_avg 0.0
-theta.243_stddev 22.0
-theta.476_stddev 22.0
-theta.667_stddev 25.0
-theta.949_stddev 24.0
-theta.233_stddev 20.0
-theta.835_stddev 26.0
-a.1_avg -1.0
-theta.409_stddev 22.0
-theta.567_stddev 21.0
-theta.327_stddev 25.0
-theta.873_avg 1.0
-theta.737_avg 1.0
-theta.327_avg 0.0
-theta.462_stddev 22.0
-theta.96_avg -1.0
-theta.210_stddev 21.0
-theta.787_avg 1.0
-theta.609_stddev 24.0
-theta.375_avg -0.0
-theta.647_avg 0.0
-theta.800_stddev 24.0
-theta.498_avg 0.0
-theta.75_avg 0.0
-theta.235_stddev 18.0
-theta.108_avg -1.0
-theta.229_stddev 21.0
-theta.14_stddev 22.0
-theta.944_stddev 22.0
-theta.500_stddev 24.0
-theta.329_stddev 23.0
-theta.649_stddev 20.0
-theta.817_stddev 19.0
-theta.194_avg -0.0
-theta.382_avg -0.0
-theta.782_stddev 21.0
-theta.763_stddev 22.0
-theta.963_avg 1.0
-theta.126_stddev 19.0
-theta.328_stddev 20.0
-theta.919_avg 1.0
-theta.225_avg -0.0
-theta.315_stddev 24.0
-theta.318_stddev 22.0
-theta.297_avg 0.0
-theta.416_avg -0.0
-theta.862_stddev 22.0
-theta.163_avg -0.0
-theta.790_avg 1.0
-theta.139_avg -0.0
-theta.465_stddev 21.0
-theta.628_stddev 24.0
-theta.646_stddev 23.0
-theta.80_avg -1.0
-theta.403_avg -0.0
-theta.813_avg 1.0
-theta.485_stddev 20.0
-theta.183_avg -0.0
-theta.89_avg -1.0
-theta.466_stddev 20.0
-theta.531_avg 0.0
-theta.321_avg 0.0
-theta.281_stddev 21.0
-theta.688_stddev 21.0
-theta.753_stddev 24.0
-theta.974_stddev 23.0
-theta.4_stddev 22.0
-theta.605_avg -0.0
-theta.339_stddev 22.0
-theta.619_avg 0.0
-theta.513_avg 0.0
-theta.319_stddev 21.0
-theta.82_avg -1.0
-theta.957_stddev 25.0
-theta.519_avg 0.0
-theta.597_stddev 23.0
-theta.729_stddev 24.0
-theta.272_stddev 23.0
-theta.353_avg -0.0
-theta.133_avg -0.0
-theta.827_avg 1.0
-theta.610_avg -0.0
-theta.147_avg -0.0
-theta.90_stddev 21.0
-theta.692_stddev 27.0
-theta.685_avg 0.0
-theta.340_avg -1.0
-theta.796_avg 1.0
-theta.664_avg 0.0
-theta.613_stddev 21.0
-theta.946_stddev 23.0
-theta.89_stddev 20.0
-theta.553_avg 0.0
-theta.982_avg 1.0
-theta.180_stddev 21.0
-theta.394_stddev 20.0
-theta.366_avg -0.0
-theta.148_avg -0.0
-theta.406_avg -0.0
-theta.956_stddev 28.0
-theta.594_stddev 21.0
-theta.135_avg -0.0
-theta.44_avg -0.0
-theta.220_stddev 20.0
-theta.716_stddev 27.0
-theta.189_avg -0.0
-theta.396_avg -0.0
-theta.873_stddev 23.0
-theta.257_avg 0.0
-theta.1_avg -2.0
-theta.621_stddev 22.0
-theta.410_avg -0.0
-theta.342_avg -1.0
-theta.972_avg 1.0
-theta.48_avg -0.0
-theta.587_avg 0.0
-theta.945_stddev 23.0
-theta.524_avg 0.0
-theta.657_stddev 22.0
-theta.179_avg -0.0
-theta.443_stddev 22.0
-theta.687_stddev 20.0
-theta.26_avg -1.0
-theta.931_stddev 23.0
-theta.903_avg 1.0
-theta.556_avg 0.0
-theta.208_avg -0.0
-theta.978_stddev 22.0
-theta.378_avg -0.0
-theta.42_avg -0.0
-theta.912_avg 1.0
-theta.408_avg -0.0
-theta.132_stddev 22.0
-theta.420_stddev 21.0
-theta.900_stddev 24.0
-theta.719_stddev 22.0
-theta.841_avg 1.0
-theta.122_stddev 22.0
-theta.919_stddev 21.0
-theta.388_avg -0.0
-theta.43_stddev 21.0
-theta.363_avg -0.0
-theta.806_stddev 22.0
-theta.558_avg 0.0
-theta.967_stddev 24.0
-theta.924_stddev 22.0
-theta.29_stddev 21.0
-theta.118_avg -1.0
-theta.259_avg 0.0
-theta.379_stddev 23.0
-theta.897_avg 1.0
-theta.323_stddev 24.0
-theta.61_avg -0.0
-theta.677_stddev 22.0
-theta.907_stddev 21.0
-theta.523_stddev 21.0
-theta.691_stddev 21.0
-theta.362_stddev 21.0
-theta.18_avg -1.0
-theta.456_avg 0.0
-theta.630_avg 0.0
-theta.878_stddev 24.0
-theta.402_avg -0.0
-theta.915_avg 1.0
-theta.747_avg 1.0
-theta.114_avg -1.0
-theta.9_avg -1.0
-theta.603_stddev 23.0
-theta.97_stddev 24.0
-theta.17_stddev 21.0
-theta.812_stddev 22.0
-theta.118_stddev 21.0
-theta.85_avg -1.0
-theta.92_avg -1.0
-theta.695_avg 0.0
-theta.440_stddev 23.0
-theta.685_stddev 22.0
-theta.415_avg -0.0
-theta.824_stddev 25.0
-theta.336_avg 0.0
-theta.508_stddev 21.0
-theta.175_avg -0.0
-theta.891_avg 1.0
-theta.762_stddev 20.0
-theta.905_stddev 26.0
-theta.632_avg 0.0
-theta.879_stddev 24.0
-theta.565_stddev 25.0
-theta.143_stddev 24.0
-theta.239_stddev 19.0
-theta.633_stddev 20.0
-theta.473_stddev 23.0
-theta.365_avg -0.0
-theta.910_stddev 24.0
-theta.362_avg -0.0
-theta.227_avg -0.0
-theta.609_avg -0.0
-theta.724_stddev 24.0
-theta.908_avg 1.0
-theta.483_stddev 22.0
-theta.686_stddev 25.0
-theta.100_avg -1.0
-theta.569_stddev 24.0
-theta.615_avg 0.0
-theta.315_avg 0.0
-theta.986_avg 1.0
-theta.908_stddev 25.0
-theta.204_stddev 19.0
-theta.255_avg -0.0
-theta.689_avg 0.0
-theta.584_stddev 24.0
-theta.903_stddev 22.0
-theta.724_avg 1.0
-theta.223_stddev 19.0
-theta.421_avg -0.0
-theta.718_stddev 24.0
-theta.185_avg -0.0
-theta.591_stddev 22.0
-theta.517_stddev 24.0
-theta.849_avg 1.0
-theta.842_avg 1.0
-theta.929_avg 1.0
-theta.794_avg 1.0
-theta.897_stddev 28.0
-theta.25_stddev 20.0
-theta.168_stddev 20.0
-theta.538_avg 0.0
-theta.346_avg -1.0
-theta.898_stddev 23.0
-theta.33_avg -1.0
-theta.256_avg -0.0
-theta.984_avg 1.0
-theta.756_avg 1.0
-theta.572_stddev 22.0
-theta.216_stddev 19.0
-theta.735_avg 1.0
-theta.336_stddev 23.0
-theta.653_avg 0.0
-theta.729_avg 1.0
-theta.46_avg -0.0
-theta.712_stddev 28.0
-theta.750_stddev 22.0
-theta.296_stddev 21.0
-theta.833_stddev 22.0
-theta.393_stddev 19.0
-theta.479_stddev 21.0
-theta.389_avg -0.0
-theta.13_avg -1.0
-theta.142_avg -0.0
-theta.528_stddev 23.0
-theta.866_avg 1.0
-theta.885_avg 1.0
-theta.37_stddev 23.0
-theta.991_stddev 20.0
-theta.601_avg 0.0
-theta.349_stddev 19.0
-theta.996_avg 1.0
-theta.321_stddev 21.0
-beta_avg 1.0
-theta.841_stddev 23.0
-theta.252_stddev 23.0
-theta.488_avg 0.0
-theta.236_avg -0.0
-theta.893_avg 1.0
-theta.811_avg 1.0
-theta.987_stddev 21.0
-theta.899_stddev 26.0
-theta.615_stddev 21.0
-theta.679_avg 0.0
-theta.639_avg 0.0
-theta.150_avg -0.0
-theta.228_avg -0.0
-theta.50_stddev 20.0
-theta.939_stddev 23.0
-theta.319_avg 0.0
-theta.45_stddev 22.0
-theta.603_avg -0.0
-theta.421_stddev 19.0
-theta.222_stddev 25.0
-theta.274_avg 0.0
-theta.648_stddev 21.0
-theta.662_stddev 19.0
-theta.507_stddev 21.0
-theta.673_avg 0.0
-theta.190_stddev 21.0
-theta.995_stddev 24.0
-theta.14_avg -1.0
-theta.98_avg -1.0
-theta.467_stddev 22.0
-theta.432_stddev 22.0
-theta.788_avg 1.0
-theta.385_stddev 20.0
-theta.909_stddev 24.0
-theta.998_stddev 24.0
-theta.946_avg 1.0
-theta.360_avg -0.0
-theta.205_avg -0.0
-theta.829_stddev 25.0
-theta.676_stddev 20.0
-theta.883_avg 1.0
-theta.171_avg -0.0
-theta.740_stddev 26.0
-theta.107_stddev 22.0
-theta.630_stddev 21.0
-theta.369_avg -0.0
-theta.760_stddev 24.0
-theta.263_avg 0.0
-theta.741_avg 1.0
-theta.786_stddev 20.0
-theta.254_avg -0.0
-theta.387_stddev 19.0
-theta.289_stddev 22.0
-theta.776_avg 1.0
-theta.793_stddev 25.0
-theta.747_stddev 23.0
-theta.680_stddev 21.0
-theta.137_avg -0.0
-theta.454_avg 0.0
-theta.572_avg 0.0
-theta.207_avg -0.0
-theta.82_stddev 21.0
-theta.561_stddev 22.0
-theta.3_avg -2.0
-theta.627_stddev 20.0
-theta.892_stddev 22.0
-theta.846_stddev 24.0
-theta.477_stddev 20.0
-theta.425_avg -0.0
-theta.484_avg 0.0
-theta.549_stddev 21.0
-theta.950_stddev 24.0
-theta.388_stddev 23.0
-theta.781_stddev 25.0
-theta.369_stddev 21.0
-theta.858_stddev 22.0
-theta.871_avg 1.0
-theta.53_stddev 18.0
-theta.1_stddev 22.0
-theta.27_stddev 19.0
-theta.326_stddev 23.0
-theta.571_stddev 20.0
-theta.738_stddev 22.0
-theta.810_stddev 26.0
-theta.746_stddev 24.0
-theta.512_stddev 19.0
-theta.710_stddev 24.0
-theta.392_stddev 21.0
-theta.160_stddev 20.0
-theta.586_stddev 20.0
-theta.489_stddev 22.0
-theta.229_avg -0.0
-theta.187_avg -0.0
-theta.848_stddev 23.0
-theta.316_stddev 21.0
-theta.698_stddev 21.0
-theta.773_stddev 21.0
-theta.487_avg 0.0
-theta.399_stddev 22.0
-theta.427_avg -0.0
-theta.299_avg 0.0
-theta.925_stddev 22.0
-theta.985_stddev 22.0
-theta.331_avg 0.0
-theta.895_avg 1.0
-theta.665_avg 0.0
-theta.868_stddev 22.0
-theta.143_avg -0.0
-alpha.4_stddev 0.0
-theta.544_stddev 21.0
-theta.371_avg -0.0
-theta.398_avg -0.0
-theta.943_stddev 24.0
-theta.73_stddev 21.0
-theta.783_stddev 23.0
-theta.783_avg 1.0
-theta.631_stddev 22.0
-theta.511_avg 0.0
-theta.244_stddev 24.0
-theta.773_avg 1.0
-theta.223_avg -0.0
-theta.745_avg 1.0
-theta.41_stddev 21.0
-theta.876_avg 1.0
-theta.664_stddev 24.0
-theta.644_stddev 20.0
-theta.751_stddev 24.0
-theta.886_stddev 22.0
-theta.618_stddev 24.0
-theta.155_stddev 20.0
-theta.761_stddev 22.0
-theta.658_stddev 23.0
-theta.351_avg -1.0
-theta.181_avg -0.0
-theta.785_stddev 24.0
-theta.853_avg 1.0
-theta.423_stddev 21.0
-theta.221_avg -0.0
-theta.465_avg 0.0
-theta.803_avg 1.0
-theta.479_avg 0.0
-theta.997_stddev 23.0
-theta.265_avg 0.0
-theta.32_stddev 18.0
-theta.152_stddev 20.0
-theta.260_avg 0.0
-theta.124_stddev 19.0
-theta.267_avg 0.0
-theta.12_stddev 20.0
-theta.830_stddev 22.0
-theta.854_avg 1.0
-theta.687_avg 0.0
-theta.582_stddev 23.0
-theta.999_avg 1.0
-theta.99_stddev 20.0
-theta.226_stddev 22.0
-theta.722_stddev 25.0
-theta.988_stddev 25.0
-theta.21_avg -1.0
-theta.472_avg 0.0
-theta.980_avg 1.0
-theta.156_avg -0.0
-theta.191_avg -0.0
-theta.599_avg 0.0
-theta.405_avg -0.0
-theta.530_avg 0.0
-theta.621_avg 0.0
-theta.762_avg 1.0
-theta.526_stddev 21.0
-theta.961_avg 1.0
-theta.490_avg 0.0
-theta.291_avg 0.0
-theta.591_avg 0.0
-theta.717_stddev 24.0
-theta.693_stddev 19.0
-theta.495_stddev 21.0
-theta.153_stddev 20.0
-theta.749_avg 1.0
-theta.475_stddev 21.0
-theta.791_stddev 24.0
-theta.292_stddev 24.0
-theta.203_avg -0.0
-theta.936_avg 1.0
-theta.701_avg 0.0
-theta.901_avg 1.0
-theta.470_avg 0.0
-theta.792_avg 1.0
-theta.456_stddev 20.0
-theta.966_avg 1.0
-theta.533_avg 0.0
-theta.671_avg 0.0
-theta.344_avg -1.0
-theta.732_stddev 24.0
-theta.583_stddev 26.0
-theta.962_avg 1.0
-theta.395_stddev 24.0
-theta.310_stddev 21.0
-theta.804_avg 1.0
-theta.147_stddev 21.0
-theta.540_stddev 21.0
-theta.207_stddev 21.0
-theta.790_stddev 25.0
-theta.40_avg -1.0
-theta.232_stddev 21.0
-theta.955_avg 1.0
-theta.707_avg 1.0
-theta.373_avg -0.0
-theta.270_avg 0.0
-theta.758_stddev 24.0
-theta.658_avg 0.0
-theta.128_avg -1.0
-theta.578_avg 0.0
-theta.937_avg 1.0
-theta.338_avg -1.0
-theta.165_stddev 19.0
-theta.26_stddev 21.0
-theta.543_stddev 22.0
-theta.991_avg 1.0
-theta.263_stddev 24.0
-theta.769_stddev 24.0
-theta.637_avg 0.0
-theta.332_stddev 24.0
-theta.499_avg 0.0
-theta.865_stddev 23.0
-theta.271_stddev 22.0
-theta.422_stddev 22.0
-theta.107_avg -1.0
-a.2_avg 0.0
-theta.384_avg -0.0
-theta.708_stddev 22.0
-theta.173_avg -0.0
-theta.272_avg 0.0
-theta.551_avg 0.0
-theta.236_stddev 19.0
-theta.167_stddev 20.0
-theta.969_avg 1.0
-theta.450_avg 0.0
-theta.823_avg 1.0
-theta.840_stddev 21.0
-theta.599_stddev 22.0
-theta.953_stddev 19.0
-theta.149_avg -0.0
-theta.839_stddev 26.0
-theta.635_stddev 24.0
-theta.461_stddev 23.0
-theta.317_avg 0.0
-theta.130_stddev 19.0
-theta.588_stddev 23.0
-theta.558_stddev 26.0
-theta.546_avg 0.0
-theta.386_avg -0.0
-theta.102_stddev 21.0
-theta.325_stddev 25.0
-theta.989_stddev 24.0
-theta.542_stddev 23.0
-theta.269_stddev 22.0
-theta.631_avg 0.0
-theta.868_avg 1.0
-theta.452_avg 0.0
-theta.472_stddev 24.0
-theta.94_avg -1.0
-theta.88_avg -1.0
-theta.30_stddev 22.0
-theta.445_stddev 22.0
-theta.493_avg 0.0
-theta.308_stddev 22.0
-theta.742_stddev 24.0
-theta.197_stddev 21.0
+theta.310 0.081578580845 20.837063985
+theta.556 0.06734806517 19.9920371969
+theta.641 0.08570245816 21.7533161752
+theta.209 -0.476942797774 22.8490922753
+theta.640 0.137075583456 24.7212933927
+theta.315 0.077666903525 23.5783223745
+theta.331 0.0953926021 21.9110487919
+theta.314 0.03802071792 24.636533867
+theta.744 0.621593875139 18.8500101357
+theta.745 0.604882904383 22.2505925385
+theta.746 0.63179172041 24.3061832568
+theta.747 0.670456616462 23.2569637906
+theta.429 -0.45821531841 20.7588687756
+theta.428 -0.436358268443 19.0911994186
+theta.742 0.61772330875 24.0101528037
+theta.743 0.643572175889 22.9499878498
+theta.425 -0.45355633105 21.2671977176
+theta.424 -0.441211627209 22.9718185202
+theta.427 -0.46049611965 22.5473482982
+theta.426 -0.459790874686 22.6432158749
+theta.421 -0.455013601842 19.3545530646
+theta.420 -0.418415881214 21.3067223333
+theta.423 -0.40525211617 21.3368906729
+theta.422 -0.429263923575 21.7606082877
+theta.488 0.049596164828 23.7629247212
+theta.834 0.62371256475 23.9911985016
+theta.46 -0.40917342208 22.0270691535
+theta.47 -0.44105163053 19.6384177637
+theta.44 -0.413698901064 22.8693441262
+theta.45 -0.428297887326 21.9143707482
+theta.42 -0.463609144208 22.352465214
+theta.43 -0.44338951299 21.0878346487
+theta.40 -0.95829410621 20.0931507306
+theta.41 -0.426294896811 20.7911531234
+theta.607 -0.40382731763 20.2672088717
+theta.779 0.63524820721 26.156623542
+theta.481 0.096497478373 23.5093513968
+theta.48 -0.443696071834 19.5904216492
+theta.49 -0.425824606992 21.115216151
+theta.638 0.097956884408 22.1959063496
+theta.639 0.061057982857 23.1517552871
+theta.480 0.106830543633 22.4732910632
+theta.630 0.0634766793636 21.4074913518
+theta.631 0.09677854754 21.924806286
+theta.632 0.074509528237 24.589019254
+theta.633 0.099454213906 20.3115119723
+theta.634 0.062409020022 22.3976828767
+theta.635 0.08799261856 23.8463308441
+theta.636 0.121504250246 21.8960114485
+theta.637 0.0599927025 22.7064779385
+theta.326 0.05906868378 23.2771301994
+theta.730 0.61933421108 23.7661413596
+theta.324 0.08857075729 22.387816429
+theta.325 0.08367146978 25.3028629927
+theta.322 0.087226855596 22.6921728188
+theta.323 0.085790386099 23.8746116612
+theta.320 0.112944618065 22.0371796766
+theta.321 0.085362793375 21.2846499648
+theta.739 0.64171002222 21.5441298992
+theta.738 0.654132201298 22.3116440567
+theta.328 0.070594706191 19.6800266234
+theta.329 0.114427035173 22.6971309679
+theta.810 0.655338002033 25.7096716505
+theta.811 0.618571842294 24.5779167928
+theta.812 0.616024185928 22.4470944798
+theta.813 0.6170556399 27.0730820758
+theta.814 0.729415229988 25.2555108684
+theta.815 0.67111478465 24.5599377654
+theta.816 0.611870006371 22.0262398942
+theta.817 0.64978583903 19.2267636468
+theta.818 0.655379927387 21.1919349518
+theta.678 0.06264442798 19.3217837695
+theta.953 0.65335666351 18.831009532
+theta.952 0.63047590928 22.129364573
+theta.955 0.61161329716 28.344675762
+theta.867 0.62878076665 23.9369597722
+theta.957 0.63242078424 24.6204555767
+theta.679 0.08657499286 21.0886162867
+theta.866 0.647447243088 25.6404854653
+theta.208 -0.41594798984 20.7529314516
+theta.85 -1.43647242965 18.6419332372
+theta.555 0.147505024238 19.3594412647
+theta.554 0.09855924661 27.6874404025
+theta.258 0.098927876749 24.8673868415
+theta.884 0.650540398576 20.1878060942
+theta.883 0.613838576054 24.3562565193
+theta.550 0.08319700689 21.4258688919
+theta.553 0.063185380351 21.9027940287
+theta.552 0.117194391539 24.6884665469
+theta.252 -0.403839937544 22.8013452891
+theta.253 -0.415644440515 20.4162515742
+theta.250 -0.42462422233 21.8629423728
+theta.251 -0.441985853511 21.8013465448
+theta.256 -0.425310466467 21.0320340606
+theta.257 0.07832385756 22.5009652244
+theta.254 -0.455168727497 21.4827373087
+theta.255 -0.45925582277 20.732986294
+theta.869 0.62780269717 25.1984110456
+theta.868 0.649926295381 21.8413462553
+theta.740 0.62727667346 25.5556764214
+theta.116 -0.94423032585 20.3416331526
+theta.741 0.642851965508 25.7195491431
+theta.385 -0.41857849607 20.419043854
+theta.748 0.61924435184 23.078933582
+theta.383 -0.47622932767 20.9240110739
+theta.917 0.619985528931 25.3012418541
+theta.749 0.63493911655 23.32718551
+theta.916 0.587511748332 23.7654365796
+theta.177 -0.42141769476 21.9837813794
+theta.176 -0.40376221059 21.8975900644
+theta.175 -0.455256280883 20.2405883959
+theta.174 -0.435790818865 19.6911641177
+theta.173 -0.42929490383 20.8951202296
+theta.172 -0.41821910318 20.3413320174
+theta.171 -0.455425972428 23.2848468621
+theta.170 -0.461917224336 23.3899488033
+theta.179 -0.417571366343 20.2891821452
+theta.178 -0.42838767587 24.312692572
+theta.147 -0.403810035005 20.5125261938
+theta.146 -0.44429986954 20.292250233
+theta.142 -0.43777365562 22.5184202516
+theta.143 -0.44240073996 24.4809925545
+theta.919 0.68211664971 20.943559197
+theta.140 -0.438774391276 18.8122573495
+theta.918 0.649192554058 22.8625529741
+theta.141 -0.43788149325 21.8716498355
+theta.289 0.0901444648841 21.7533881328
+theta.288 0.081811954745 24.3514677152
+theta.536 0.078681665644 18.9205697547
+theta.285 0.074360773706 20.1858720234
+theta.284 0.10956801393 20.6748414436
+theta.287 0.09929456146 25.8487310594
+theta.286 0.095450971119 24.3424636227
+theta.281 0.1135744092 20.9697509105
+theta.280 0.09654912285 23.782016822
+theta.283 0.074744336108 22.5215972447
+theta.282 0.096136555666 22.6211963409
+theta.674 0.06832943652 20.8076253581
+theta.675 0.126293823079 22.1090028986
+theta.676 0.04493087569 20.072647364
+theta.677 0.07021201332 21.6288312306
+theta.670 0.08269875086 22.3555938163
+theta.671 0.05289727182 20.4991284342
+theta.672 0.073724473607 22.196265305
+theta.673 0.106985432108 20.8642506506
+theta.775 0.634958030823 23.0674019841
+theta.774 0.65891538587 25.6783955005
+theta.777 0.63690907399 22.5022158467
+theta.776 0.634305257335 23.7771297767
+theta.771 0.629928103638 24.1736954603
+theta.770 0.5864531572 22.8011721463
+theta.773 0.65980136127 21.1697256075
+theta.772 0.64789446722 24.8863916818
+theta.472 0.09555186498 23.9819210167
+theta.473 0.08389374583 23.1811584805
+theta.470 0.10672737246 23.9202569927
+theta.471 0.07320193268 24.825343316
+theta.476 0.09352055555 21.5141234267
+theta.477 0.10667085632 19.8410804587
+theta.474 0.088996139585 23.1607890948
+theta.475 0.10308635927 21.3726594234
+theta.478 0.089785801153 24.7707890895
+theta.479 0.099865511725 21.386430735
+theta.118 -0.9562061111 20.8152104397
+theta.915 0.66168077847 26.0010424961
+theta.914 0.625148444405 22.0706382914
+theta.698 0.065548191751 20.847570189
+theta.699 0.056731513968 23.1281171655
+theta.911 0.632777903238 23.9938639063
+theta.910 0.6899153483 23.7909962009
+theta.913 0.628529263885 23.1474172112
+theta.912 0.642587788355 21.9887371988
+theta.692 0.069770851343 26.8191070068
+theta.693 0.0966360685895 19.4494037967
+theta.690 0.098245998615 21.2413202293
+theta.691 0.0812615374388 21.0948326138
+theta.696 0.05897552496 22.223848497
+theta.697 0.0610849869845 20.7190250977
+theta.694 0.074058085248 22.7748217356
+theta.695 0.093480595909 22.4714725789
+theta.99 -0.98633379531 19.9396607977
+theta.98 -0.973093992631 21.4428436194
+theta.95 -0.967247556166 18.7841835173
+theta.94 -0.950014889606 19.5208882848
+theta.97 -0.91106193914 23.743895326
+theta.96 -0.926368496597 23.55860547
+theta.91 -0.969464589027 19.8483332169
+theta.90 -0.921578480931 21.0746737874
+theta.93 -0.953813484238 24.1085411992
+theta.92 -0.977361250504 18.4136375224
+theta.591 0.1044732155 21.932819196
+theta.590 0.10133520104 22.4809885402
+theta.593 0.06992226892 23.1329067152
+theta.592 0.060849588335 19.6003284345
+theta.595 0.102718357298 21.497447885
+theta.594 0.10506383067 21.3011145446
+theta.597 0.088392689849 23.0727905804
+theta.596 0.07801913504 20.9031605701
+theta.599 0.09541703704 21.7649989399
+theta.598 0.079204155522 22.3131341297
+theta.601 0.05677205717 20.3401563641
+theta.600 0.058005717471 21.4640371329
+theta.603 -0.45177313245 22.8570334735
+theta.602 0.084976846609 23.6966133059
+theta.605 -0.451212630924 18.2615495998
+theta.604 -0.45882521958 20.4569104848
+theta.359 -0.42565901336 21.4115826264
+theta.358 -0.411300556946 20.0378923893
+theta.609 -0.47613692214 23.8518468664
+theta.608 -0.45351568467 22.3192102696
+theta.355 -0.43671160686 23.0482650928
+theta.354 -0.45740694278 17.0239509526
+theta.353 -0.438947778942 20.5376647653
+theta.352 -0.92512424654 21.9028596094
+theta.351 -0.92006598394 19.9274471642
+theta.219 -0.458728448097 20.9906901158
+theta.829 0.604696431547 25.358219942
+theta.828 0.64048518711 22.5908367654
+theta.269 0.08038289319 22.4696353404
+theta.821 0.6675743482 19.9293572446
+theta.820 0.643419624333 24.0594506225
+theta.823 0.596783558035 21.7417991095
+theta.822 0.605603186569 25.2369813773
+theta.825 0.66119710861 22.9373692803
+theta.824 0.641990309859 24.9195153949
+theta.827 0.608458907301 22.6164166049
+theta.826 0.61513312522 25.4901447515
+theta.990 0.59952026732 23.3314218607
+theta.9 -1.40475996119 20.246815263
+theta.8 -1.43834755105 18.6476176082
+theta.508 0.078717218905 20.9770445061
+theta.509 0.079849279211 20.4415189554
+theta.858 0.67156834443 21.5988308521
+theta.261 0.0828764519 22.079700109
+theta.502 0.08507857034 21.2253336748
+theta.503 0.059178348762 22.0904336431
+theta.3 -1.89754796821 19.5048341754
+theta.501 0.112934905896 20.7232361319
+theta.5 -1.41996547062 20.5609842681
+theta.4 -1.41290403742 21.6669409826
+theta.7 -1.43989154931 21.607438298
+theta.6 -1.42036437216 21.7145402298
+mean_alpha -1.48078361 0.0903097114499
+theta.133 -0.460544642834 17.9028950785
+theta.132 -0.45361420712 22.4532937196
+theta.131 -0.460762568455 22.081600673
+theta.130 -0.445274464935 19.4253369922
+theta.137 -0.443372766981 23.3277727878
+theta.136 -0.476148744915 21.6458017178
+theta.135 -0.451684391923 20.8028393733
+theta.134 -0.43589983853 21.6599398663
+theta.139 -0.421453612465 19.4144002955
+theta.138 -0.43429352878 20.7160795215
+theta.157 -0.430402726932 18.8968895386
+theta.216 -0.437432107878 18.5707479346
+theta.217 -0.453150038255 19.3996043585
+theta.38 -0.94367082806 19.210469732
+theta.214 -0.40381516426 23.8613973842
+theta.215 -0.440917543637 19.093229523
+theta.212 -0.937262721526 19.8526400742
+theta.337 -0.94161521616 22.4884633193
+theta.213 -0.93833722363 21.747532811
+theta.210 -0.423406585743 21.4616620045
+theta.33 -0.969562605068 18.9487441808
+theta.211 -0.96110794701 19.0694960496
+theta.357 -0.447213732867 24.2920604354
+theta.356 -0.419559329972 21.9606275615
+theta.145 -0.45301340208 20.584624942
+theta.438 0.092517941526 23.2001839551
+theta.439 0.127302409634 21.3224064926
+theta.436 0.062986527505 22.3623140868
+theta.437 0.08382482875 24.975276398
+theta.434 0.045936182895 23.1094565164
+theta.435 0.067111796313 22.2519657406
+theta.432 0.082516800487 22.115977352
+theta.433 0.09601075713 23.4714622788
+theta.430 0.058178976168 20.1169213543
+theta.431 0.054199070381 18.6369617333
+theta.218 -0.48370451357 21.8061778366
+theta.260 0.053597008361 20.5981540785
+theta.350 -0.934896275838 21.576323048
+theta.59 -0.436710386758 19.9146510525
+theta.58 -0.418498841404 23.1431956311
+theta.799 0.64343262121 23.420596921
+theta.798 0.621161493232 24.1317277229
+theta.797 0.6483700173 23.3238399287
+theta.796 0.642782659419 25.6068682695
+theta.53 -0.3966277835 17.9585296116
+theta.52 -0.44992245925 17.9316230269
+theta.793 0.633614735574 24.9322550968
+theta.54 -0.416999506855 20.4301738191
+theta.57 -0.420099951278 21.8556593935
+theta.56 -0.454523513966 20.3734372518
+alpha.1 -2.74635615 0.495400034454
+alpha.3 -0.24011668607 0.161838781795
+alpha.2 -1.001373062 0.191870482638
+alpha.5 -2.10463014 0.359616845757
+alpha.4 -1.31144285 0.25177607676
+theta.731 0.609809055544 23.4474239781
+theta.319 0.06429793724 21.281027852
+theta.318 0.071461347819 21.7420245531
+theta.649 0.091015651378 20.2878512761
+theta.648 0.060786577031 21.161531391
+theta.327 0.087862412122 24.8427239603
+theta.313 0.10999164989 21.1378394991
+theta.312 0.075251716983 20.7648025249
+theta.311 0.0805764689 21.2639976235
+theta.646 0.0678545979997 22.693197507
+theta.317 0.087504716604 21.0985829101
+theta.316 0.06909489881 20.8584920838
+theta.643 0.057743998118 22.456417581
+theta.642 0.03930586078 21.5894955079
+theta.722 0.665273284051 25.4568266523
+theta.723 0.650182517095 22.048310787
+theta.489 0.075822131783 21.644921782
+theta.721 0.640029238556 23.5516690363
+theta.726 0.6384633618 21.1149957215
+theta.727 0.65037476119 23.2031094648
+theta.724 0.62602010965 24.1606427114
+theta.725 0.636926570566 22.5260967394
+theta.483 0.0966731169 22.3155045127
+theta.482 0.04553134629 21.5128665702
+theta.728 0.61694677659 18.5277791119
+theta.729 0.63414448387 24.2844462677
+theta.487 0.10975903304 23.8137280425
+theta.486 0.061348613335 24.6538476456
+theta.485 0.049880438235 20.2789150434
+theta.484 0.09422206002 24.0195968319
+theta.865 0.574368223876 22.9588282191
+theta.663 0.0756964038 22.2083600888
+theta.948 0.636784183 26.8714968369
+theta.949 0.6502384472 23.6865288484
+theta.861 0.66226037524 24.8377704247
+theta.860 0.60714636831 21.9365894757
+theta.863 0.610612261395 23.4982998977
+theta.862 0.61763631618 21.873894638
+theta.942 0.631799209716 24.8058853172
+theta.943 0.642343028876 24.370161902
+theta.940 0.596552234864 25.0490285531
+theta.941 0.641999122538 23.5904211169
+theta.946 0.631498142955 22.7181132996
+theta.947 0.623311397609 22.4014706583
+theta.944 0.62118573877 21.866795882
+theta.945 0.652712142453 22.8996734789
+theta.819 0.617947220749 24.421624454
+theta.504 0.05560050918 21.7318693298
+theta.898 0.647170656435 23.0032043879
+theta.899 0.646800302508 25.6902284065
+theta.234 -0.443131572173 18.4731443691
+theta.890 0.607250138474 21.9743623145
+theta.891 0.64907661081 24.5021104611
+theta.892 0.642771830993 22.1227337335
+theta.893 0.61144496779 21.1821043108
+theta.894 0.61927153207 22.8968894844
+theta.895 0.633810622059 24.8927852704
+theta.896 0.630271565656 22.9557126665
+theta.897 0.621946789566 27.5666856109
+theta.546 0.04814615077 23.9872681946
+theta.547 0.08545376853 22.9877452294
+theta.544 0.07235942579 21.119688315
+theta.545 0.041827395508 25.6662599648
+theta.542 0.09801949549 23.0971861928
+theta.543 0.095278046231 21.6437141181
+theta.540 0.078403078731 20.9734793175
+theta.541 0.10836309008 26.254462604
+theta.267 0.101056768699 24.0351669386
+theta.266 0.10883082796 26.0863066083
+theta.265 0.10462782791 21.4969169421
+theta.264 0.080350325811 20.3622772591
+theta.263 0.085058351371 24.3073062827
+theta.262 0.103629207382 21.2887073413
+theta.548 0.093576602786 20.5013872014
+theta.549 0.05351372765 20.9249805863
+theta.959 0.675915933556 22.9266688396
+theta.668 0.07217397968 20.4913687791
+theta.958 0.646110272921 26.7842529709
+theta.196 -0.465303515762 22.5464264601
+theta.404 -0.44898704204 21.3741890973
+theta.611 -0.480843138335 20.1941384063
+theta.236 -0.44744116507 18.9690612441
+theta.460 0.04822594054 20.7526130276
+theta.951 0.60410081305 23.7373806605
+theta.950 0.60498998228 24.3140002527
+theta.204 -0.42023942729 19.2149478117
+theta.458 0.11712670854 23.102851792
+theta.459 0.085922315047 19.4053369573
+theta.466 0.056914242683 20.3111225064
+theta.954 0.663316666077 23.8324359333
+theta.168 -0.44802390248 19.837006514
+theta.169 -0.458938628919 21.3899652224
+theta.160 -0.461081545485 19.6970105127
+theta.161 -0.46125262424 21.9934893982
+theta.162 -0.42153894828 19.8667355444
+theta.163 -0.43588991858 18.4478478948
+theta.164 -0.42081573275 22.4295933441
+theta.165 -0.4330609879 19.2425120866
+theta.166 -0.41529031617 22.4241502531
+theta.167 -0.421289171615 20.1187228968
+theta.393 -0.475112945556 19.2250930377
+theta.778 0.61980750218 24.3577210858
+theta.558 0.08040683885 26.2344515165
+theta.452 0.0800784367335 21.2953706859
+theta.1000 0.68033255722 24.1830896276
+theta.15 -0.91983654527 22.900481867
+theta.14 -0.97187033763 21.5934091638
+theta.17 -0.96115571244 21.290225816
+theta.16 -0.97126560694 19.7129041573
+theta.11 -1.42390797482 17.071793847
+theta.10 -1.44835020145 19.0998246968
+theta.13 -0.947260466956 20.3896450316
+theta.12 -0.958697958414 20.2885796888
+theta.394 -0.461168410407 20.3647676455
+theta.19 -0.89070659102 18.83776108
+theta.18 -0.922919480314 19.8178351738
+theta.440 0.11421798756 23.2201878143
+theta.298 0.11544214297 25.1598434461
+theta.299 0.11060938864 19.969801653
+theta.296 0.08486326125 21.0975902302
+theta.297 0.081852101273 21.3635634137
+theta.294 0.09608015788 21.127791448
+theta.295 0.102422837971 23.4547416535
+theta.292 0.09843580733 24.0238132964
+theta.293 0.138896670309 23.3603033668
+theta.290 0.133812002443 22.0355600376
+theta.291 0.0802544083 25.2261664481
+theta.768 0.66122561564 23.0322433108
+theta.769 0.62678158679 24.2997232521
+theta.766 0.65016418585 25.0947007808
+theta.767 0.626916202558 23.3707129952
+theta.764 0.61598062333 25.1820191747
+theta.765 0.64216967809 23.5210534657
+theta.762 0.60493859014 20.4558486589
+theta.763 0.628308628732 22.2842080309
+theta.760 0.63894825736 24.2278253541
+theta.761 0.639181108408 21.8436498967
+theta.195 -0.45353222907 21.146702008
+theta.194 -0.447901417284 21.4662875759
+theta.445 0.056582773676 22.1070531804
+theta.444 0.10568427456 22.5783516352
+theta.191 -0.422671175693 22.5746093807
+theta.190 -0.480120482759 20.7998000359
+theta.193 -0.436418318971 20.629891946
+theta.192 -0.4488282608 18.845481182
+theta.199 -0.423701771107 20.9170716214
+theta.198 -0.46829782193 20.9932528783
+theta.449 0.123599523226 21.6775972735
+theta.448 0.124933239861 21.788757584
+theta.906 0.63301203782 20.941515666
+theta.151 -0.438003339968 22.8724705747
+theta.904 0.66421027203 24.8670593532
+theta.905 0.64565230344 25.9580463042
+theta.902 0.651914329227 22.8850463628
+theta.903 0.656427343719 22.3845102901
+theta.900 0.646475708517 23.537812526
+theta.150 -0.446711853856 19.5753915773
+theta.153 -0.454690528137 20.3273448384
+theta.908 0.63723160463 24.8593951757
+theta.909 0.628258828702 23.8341755999
+theta.60 -0.43189923395 21.3465590355
+theta.1 -1.8883915585 21.9927064288
+beta 0.763486592 0.160662179229
+theta.63 0.03618186009 20.6555284248
+theta.64 0.08782051444 25.0801748925
+theta.65 0.07281870698 20.7225419964
+theta.66 0.13094723826 22.7901852519
+theta.67 0.11203945326 23.0706957412
+theta.68 0.09871213557 20.1674121066
+theta.69 0.085022506701 21.0454288608
+theta.686 0.041746270504 24.941272751
+theta.500 0.11992875446 24.0377172283
+theta.154 -0.507232554144 19.607887929
+theta.582 0.062178529696 23.445707171
+theta.583 0.11868791546 25.9628541321
+theta.229 -0.43265692577 21.2401922942
+theta.2 -1.933281827 19.0990876432
+theta.999 0.60963438281 25.4997610524
+theta.998 0.63705204839 23.5673807902
+theta.584 0.09175255261 23.7664503
+theta.585 0.078103683115 19.6359881825
+theta.223 -0.457152276626 18.7116875346
+theta.222 -0.4424804881 24.8914665421
+theta.997 0.61405784306 23.3716083385
+theta.996 0.602456876338 22.1664592509
+theta.227 -0.456634827053 22.6478505113
+theta.226 -0.4399753123 22.0225327804
+theta.225 -0.45750893547 21.5384500303
+theta.224 -0.45786686546 20.6522852351
+theta.340 -0.914558515017 20.2610488354
+theta.341 -0.909264243435 18.679758523
+theta.342 -0.955810746154 19.1773893758
+theta.343 -0.915843565766 20.4494968282
+theta.616 0.0839572370479 22.9750667416
+theta.617 0.04978164676 23.0031150788
+theta.346 -0.90790274881 20.4744062511
+theta.347 -0.95268317046 20.9407687049
+theta.348 -0.942498323801 18.1921646001
+theta.349 -0.924936080502 19.158607212
+theta.618 0.10386982218 23.6275020529
+theta.505 0.102059561468 20.3387680366
+theta.507 0.12254808678 21.1238412856
+theta.838 0.592965636361 25.7854275172
+theta.839 0.634833473174 26.2020465895
+theta.832 0.589054596824 24.3975713116
+theta.833 0.603965409977 21.9241345318
+theta.830 0.644687565142 21.8540426658
+theta.831 0.65522353772 26.107539601
+theta.836 0.646907283336 24.4947221407
+theta.837 0.62519596681 23.5545058951
+theta.969 0.623955701175 24.9104687133
+theta.835 0.661986343222 25.5688210278
+theta.83 -1.45524244588 23.7792655046
+theta.887 0.65620557339 23.1346231002
+theta.81 -1.40158326199 21.9285957644
+theta.886 0.66087662492 22.1479833279
+theta.557 0.08379549462 23.4548763637
+theta.956 0.61923768915 28.3023068778
+theta.259 0.117177352276 21.3947781906
+theta.539 0.052669528138 19.9924843453
+theta.538 0.05990505205 21.3440554552
+theta.537 0.09732140678 22.3002338128
+theta.551 0.123978000903 22.7435552374
+theta.535 0.07343539442 23.7652245342
+theta.534 0.094925943162 22.3340757391
+theta.533 0.068456218901 23.7105402273
+theta.532 0.07781526985 24.1923896612
+theta.531 0.071781348183 22.590854215
+theta.530 0.0890480804502 20.8604819844
+theta.881 0.658736370192 22.8243367831
+theta.880 0.646239769876 25.0352802922
+theta.794 0.648537581705 24.4542477434
+theta.124 -0.945172099204 18.8012737272
+theta.125 -0.93955338592 21.4863772251
+theta.126 -0.923293423308 19.1748401644
+theta.127 -0.942409359656 17.7548615984
+theta.120 -0.9556396137 19.2491777252
+theta.121 -0.90504893373 19.1971004322
+theta.122 -0.957941079752 22.0507453582
+theta.123 -0.947852675782 22.755843755
+theta.128 -0.97123208965 20.5324180248
+theta.129 -0.96740011208 21.5104761404
+theta.334 0.0807550713 21.2822677571
+theta.580 0.0975142660219 23.5954363485
+theta.927 0.62732677356 23.001644816
+theta.559 0.114688619245 21.6753321557
+theta.921 0.6231180401 22.3674261801
+theta.681 0.099359370886 22.2630816221
+theta.564 0.10513491669 22.6077823239
+theta.922 0.636624024892 21.4853986149
+theta.62 0.08073438 22.0465533322
+theta.923 0.60192366737 21.4742707892
+theta.612 -0.451583519251 19.7751648919
+theta.567 0.0844744017758 20.8267887205
+theta.855 0.641068114858 24.9942006673
+theta.61 -0.42123740914 21.4892421769
+theta.680 0.075685749922 21.1403277917
+a.4 0.169341102715 0.188274722718
+theta.392 -0.45745923987 20.5448852091
+theta.391 -0.43407076925 21.6598384589
+theta.390 -0.452907565415 23.0048335246
+theta.397 -0.448903595103 20.283067001
+theta.396 -0.415928159803 21.9064768327
+theta.395 -0.45635480667 24.2480231517
+a.3 1.24066691 0.141648548461
+theta.28 -0.426018584036 23.1999929239
+theta.399 -0.42226402083 21.5628852327
+theta.398 -0.45767447094 22.1354288401
+theta.442 0.055020751768 18.7463737219
+theta.29 -0.42753687232 20.6399320843
+theta.403 -0.415642065926 22.3106636961
+theta.402 -0.44692243746 21.9272277257
+theta.401 -0.458029213745 21.7017394243
+theta.152 -0.43962163015 20.4491619905
+theta.155 -0.420807910162 19.6807620133
+theta.406 -0.42809221997 22.8114500796
+theta.405 -0.39802512674 25.284825901
+theta.156 -0.41923559219 19.3796750325
+theta.159 -0.439022166674 21.2693870659
+theta.158 -0.44429680479 22.9947744854
+theta.409 -0.44588416882 21.6711637463
+theta.408 -0.462063234876 20.3398710428
+theta.207 -0.39948419489 21.3594084472
+theta.24 -0.923489262188 19.6239228307
+theta.206 -0.4422259578 21.095896969
+theta.25 -0.97024956478 19.9588670904
+theta.928 0.63771789181 24.0532581667
+theta.780 0.65596325279 27.3159191942
+theta.781 0.64412482771 24.611979357
+theta.782 0.652884624549 21.3074775293
+theta.783 0.67857778268 23.4934396142
+theta.784 0.63590351358 24.4526363239
+theta.785 0.607545481793 23.7322521171
+theta.786 0.641306181089 19.7408234607
+theta.787 0.645770012031 22.5562941228
+theta.788 0.62233969966 21.891814625
+theta.789 0.63395517059 22.4066435713
+theta.26 -0.94449186981 21.0498413266
+theta.27 -0.95519242233 18.6114324408
+theta.20 -0.92793698962 22.1280974663
+theta.21 -0.97974480338 18.350325302
+theta.22 -0.93355060107 20.0655933704
+theta.23 -1.38250319196 20.4599152848
+theta.510 0.115101864735 24.1148674611
+theta.239 -0.43464599684 19.4639864854
+theta.308 0.09281234288 21.6359800221
+theta.309 0.090908379412 20.7739270225
+theta.658 0.0512697995051 23.0170834702
+theta.659 0.075243896835 23.7896756365
+theta.304 0.05702514308 20.9032241244
+theta.305 0.08182963444 22.855218101
+theta.306 0.07537422294 22.5368213792
+theta.307 0.097856092024 22.1816865865
+theta.300 0.043553095292 21.6472878444
+theta.301 0.0770108406537 20.8048463269
+theta.650 0.06968652816 23.7770803488
+theta.651 0.112079739988 21.5013002111
+theta.717 0.6546110108 23.7265884654
+theta.716 0.62361603153 26.7726262624
+theta.715 0.63112914247 24.1367193867
+theta.714 0.652698950927 25.6947715874
+theta.498 0.08502107454 22.0119059446
+theta.499 0.054685952 23.5809248261
+theta.711 0.576567500354 25.5077921301
+theta.710 0.636383935167 24.2956049359
+theta.494 0.093617074368 23.144363559
+theta.495 0.07899953861 21.4271545989
+theta.496 0.136693570225 21.6790547151
+theta.497 0.0859324803 19.1735140576
+theta.490 0.11870451185 23.7902602269
+theta.491 0.052567082389 19.5999567155
+theta.719 0.64476749028 21.9399741647
+theta.493 0.06870205923 19.6713744511
+theta.876 0.615726237558 22.4592447268
+theta.877 0.63597664361 24.630507954
+theta.874 0.681533964431 20.1647398323
+theta.875 0.638587428987 24.9062589559
+theta.872 0.62742082488 25.9738216883
+theta.873 0.629710212367 23.1699230482
+theta.870 0.63975589542 24.2314483923
+theta.871 0.632406145943 25.6536474962
+theta.977 0.60648966289 24.0017122683
+theta.230 -0.479719071596 21.6892599067
+theta.975 0.651477217748 22.4584701949
+theta.974 0.65942154637 23.1659168915
+theta.973 0.659233975011 23.7668526091
+theta.972 0.62425184431 21.9439876243
+theta.878 0.62958964188 23.628426375
+theta.879 0.64492595267 23.6748035496
+theta.588 0.082095046271 22.6697373287
+theta.232 -0.40742672806 21.2185381604
+theta.237 -0.43783744012 21.4266934324
+theta.233 -0.47127966717 20.2921600282
+theta.202 -0.385263651134 20.8968517125
+theta.335 0.083750063315 22.1399587376
+theta.579 0.0762629899849 22.7987326228
+theta.578 0.0414251219815 22.7132555832
+theta.367 -0.432442533302 22.6746766445
+theta.573 0.0913101802 21.3671759741
+theta.572 0.080302791154 21.6687285142
+theta.571 0.10139590052 19.8271622174
+theta.570 0.060025313898 22.8174300867
+theta.577 0.105227875068 23.3440793994
+theta.576 0.10449918548 22.2966874504
+theta.575 0.0684323371052 21.4057641302
+theta.574 0.09369317995 21.0296441146
+theta.270 0.06681757148 22.3770715441
+theta.271 0.0898819747497 21.8890460045
+theta.272 0.10114169845 22.6708420596
+theta.273 0.05201835756 24.3796421155
+theta.274 0.12758629306 20.7439057163
+theta.275 0.11305044778 22.846130772
+theta.276 0.074677613096 21.7954932097
+theta.277 0.136072583893 25.4477312042
+theta.278 0.0516132152 20.0071065573
+theta.279 0.09296683143 23.1664619328
+theta.373 -0.43173691108 24.4835071594
+theta.372 -0.41640631539 20.7877740147
+theta.375 -0.440538250402 20.8511164423
+theta.374 -0.44147765092 20.076270103
+theta.377 -0.41561392063 24.8727198448
+theta.376 -0.415272405041 19.5502315073
+theta.333 0.09017354678 23.0465386251
+theta.517 0.051563944321 23.7824645982
+theta.332 0.114287067 23.9927587619
+theta.506 0.089159309678 23.6704122096
+theta.709 0.62478725385 22.6034095325
+a.1 -1.265572408 0.294957768335
+theta.516 0.0834655939022 20.9511655525
+theta.656 0.08567616708 23.4841837614
+theta.657 0.11917110346 21.869993589
+theta.183 -0.40827288708 24.7736626836
+theta.654 0.102617716893 21.1122956313
+a.2 0.479410714 0.143018228842
+theta.864 0.63263990924 24.0067846414
+theta.655 0.07491687488 22.4177956663
+theta.652 0.07178625365 19.9746503443
+theta.336 0.104672323279 22.6036406068
+theta.653 0.11304662449 21.6067573394
+theta.119 -0.954477559233 18.2383579709
+theta.302 0.09639438014 21.7873571612
+theta.115 -0.92480484399 21.499183294
+theta.114 -0.932255965964 20.094043159
+theta.117 -0.90782889132 18.100498999
+theta.303 0.0976235287313 18.5264098329
+theta.111 -0.94328857259 21.4646599665
+theta.110 -0.906224351558 22.5487739085
+theta.113 -0.950635766529 21.2302207212
+theta.112 -0.93846347587 18.2928010942
+theta.610 -0.426498665078 22.048295977
+theta.378 -0.43943851 20.0779742031
+theta.713 0.638471456297 22.4018568586
+theta.712 0.63906104174 27.9245683988
+theta.268 0.08182526258 25.4172949356
+theta.859 0.63737161163 22.2748762585
+theta.689 0.059387364917 21.2190954899
+theta.753 0.65519681221 24.2206152326
+theta.752 0.638282654874 23.706631022
+theta.751 0.58825709188 23.5577211878
+theta.750 0.61581701633 22.0624544094
+theta.757 0.584490404519 24.3863992217
+theta.756 0.60390802883 22.1959678882
+theta.755 0.659947952 25.9599948012
+theta.754 0.65074119822 22.3537258991
+theta.450 0.098950551909 23.1569760247
+theta.451 0.088555863791 25.7702354927
+theta.759 0.66357198324 21.4675808223
+theta.453 0.079949388548 22.5522071953
+theta.454 0.07706566024 22.7710062179
+theta.455 0.080965772577 22.7206581602
+theta.456 0.056016989195 20.4685719477
+theta.457 0.06697816038 25.76459918
+theta.186 -0.457747337642 22.8958388366
+theta.187 -0.423395049886 20.092302722
+theta.184 -0.44952294373 21.229037011
+theta.185 -0.4672733786 23.2844824159
+theta.182 -0.46144522955 21.6586112307
+theta.492 0.081359534754 22.1341846811
+theta.180 -0.449911857374 20.5087642013
+theta.181 -0.423875576338 22.2815207141
+theta.718 0.624307777468 24.1558457144
+theta.188 -0.42663985432 25.0097554984
+theta.189 -0.44316318142 23.5540561282
+theta.606 -0.44624048461 22.7122875706
+theta.379 -0.46004204425 23.0856904546
+theta.73 0.100479349544 20.7720258472
+theta.72 0.104179483352 22.8995607936
+theta.71 0.074898316067 19.9676555667
+theta.70 0.0749077969392 24.3235522109
+theta.77 -1.45479969611 21.3656684478
+theta.76 0.099661795395 20.3596560843
+theta.75 0.073469150629 23.0717402529
+theta.74 0.12921053335 24.9160627253
+theta.79 -1.45545339271 20.2718749486
+theta.78 -1.44319505463 22.0313887207
+theta.447 0.03444526715 20.9510448585
+theta.979 0.66304906186 22.2431004806
+theta.242 -0.422533882907 20.2173126673
+theta.238 -0.45923961376 24.0527829129
+theta.854 0.63310254894 23.450381318
+theta.988 0.633087180494 24.5937048381
+theta.446 0.0678809610182 21.3830218784
+theta.986 0.632451503416 22.0854571028
+theta.235 -0.419842920554 18.1901658872
+theta.984 0.65622422266 25.4736244415
+theta.985 0.61734870941 22.1070502309
+theta.982 0.595218023837 23.5922997387
+theta.197 -0.46613917532 21.1224665349
+theta.980 0.616688767495 20.5519471367
+theta.981 0.63970765663 22.5151957385
+theta.627 0.061607665036 19.7384595813
+theta.626 0.0841328756 21.8632850296
+theta.625 0.078914112023 25.6349529042
+theta.624 0.083755635787 21.1170232455
+theta.623 0.12267315866 26.0757548661
+theta.622 0.039738683176 19.3807489428
+theta.621 0.04941116145 21.5833146115
+theta.620 0.06301040325 23.0660606365
+theta.443 0.103612775603 22.4039551361
+theta.339 -0.947680160718 21.8334977339
+theta.338 -0.9485511029 18.8538261818
+theta.629 0.11072327082 21.5662556972
+theta.628 0.124305394643 23.6597742484
+theta.978 0.681823511441 22.2922073785
+theta.144 -0.397732833542 21.8308230355
+theta.231 -0.42546281123 21.5937465732
+theta.441 0.068971753403 21.9115967376
+theta.809 0.64703851023 23.5473244163
+theta.808 0.636258792031 23.0105308877
+theta.807 0.630914239939 24.6200206955
+theta.806 0.59260075037 22.2117551008
+theta.805 0.64782617 28.8962625471
+theta.804 0.63246103239 23.3285511439
+theta.803 0.611433026675 19.7709812443
+theta.802 0.62902932876 23.7367155465
+theta.801 0.64153378839 28.5655588104
+theta.800 0.67583997494 23.6479521849
+theta.511 0.064901939624 19.4347649221
+theta.589 0.081914322474 21.9371063311
+theta.971 0.633045481181 23.805084691
+theta.842 0.654122595906 25.1487283362
+theta.970 0.61443673641 23.1197165586
+theta.513 0.09919904891 22.5431678889
+theta.856 0.6522595722 22.6827020144
+theta.512 0.05643586948 19.0646153885
+theta.688 0.0802720241139 21.0339398287
+theta.515 0.087395025027 20.5207278745
+theta.514 0.115530946832 21.6017095953
+theta.249 -0.41595809296 21.3157611411
+theta.248 -0.44042407267 21.9460732863
+theta.939 0.61349113483 23.2592112774
+theta.523 0.038342804315 21.3210062375
+theta.524 0.06510275483 21.6279960832
+theta.525 0.10284799222 21.0947124432
+theta.526 0.0632013422317 21.4795952921
+theta.527 0.05457305857 24.4021890514
+theta.528 0.09861956271 22.8034963784
+theta.932 0.616858975688 21.6691325068
+theta.931 0.654721666208 23.0933766289
+theta.930 0.60744048602 25.3811605615
+theta.245 -0.482978369152 21.537587086
+theta.244 -0.434975133289 23.8725856209
+theta.247 -0.4487599079 21.4037913649
+theta.246 -0.455270745354 22.3027027206
+theta.882 0.638055795946 22.052730245
+theta.907 0.61270714875 21.0378095114
+theta.857 0.599298274398 22.526642048
+theta.850 0.63361827434 22.9710837073
+theta.520 0.0837155126509 24.3473526751
+theta.983 0.63948537935 21.2301449357
+theta.733 0.628787406863 21.6003348671
+theta.521 0.050925811221 19.5865949057
+theta.901 0.627967324804 23.1958514819
+theta.522 0.104444604337 20.9391230814
+theta.938 0.647173242171 24.0805254614
+theta.330 0.09045490646 24.9927192232
+theta.89 -0.929677153264 20.2592924235
+theta.851 0.61790994911 23.7636290471
+theta.732 0.60286251323 23.69279649
+theta.989 0.631011165381 24.2391787406
+theta.384 -0.439681726296 18.4832243355
+theta.241 -0.43044226213 21.6221833604
+theta.386 -0.443076699002 21.0538414272
+theta.387 -0.41849655076 19.3368963063
+theta.380 -0.4256128416 19.7850378016
+theta.381 -0.403847687198 22.9907042411
+theta.382 -0.420581861875 21.7540591085
+theta.529 0.08996903039 22.5928604199
+theta.852 0.623469678734 22.8878504189
+theta.388 -0.402137656017 22.780889288
+theta.243 -0.409352074983 22.1237144111
+theta.414 -0.451287634988 20.0719666923
+theta.415 -0.46533219531 18.91057472
+theta.416 -0.418140194282 22.8091682357
+theta.417 -0.46061291179 22.0259283741
+theta.410 -0.458411360792 22.1251758724
+theta.411 -0.433693252838 21.5064970448
+theta.412 -0.454967888889 21.0009734253
+theta.413 -0.422132736251 24.1002440178
+theta.937 0.62708611625 21.504970945
+theta.148 -0.428261246843 19.2850732674
+theta.149 -0.469291188993 21.3454749779
+theta.418 -0.43810938867 22.3815116301
+theta.735 0.62419707663 20.7198830325
+theta.936 0.625866664988 24.3284042336
+theta.935 0.60891837041 20.7748842436
+theta.853 0.62577739592 21.7432943469
+theta.934 0.62473160834 22.8415931239
+theta.734 0.654328906889 25.1011653774
+theta.929 0.65182647542 25.0604452038
+theta.987 0.62965694185 21.2693767387
+theta.39 -0.92041781402 19.1299076017
+theta.419 -0.44903921792 21.8842985428
+theta.37 -0.924898993579 22.6696269965
+theta.36 -0.95238560261 23.4001243439
+theta.35 -0.99750083013 21.8236902188
+theta.34 -0.937297071167 22.1773207506
+theta.345 -0.94949659134 19.2107054988
+theta.32 -1.39458388382 17.6207943707
+theta.31 -0.434110719666 19.2654447909
+theta.30 -0.420467407021 22.1806604869
+theta.924 0.60575344228 21.7462874456
+theta.737 0.60859799179 22.4449034625
+theta.708 0.64896958287 21.9084333743
+theta.662 0.10227697748 19.4243317667
+theta.661 0.083284908657 21.8866242953
+theta.660 0.049207869761 19.033116478
+theta.667 0.0747773691433 25.3756551883
+theta.666 0.079060444704 23.3861028638
+theta.665 0.099079457497 22.8493072036
+theta.664 0.08477176336 23.9528208099
+theta.700 0.064627257464 22.9762162665
+theta.701 0.098937540578 23.1631576392
+theta.702 0.106230370907 22.5168347925
+theta.703 0.63869352694 22.7014720691
+theta.704 0.59455628616 19.1472038126
+theta.705 0.622200154265 22.9460852304
+theta.706 0.6908904946 23.5880351182
+theta.707 0.63124574387 23.6675117801
+theta.461 0.09622188613 23.4383660047
+theta.51 -0.41796162248 21.044582925
+theta.463 0.082344898238 20.774760647
+theta.462 0.0785853188633 21.9318830306
+theta.465 0.098133533564 20.7654074514
+theta.464 0.10868251914 22.272464641
+theta.467 0.07932618423 22.090079957
+theta.50 -0.44563814569 20.1967271855
+theta.469 0.089757137614 19.3879084564
+theta.468 0.05024635835 20.5948839093
+theta.736 0.648331164428 21.8058814771
+theta.795 0.63057393346 25.518823298
+theta.758 0.66143076086 24.3391009301
+theta.960 0.613746802188 23.2698039971
+theta.961 0.597986683825 21.6956281661
+theta.962 0.606739251266 28.6359144897
+theta.963 0.63248406899 21.9777117919
+theta.964 0.630658648224 22.7500149642
+theta.965 0.638722771835 24.3454828455
+theta.966 0.64041437784 28.3793629677
+theta.967 0.66804331912 24.4696438265
+theta.968 0.61740632681 21.7541571496
+theta.55 -0.455847456281 20.854599495
+theta.683 0.11260458745 23.3420811749
+theta.682 0.09681198167 21.4457639139
+theta.685 0.063215123268 21.5382261066
+theta.684 0.05673598744 20.5529750638
+theta.687 0.082408335163 20.0251408729
+theta.669 0.080327504406 21.0759065238
+theta.371 -0.392515500592 21.4271488561
+theta.88 -0.93946276293 21.4390671089
+theta.228 -0.437774557624 19.6086150056
+theta.791 0.66864338547 24.4103147699
+theta.370 -0.42850662827 20.0847102731
+theta.82 -1.45005075378 20.7039060413
+theta.586 0.09268712427 20.4525206716
+theta.80 -1.40526396492 19.4464779099
+theta.790 0.6479682995 25.0366595208
+theta.86 -1.4134159467 18.429641268
+theta.87 -0.93350768747 21.1731142505
+theta.84 -1.41817465133 20.4587657526
+theta.587 0.073338145651 23.1490142921
+theta.389 -0.41365157288 21.5017317063
+theta.568 0.07586953934 22.7041108032
+theta.569 0.087063348452 24.1403384637
+a.5 -0.623846349 0.241053029425
+theta.565 0.055717242818 25.1691317235
+theta.566 0.104040435697 23.0641759828
+theta.933 0.63308448374 23.1296257015
+theta.560 0.120552003966 24.2630289203
+theta.561 0.08449843615 22.0355007202
+theta.562 0.1205759942 23.5279904646
+theta.563 0.081489757388 22.7633752721
+theta.205 -0.433350778978 23.1371223194
+theta.995 0.63033103642 24.1516157558
+theta.368 -0.4337293431 21.6649117617
+theta.369 -0.44725503478 20.5095354446
+theta.201 -0.415983940165 23.8934349176
+theta.200 -0.45414683288 20.1694415949
+theta.203 -0.440949432044 22.0621033881
+theta.994 0.64492297016 21.6636509864
+theta.362 -0.42764649411 20.8075649775
+theta.363 -0.43396617383 20.2519340869
+theta.360 -0.452752005856 22.4195009865
+theta.361 -0.4480686217 22.9985986516
+theta.366 -0.492872029945 18.3934862497
+theta.221 -0.45414057264 20.7881201766
+theta.364 -0.44684144747 19.6580825341
+theta.365 -0.417414367562 20.3945120126
+theta.720 0.6095937426 22.7446474151
+theta.220 -0.420618864869 20.1600147591
+theta.400 -0.44330920633 19.1367723248
+theta.792 0.607621223192 22.5720392555
+theta.991 0.582412384052 20.4680914406
+theta.889 0.670808061 22.4181697668
+theta.993 0.669903599176 20.6221223634
+theta.581 0.08504434269 21.4366161563
+theta.926 0.63546335744 20.2514383199
+theta.992 0.61903713546 23.7969856466
+theta.240 -0.411129749679 23.2083920648
+theta.407 -0.447093300233 20.0026361145
+theta.613 -0.41792569769 20.5584520099
+theta.976 0.63173132464 25.2994514454
+theta.925 0.63753858692 21.5109836757
+theta.888 0.63251484449 26.0989762142
+theta.519 0.073357390257 22.4521279725
+theta.518 0.057535347392 22.0915606405
+theta.849 0.600360629021 21.7085093387
+theta.848 0.62331636132 22.5953797229
+theta.843 0.643987656695 24.476724201
+theta.344 -0.94558842921 22.7974287402
+theta.841 0.628569554244 22.98006987
+theta.840 0.65012639655 21.3888747232
+theta.847 0.63513195018 22.3942939199
+theta.846 0.64526185339 24.1788461279
+theta.845 0.611739255497 26.2061599828
+theta.844 0.65214687084 24.80237073
+theta.614 0.127601109778 21.3887920204
+theta.615 0.07215152682 21.3536795679
+theta.885 0.65109476896 25.1580584103
+theta.920 0.617645963336 21.1014403858
+theta.108 -0.93454524864 18.480278375
+theta.109 -0.94408147282 20.1455985766
+theta.106 -0.9188567444 21.5352395819
+theta.107 -0.97155548557 22.2519433259
+theta.104 -0.95528432783 21.4671355055
+theta.105 -0.94800316513 21.0420369843
+theta.102 -0.94597710448 21.2738979463
+theta.103 -0.94623750235 20.2490155966
+theta.100 -0.957167391503 22.8426200696
+theta.101 -0.915790817738 20.3248525557
+theta.619 0.04968710202 21.1610359954
+theta.645 0.1343655918 25.753720197
+theta.644 0.07039944379 19.6320335954
+theta.647 0.117064615665 24.5604598774

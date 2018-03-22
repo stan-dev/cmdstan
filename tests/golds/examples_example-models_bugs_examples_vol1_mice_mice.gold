@@ -1,54 +1,27 @@
-t2_censored.3_stddev 1.0
-t2_censored.5_stddev 1.0
-pos_control_stddev 3.0
-t2_censored.15_stddev 15.0
-t2_censored.1_avg 1.0
-t2_censored.3_avg 1.0
-t2_censored.2_avg 1.0
-median.4_avg 22.0
-beta.1_avg -11.0
-beta.2_stddev 45.0
-t2_censored.10_avg 1.0
-t2_censored.15_avg 2.0
-median.3_stddev 147.0
-t2_censored.12_stddev 0.0
-test_sub_avg -0.0
-t2_censored.2_stddev 1.0
-t2_censored.13_stddev 2.0
-t2_censored.9_avg 3.0
-r_stddev 3.0
-veh_control_stddev 4.0
-t2_censored.14_stddev 0.0
-beta.2_avg -12.0
-t2_censored.13_avg 1.0
-median.3_avg 27.0
-t2_censored.5_avg 1.0
-t2_censored.10_stddev 2.0
-median.1_stddev 95.0
-beta.3_avg -11.0
-t2_censored.4_stddev 1.0
-pos_control_avg 0.0
-beta.3_stddev 44.0
-beta.4_stddev 37.0
-t2_censored.1_stddev 0.0
-median.1_avg 24.0
-test_sub_stddev 4.0
-median.2_stddev 311.0
-t2_censored.6_stddev 1.0
-t2_censored.7_stddev 1.0
-t2_censored.11_stddev 0.0
-t2_censored.7_avg 1.0
-beta.4_avg -10.0
-r_avg 3.0
-veh_control_avg -1.0
-t2_censored.14_avg 1.0
-t2_censored.8_avg 1.0
-median.4_stddev 82.0
-t2_censored.9_stddev 28.0
-t2_censored.6_avg 1.0
-t2_censored.12_avg 1.0
-t2_censored.8_stddev 1.0
-median.2_avg 35.0
-t2_censored.4_avg 1.0
-t2_censored.11_avg 1.0
-beta.1_stddev 40.0
+median.1 24.3693442 94.923508619
+median.2 35.0936632 310.628635418
+median.3 27.1874737 146.685134079
+median.4 21.5210066 82.3250390258
+t2_censored.15 2.22531382 15.1900728763
+t2_censored.14 1.13188084 0.483685306241
+t2_censored.13 1.33666344 2.16020117768
+t2_censored.12 1.10379954 0.293741177617
+t2_censored.11 1.1074037 0.30962852923
+t2_censored.10 1.35697896 2.40035126536
+t2_censored.9 2.75154272 28.0556657641
+t2_censored.8 1.19464831 0.907018731498
+t2_censored.7 1.20710306 1.10365541555
+t2_censored.6 1.19797038 0.953483713462
+t2_censored.5 1.20239245 1.06560740275
+t2_censored.4 1.21220579 0.947031498135
+t2_censored.3 1.20743208 0.962307534333
+t2_censored.2 1.21231734 1.01579930227
+t2_censored.1 1.07777857 0.181430016063
+beta.2 -11.9784706 45.2747579977
+beta.3 -11.15379035 43.6187767167
+beta.1 -10.79700784 39.8124501446
+beta.4 -10.38978772 36.8630117313
+test_sub -0.356784050884 3.50492482791
+pos_control 0.407219299897 3.21805657569
+r 3.26680639 3.30706920007
+veh_control -1.18146177941 4.27810512221
