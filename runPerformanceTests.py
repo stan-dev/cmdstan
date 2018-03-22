@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import argparse
+import csv
+from collections import defaultdict
 import os
 import re
 import subprocess
@@ -53,8 +55,8 @@ def shexec(command):
         raise Exception("{} from '{}'!".format(returncode, command))
     return returncode
 
-def make(targets):
-    shexec("make -j8 " + " ".join(targets))
+def make(targets, j=8):
+    shexec("make -j{} ".format(j) + " ".join(targets))
 
 model_name_re = re.compile(".*/[A-z_][^/]+\.stan$")
 
@@ -84,13 +86,44 @@ bad_models = frozenset(
      , "examples/example-models/bugs_examples/vol1/rats/rats_stanified.stan"
     ])
 
-def run(exe, data, overwrite=False):
+def avg(coll):
+    return float(sum(coll)) / len(coll)
 
-    gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".csv")
+def stdev(coll, mean):
+    return (sum((x - mean)**2 for x in coll) / (len(coll) - 1)**0.5)
+
+def csv_summary(csv_file):
+    d = defaultdict(list)
+    with open(csv_file, 'rb') as raw:
+        headers = None
+        for row in csv.reader(raw):
+            if row[0].startswith("#"):
+                continue
+            if headers is None:
+                headers = row
+                continue
+            for i in range(0, len(row)):
+                d[headers[i]].append(float(row[i]))
+    res = {}
+    for k, v in d.items():
+        mean = avg(v)
+        res[k + "_avg"] = mean
+        res[k + "_stddev"] = stdev(v, mean)
+    return res
+
+def run(exe, data, overwrite=False):
+    gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".gold")
     tmp = gold + ".tmp"
     shexec("{} sample data file={} random seed=1234 output file={}"
-           .format(exe, data, gold if overwrite else tmp))
-    if not overwrite:
+           .format(exe, data, tmp))
+    summary = csv_summary(tmp)
+    with open(tmp, "w+") as f:
+        lines = ["{} {}\n".format(k, v) for k, v in summary.items()]
+        f.writelines(lines)
+
+    if overwrite:
+        shexec("mv {} {}".format(tmp, gold))
+    else:
         if shexec("diff {} {}".format(gold, tmp)) != 0:
             print("FAIL: {} not matched by output.".format(gold))
             return False
@@ -100,6 +133,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
     parser.add_argument("--overwrite", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
+    parser.add_argument("-j", dest="j", action="store")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -110,14 +144,8 @@ if __name__ == "__main__":
     models = filter(model_name_re.match, models)
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
-    time_step("make_all_models", make, executables)
-    #found = False
+    time_step("make_all_models", make, executables, args.j)
     for model, exe in zip(models, executables):
-        #if not found and model != "examples/example-models/bugs_examples/vol1/rats/rats_stanified.stan":
-        #    continue
-        #if not found:
-        #    found = True
-        #    continue
         data = find_data_for_model(model)
         if not data:
             continue

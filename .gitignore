@@ -43,3 +43,4 @@ make/local
 src/docs/**/*.pdf
 
 output.csv
+tests/golds/*.tmp
