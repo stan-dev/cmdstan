@@ -36,7 +36,7 @@ b.1_stddev 2.0
 b.4_avg 0.0
 b.1_avg -0.0
 b.14_avg -0.0
-tau_stddev 145254.0
+tau_stddev 98830.0
 b.6_avg 0.0
 b.10_avg -0.0
 b.7_stddev 1.0
@@ -44,11 +44,11 @@ alpha2_avg 1.0
 b.9_avg -0.0
 b.17_stddev 3.0
 b.16_avg -0.0
-b.2_stddev 1.0
-b.2_avg -0.0
+b.2_stddev 2.0
+b.2_avg 0.0
 b.3_stddev 2.0
 b.12_stddev 2.0
-tau_avg 35.0
+tau_avg 30.0
 alpha12_avg -1.0
 b.12_avg 0.0
 b.17_avg -0.0

@@ -13,7 +13,7 @@ mu.20_stddev 1.0
 delta.6_stddev 1.0
 mu.8_avg -2.0
 delta.16_avg -0.0
-mu.12_stddev 0.0
+mu.12_stddev 1.0
 delta.10_stddev 0.0
 sigmasq_delta_avg 0.0
 delta.12_avg -0.0
@@ -33,7 +33,7 @@ mu.21_stddev 1.0
 mu.9_stddev 1.0
 delta.13_avg -0.0
 mu.7_avg -2.0
-mu.18_stddev 2.0
+mu.18_stddev 3.0
 delta.10_avg -0.0
 delta.8_stddev 0.0
 d_avg -0.0
@@ -54,7 +54,7 @@ mu.9_avg -2.0
 delta_new_avg -0.0
 mu.17_avg -2.0
 mu.17_stddev 1.0
-delta.21_stddev 1.0
+delta.21_stddev 0.0
 mu.5_avg -2.0
 delta.7_avg -0.0
 mu.21_avg -2.0
@@ -65,7 +65,7 @@ delta.17_stddev 1.0
 mu.11_stddev 0.0
 mu.6_avg -2.0
 mu.19_avg -3.0
-mu.1_stddev 7.0
+mu.1_stddev 6.0
 mu.22_avg -3.0
 delta.4_avg -0.0
 mu.2_avg -2.0
@@ -73,10 +73,10 @@ delta.11_stddev 0.0
 delta.1_stddev 1.0
 delta.19_stddev 1.0
 d_stddev 0.0
-delta.22_stddev 1.0
+delta.22_stddev 0.0
 sigma_delta_stddev 0.0
 mu.16_avg -1.0
-delta.2_stddev 0.0
+delta.2_stddev 1.0
 delta.20_avg -0.0
 mu.19_stddev 4.0
 delta.14_avg -0.0
@@ -93,4 +93,4 @@ delta.5_avg -0.0
 delta.14_stddev 1.0
 delta.16_stddev 0.0
 delta.6_avg -0.0
-mu.20_avg -1.0
+mu.20_avg -2.0

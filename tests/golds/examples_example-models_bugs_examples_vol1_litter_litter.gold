@@ -1,4 +1,4 @@
-a_plus_b.1_avg 12.0
+a_plus_b.1_avg 10.0
 p.1.9_stddev 0.0
 theta.1_avg 0.0
 p.1.14_stddev 0.0
@@ -9,7 +9,7 @@ p.2.9_stddev 0.0
 p.1.5_stddev 0.0
 p.2.4_avg 1.0
 p.2.11_avg 1.0
-theta.1_stddev 1.0
+theta.1_stddev 2.0
 p.1.7_avg 1.0
 p.2.2_stddev 0.0
 p.1.15_stddev 0.0
@@ -20,10 +20,10 @@ p.2.13_avg 1.0
 p.2.11_stddev 0.0
 p.2.5_avg 1.0
 p.1.5_avg 1.0
-a_plus_b.2_stddev 23.0
+a_plus_b.2_stddev 24.0
 p.1.12_stddev 0.0
 p.2.3_avg 1.0
-a_plus_b.1_stddev 10398.0
+a_plus_b.1_stddev 4424.0
 p.2.7_avg 1.0
 p.2.7_stddev 0.0
 p.2.9_avg 1.0
@@ -31,7 +31,7 @@ p.1.13_avg 1.0
 theta.2_avg 1.0
 p.1.16_stddev 0.0
 theta.2_stddev 5.0
-a.1_stddev 8487.0
+a.1_stddev 3728.0
 p.1.3_avg 1.0
 p.2.5_stddev 0.0
 p.1.15_avg 1.0
@@ -54,12 +54,12 @@ p.2.2_avg 1.0
 b.1_avg 1.0
 p.2.16_avg 0.0
 p.1.16_avg 1.0
-b.1_stddev 105.0
+b.1_stddev 37.0
 p.1.7_stddev 0.0
 p.2.12_avg 1.0
 p.1.9_avg 1.0
 p.1.1_stddev 0.0
-a.1_avg 10.0
+a.1_avg 9.0
 p.1.4_stddev 0.0
 p.1.12_avg 1.0
 p.2.15_stddev 1.0

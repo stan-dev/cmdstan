@@ -151,5 +151,4 @@ if __name__ == "__main__":
         data = find_data_for_model(model)
         if not data:
             continue
-        print(model, data)
         time_step(model, run, exe, data, args.overwrite)
