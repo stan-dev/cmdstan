@@ -199,7 +199,7 @@ def parse_args():
     parser.add_argument("--runs", dest="runs", action="store", type=int,
                         help="Number of runs per benchmark.", default=1)
     parser.add_argument("-j", dest="j", action="store", type=int, default=4)
-    parser.add_argument("-runj", dest="runj", action="store", type=int, default=1)
+    parser.add_argument("--runj", dest="runj", action="store", type=int, default=1)
     return parser.parse_args()
 
 def process_test(overwrite, check_golds, check_golds_exact, runs):
@@ -223,8 +223,10 @@ if __name__ == "__main__":
              for model, exe in zip(models, executables)]
     tests = filter(lambda x: x[2], tests)
     tp = ThreadPool(args.runj)
-    results = tp.map(process_test(args.overwrite, args.check_golds,
-                               args.check_golds_exact, args.runs), tests)
+    results = tp.imap_unordered(process_test(args.overwrite, args.check_golds,
+                                             args.check_golds_exact, args.runs),
+                                tests)
+    results = list(results)
     test_results_xml(results).write("performance.xml")
     with open("performance.csv", "w") as f:
         f.write(test_results_csv(results))
