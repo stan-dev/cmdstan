@@ -9,6 +9,7 @@ import subprocess
 from difflib import SequenceMatcher
 from fnmatch import fnmatch
 from functools import wraps
+from multiprocessing.pool import ThreadPool
 from time import time
 import xml.etree.ElementTree as ET
 
@@ -181,8 +182,16 @@ def parse_args():
                         type=float)
     parser.add_argument("--overwrite-golds", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
-    parser.add_argument("-j", dest="j", action="store")
+    parser.add_argument("-j", dest="j", action="store", type=int)
     return parser.parse_args()
+
+def process_test(overwrite, check_golds, check_golds_exact):
+    def process_test_wrapper(tup):
+        model, exe, data = tup
+        time_, (fails, errors) = time_step(
+            model, run, exe, data, overwrite, check_golds, check_golds_exact)
+        return (model, time_, fails, errors)
+    return process_test_wrapper
 
 if __name__ == "__main__":
     args = parse_args()
@@ -192,12 +201,10 @@ if __name__ == "__main__":
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
     time_step("make_all_models", make, executables, args.j or 4)
-    tests = []
-    for model, exe in zip(models, executables):
-        data = find_data_for_model(model)
-        if not data:
-            continue
-        time_, (fails, errors) = time_step(model, run, exe, data, args.overwrite,
-                                           args.check_golds, args.check_golds_exact)
-        tests.append((model, time_, fails, errors))
-    test_results_xml(tests).write("performance.xml")
+    tests = [(model, exe, find_data_for_model(model))
+             for model, exe in zip(models, executables)]
+    tests = filter(lambda x: x[2], tests)
+    tp = ThreadPool(args.j)
+    results = tp.map(process_test(args.overwrite, args.check_golds,
+                                            args.check_golds_exact), tests)
+    test_results_xml(results).write("performance.xml")
