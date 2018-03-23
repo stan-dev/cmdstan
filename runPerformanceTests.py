@@ -12,7 +12,6 @@ from functools import wraps
 from time import time
 import xml.etree.ElementTree as ET
 
-TIME_FILE = "times.csv"
 GOLD_OUTPUT_DIR = "tests/golds/"
 
 def find_files(pattern, dirs):
@@ -121,7 +120,7 @@ def parse_summary(f):
         d[param] = (float(avg), float(stdev))
     return d
 
-def run(exe, data, overwrite=False):
+def run(exe, data, overwrite, check_golds, check_golds_exact):
     fails, errors = [], []
     gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".gold")
     tmp = gold + ".tmp"
@@ -136,19 +135,20 @@ def run(exe, data, overwrite=False):
 
     if overwrite:
         shexec("mv {} {}".format(tmp, gold))
-    else:
+    elif check_golds or check_golds_exact:
         gold_summary = {}
         with open(gold) as gf:
             gold_summary = parse_summary(gf)
 
-        # just printing for diagnostic purposes. XXX could make this prettier
-        subprocess.call("diff {} {}".format(gold, tmp), shell=True)
-
         for k, (mean, stdev) in gold_summary.items():
-            if stdev == 0: #XXX Uh...
+            if stdev < 0.00001: #XXX Uh...
                 continue
-            err = summary[k][0] - mean
-            if err > 0.0001 and (err / stdev) > 0.5:
+            err = abs(summary[k][0] - mean)
+            if check_golds_exact and err > check_golds_exact:
+                print("FAIL: {} param {} |{} - {}| not within {}"
+                      .format(gold, k, summary[k][0], mean, check_golds_exact))
+                fails.append((k, mean, stdev, summary[k][0]))
+            elif err > 0.0001 and (err / stdev) > 0.5:
                 print("FAIL: {} param {} not within ({} - {}) / {} < 0.5"
                       .format(gold, k, summary[k][0], mean, stdev))
                 fails.append((k, mean, stdev, summary[k][0]))
@@ -165,7 +165,7 @@ def test_results_xml(tests):
         for fail in fails:
             testcase = ET.SubElement(root, "failure", type="param mismatch")
             testcase.text = ("param {} got mean {}, gold has mean {} and stdev {}"
-                             .format(fail[0], fail[4], fail[1], fail[2]))
+                             .format(fail[0], fail[3], fail[1], fail[2]))
         for error in errors:
             testcase = ET.SubElement(root, "error", type="Exception")
             testcase.text = error
@@ -174,14 +174,18 @@ def test_results_xml(tests):
 def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
     parser.add_argument("directories", nargs="+")
-    parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+    parser.add_argument("--check-golds", dest="check_golds", action="store_true",
+                        help="Run the gold tests and check output within loose boundaries.")
+    parser.add_argument("--check-golds-exact", dest="check_golds_exact", action="store",
+                        help="Run the gold tests and check output to within specified tolerance",
+                        type=float)
+    parser.add_argument("--overwrite-golds", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
     parser.add_argument("-j", dest="j", action="store")
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = parse_args()
-    with open(TIME_FILE, "w+") as f: f.write("function, time\n")
 
     models = find_files("*.stan", args.directories)
     models = filter(model_name_re.match, models)
@@ -193,6 +197,7 @@ if __name__ == "__main__":
         data = find_data_for_model(model)
         if not data:
             continue
-        time_, (fails, errors) = time_step(model, run, exe, data, args.overwrite)
+        time_, (fails, errors) = time_step(model, run, exe, data, args.overwrite,
+                                           args.check_golds, args.check_golds_exact)
         tests.append((model, time_, fails, errors))
     test_results_xml(tests).write("performance.xml")
