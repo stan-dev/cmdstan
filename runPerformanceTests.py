@@ -198,6 +198,7 @@ def parse_args():
     parser.add_argument("--runs", dest="runs", action="store", type=int,
                         help="Number of runs per benchmark.")
     parser.add_argument("-j", dest="j", action="store", type=int)
+    parser.add_argument("-runj", dest="runj", action="store", type=int)
     return parser.parse_args()
 
 def process_test(overwrite, check_golds, check_golds_exact, runs):
@@ -220,7 +221,7 @@ if __name__ == "__main__":
     tests = [(model, exe, find_data_for_model(model))
              for model, exe in zip(models, executables)]
     tests = filter(lambda x: x[2], tests)
-    tp = ThreadPool(args.j or 1)
+    tp = ThreadPool(args.runj or 1)
     results = tp.map(process_test(args.overwrite, args.check_golds,
                                             args.check_golds_exact, args.runs), tests)
     test_results_xml(results).write("performance.xml")
