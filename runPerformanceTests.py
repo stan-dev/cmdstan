@@ -178,6 +178,13 @@ def test_results_xml(tests):
             testcase.text = error
     return ET.ElementTree(root)
 
+def test_results_csv(tests):
+    for model, time_, fails, errors in tests:
+        assert(not fails)
+        assert(not errors)
+
+    return "\n".join(",".join([model, str(time_)]) for model, time_, _, _ in tests) + "\n"
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Run gold tests and record performance.")
     parser.add_argument("directories", nargs="+")
@@ -217,3 +224,5 @@ if __name__ == "__main__":
     results = tp.map(process_test(args.overwrite, args.check_golds,
                                             args.check_golds_exact, args.runs), tests)
     test_results_xml(results).write("performance.xml")
+    with open("performance.csv", "w") as f:
+        f.write(test_results_csv(results))
