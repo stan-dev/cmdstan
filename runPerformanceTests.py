@@ -220,7 +220,7 @@ if __name__ == "__main__":
     tests = [(model, exe, find_data_for_model(model))
              for model, exe in zip(models, executables)]
     tests = filter(lambda x: x[2], tests)
-    tp = ThreadPool(args.j)
+    tp = ThreadPool(args.j or 1)
     results = tp.map(process_test(args.overwrite, args.check_golds,
                                             args.check_golds_exact, args.runs), tests)
     test_results_xml(results).write("performance.xml")
