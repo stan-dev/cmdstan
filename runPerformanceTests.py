@@ -135,7 +135,8 @@ def run(exe, data, overwrite, check_golds, check_golds_exact, runs):
             end = time()
             total_time += end-start
     except Exception as e:
-        return fails, errors + [str(e)]
+        print(e)
+        return 0, (fails, errors + [str(e)])
     summary = csv_summary(tmp)
     with open(tmp, "w+") as f:
         f.writelines(format_summary_lines(summary))
@@ -196,9 +197,9 @@ def parse_args():
     parser.add_argument("--overwrite-golds", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
     parser.add_argument("--runs", dest="runs", action="store", type=int,
-                        help="Number of runs per benchmark.")
-    parser.add_argument("-j", dest="j", action="store", type=int)
-    parser.add_argument("-runj", dest="runj", action="store", type=int)
+                        help="Number of runs per benchmark.", default=1)
+    parser.add_argument("-j", dest="j", action="store", type=int, default=4)
+    parser.add_argument("-runj", dest="runj", action="store", type=int, default=1)
     return parser.parse_args()
 
 def process_test(overwrite, check_golds, check_golds_exact, runs):
@@ -217,13 +218,13 @@ if __name__ == "__main__":
     models = filter(model_name_re.match, models)
     models = list(filter(lambda m: not m in bad_models, models))
     executables = [m[:-5] for m in models]
-    time_step("make_all_models", make, executables, args.j or 4)
+    time_step("make_all_models", make, executables, args.j)
     tests = [(model, exe, find_data_for_model(model))
              for model, exe in zip(models, executables)]
     tests = filter(lambda x: x[2], tests)
-    tp = ThreadPool(args.runj or 1)
+    tp = ThreadPool(args.runj)
     results = tp.map(process_test(args.overwrite, args.check_golds,
-                                            args.check_golds_exact, args.runs), tests)
+                               args.check_golds_exact, args.runs), tests)
     test_results_xml(results).write("performance.xml")
     with open("performance.csv", "w") as f:
         f.write(test_results_csv(results))
