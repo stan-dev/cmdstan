@@ -48,6 +48,7 @@ def time_step(name, fn, *args, **kwargs):
     return end-start, res
 
 def shexec(command):
+    print(command)
     returncode = subprocess.call(command, shell=True)
     if returncode != 0:
         raise Exception("{} from '{}'!".format(returncode, command))
@@ -121,13 +122,18 @@ def parse_summary(f):
         d[param] = (float(avg), float(stdev))
     return d
 
-def run(exe, data, overwrite, check_golds, check_golds_exact):
+def run(exe, data, overwrite, check_golds, check_golds_exact, runs):
     fails, errors = [], []
     gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".gold")
     tmp = gold + ".tmp"
     try:
-        shexec("{} sample data file={} random seed=1234 output file={}"
-            .format(exe, data, tmp))
+        total_time = 0
+        for i in range(runs):
+            start = time()
+            shexec("{} sample data file={} random seed=1234 output file={}"
+                   .format(exe, data, tmp))
+            end = time()
+            total_time += end-start
     except Exception as e:
         return fails, errors + [str(e)]
     summary = csv_summary(tmp)
@@ -153,7 +159,7 @@ def run(exe, data, overwrite, check_golds, check_golds_exact):
                 print("FAIL: {} param {} not within ({} - {}) / {} < 0.5"
                       .format(gold, k, summary[k][0], mean, stdev))
                 fails.append((k, mean, stdev, summary[k][0]))
-    return fails, errors
+    return total_time, (fails, errors)
 
 def test_results_xml(tests):
     failures = str(sum(1 if x[2] else 0 for x in tests))
@@ -182,15 +188,18 @@ def parse_args():
                         type=float)
     parser.add_argument("--overwrite-golds", dest="overwrite", action="store_true",
                         help="Overwrite the gold test records.")
+    parser.add_argument("--runs", dest="runs", action="store", type=int,
+                        help="Number of runs per benchmark.")
     parser.add_argument("-j", dest="j", action="store", type=int)
     return parser.parse_args()
 
-def process_test(overwrite, check_golds, check_golds_exact):
+def process_test(overwrite, check_golds, check_golds_exact, runs):
     def process_test_wrapper(tup):
+        # TODO: figure out the right place to compute the average or maybe don't compute the average.
         model, exe, data = tup
-        time_, (fails, errors) = time_step(
-            model, run, exe, data, overwrite, check_golds, check_golds_exact)
-        return (model, time_, fails, errors)
+        time_, (fails, errors) = run(exe, data, overwrite, check_golds, check_golds_exact, runs)
+        average_time = time_ / runs
+        return (model, average_time, fails, errors)
     return process_test_wrapper
 
 if __name__ == "__main__":
@@ -206,5 +215,5 @@ if __name__ == "__main__":
     tests = filter(lambda x: x[2], tests)
     tp = ThreadPool(args.j)
     results = tp.map(process_test(args.overwrite, args.check_golds,
-                                            args.check_golds_exact), tests)
+                                            args.check_golds_exact, args.runs), tests)
     test_results_xml(results).write("performance.xml")
