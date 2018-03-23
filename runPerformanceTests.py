@@ -82,6 +82,7 @@ bad_models = frozenset(
      , "examples/example-models/ARM/Ch.19/item_response.stan"
      , "examples/example-models/bugs_examples/vol1/dogs/dogs.stan"
      , "examples/example-models/bugs_examples/vol1/rats/rats_stanified.stan"
+     , "examples/example-models/bugs_examples/vol2/pines/pines-4.stan"
     ])
 
 def avg(coll):
@@ -121,10 +122,14 @@ def parse_summary(f):
     return d
 
 def run(exe, data, overwrite=False):
+    fails, errors = [], []
     gold = os.path.join(GOLD_OUTPUT_DIR, exe.replace("/", "_") + ".gold")
     tmp = gold + ".tmp"
-    shexec("{} sample data file={} random seed=1234 output file={}"
-           .format(exe, data, tmp))
+    try:
+        shexec("{} sample data file={} random seed=1234 output file={}"
+            .format(exe, data, tmp))
+    except Exception as e:
+        return fails, errors + [str(e)]
     summary = csv_summary(tmp)
     with open(tmp, "w+") as f:
         f.writelines(format_summary_lines(summary))
@@ -138,7 +143,6 @@ def run(exe, data, overwrite=False):
 
         # just printing for diagnostic purposes. XXX could make this prettier
         subprocess.call("diff {} {}".format(gold, tmp), shell=True)
-        fails = []
 
         for k, (mean, stdev) in gold_summary.items():
             if stdev == 0: #XXX Uh...
@@ -148,20 +152,23 @@ def run(exe, data, overwrite=False):
                 print("FAIL: {} param {} not within ({} - {}) / {} < 0.5"
                       .format(gold, k, summary[k][0], mean, stdev))
                 fails.append((k, mean, stdev, summary[k][0]))
-        return fails
+    return fails, errors
 
 def test_results_xml(tests):
-    failures = str(sum(1 if x[-1] else 0 for x in tests))
+    failures = str(sum(1 if x[2] else 0 for x in tests))
     time_ = str(sum(x[1] for x in tests))
     root = ET.Element("testsuite", failures=failures, name="Performance Tests",
                       tests=str(len(tests)), time=str(time_))
-    for model, time_, fails in tests:
+    for model, time_, fails, errors in tests:
         time_ = str(time_)
         testcase = ET.SubElement(root, "testcase", classname=model, time=time_)
         for fail in fails:
             testcase = ET.SubElement(root, "failure", type="param mismatch")
             testcase.text = ("param {} got mean {}, gold has mean {} and stdev {}"
                              .format(fail[0], fail[4], fail[1], fail[2]))
+        for error in errors:
+            testcase = ET.SubElement(root, "error", type="Exception")
+            testcase.text = error
     return ET.ElementTree(root)
 
 def parse_args():
@@ -186,6 +193,6 @@ if __name__ == "__main__":
         data = find_data_for_model(model)
         if not data:
             continue
-        time_, fails = time_step(model, run, exe, data, args.overwrite)
-        tests.append((model, time_, fails))
+        time_, (fails, errors) = time_step(model, run, exe, data, args.overwrite)
+        tests.append((model, time_, fails, errors))
     test_results_xml(tests).write("performance.xml")
