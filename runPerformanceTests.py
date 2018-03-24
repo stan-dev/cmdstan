@@ -135,6 +135,7 @@ def run(exe, data, overwrite, check_golds, check_golds_exact, runs):
             end = time()
             total_time += end-start
     except Exception as e:
+        print("Encountered exception while running {}:".format(exe))
         print(e)
         return 0, (fails, errors + [str(e)])
     summary = csv_summary(tmp)
@@ -180,10 +181,6 @@ def test_results_xml(tests):
     return ET.ElementTree(root)
 
 def test_results_csv(tests):
-    for model, time_, fails, errors in tests:
-        assert(not fails)
-        assert(not errors)
-
     return "\n".join(",".join([model, str(time_)]) for model, time_, _, _ in tests) + "\n"
 
 def parse_args():
@@ -230,3 +227,6 @@ if __name__ == "__main__":
     test_results_xml(results).write("performance.xml")
     with open("performance.csv", "w") as f:
         f.write(test_results_csv(results))
+    for model, _, fails, errors in results:
+        if fails or errors:
+            print("'{}' had fails '{}' and errors '{}'".format(model, fails, errors))
