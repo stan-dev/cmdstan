@@ -32,6 +32,6 @@ if __name__ == "__main__":
     assert(len(ratios) == len(names1))
     for i in range(len(names1)):
         assert(names1[i] == names2[i])
-        print(names1[i], ratios[i])
+        print(names1[i], round(ratios[i], 2))
 
     print(geo_mean(ratios))
