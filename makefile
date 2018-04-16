@@ -242,7 +242,7 @@ endif
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES) $(MODEL_PCH)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
