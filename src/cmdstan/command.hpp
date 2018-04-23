@@ -252,7 +252,10 @@ namespace cmdstan {
         double stepsize = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
         double stepsize_jitter= dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
 
-        if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
+        if (adapt_engaged == true && num_warmup == 0) {
+          info("The number of warmup samples (num_warmup) must be greater than zero if adaptation is enabled.");
+          return_code = stan::services::error_codes::CONFIG;
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
                                                                  init_context,
