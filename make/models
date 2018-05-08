@@ -10,13 +10,13 @@ $(MODEL_PCH) : $(MODEL_HEADER)
 	$(COMPILE.cc) -O$O $(MODEL_HEADER) -o $@
 
 .PRECIOUS: %.hpp %.o
-$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan bin/stanc$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) $(LIBCVODES) $(MODEL_PCH)
+$(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : %.hpp %.stan bin/stanc$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) $(LIBMPI) $(LIBCVODES) $(MODEL_PCH)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 ifneq (,$(findstring allow_undefined,$(STANCFLAGS)))
-	$(LINK.cc) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(USER_HEADER) $(LIBCVODES)
+	$(LINK.cc) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) $(CMDSTAN_MAIN) -include $< -include $(USER_HEADER) $(LIBCVODES)
 else
-	$(LINK.cc) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< $(LIBCVODES)
+	$(LINK.cc) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) $(CMDSTAN_MAIN) -include $< $(LIBCVODES)
 endif
 
 .PRECIOUS: %.hpp

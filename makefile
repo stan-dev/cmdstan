@@ -86,6 +86,11 @@ include make/tests
 include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 -include $(STAN)make/manual
 
+# Define additional libraries to use when MPI is enabled
+ifdef STAN_MPI
+  LIBMPI := $(BOOST)/stage/lib/libboost_mpi$(DLL) $(BOOST)/stage/lib/libboost_serialization$(DLL)
+endif
+
 ##
 # Tell make the default way to compile a .o file.
 ##
@@ -96,7 +101,7 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES)
+	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES)
 
 
 ##
@@ -242,7 +247,7 @@ endif
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
+build: $(LIBMPI) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
