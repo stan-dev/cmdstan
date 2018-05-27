@@ -80,16 +80,16 @@ CMDSTAN_VERSION := 2.17.1
 ##
 -include $(MATH)make/detect_os
 
+# Define additional libraries to use when MPI is enabled
+ifdef STAN_MPI
+  LIBMPI := $(BOOST)/stage/lib/libboost_mpi$(DLL) $(BOOST)/stage/lib/libboost_serialization$(DLL)
+endif
+
 include make/libstan  # libstan.a
 include make/models   # models
 include make/tests
 include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 -include $(STAN)make/manual
-
-# Define additional libraries to use when MPI is enabled
-ifdef STAN_MPI
-  LIBMPI := $(BOOST)/stage/lib/libboost_mpi$(DLL) $(BOOST)/stage/lib/libboost_serialization$(DLL)
-endif
 
 ##
 # Tell make the default way to compile a .o file.
@@ -293,3 +293,4 @@ stan-revert:
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 
+print-%  : ; @echo $* = $($*)

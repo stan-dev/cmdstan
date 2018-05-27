@@ -34,6 +34,7 @@
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
@@ -61,6 +62,13 @@ namespace cmdstan {
     stan::callbacks::stream_writer err(std::cout);
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
+
+#ifdef STAN_MPI
+    static stan::math::mpi_cluster cluster;
+    std::cout << "Starting MPI process " << cluster.rank_+1 << " / " << cluster.world_.size() << std::endl;
+    cluster.listen();
+    if (cluster.rank_ != 0) return 0;
+#endif
 
     // Read arguments
     std::vector<argument*> valid_arguments;

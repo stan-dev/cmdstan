@@ -23,6 +23,14 @@ endif
 path_separator :
 	@echo $(PATH_SEPARATOR)
 
+#### MPI TEST #####
+ifdef STAN_MPI
+  MPI_TESTS := $(patsubst src/%.cpp,%$(EXE),$(shell find src/test -name *mpi_*test.cpp))
+  $(MPI_TESTS): LDFLAGS += $(LDFLAGS_MPI)
+  $(MPI_TESTS): CXXFLAGS += $(CXXFLAGS_MPI)
+  $(MPI_TESTS): $(LIBMPI)
+endif
+
 ##
 # PERCENT used for secondary expansion
 # $$(PERCENT) turns into %.
@@ -127,6 +135,7 @@ endif
 ##
 test/interface/command_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test))
 test/interface/metric_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, test_model proper))
+test/interface/mpi_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, logistic_map_rect))
 test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_header_consistency$(EXE)
 test/interface/diagnose_test$(EXE): bin/diagnose$(EXE)
 test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
