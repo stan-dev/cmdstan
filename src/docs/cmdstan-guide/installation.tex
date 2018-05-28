@@ -622,6 +622,30 @@ to force more accurate floating point computations:
 \end{itemize}
 
 
+\section{Optional Parallelization Support}
+
+\CmdStan has optional support for within-chain parallelization using
+threads or multiple processes which are linked via the message passing
+interface (MPI).
+%
+\begin{description}
+  \item[Threads] can utilize multiple cores on a single
+    machine. Please refer to
+    \url{https://github.com/stan-dev/math/wiki/Threading-Support} for
+    instructions on how to setup threading.
+  \item[MPI] is typically used on large computing clusters. The MPI
+    standard allows to link together a large number of processes which
+    can run locally on the same and/or accross potentially many
+    different machines. Please refer to
+    \url{https://github.com/stan-dev/math/wiki/MPI-Parallelism} for
+    more details.
+\end{description}
+%
+The within-chain parallelization is used in the Stan language to
+parallelize the evaluation of the \Verb|map_rect| command. Note that
+MPI parallelism will take precendence in case both features are
+enabled.
+
 \section{Optional Components for Developers}
 
 \CmdStan is developed using the following set of tools.  The various
