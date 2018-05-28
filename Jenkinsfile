@@ -24,7 +24,6 @@ def setupCC() {
 }
 
 def runTests(String prefix = "") {
-    unstash 'CmdStanSetup'
     """ make -j${env.PARALLEL} build
         ${prefix}runCmdStanTests.py src/test/interface
     """
