@@ -111,17 +111,39 @@ def makeTests(dirname, filenames, j):
             if (endIdx > len(targets)):
                 endIdx = len(targets)
          
-
-def runTest(name):
+def commandExists(command):
+    p = subprocess.Popen(command, shell=True,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    p.wait()
+    return p.returncode != 127
+                
+def runTest(name, mpi=False, j=1):
     executable = mungeName(name).replace("/",os.sep)
     xml = mungeName(name).replace(winsfx, "")
     command = '%s --gtest_output="xml:%s.xml"' % (executable, xml)
+    if mpi:
+        if not commandExists("mpirun"):
+            stopErr("Error: need to have mpi (and mpirun) installed to run mpi tests"
+                    + "\nCheck https://github.com/stan-dev/stan/wiki/Parallelism-using-MPI-in-Stan for more details."
+                    , -1)
+        if "mpi_" in name:
+            j = j > 2 and j or 2
+        else:
+            j = 1
+        command = "mpirun -np {} {}".format(j, command)
     doCommand(command)
 
 def main():
     if (len(sys.argv) < 2):
         usage()
 
+    try:
+        with open("make/local") as f:
+            stan_mpi =  "STAN_MPI" in f.read()
+    except IOError:
+        stan_mpi = False
+    
     argsIdx = 1
     j = None
     if (sys.argv[1].startswith("-j")):
@@ -167,14 +189,14 @@ def main():
         if (not(os.path.isdir(testname))):
             if (debug):
                 print("run single test: %s" % testname)
-            runTest(testname)
+            runTest(testname, mpi = stan_mpi, j = j)
         else:
             for root, dirs, files in os.walk(testname):
                 for name in files:
                     if (name.endswith(testsfx)):
                         if (debug):
                             print("run dir,test: %s,%s" % (root,name))
-                        runTest(os.sep.join([root,name]))
+                        runTest(os.sep.join([root,name]), mpi = stan_mpi, j = j)
 
     
 if __name__ == "__main__":
