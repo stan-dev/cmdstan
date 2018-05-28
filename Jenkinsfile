@@ -93,8 +93,9 @@ pipeline {
                     agent any
                     steps {
                           setupCC()
-                          sh "echo >> make/local"
+                          sh "echo > make/local"
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
+                          sh "echo CXX=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
                           sh runTests("./")
                     }
