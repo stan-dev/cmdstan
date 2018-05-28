@@ -20,7 +20,6 @@ def checkout_pr(String repo, String pr) {
 
 def runTests(String prefix = "") {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${env.CXX}")
     """ make -j${env.PARALLEL} build
         ${prefix}runCmdStanTests.py src/test/interface
     """
@@ -66,12 +65,33 @@ pipeline {
             parallel {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
-                    steps { bat runTests() }
+                    steps {
+                          sh "echo CC=${env.CXX} > make/local"
+                          bat runTests()
+                          }
                     post { always { deleteDir() }}
                 }
                 stage('Non-windows interface tests') {
                     agent any
-                    steps { sh runTests("./") }
+                    steps {
+                          sh "echo CC=${env.CXX} > make/local"
+                          sh runTests("./")
+                          }
+                    post {
+                        always {
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            deleteDir()
+                        }
+                    }
+                }
+                stage('Non-windows interface tests with MPI') {
+                    agent any
+                    steps {
+                          sh "echo CC=${env.MPICXX} -cxx=${env.CXX} > make/local"
+                          sh "echo STAN_MPI=true >> make/local"
+                          sh runTests("./")
+                          }
                     post {
                         always {
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
