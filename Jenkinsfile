@@ -70,7 +70,7 @@ pipeline {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
-                          sh setupCC()
+                          setupCC()
                           bat runTests()
                     }
                     post { always { deleteDir() }}
@@ -78,7 +78,7 @@ pipeline {
                 stage('Non-windows interface tests') {
                     agent any
                     steps {
-                          sh setupCC()
+                          setupCC()
                           sh runTests("./")
                     }
                     post {
@@ -92,7 +92,7 @@ pipeline {
                 stage('Non-windows interface tests with MPI') {
                     agent any
                     steps {
-                          sh setupCC()
+                          setupCC()
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
                           sh runTests("./")
