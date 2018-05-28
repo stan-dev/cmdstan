@@ -18,9 +18,9 @@ def checkout_pr(String repo, String pr) {
     """
 }
 
-def setupCC(Boolean failOnError = true) {
-    errorStr = failOnError ? "-Werror " : ""
-    "echo CC=${env.CXX} ${errorStr}> make/local"
+def setupCC() {
+    unstash 'CmdStanSetup'
+    writeFile(file: "make/local", text: "CC = ${env.CXX}")
 }
 
 def runTests(String prefix = "") {
