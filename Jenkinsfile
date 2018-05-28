@@ -18,6 +18,11 @@ def checkout_pr(String repo, String pr) {
     """
 }
 
+def setupCC(Boolean failOnError = true) {
+    errorStr = failOnError ? "-Werror " : ""
+    "echo CC=${env.CXX} ${errorStr}> make/local"
+}
+
 def runTests(String prefix = "") {
     unstash 'CmdStanSetup'
     """ make -j${env.PARALLEL} build
@@ -66,8 +71,7 @@ pipeline {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
-                          sh "touch make/local"
-                          sh "echo CC=${env.CXX} >> make/local"
+                          sh setupCC()
                           bat runTests()
                           }
                     post { always { deleteDir() }}
@@ -75,8 +79,7 @@ pipeline {
                 stage('Non-windows interface tests') {
                     agent any
                     steps {
-                          sh "touch make/local"
-                          sh "echo CC=${env.CXX} >> make/local"
+                          sh setupCC()
                           sh runTests("./")
                           }
                     post {
@@ -90,7 +93,7 @@ pipeline {
                 stage('Non-windows interface tests with MPI') {
                     agent any
                     steps {
-                          sh "touch make/local"
+                          sh setupCC()
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
                           sh runTests("./")
