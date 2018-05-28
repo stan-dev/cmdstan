@@ -44,7 +44,14 @@
 
 namespace cmdstan {
 
-  stan::io::dump get_var_context(const std::string file) {
+#ifdef STAN_MPI
+stan::math::mpi_cluster& get_mpi_cluster() {
+  static stan::math::mpi_cluster cluster;
+  return cluster;
+}
+#endif
+
+stan::io::dump get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
       std::stringstream msg;
@@ -64,7 +71,7 @@ namespace cmdstan {
                                           std::cerr, std::cerr);
 
 #ifdef STAN_MPI
-    static stan::math::mpi_cluster cluster;
+    stan::math::mpi_cluster& cluster = get_mpi_cluster();
     std::cout << "Starting MPI process " << cluster.rank_+1 << " / " << cluster.world_.size() << std::endl;
     cluster.listen();
     if (cluster.rank_ != 0) return 0;
@@ -876,6 +883,9 @@ namespace cmdstan {
     diagnostic_stream.close();
     for (size_t i = 0; i < valid_arguments.size(); ++i)
       delete valid_arguments.at(i);
+#ifdef STAN_MPI
+    cluster.stop_listen();
+#endif
     return return_code;
   }
 
