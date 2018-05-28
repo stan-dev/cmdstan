@@ -72,7 +72,7 @@ pipeline {
                     steps {
                           sh setupCC()
                           bat runTests()
-                          }
+                    }
                     post { always { deleteDir() }}
                 }
                 stage('Non-windows interface tests') {
@@ -80,7 +80,7 @@ pipeline {
                     steps {
                           sh setupCC()
                           sh runTests("./")
-                          }
+                    }
                     post {
                         always {
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
@@ -96,7 +96,7 @@ pipeline {
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
                           sh runTests("./")
-                          }
+                    }
                     post {
                         always {
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
