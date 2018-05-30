@@ -1,6 +1,19 @@
-# Makefile for CmdStan.
-# This makefile relies heavily on the make defaults for
-# make 3.81.
+##
+# CmdStan users: if you need to customize make options,
+#   you should add variables to a new file called
+#   make/local (no file extension)
+#
+# A typical option might be:
+#   CXX = clang++
+#
+# Users should only need to set these variables:
+# - CXX: The compiler to use. Expecting g++ or clang++.
+# - O: Optimization level. Valid values are {s, 0, 1, 2, 3}.
+#      Default is 3.
+# - O_STANC: Optimization level for compiling stanc.
+#      Valid values are {s, 0, 1, 2, 3}. Default is 0
+# - STANCFLAGS: Extra options for calling stanc
+# - AR: archiver (must specify for cross-compiling)
 ##
 
 # The default target of this Makefile is...
@@ -9,39 +22,45 @@ help:
 ## Disable implicit rules.
 .SUFFIXES:
 
-##
-# Users should only need to set these three variables for use.
-# - CC: The compiler to use. Expecting g++ or clang++.
-# - O: Optimization level. Valid values are {0, 1, 2, 3}.
-# - AR: archiver (must specify for cross-compiling)
-# - OS: {mac, win, linux}. 
-##
-CC = g++
-O = 3
-O_STANC = 0
-AR = ar
 
 ##
 # Library locations
 ##
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
-include $(MATH)make/libraries
 
-##
-# Set default compiler options.
-## 
-include $(MATH)make/default_compiler_options
-CXXFLAGS += -I src -I $(STAN)src -isystem $(MATH) -DEIGEN_NO_DEBUG -DFUSION_MAX_VECTOR_SIZE=12
+##########################
+## FIXME(DL): Default compiler options broken in math tagged v2.17.1.
+##            Once fixed, remove lines and replace with include
+#-include $(MATH)make/default_compiler_options
+O = 3
+O_STANC = 0
+AR = ar
+CPPFLAGS = -DNO_FPRINTF_OUTPUT -pipe
+# CXXFLAGS are just used for C++
+CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
+GTEST_CXXFLAGS = -DGTEST_USE_OWN_TR1_TUPLE
+LDLIBS =
+EXE =
+WINE =
+
+
+##########################
+
+
+CXXFLAGS += -I src -isystem $(STAN)src -isystem $(MATH)
+CXXFLAGS += -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+CXXFLAGS += -DEIGEN_NO_DEBUG
 LDLIBS_STANC = -Lbin -lstanc
 STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.17.0
+CMDSTAN_VERSION := 2.17.1
 
--include make/local
+-include $(HOME)/.config/cmdstan/make.local  # define local variables
+-include make/local                       # overwrite local variables
 
-CXX = $(CC)
+-include $(MATH)make/libraries
 
 ##
 # Get information about the compiler used.
@@ -49,22 +68,23 @@ CXX = $(CC)
 # - CC_MAJOR: major version of CC
 # - CC_MINOR: minor version of CC
 ##
-include $(MATH)make/detect_cc
+-include $(MATH)make/detect_cc
 
-# OS is set automatically by this script
+# OS_TYPE is set automatically by this script
 ##
 # These includes should update the following variables
 # based on the OS:
-#   - CXXFLAGS
+#   - CFLAGS
 #   - GTEST_CXXFLAGS
 #   - EXE
 ##
-include $(MATH)make/detect_os
+-include $(MATH)make/detect_os
 
-##
-# Get information about the version of make.
-##
--include $(MATH)make/detect_make
+include make/libstan  # libstan.a
+include make/models   # models
+include make/tests
+include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
+-include $(STAN)make/manual
 
 ##
 # Tell make the default way to compile a .o file.
@@ -180,18 +200,18 @@ help-dev:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan help for developers:'
 	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):   ' $(OS)
-	@echo '  - CC (Compiler):           ' $(CC)
-	@echo '  - Compiler version:        ' $(CC_MAJOR).$(CC_MINOR)
-	@echo '  - O (Optimization Level):  ' $(O)
-	@echo '  - O_STANC (Opt for stanc): ' $(O_STANC)
+	@echo '  - OS_TYPE (Operating System): ' $(OS_TYPE)
+	@echo '  - CXX (Compiler):             ' $(CXX)
+	@echo '  - Compiler version:           ' $(CC_MAJOR).$(CC_MINOR)
+	@echo '  - O (Optimization Level):     ' $(O)
+	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
 ifdef TEMPLATE_DEPTH
-	@echo '  - TEMPLATE_DEPTH:          ' $(TEMPLATE_DEPTH)
+	@echo '  - TEMPLATE_DEPTH:             ' $(TEMPLATE_DEPTH)
 endif
 	@echo '  Library configuration:'
-	@echo '  - EIGEN                    ' $(EIGEN)
-	@echo '  - BOOST                    ' $(BOOST)
-	@echo '  - GTEST                    ' $(GTEST)
+	@echo '  - EIGEN                       ' $(EIGEN)
+	@echo '  - BOOST                       ' $(BOOST)
+	@echo '  - GTEST                       ' $(GTEST)
 	@echo ''
 	@echo '  If this copy of CmdStan has been cloned using git,'
 	@echo '  before building CmdStan utilities the first time you need'
@@ -210,8 +230,8 @@ endif
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
-	@echo '- bin/stansummary(EXE): Build the print utility.'
-	@echo '- bin/diagnostic(EXE): Build the diagnostic utility.'
+	@echo '- bin/stansummary$(EXE): Build the print utility.'
+	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
 	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
@@ -220,14 +240,6 @@ endif
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
-
--include $(HOME)/.config/cmdstan/make.local    # define local variables
--include make/local    # for local variables
--include make/libstan  # libstan.a
--include make/models   # models
--include make/tests
--include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
--include $(STAN)make/manual
 
 .PHONY: build
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)

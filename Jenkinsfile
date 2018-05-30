@@ -1,3 +1,8 @@
+@Library('StanUtils')
+import org.stan.Utils
+
+def utils = new org.stan.Utils()
+
 def checkout_pr(String repo, String pr) {
     prNumber = pr.tokenize('-').last()
     if (repo == "math") {
@@ -7,16 +12,23 @@ def checkout_pr(String repo, String pr) {
     }
     sh """
         cd ${dir}
+        git clean -xffd
         git fetch https://github.com/stan-dev/${repo} +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
         git checkout refs/remotes/origin/pr/${prNumber}/merge
     """
 }
 
+def runTests(String prefix = "") {
+    unstash 'CmdStanSetup'
+    writeFile(file: "make/local", text: "CC = ${env.CXX}")
+    """ make -j${env.PARALLEL} build
+        ${prefix}runCmdStanTests.py src/test/interface
+    """
+}
+
 pipeline {
-    agent any
-    options {
-        disableConcurrentBuilds()
-    }
+    agent none
+    options { skipDefaultCheckout() }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
           description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
@@ -24,10 +36,19 @@ pipeline {
           description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
     stages {
+        stage('Kill previous builds') {
+            when {
+                not { branch 'develop' }
+                not { branch 'master' }
+                not { branch 'downstream tests' }
+            }
+            steps { script { utils.killOldBuilds() } }
+        }
         stage('Clean & Setup') {
+            agent any
             steps {
+                retry(3) { checkout scm }
                 sh 'git clean -xffd'
-                sh 'git submodule update --init --recursive'
                 sh 'make stan-revert'
                 script {
                     if (params.stan_pr != '') {
@@ -37,26 +58,38 @@ pipeline {
                         checkout_pr("math", params.math_pr)
                     }
                 }
-                sh "echo 'CC=${env.CXX}' > make/local"
-                sh "echo 'CXXFLAGS += -Werror' >> make/local"
-                sh "echo 'MAKEVARS=-j{env.PARALLEL}' >> make/local"
+                stash 'CmdStanSetup'
             }
+            post { always { deleteDir() }}
         }
-        stage('Interface tests') {
-            steps { sh './runCmdStanTests.py src/test/interface' }
-        }
-        stage('Manual') {
-            steps {
-                sh 'make manual'
-                archiveArtifacts 'doc/*'
+        stage('Parallel tests') {
+            parallel {
+                stage('Windows interface tests') {
+                    agent { label 'windows' }
+                    steps { bat runTests() }
+                    post { always { deleteDir() }}
+                }
+                stage('Non-windows interface tests') {
+                    agent any
+                    steps { sh runTests("./") }
+                    post {
+                        always {
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            deleteDir()
+                        }
+                    }
+                }
+                stage('Manual') {
+                    agent any
+                    steps {
+                        unstash 'CmdStanSetup'
+                        sh 'make manual'
+                        archiveArtifacts 'doc/*'
+                    }
+                    post { always { deleteDir() }}
+                }
             }
-        }
-    }
-    post {
-        always {
-            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-            deleteDir()
         }
     }
 }

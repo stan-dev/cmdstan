@@ -3,5 +3,5 @@ parameters {
 }
 
 model {
-  increment_log_prob(1 / x);
+  target += 1 / x;
 }

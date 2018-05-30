@@ -6,6 +6,15 @@ LIBGTEST = test/libgtest.a
 GTEST_MAIN = $(GTEST)/src/gtest_main.cc
 GTEST_CXXFLAGS += -I $(GTEST)/include -I $(GTEST)
 
+##########################
+## FIXME(DL): Remove when os_linux is updated in math
+
+ifeq ($(OS_TYPE), linux)
+  GTEST_CXXFLAGS += -DGTEST_HAS_PTHREAD=0
+endif
+
+##########################
+
 ##
 # target path_separator for use in some tests that need to
 # call executables.
@@ -47,7 +56,7 @@ $(LIBGTEST): $(LIBGTEST)(test/gtest.o)
 
 test/gtest.o: $(GTEST)/src/gtest-all.cc
 	@mkdir -p test
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
+	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION) -Wno-unused-variable
 
 test/%.o : src/test/%.cpp 
 	@mkdir -p $(dir $@)
@@ -116,16 +125,16 @@ endif
 ##
 # Tests that depend on compiled models
 ##
-test/interface/command_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test))
-test/interface/metric_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, test_model proper))
-test/interface/csv_header_consistency_test.o: src/test/test-models/csv_header_consistency$(EXE)
-test/interface/diagnose_test.o: bin/diagnose$(EXE)
-test/interface/elapsed_time_test.o: src/test/test-models/test_model$(EXE)
-test/interface/fixed_param_sampler_test.o: $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
-test/interface/model_output_test.o: src/test/test-models/printer$(EXE)
-test/interface/optimization_output_test.o: src/test/test-models/optimization_output$(EXE)
-test/interface/print_test.o: src/test/interface/matrix_output.csv bin/print$(EXE)
-test/interface/print_uninitialized_test.o: src/test/test-models/print_uninitialized$(EXE)
-test/interface/arguments/argument_configuration_test.o: src/test/test-models/test_model$(EXE)
-test/interface/stansummary_test.o: src/test/interface/matrix_output.csv bin/stansummary$(EXE)
-test/interface/variational_output_test.o: src/test/test-models/variational_output$(EXE)
+test/interface/command_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test))
+test/interface/metric_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, test_model proper))
+test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_header_consistency$(EXE)
+test/interface/diagnose_test$(EXE): bin/diagnose$(EXE)
+test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
+test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
+test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
+test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
+test/interface/print_test$(EXE): src/test/interface/matrix_output.csv bin/print$(EXE)
+test/interface/print_uninitialized_test$(EXE): src/test/test-models/print_uninitialized$(EXE)
+test/interface/arguments/argument_configuration_test$(EXE): src/test/test-models/test_model$(EXE)
+test/interface/stansummary_test$(EXE): src/test/interface/matrix_output.csv bin/stansummary$(EXE)
+test/interface/variational_output_test$(EXE): src/test/test-models/variational_output$(EXE)
