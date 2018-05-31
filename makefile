@@ -38,7 +38,7 @@ O_STANC = 0
 AR = ar
 CPPFLAGS = -DNO_FPRINTF_OUTPUT -pipe
 # CXXFLAGS are just used for C++
-CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
+CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(SUNDIALS)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
 GTEST_CXXFLAGS = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS =
 EXE =
@@ -96,7 +96,7 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES)
+	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS)
 
 
 ##
