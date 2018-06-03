@@ -95,13 +95,13 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.cc) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION)
 
 %$(EXE) : %.hpp %.stan 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS)
+	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS)
 
 
 ##
@@ -109,14 +109,14 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 ##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 
 ##
@@ -129,7 +129,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -139,7 +139,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
