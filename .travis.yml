@@ -6,7 +6,7 @@ before_script:
   - echo ${CXX}
   - ${CXX} --version
   - echo "CC=$CXX" > make/local
-  - echo "MATH=${PWD}/stan/lib/stan_math/" >> make/local
+  - echo "MATH=`pwd`/stan/lib/stan_math/" >> make/local
 
 linux_clang: &linux_clang
   os: linux
