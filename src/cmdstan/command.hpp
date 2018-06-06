@@ -72,7 +72,6 @@ stan::io::dump get_var_context(const std::string file) {
 
 #ifdef STAN_MPI
     stan::math::mpi_cluster& cluster = get_mpi_cluster();
-    std::cout << "Starting MPI process " << cluster.rank_+1 << " / " << cluster.world_.size() << std::endl;
     cluster.listen();
     if (cluster.rank_ != 0) return 0;
 #endif
