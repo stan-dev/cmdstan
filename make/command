@@ -1,19 +1,19 @@
 .PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a $(LIBMPI)
+bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a
 	@mkdir -p $(dir $@)
 	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
 
 .PRECIOUS: bin/print$(EXE)
-bin/print$(EXE) : bin/cmdstan/print.o $(LIBMPI)
+bin/print$(EXE) : bin/cmdstan/print.o
 	@mkdir -p $(dir $@)
 	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
 .PRECIOUS: bin/stansummary$(EXE)
-bin/stansummary$(EXE) : bin/cmdstan/stansummary.o $(LIBMPI)
+bin/stansummary$(EXE) : bin/cmdstan/stansummary.o
 	@mkdir -p $(dir $@)
 	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
 
 .PRECIOUS: bin/diagnose$(EXE)
-bin/diagnose$(EXE) : bin/cmdstan/diagnose.o $(LIBMPI)
+bin/diagnose$(EXE) : bin/cmdstan/diagnose.o
 	@mkdir -p $(dir $@)
 	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<

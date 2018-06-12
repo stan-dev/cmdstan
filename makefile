@@ -112,14 +112,14 @@ stan/%.o : stan/%.cpp
 ##
 # Tell make the default way to compile a .o file.
 ##
-bin/%.o : src/%.cpp
+bin/%.o : $(LIBMPI) src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
-bin/stan/%.o : $(STAN)src/stan/%.cpp
+bin/stan/%.o : $(LIBMPI) $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
@@ -128,7 +128,7 @@ bin/stan/%.o : $(STAN)src/stan/%.cpp
 # Applies to all *.cpp files in src.
 # Test cpp files are handled slightly differently.
 ##
-bin/%.d : src/%.cpp
+bin/%.d : $(LIBMPI) src/%.cpp
 	@if test -d $(dir $@); \
 	then \
 	(set -e; \
@@ -138,7 +138,7 @@ bin/%.d : src/%.cpp
 	rm -f $@.$$$$);\
 	fi
 
-%.d : %.cpp
+%.d : $(LIBMPI) %.cpp
 	@if test -d $(dir $@); \
 	then \
 	(set -e; \
