@@ -614,9 +614,10 @@ performance gains.
 \subsection{Additional compiler options}
 
 By default, Intel's compiler trades off accuracy for speed. This,
-unfortunately, isn't ideal behavior for the inference algorithms
-and may cause divergent transitions. Add these flags to \code{make/local}
-to force more accurate floating point computations:
+unfortunately, isn't ideal behavior for the inference algorithms and
+may cause divergent transitions to go {\em unreported}. Add these
+flags to \code{make/local} to force more accurate floating point
+computations which ensure that divergent transitions are reported:
 \begin{itemize}
   \item \Verb|CXXFLAGS += -fp-model precise -fp-model source|
 \end{itemize}

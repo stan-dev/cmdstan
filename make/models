@@ -14,9 +14,9 @@ $(patsubst %.stan,%,$(wildcard $(addsuffix .stan,$(MAKECMDGOALS)))) : %$(EXE) : 
 	@echo ''
 	@echo '--- Linking C++ model ---'
 ifneq (,$(findstring allow_undefined,$(STANCFLAGS)))
-	$(LINK.cc) $(CMDSTAN_MAIN) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) -include $< -include $(USER_HEADER) $(LIBSUNDIALS)
+	$(LINK.cc) $(CMDSTAN_MAIN) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) -include $< -include $(USER_HEADER) $(LIBSUNDIALS) $(LIBMPI)
 else
-	$(LINK.cc) $(CMDSTAN_MAIN) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) $(LDFLAGS_MPI) $(CXXFLAGS_MPI) -include $< $(LIBSUNDIALS)
+	$(LINK.cc) $(CMDSTAN_MAIN) $(if $(filter $(CC_TYPE),clang++),-include-pch $(MODEL_PCH)) -O$O $(OUTPUT_OPTION) -include $< $(LIBSUNDIALS) $(LIBMPI)
 endif
 
 .PRECIOUS: %.hpp
