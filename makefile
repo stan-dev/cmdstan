@@ -93,6 +93,12 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 ##
 # Tell make the default way to compile a .o file.
 ##
+stan/%.o : stan/%.cpp
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
+
+##
+# Tell make the default way to compile a .o file.
+##
 %.o : %.cpp
 	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION)
 
@@ -115,12 +121,6 @@ bin/%.o : src/%.cpp
 ##
 bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
-
-##
-# Tell make the default way to compile a .o file.
-##
-stan/%.o : stan/%.cpp
 	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
