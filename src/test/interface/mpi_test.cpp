@@ -7,7 +7,7 @@
 TEST(StanUiCommand, mpi_ready) {
   // The initialization has all worked if we get to here on the rank=0
   // process. 
-  EXPECT_TRUE(stan::math::mpi_cluster::listening_state());
+  EXPECT_TRUE(stan::math::mpi_cluster::listening_status());
 }
 
 struct mpi_hello {
@@ -16,6 +16,7 @@ struct mpi_hello {
     boost::mpi::gather(world, world.rank(), 0);
   }
 };
+
 
 // register worker command
 STAN_REGISTER_MPI_DISTRIBUTED_APPLY(mpi_hello)

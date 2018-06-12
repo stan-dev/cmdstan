@@ -60,6 +60,8 @@ CMDSTAN_VERSION := 2.17.1
 -include $(HOME)/.config/cmdstan/make.local  # define local variables
 -include make/local                       # overwrite local variables
 
+CXX = $(CC)
+
 -include $(MATH)make/libraries
 
 ##
@@ -98,7 +100,7 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS)
+	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(LIBMPI)
 
 
 ##
@@ -115,6 +117,11 @@ bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
+##
+# Tell make the default way to compile a .o file.
+##
+stan/%.o : stan/%.cpp
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
 # Rule for generating dependencies.

@@ -23,11 +23,6 @@ endif
 path_separator :
 	@echo $(PATH_SEPARATOR)
 
-#### MPI TEST #####
-##ifdef STAN_MPI
-##  GTEST_CXXFLAGS += $(CXXFLAGS_MPI)
-##endif
-
 ##
 # PERCENT used for secondary expansion
 # $$(PERCENT) turns into %.
@@ -83,7 +78,7 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%.cpp,%$(EXE),$(ALL_TESTS))
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBSUNDIALS) $(LIBMPI)
 	@mkdir -p $(dir $@)
-	$(LINK.cc) $< -O$O $(GTEST_MAIN) $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LIBSUNDIALS)
+	$(LINK.cc) $< -O$O $(GTEST_MAIN) $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LIBSUNDIALS) $(LIBMPI)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
 	$(WINE) $@ --gtest_output="xml:$(basename $@).xml"
 endif
