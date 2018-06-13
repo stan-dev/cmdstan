@@ -23,8 +23,9 @@ def setupCC() {
     writeFile(file: "make/local", text: "CC = ${env.CXX}")
 }
 
+//make -j${env.PARALLEL} build
 def runTests(String prefix = "") {
-    """ make -j${env.PARALLEL} build
+    """ make -j1 build
         ${prefix}runCmdStanTests.py src/test/interface
     """
 }
@@ -95,9 +96,7 @@ pipeline {
                           setupCC()
                           sh "echo > make/local"
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
-                          sh "echo CXX=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
-                          sh "echo MATH=${env.PWD}/stan/lib/stan_math/ >> make/local"
                           sh runTests("./")
                     }
                     post {
