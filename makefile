@@ -82,7 +82,14 @@ CXX = $(CC)
 ##
 -include $(MATH)make/detect_os
 
--include $(MATH)make/setup_mpi
+#-include $(MATH)make/setup_mpi
+
+ifdef STAN_MPI
+  CXXFLAGS_MPI = -DSTAN_MPI
+  #LDFLAGS += $(LDFLAGS_MPI)
+  LIBMPI = $(BOOST_LIB)/libboost_mpi$(DLL) $(BOOST_LIB)/libboost_serialization$(DLL) $(MATH)src/math/prim/arr/mpi_cluster.o
+  LDFLAGS_MPI += $(MATH)src/math/prim/arr/mpi_cluster.o
+endif
 
 include make/libstan  # libstan.a
 include make/models   # models
@@ -94,20 +101,19 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 # Tell make the default way to compile a .o file.
 ##
 stan/%.o : stan/%.cpp
-	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 %.o : %.cpp
-	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION)
+	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
 
 %$(EXE) : %.hpp %.stan $(LIBMPI)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(LIBMPI)
-
+	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(LDFLAGS_MPI)
 
 ##
 # Tell make the default way to compile a .o file.
