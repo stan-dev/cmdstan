@@ -23,9 +23,8 @@ def setupCC() {
     writeFile(file: "make/local", text: "CC = ${env.CXX}")
 }
 
-//make -j${env.PARALLEL} build
 def runTests(String prefix = "") {
-    """ make -j1 build
+    """ make -j${env.PARALLEL} build
         ${prefix}runCmdStanTests.py src/test/interface
     """
 }
