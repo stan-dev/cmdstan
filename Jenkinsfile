@@ -94,7 +94,7 @@ pipeline {
                     steps {
                           setupCC()
                           sh "echo > make/local"
-                          sh "echo CC=${env.MPICXX} -cxx=clang++ >> make/local"
+                          sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
                           sh runTests("./")
                     }
