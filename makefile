@@ -113,7 +113,7 @@ stan/%.o : stan/%.cpp
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LDFLAGS_MPI)
+	$(LINK.cc) $(LDFLAGS_MPI) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI)
 
 ##
 # Tell make the default way to compile a .o file.
