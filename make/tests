@@ -78,7 +78,7 @@ ALL_TEST_EXECUTABLES = $(patsubst src/%.cpp,%$(EXE),$(ALL_TESTS))
 .PRECIOUS: test/%.o
 test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBSUNDIALS) $(LIBMPI)
 	@mkdir -p $(dir $@)
-	$(LINK.cc) $< -O$O $(GTEST_MAIN) $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LDFLAGS_MPI)
+	$(LINK.cc) $< -O$O $(LDFLAGS_MPI) $(GTEST_MAIN) $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LIBSUNDIALS) $(CXXFLAGS_MPI)
 ifeq ($(strip $(findstring src/test/,$(MAKECMDGOALS))), )
 	$(WINE) $@ --gtest_output="xml:$(basename $@).xml"
 endif
