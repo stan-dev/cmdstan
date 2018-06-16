@@ -90,7 +90,7 @@ pipeline {
                     }
                 }
                 stage('Non-windows interface tests with MPI') {
-                    agent any
+                    agent { label 'osx' }
                     steps {
                           setupCC()
                           sh "echo > make/local"
