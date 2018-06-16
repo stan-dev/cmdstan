@@ -255,8 +255,13 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+.PHONY: build-mpi
+build-mpi: $(LIBMPI)
+	@echo ''
+	@echo '--- boost mpi bindings built ---'
+
 .PHONY: build
-build: $(LIBMPI) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
+build: build-mpi bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 

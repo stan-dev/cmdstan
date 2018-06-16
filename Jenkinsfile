@@ -96,12 +96,13 @@ pipeline {
                           sh "echo > make/local"
                           sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
                           sh "echo STAN_MPI=true >> make/local"
+                          sh "make build-mpi > build-mpi.log 2>&1"
                           sh runTests("./")
                     }
                     post {
                         always {
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '3', usePreviousBuildAsReference: false, canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '3', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
                         }
                     }
