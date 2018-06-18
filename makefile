@@ -82,13 +82,7 @@ CXX = $(CC)
 ##
 -include $(MATH)make/detect_os
 
-#-include $(MATH)make/setup_mpi
-
-ifdef STAN_MPI
-  CXXFLAGS_MPI = -DSTAN_MPI
-  LIBMPI = $(MATH)src/math/prim/arr/mpi_cluster.o $(BOOST_LIB)/libboost_mpi$(DLL) $(BOOST_LIB)/libboost_serialization$(DLL)
-  LDFLAGS_MPI = $(LIBMPI) -Wl,-lboost_mpi -Wl,-lboost_serialization -Wl,-L,"$(BOOST_LIB_ABS)" -Wl,-rpath,"$(BOOST_LIB_ABS)"
-endif
+-include $(MATH)make/setup_mpi
 
 include make/libstan  # libstan.a
 include make/models   # models
@@ -112,7 +106,7 @@ stan/%.o : stan/%.cpp
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LDFLAGS_MPI)
+	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LIBMPI) $(LDFLAGS_MPI)
 
 ##
 # Tell make the default way to compile a .o file.
@@ -261,7 +255,7 @@ build-mpi: $(LIBMPI)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: build-mpi bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES)
+build: $(LIBMPI) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
