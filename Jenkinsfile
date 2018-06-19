@@ -99,6 +99,7 @@ pipeline {
                     }
                     post {
                         always {
+                            archiveArtifacts 'build-mpi.log'
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
@@ -110,7 +111,7 @@ pipeline {
                     steps {
                         unstash 'CmdStanSetup'
                         sh 'make manual'
-                        archiveArtifacts 'doc/*, build-mpi.log'
+                        archiveArtifacts 'doc/*'
                     }
                     post { always { deleteDir() }}
                 }
