@@ -129,7 +129,7 @@ def runTest(name, mpi=False, j=1):
                     , -1)
         if "mpi_" in name:
             j = j > 2 and j or 2
-            command = "mpirun -np {} {}".format(j, command)
+            command = "mpirun -q -np {} {}".format(j, command)
     doCommand(command)
 
 def main():

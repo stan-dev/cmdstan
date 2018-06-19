@@ -18,9 +18,9 @@ def checkout_pr(String repo, String pr) {
     """
 }
 
-def setupCC() {
+def setupCC(CC = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${env.CXX}")
+    writeFile(file: "make/local", text: "CC = ${CC}\n")
 }
 
 def runTests(String prefix = "") {
@@ -90,17 +90,20 @@ pipeline {
                     }
                 }
                 stage('Non-windows interface tests with MPI') {
-                    agent { label 'osx' }
+                    agent { label 'linux' }
+                    environment {
+                        OMPI_CXX = "${env.CXX}"
+                        MPICH_CXX = "${env.CXX}"
+                    }
                     steps {
-                          setupCC()
-                          sh "echo > make/local"
-                          sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
+                          setupCC("${env.MPICXX}")
                           sh "echo STAN_MPI=true >> make/local"
                           sh "make build-mpi > build-mpi.log 2>&1"
                           sh runTests("./")
                     }
                     post {
                         always {
+                            archiveArtifacts 'build-mpi.log'
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
