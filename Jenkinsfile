@@ -18,9 +18,9 @@ def checkout_pr(String repo, String pr) {
     """
 }
 
-def setupCC() {
+def setupCC(CC = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${env.CXX}")
+    writeFile(file: "make/local", text: "CC = ${CC}")
 }
 
 def runTests(String prefix = "") {
@@ -92,9 +92,7 @@ pipeline {
                 stage('Non-windows interface tests with MPI') {
                     agent { label 'osx' }
                     steps {
-                          setupCC()
-                          sh "echo > make/local"
-                          sh "echo CC=${env.MPICXX} -cxx=${env.CXX} >> make/local"
+                          setupCC("${env.MPICXX} -cxx=${env.CXX}")
                           sh "echo STAN_MPI=true >> make/local"
                           sh "make build-mpi > build-mpi.log 2>&1"
                           sh runTests("./")
@@ -112,7 +110,7 @@ pipeline {
                     steps {
                         unstash 'CmdStanSetup'
                         sh 'make manual'
-                        archiveArtifacts 'doc/*'
+                        archiveArtifacts 'doc/*, build-mpi.log'
                     }
                     post { always { deleteDir() }}
                 }
