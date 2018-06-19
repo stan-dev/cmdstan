@@ -20,7 +20,7 @@ def checkout_pr(String repo, String pr) {
 
 def setupCC(CC = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${CC}")
+    writeFile(file: "make/local", text: "CC = ${CC}\n")
 }
 
 def runTests(String prefix = "") {
