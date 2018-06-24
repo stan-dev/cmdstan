@@ -91,10 +91,12 @@ pipeline {
                 }
                 stage('Non-windows interface tests with MPI') {
                     agent { label 'linux' }
+                    /* use system default compiler used to build MPI
                     environment {
                         OMPI_CXX = "${env.CXX}"
                         MPICH_CXX = "${env.CXX}"
                     }
+                    */
                     steps {
                           setupCC("${env.MPICXX}")
                           sh "echo STAN_MPI=true >> make/local"
