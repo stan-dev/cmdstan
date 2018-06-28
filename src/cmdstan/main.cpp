@@ -1,7 +1,7 @@
 #include <cmdstan/command.hpp>
 #include <stan/services/error_codes.hpp>
 #include <boost/exception/diagnostic_information.hpp> 
-#include <boost/exception_ptr.hpp> 
+#include <boost/exception_ptr.hpp>
 
 int main(int argc, const char* argv[]) {
   try {

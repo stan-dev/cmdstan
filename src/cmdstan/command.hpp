@@ -34,6 +34,7 @@
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
@@ -43,7 +44,14 @@
 
 namespace cmdstan {
 
-  stan::io::dump get_var_context(const std::string file) {
+#ifdef STAN_MPI
+stan::math::mpi_cluster& get_mpi_cluster() {
+  static stan::math::mpi_cluster cluster;
+  return cluster;
+}
+#endif
+
+stan::io::dump get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
       std::stringstream msg;
@@ -61,6 +69,12 @@ namespace cmdstan {
     stan::callbacks::stream_writer err(std::cout);
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
+
+#ifdef STAN_MPI
+    stan::math::mpi_cluster& cluster = get_mpi_cluster();
+    cluster.listen();
+    if (cluster.rank_ != 0) return 0;
+#endif
 
     // Read arguments
     std::vector<argument*> valid_arguments;
@@ -868,6 +882,9 @@ namespace cmdstan {
     diagnostic_stream.close();
     for (size_t i = 0; i < valid_arguments.size(); ++i)
       delete valid_arguments.at(i);
+#ifdef STAN_MPI
+    cluster.stop_listen();
+#endif
     return return_code;
   }
 

@@ -23,6 +23,22 @@ linux_gcc: &linux_gcc
       sources: [ 'ubuntu-toolchain-r-test' ]
       packages: [ 'g++-4.9' ]
 
+mpi_linux_clang: &mpi_linux_clang
+  os: linux
+  compiler: "clang-3.8"
+  addons: 
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8' ]
+      packages: [ 'clang-3.8', 'libc++-dev', 'mpich', 'libmpich-dev' ]
+
+mpi_linux_gcc: &mpi_linux_gcc
+  os: linux
+  compiler: "gcc-4.9"
+  addons:
+    apt:
+      sources: [ 'ubuntu-toolchain-r-test' ]
+      packages: [ 'g++-4.9', 'mpich', 'libmpich-dev' ]
+
 before_install:
   - git submodule update --init --recursive
 
@@ -37,7 +53,18 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           PARALLEL=1
+    - <<: *mpi_linux_clang
+      env:
+        - MATRIX_EVAL="CXX=\"mpicxx -cxx=clang++-3.8\""
+          STAN_MPI=true
+          PARALLEL=2
+    - <<: *mpi_linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=\"mpicxx -cxx=g++-4.9\""
+          STAN_MPI=true
+          PARALLEL=1
 
 script:
   - git submodule foreach 'echo $path `git rev-parse HEAD`'
+  - if [ ! -z ${STAN_MPI} ]; then echo "STAN_MPI=true" >> make/local; echo "Testing MPI"; fi
   - ./runCmdStanTests.py -j$PARALLEL src/test/interface
