@@ -18,9 +18,12 @@ def checkout_pr(String repo, String pr) {
     """
 }
 
-def runTests(String prefix = "") {
+def setupCC(CC = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${env.CXX}")
+    writeFile(file: "make/local", text: "CC = ${CC}\n")
+}
+
+def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
         ${prefix}runCmdStanTests.py src/test/interface
     """
@@ -66,14 +69,43 @@ pipeline {
             parallel {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
-                    steps { bat runTests() }
+                    steps {
+                          setupCC()
+                          bat runTests()
+                    }
                     post { always { deleteDir() }}
                 }
                 stage('Non-windows interface tests') {
                     agent any
-                    steps { sh runTests("./") }
+                    steps {
+                          setupCC()
+                          sh runTests("./")
+                    }
                     post {
                         always {
+                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            deleteDir()
+                        }
+                    }
+                }
+                stage('Non-windows interface tests with MPI') {
+                    agent { label 'linux' }
+                    /* use system default compiler used to build MPI
+                    environment {
+                        OMPI_CXX = "${env.CXX}"
+                        MPICH_CXX = "${env.CXX}"
+                    }
+                    */
+                    steps {
+                          setupCC("${env.MPICXX}")
+                          sh "echo STAN_MPI=true >> make/local"
+                          sh "make build-mpi > build-mpi.log 2>&1"
+                          sh runTests("./")
+                    }
+                    post {
+                        always {
+                            archiveArtifacts 'build-mpi.log'
                             warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
