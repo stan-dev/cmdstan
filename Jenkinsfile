@@ -43,7 +43,7 @@ pipeline {
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
-                not { branch 'downstream tests' }
+                not { branch 'downstream_tests' }
             }
             steps { script { utils.killOldBuilds() } }
         }
