@@ -81,6 +81,7 @@ CMDSTAN_VERSION := 2.17.1
 -include $(MATH)make/detect_os
 
 -include $(MATH)make/setup_mpi
+-include $(MATH)make/libstanmath_mpi # $(MATH)bin/libstanmath_mpi.a
 
 include make/libstan  # libstan.a
 include make/models   # models
