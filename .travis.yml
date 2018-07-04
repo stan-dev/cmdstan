@@ -5,7 +5,7 @@ before_script:
   - eval "${MATRIX_EVAL}"
   - echo ${CXX}
   - ${CXX} --version
-  - echo "CC=$CXX" > make/local
+  - echo "CXX=$CXX" > make/local
 
 linux_clang: &linux_clang
   os: linux
