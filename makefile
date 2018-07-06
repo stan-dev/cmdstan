@@ -60,8 +60,6 @@ CMDSTAN_VERSION := 2.17.1
 -include $(HOME)/.config/cmdstan/make.local  # define local variables
 -include make/local                       # overwrite local variables
 
-CXX = $(CC)
-
 -include $(MATH)make/libraries
 
 ##

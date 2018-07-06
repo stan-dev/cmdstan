@@ -20,7 +20,7 @@ def checkout_pr(String repo, String pr) {
 
 def setupCC(CC = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CC = ${CC}\n")
+    writeFile(file: "make/local", text: "CXX = ${CC}\n")
 }
 
 def runTests(String prefix = "") {
@@ -43,7 +43,7 @@ pipeline {
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
-                not { branch 'downstream tests' }
+                not { branch 'downstream_tests' }
             }
             steps { script { utils.killOldBuilds() } }
         }
