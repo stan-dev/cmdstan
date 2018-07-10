@@ -38,7 +38,7 @@ O_STANC = 0
 AR = ar
 CPPFLAGS = -DNO_FPRINTF_OUTPUT -pipe
 # CXXFLAGS are just used for C++
-CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(CVODES)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
+CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(SUNDIALS)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
 GTEST_CXXFLAGS = -DGTEST_USE_OWN_TR1_TUPLE
 LDLIBS =
 EXE =
@@ -80,6 +80,9 @@ CMDSTAN_VERSION := 2.17.1
 ##
 -include $(MATH)make/detect_os
 
+-include $(MATH)make/setup_mpi
+-include $(MATH)make/libstanmath_mpi # $(MATH)bin/libstanmath_mpi.a
+
 include make/libstan  # libstan.a
 include make/models   # models
 include make/tests
@@ -89,30 +92,34 @@ include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
 ##
 # Tell make the default way to compile a .o file.
 ##
-%.o : %.cpp
-	$(COMPILE.cc) -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $<
+stan/%.o : stan/%.cpp
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
 
-%$(EXE) : %.hpp %.stan 
+##
+# Tell make the default way to compile a .o file.
+##
+%.o : %.cpp
+	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
+
+%$(EXE) : %.hpp %.stan $(LIBMPI)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-	$(LINK.cc) -O$O $(OUTPUT_OPTION) $(CMDSTAN_MAIN) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBCVODES)
-
+	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LIBMPI) $(LDFLAGS_MPI)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
 # Tell make the default way to compile a .o file.
 ##
 bin/stan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
-
+	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
 
 ##
 # Rule for generating dependencies.
@@ -124,7 +131,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -134,7 +141,7 @@ bin/%.d : src/%.cpp
 	then \
 	(set -e; \
 	rm -f $@; \
-	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
+	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
 	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$);\
 	fi
@@ -241,8 +248,13 @@ endif
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
+.PHONY: build-mpi
+build-mpi: $(LIBMPI)
+	@echo ''
+	@echo '--- boost mpi bindings built ---'
+
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBCVODES) $(MODEL_PCH)
+build: $(LIBMPI) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS)  $(MODEL_PCH)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
@@ -287,4 +299,3 @@ stan-revert:
 ##
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
-

@@ -34,6 +34,7 @@
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
@@ -43,7 +44,14 @@
 
 namespace cmdstan {
 
-  stan::io::dump get_var_context(const std::string file) {
+#ifdef STAN_MPI
+stan::math::mpi_cluster& get_mpi_cluster() {
+  static stan::math::mpi_cluster cluster;
+  return cluster;
+}
+#endif
+
+stan::io::dump get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
       std::stringstream msg;
@@ -61,6 +69,12 @@ namespace cmdstan {
     stan::callbacks::stream_writer err(std::cout);
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
+
+#ifdef STAN_MPI
+    stan::math::mpi_cluster& cluster = get_mpi_cluster();
+    cluster.listen();
+    if (cluster.rank_ != 0) return 0;
+#endif
 
     // Read arguments
     std::vector<argument*> valid_arguments;
@@ -252,7 +266,10 @@ namespace cmdstan {
         double stepsize = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
         double stepsize_jitter= dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
 
-        if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
+        if (adapt_engaged == true && num_warmup == 0) {
+          info("The number of warmup samples (num_warmup) must be greater than zero if adaptation is enabled.");
+          return_code = stan::services::error_codes::CONFIG;
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
                                                                  init_context,
@@ -865,6 +882,9 @@ namespace cmdstan {
     diagnostic_stream.close();
     for (size_t i = 0; i < valid_arguments.size(); ++i)
       delete valid_arguments.at(i);
+#ifdef STAN_MPI
+    cluster.stop_listen();
+#endif
     return return_code;
   }
 

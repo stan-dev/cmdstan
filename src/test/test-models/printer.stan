@@ -1,6 +1,6 @@
 transformed data {
   real x;
-  x <- 2;
+  x = 2;
   print("x=",x);
 }
 parameters {
@@ -8,7 +8,7 @@ parameters {
 }
 transformed parameters {
   real z;
-  z <- y * y;
+  z = y * y;
   print("z=",z);
 }
 model {
@@ -17,6 +17,6 @@ model {
 }
 generated quantities {
   real w;
-  w <- z / 2;
+  w = z / 2;
   print("w=",w);
 }
