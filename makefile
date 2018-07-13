@@ -30,7 +30,7 @@ STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
 
 ##########################
-## FIXME(DL): Default compiler options broken in math tagged v2.17.1.
+## FIXME(DL): Default compiler options broken in math tagged v2.18.0.
 ##            Once fixed, remove lines and replace with include
 #-include $(MATH)make/default_compiler_options
 O = 3
@@ -55,7 +55,7 @@ LDLIBS_STANC = -Lbin -lstanc
 STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
 PATH_SEPARATOR = /
-CMDSTAN_VERSION := 2.17.1
+CMDSTAN_VERSION := 2.18.0
 
 -include $(HOME)/.config/cmdstan/make.local  # define local variables
 -include make/local                       # overwrite local variables
