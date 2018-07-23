@@ -1,13 +1,14 @@
 version: 2.0
 jobs:
-  docs:
+  manual:
     docker:
       - image: seantalts/bookdown
     steps:
       - checkout
+      - run: git submodule update --init --recursive
       - run: make manual
       - store_artifacts:
-          path: manual
+          path: doc
 
 workflows:
   version: 2
