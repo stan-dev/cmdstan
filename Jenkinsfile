@@ -112,15 +112,6 @@ pipeline {
                         }
                     }
                 }
-                stage('Manual') {
-                    agent any
-                    steps {
-                        unstash 'CmdStanSetup'
-                        sh 'make manual'
-                        archiveArtifacts 'doc/*'
-                    }
-                    post { always { deleteDir() }}
-                }
             }
         }
     }
