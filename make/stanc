@@ -14,6 +14,8 @@ $(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
 bin/stanc$(EXE) : O = $(O_STANC)
+bin/stanc$(EXE) : CPPFLAGS_MPI =
+bin/stanc$(EXE) : LDFLAGS_MPI =
 bin/stanc$(EXE) : bin/cmdstan/libstanc.a
 bin/stanc$(EXE) : bin/cmdstan/stanc.o
 	@mkdir -p $(dir $@)
