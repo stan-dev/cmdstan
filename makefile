@@ -1,4 +1,3 @@
-## FIXME(dl): update
 ##
 # CmdStan users: if you need to customize make options,
 #   you should add variables to a new file called
@@ -14,12 +13,10 @@
 # - O_STANC: Optimization level for compiling stanc.
 #      Valid values are {s, 0, 1, 2, 3}. Default is 0
 # - STANCFLAGS: Extra options for calling stanc
-# - AR: archiver (must specify for cross-compiling)
 ##
 
 # The default target of this Makefile is...
 help:
-
 
 -include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
@@ -39,6 +36,7 @@ USER_HEADER ?= $(dir $<)user_header.hpp
 include make/stanc
 include make/program
 include make/tests
+include make/command
 
 ifneq ($(filter-out clean clean-% print-% help manual,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
@@ -47,70 +45,8 @@ endif
 
 CMDSTAN_VERSION := 2.18.0
 
+-include $(STAN)make/manual
 
-
-
-
-# include make/tests
-# include make/command  # bin/stanc, bin/stansummary, bin/print, bin/diagnose
-# -include $(STAN)make/manual
-
-# ##
-# # Tell make the default way to compile a .o file.
-# ##
-# stan/%.o : stan/%.cpp
-#	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
-
-# ##
-# # Tell make the default way to compile a .o file.
-# ##
-# %.o : %.cpp
-#	$(COMPILE.cc) $< -O$O -include $(dir $<)USER_HEADER.hpp  $(OUTPUT_OPTION) $(CXXFLAGS_MPI)
-
-# %$(EXE) : %.hpp %.stan $(LIBMPI)
-#	@echo ''
-#	@echo '--- Linking C++ model ---'
-#	@test -f $(dir $<)USER_HEADER.hpp || touch $(dir $<)USER_HEADER.hpp
-#	$(LINK.cc) $(CMDSTAN_MAIN) -O$O $(OUTPUT_OPTION) -include $< -include $(dir $<)USER_HEADER.hpp $(LIBSUNDIALS) $(CXXFLAGS_MPI) $(LIBMPI) $(LDFLAGS_MPI)
-
-# ##
-# # Tell make the default way to compile a .o file.
-# ##
-# bin/%.o : src/%.cpp
-#	@mkdir -p $(dir $@)
-#	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
-
-# ##
-# # Tell make the default way to compile a .o file.
-# ##
-# bin/stan/%.o : $(STAN)src/stan/%.cpp
-#	@mkdir -p $(dir $@)
-#	$(COMPILE.cc) $< -O$O $(OUTPUT_OPTION)
-
-# ##
-# # Rule for generating dependencies.
-# # Applies to all *.cpp files in src.
-# # Test cpp files are handled slightly differently.
-# ##
-# bin/%.d : src/%.cpp
-#	@if test -d $(dir $@); \
-#	then \
-#	(set -e; \
-#	rm -f $@; \
-#	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
-#	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-#	rm -f $@.$$$$);\
-#	fi
-
-# %.d : %.cpp
-#	@if test -d $(dir $@); \
-#	then \
-#	(set -e; \
-#	rm -f $@; \
-#	$(COMPILE.cc) $< -O$O $(TARGET_ARCH) -MM > $@.$$$$; \
-#	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1.o $@ : ,g' < $@.$$$$ > $@; \
-#	rm -f $@.$$$$);\
-#	fi
 
 .PHONY: help
 help:
@@ -156,9 +92,17 @@ help:
 	@echo '    1. Build the model:'
 	@echo '       > make examples/bernoulli/bernoulli$(EXE)'
 	@echo '    2. Run the model:'
-	@echo '       > examples'$(PATH_SEPARATOR)'bernoulli'$(PATH_SEPARATOR)'bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
+ifeq ($(OS),Windows_NT)
+	@echo '       > examples\bernoulli\bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
+else
+	@echo '       > examples/bernoulli/bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
+endif
 	@echo '    3. Look at the samples:'
-	@echo '       > bin'$(PATH_SEPARATOR)'stansummary$(EXE) output.csv'
+ifeq ($(OS),Windows_NT)
+	@echo '       > bin\stansummary$(EXE) output.csv'
+else
+	@echo '       > bin/stansummary$(EXE) output.csv'
+endif
 	@echo ''
 	@echo ''
 	@echo '  Clean CmdStan:'
@@ -168,107 +112,101 @@ help:
 	@echo ''
 	@echo '--------------------------------------------------------------------------------'
 
-# .PHONY: help-dev
-# help-dev:
-#	@echo '--------------------------------------------------------------------------------'
-#	@echo 'CmdStan help for developers:'
-#	@echo '  Current configuration:'
-#	@echo '  - OS_TYPE (Operating System): ' $(OS_TYPE)
-#	@echo '  - CXX (Compiler):             ' $(CXX)
-#	@echo '  - Compiler version:           ' $(CC_MAJOR).$(CC_MINOR)
-#	@echo '  - O (Optimization Level):     ' $(O)
-#	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
-# ifdef TEMPLATE_DEPTH
-#	@echo '  - TEMPLATE_DEPTH:             ' $(TEMPLATE_DEPTH)
-# endif
-#	@echo '  Library configuration:'
-#	@echo '  - EIGEN                       ' $(EIGEN)
-#	@echo '  - BOOST                       ' $(BOOST)
-#	@echo '  - GTEST                       ' $(GTEST)
-#	@echo ''
-#	@echo '  If this copy of CmdStan has been cloned using git,'
-#	@echo '  before building CmdStan utilities the first time you need'
-#	@echo '  to initialize the Stan repository with:'
-#	@echo '     make stan-update'
-#	@echo ''
-#	@echo ''
-#	@echo 'Developer relevant targets:'
-#	@echo '  Stan management targets:'
-#	@echo '  - stan-update    : Initializes and updates the Stan repository'
-#	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
-#	@echo '                     branch or commit hash.'
-#	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
-#	@echo '                     what is in the repository.'
-#	@echo ''
-#	@echo 'Model related:'
-#	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
-#	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
-#	@echo '- bin/stansummary$(EXE): Build the print utility.'
-#	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
-#	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
-#	@echo '                   bin/stanc$(EXE))'
-#	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
-#	@echo '                   the Stan model as an executable.'
-#	@echo ''
-#	@echo 'Documentation:'
-#	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
-#	@echo '--------------------------------------------------------------------------------'
+.PHONY: help-dev
+help-dev:
+	@echo '--------------------------------------------------------------------------------'
+	@echo 'CmdStan help for developers:'
+	@echo '  Current configuration:'
+	@echo '  - OS (Operating System):      ' $(OS)
+	@echo '  - CXX (Compiler):             ' $(CXX)
+	@echo '  - Compiler version:           ' $(CXX_MAJOR).$(CXX_MINOR)
+	@echo '  - O (Optimization Level):     ' $(O)
+	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
+	@echo '  Library configuration:'
+	@echo '  - EIGEN                       ' $(EIGEN)
+	@echo '  - BOOST                       ' $(BOOST)
+	@echo '  - GTEST                       ' $(GTEST)
+	@echo ''
+	@echo '  If this copy of CmdStan has been cloned using git,'
+	@echo '  before building CmdStan utilities the first time you need'
+	@echo '  to initialize the Stan repository with:'
+	@echo '     make stan-update'
+	@echo ''
+	@echo ''
+	@echo 'Developer relevant targets:'
+	@echo '  Stan management targets:'
+	@echo '  - stan-update    : Initializes and updates the Stan repository'
+	@echo '  - stan-update/*  : Updates the Stan repository to the specified'
+	@echo '                     branch or commit hash.'
+	@echo '  - stan-revert    : Reverts changes made to Stan library back to'
+	@echo '                     what is in the repository.'
+	@echo ''
+	@echo 'Model related:'
+	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
+	@echo '- bin/stansummary$(EXE): Build the print utility.'
+	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
+	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
+	@echo '                   bin/stanc$(EXE))'
+	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
+	@echo '                   the Stan model as an executable.'
+	@echo ''
+	@echo 'Documentation:'
+	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
+	@echo '--------------------------------------------------------------------------------'
 
-# .PHONY: build-mpi
-# build-mpi: $(LIBMPI)
-#	@echo ''
-#	@echo '--- boost mpi bindings built ---'
+.PHONY: build-mpi
+build-mpi: $(MPI_TARGETS)
+	@echo ''
+	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-# build: $(LIBMPI) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS)
-#	@echo ''
-#	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
-
-build: bin/stanc$(EXE)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(MPI_TARGETS) $(LIBSUNDIALS)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
-# ##
-# # Clean up.
-# ##
-# .PHONY: clean clean-manual clean-all
 
-# clean: clean-manual
-#	$(RM) -r test
-#	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
-#	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
+##
+# Clean up.
+##
+.PHONY: clean clean-manual clean-all
 
-# clean-manual:
-#	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+clean: clean-manual
+	$(RM) -r test
+	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
-# clean-all: clean clean-libraries
-#	$(RM) -r bin
-#	$(RM) $(STAN)src/stan/model/model_header.hpp.gch
+clean-manual:
+	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-# ##
-# # Submodule related tasks
-# ##
+clean-all: clean clean-libraries
+	$(RM) -r bin
+	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
-# .PHONY: stan-update
-# stan-update :
-#	git submodule update --init --recursive
+##
+# Submodule related tasks
+##
 
-# stan-update/%: stan-update
-#	cd stan && git fetch --all && git checkout $* && git pull
+.PHONY: stan-update
+stan-update :
+	git submodule update --init --recursive
 
-# stan-pr/%: stan-update
-#	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
+stan-update/%: stan-update
+	cd stan && git fetch --all && git checkout $* && git pull
 
-# .PHONY: stan-revert
-# stan-revert:
-#	git submodule update --init --recursive
+stan-pr/%: stan-update
+	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
+
+.PHONY: stan-revert
+stan-revert:
+	git submodule update --init --recursive
 
 
-# ##
-# # Manual related
-# ##
-# .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
-# manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
+##
+# Manual related
+##
+.PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
+manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 
 ##
 # Debug target that allows you to print a variable
