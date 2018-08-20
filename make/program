@@ -35,7 +35,7 @@ endif
 %$(EXE) : %.hpp $(CMDSTAN_MAIN)
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.cpp) $(CXXFLAGS_PROGRAM) -include $< $(CMDSTAN_MAIN) $(LIBSUNDIALS) $(MPI_TARGETS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $(CXXFLAGS_PROGRAM) -include $< $(CMDSTAN_MAIN) $(LDLIBS) $(OUTPUT_OPTION)
 
 
 ##
