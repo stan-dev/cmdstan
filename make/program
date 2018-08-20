@@ -32,7 +32,7 @@ endif
 
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Linking C++ model ---'
 	$(LINK.cpp) $(CXXFLAGS_PROGRAM) -include $< $(CMDSTAN_MAIN) $(LDLIBS) $(OUTPUT_OPTION)
