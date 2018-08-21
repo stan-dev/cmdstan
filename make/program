@@ -42,6 +42,6 @@ endif
 # Dependencies file
 ##
 ifneq (,$(STAN_TARGETS))
-$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPFLAGS = -MT $(patsubst %.d,%$(EXE),$@) -MT $@ -M -MG -MP -MF $@
+$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPFLAGS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 endif
