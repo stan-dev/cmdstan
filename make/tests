@@ -53,14 +53,6 @@ test-headers: $(HEADER_TESTS)
 
 
 ##
-# Build test executables
-##
-ifeq ($(CXX_TYPE),clang)
-TEST_MODELS = $(shell find src/test/test-models -name '*.stan')
-$(patsubst %.stan,%$(EXE),$(TEST_MODELS)) : $(STAN)src/stan/model/model_header.hpp.gch
-endif
-
-##
 # Tests that depend on compiled models
 ##
 test/interface/command_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test))
@@ -71,8 +63,8 @@ test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
 test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
 test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
 test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
-test/interface/print_test$(EXE): src/test/interface/matrix_output.csv bin/print$(EXE)
+test/interface/print_test$(EXE): bin/print$(EXE)
 test/interface/print_uninitialized_test$(EXE): src/test/test-models/print_uninitialized$(EXE)
 test/interface/arguments/argument_configuration_test$(EXE): src/test/test-models/test_model$(EXE)
-test/interface/stansummary_test$(EXE): src/test/interface/matrix_output.csv bin/stansummary$(EXE)
+test/interface/stansummary_test$(EXE): bin/stansummary$(EXE)
 test/interface/variational_output_test$(EXE): src/test/test-models/variational_output$(EXE)

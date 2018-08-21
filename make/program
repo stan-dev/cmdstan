@@ -17,11 +17,11 @@ $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.
 ifeq ($(CXX_TYPE),clang)
 -include $(STAN)src/stan/model/model_header.d
 CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header.hpp.gch
-$(sort $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE)) : %$(EXE) : $(STAN)src/stan/model/model_header.hpp.gch
+$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header.hpp.gch
 endif
 
 ifneq ($(findstring allow_undefined,$(STANCFLAGS)),)
-$(sort $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE)) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
+$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
 endif
 
 
@@ -35,7 +35,7 @@ endif
 %$(EXE) : %.hpp $(CMDSTAN_MAIN) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Linking C++ model ---'
-	$(LINK.cpp) $(CXXFLAGS_PROGRAM) -include $< $(CMDSTAN_MAIN) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $(CXXFLAGS_PROGRAM) -include $< $(CMDSTAN_MAIN) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(OUTPUT_OPTION)
 
 
 ##
