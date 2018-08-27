@@ -1,0 +1,116 @@
+# Notes:
+#   - Minimal appveyor.yml file is an empty file. All sections are optional.
+#   - Indent each level of configuration with 2 spaces. Do not use tabs!
+#   - All section names are case-sensitive.
+#   - Section names should be unique on each level.
+
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 1.0.{build}
+
+# you can use {branch} name in version format too
+# version: 1.0.{build}-{branch}
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - master
+
+  # blacklist
+  except:
+    - gh-pages
+
+
+# Maximum number of concurrent jobs for the project
+max_jobs: 1
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+# Build worker image (VM template)
+image: Visual Studio 2017
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+
+# clone directory
+clone_folder: c:\projects\cmdstan
+
+# set clone depth
+clone_depth: 1                      # clone entire repository history if not defined
+
+# this is how to allow failing jobs in the matrix
+matrix:
+  fast_finish: true     # set this flag to immediately finish build once one of the jobs fails.
+  allow_failures:
+    - platform: x86
+      configuration: Debug
+    - platform: x64
+      configuration: Release
+
+# exclude configuration from the matrix. Works similarly to 'allow_failures' but build not even being started for excluded combination.
+  exclude:
+    - platform: x86
+      configuration: Debug
+
+# build cache to preserve files/folders between builds
+cache:
+  - c:\Rtools  
+  - Rtools34.exe
+
+
+# scripts that run after cloning repository
+install:
+  - git submodule update --init --recursive
+  - ps: Start-FileDownload 'https://cran.r-project.org/bin/windows/Rtools/Rtools34.exe' 
+  - Rtools34.exe /VERYSILENT /SP- /NORESTART  #TODO: dont download and install if c:\rtools folder exists.
+
+
+
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+
+
+# scripts to run before build
+before_build:
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+  - echo This is my custom build script
+  - set PATH=C:\Rtools\bin;c:\Rtools\mingw_64\bin;%PATH%
+  - echo %PATH%
+  - make build
+
+# scripts to run after build (working directory and environment changes are persisted from the previous steps)
+after_build:
+  - echo AfterBuild
+
+
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
+# scripts to run before tests (working directory and environment changes are persisted from the previous steps such as "before_build")
+before_test:
+  - echo script1
+  - ps: Write-Host "script1"
+
+# to run your custom scripts instead of automatic tests
+test_script:
+  - echo This is my custom test script
+  - echo %PATH%  
+  - set PATH=C:\Rtools\bin;c:\Rtools\mingw_64\bin;%PATH%
+  - echo %PATH%  
+  - make examples/bernoulli/bernoulli
+
+# scripts to run after tests
+after_test:
+
+# to disable automatic tests
+#test: off
