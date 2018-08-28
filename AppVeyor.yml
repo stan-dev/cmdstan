@@ -9,10 +9,8 @@
 #---------------------------------#
 
 # version format
-version: 1.0.{build}
+version: 1.0.{build}-{branch}
 
-# you can use {branch} name in version format too
-# version: 1.0.{build}-{branch}
 
 # branches to build
 branches:
@@ -60,10 +58,7 @@ matrix:
       configuration: Debug
 
 # build cache to preserve files/folders between builds
-cache:
-  - c:\Rtools  
-  - Rtools34.exe
-
+# TODO: implement cache for Rtools
 
 # scripts that run after cloning repository
 install:
@@ -71,14 +66,8 @@ install:
   - ps: Start-FileDownload 'https://cran.r-project.org/bin/windows/Rtools/Rtools34.exe' 
   - Rtools34.exe /VERYSILENT /SP- /NORESTART  #TODO: dont download and install if c:\rtools folder exists.
 
-
-
 # build Configuration, i.e. Debug, Release, etc.
-configuration: Release
-
-
-# scripts to run before build
-before_build:
+configuration: Debug
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
@@ -87,30 +76,16 @@ build_script:
   - echo %PATH%
   - make build
 
-# scripts to run after build (working directory and environment changes are persisted from the previous steps)
-after_build:
-  - echo AfterBuild
-
-
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 
 # scripts to run before tests (working directory and environment changes are persisted from the previous steps such as "before_build")
 before_test:
-  - echo script1
-  - ps: Write-Host "script1"
+  - echo BeforeTest
 
 # to run your custom scripts instead of automatic tests
 test_script:
   - echo This is my custom test script
-  - echo %PATH%  
   - set PATH=C:\Rtools\bin;c:\Rtools\mingw_64\bin;%PATH%
-  - echo %PATH%  
   - make examples/bernoulli/bernoulli
-
-# scripts to run after tests
-after_test:
-
-# to disable automatic tests
-#test: off
