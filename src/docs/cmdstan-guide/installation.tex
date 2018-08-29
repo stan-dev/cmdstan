@@ -108,7 +108,7 @@ The Boost source code is distributed with \CmdStan.
 \subsubsection{Eigen Matrix and Linear Algebra Library Source}
 
 Stan's matrix algebra depends on the Eigen \Cpp matrix and linear
-algebra library.  
+algebra library.
 %
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
@@ -247,7 +247,7 @@ version 2, minor version 7, and patch level 0.  Download the latest
 \end{quote}
 %
 to any non-temporary folder.  (If in doubt, select \code{My Documents}
-on Windows XP or \code{Documents} on Windows 7.)  
+on Windows XP or \code{Documents} on Windows 7.)
 
 Change to the download directory (aka folder) using one of the
 following commands, replacing \code{<username>} with
@@ -273,7 +273,7 @@ The full path (including quotes) will work from anywhere,
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
 > cd Documents
 \end{Verbatim}
-\end{quote} 
+\end{quote}
 or use the full path, including quotes, from anywhere,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.18.0.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.18.0.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -325,7 +325,7 @@ Lion, and Mountain Lion.
 The easiest (but not the only) way to install a \Cpp development
 environment on a Mac is to use Apple's Xcode development environment.
 
-From the Xcode home page, 
+From the Xcode home page,
 %
 \begin{quote}
 \url{https://developer.apple.com/xcode/}
@@ -340,9 +340,9 @@ Open the Xcode application, click top-level menu
 \code{Preferences}, click top-row button \code{Downloads},
 click button for \code{Components}, click on the \code{Install}
 button to the right of the \code{Command Line Tools} entry, then
-wait for it to finish installing.  
+wait for it to finish installing.
 
-Click the top-level menu item \code{Xcode}, then click item 
+Click the top-level menu item \code{Xcode}, then click item
 \code{Quit Xcode} to quit.
 
 To test, open the Terminal application and enter
@@ -411,11 +411,11 @@ tools (or upgrade an older version), use the commands
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> sudo apt-get install g++ 
-> sudo apt-get install make 
+> sudo apt-get install g++
+> sudo apt-get install make
 \end{Verbatim}
 \end{quote}
-% 
+%
 A password will likely be required by the superuser command \code{sudo}.
 
 
@@ -472,7 +472,7 @@ variables, write \Verb|<variable>+=<value>|.
 
 \subsubsection{Compiler Settings}
 
-The most common options to set are the compiler options:
+The defaults should work for most Windows, Linux, and Mac setups. The most common options to customize the build are:
 %
 \begin{itemize}
   \item \Verb|CXX|. The compiler used to build \CmdStan and the Stan
@@ -480,6 +480,10 @@ The most common options to set are the compiler options:
   \item \Verb|O|. The optimization level for the compiler. The default
     is \Verb|O=3|. Both \gpp and \clang recognize \Verb|0,1,2,3|, and
     \Verb|s|.
+  \item \Verb|O_STANC|. The optimization level for building the Stan compiler.
+    The default is \Verb|O=3| on Windows and \Verb|O=0| for other operating systems.
+  \item \Verb|CXXFLAGS_OS|. Any additional compiler flags that would be useful to set.
+  \item \Verb|INC_FIRST|. Any header files to include before the rest of the Stan includes.
 \end{itemize}
 
 \subsubsection{{\tt stanc} Options}
@@ -515,48 +519,22 @@ versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the Stan source
-    directory. The default is \Verb|STAN=stan_2.18.0/|. Note: the
+    directory. The default is \Verb|STAN=stan/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.18.0/|.
+    default is \Verb|MATH=stan/lib/stan_math/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
-    \Verb|lib/boost_1.60.0/| folder within \Verb|MATH|.
+    \Verb|lib/boost_1.66.0/| folder within \Verb|MATH|.
   \item \Verb|EIGEN|. The location of the Eigen library. If
     \Verb|EIGEN| is not explicitly set, this will default to the
-    \Verb|lib/eigen_3.2.8/| folder within \Verb|MATH|.
-  \item \Verb|CVODES|. The location of the CVODES library. If
-    \Verb|CVODES| is not explicity set, this will default to the
-    \Verb|lib/cvodes_2.8.2/| folder with \Verb|MATH|.
+    \Verb|lib/eigen_3.3.3/| folder within \Verb|MATH|.
+  \item \Verb|SUNDIALS|. The location of the SUNDIALS library. If
+    \Verb|SUNDIALS| is not explicity set, this will default to the
+    \Verb|lib/sundials_3.1.0/| folder with \Verb|MATH|.
 \end{itemize}
 %
 
-\subsubsection{Additional Options}
-
-These are the additional options and typically do not need to be set.
-%
-\begin{itemize}
-  \item \Verb|O_STANC|. The optimization level for building
-    \code{stanc}. The default is \Verb|O_STANC=0|.
-  \item \Verb|CXXFLAGS|. The compiler flags for building \CmdStan
-    programs. The default value is dependent on the operating system.
-  \item \Verb|LDLIBS|. The libraries used for linking \CmdStan
-    programs. The default value is dependent on the operating system.
-  \item \Verb|LDLIBS_STANC|. The libraries used for linking the Stan
-    compiler, \code{stanc}. The default is the value of \Verb|LDLIBS|.
-  \item \Verb|BIT|. The bitness of the executable. This variable only
-    applies to Windows. The default is \Verb|BIT=64|. If building on a
-    32-bit Windows machine, \Verb|BIT=32| must be set.
-  \item \Verb|TEMPLATE_DEPTH|. The maximum instantiation depth for
-    template classes which is passed to \gpp or \clang. This variable
-    only applies to Mac OS X due to the current compilers distributed
-    through Xcode not specifying enough depth by default.
-  \item \Verb|EXE|. The file extension for executables. The default is
-    operating system dependent. On Windows, the default is
-    \Verb|EXE=.exe|. On other operating systems, the default is empty,
-    \Verb|EXE=|.
-\end{itemize}
-%
 
 \subsection{Rebuilding \CmdStan}
 
@@ -591,7 +569,7 @@ For non-commercial development, see
 \subsection{Compiling with MKL}
 
 In order to use Intel's math kernel library (MKL) for \Cpp, a few
-lines need to be added to \code{make/local}. 
+lines need to be added to \code{make/local}.
 \begin{itemize}
   \item \Verb|CXX = icc|. Set the compiler to icc.
   \item \Verb|MKLROOT = /apps/intel/2013/mkl|. Create a new variable
@@ -652,7 +630,7 @@ enabled.
 \CmdStan is developed using the following set of tools.  The various
 command examples in this manual have assumed they can be found on
 the command path.  The makefile allows precise locations to be plugged
-in. 
+in.
 
 \subsection{GNU Make Build Tool}
 
@@ -683,7 +661,7 @@ using scripts in the form of makefiles to run with GNU Make.
 \CmdStan uses the Git version control system for its software, libraries,
 and documentations.  Git is required to interact with the most recent
 versions of code in the version control repository.
-% 
+%
 \begin{itemize}
 \item Home: \url{http://git-scm.com/}
 \item License: GPL2
@@ -694,7 +672,7 @@ versions of code in the version control repository.
 \subsubsection{Google Test C++ Testing Framework}
 
 \CmdStan's unit testing is based on the Google's googletest \Cpp testing
-framework.  
+framework.
 %
 \begin{itemize}
 \item
