@@ -44,4 +44,6 @@ endif
 ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPFLAGS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
+-include src/cmdstan/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif

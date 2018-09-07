@@ -22,6 +22,9 @@ bin/stanc$(EXE) : bin/cmdstan/stanc.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
+$(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPFLAGS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
+#DEPFLAGS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
+
 ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
