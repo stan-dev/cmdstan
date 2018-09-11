@@ -38,7 +38,7 @@ include make/program
 include make/tests
 include make/command
 
-ifneq ($(filter-out clean clean-% print-% help manual,$(MAKECMDGOALS)),)
+ifneq ($(filter-out clean clean-% print-% help help-% manual,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 -include src/cmdstan/stanc.d
 endif
@@ -116,16 +116,8 @@ endif
 help-dev:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan help for developers:'
-	@echo '  Current configuration:'
-	@echo '  - OS (Operating System):      ' $(OS)
-	@echo '  - CXX (Compiler):             ' $(CXX)
-	@echo '  - Compiler version:           ' $(CXX_MAJOR).$(CXX_MINOR)
-	@echo '  - O (Optimization Level):     ' $(O)
+	@$(MAKE) print-compiler-flags
 	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
-	@echo '  Library configuration:'
-	@echo '  - EIGEN                       ' $(EIGEN)
-	@echo '  - BOOST                       ' $(BOOST)
-	@echo '  - GTEST                       ' $(GTEST)
 	@echo ''
 	@echo '  If this copy of CmdStan has been cloned using git,'
 	@echo '  before building CmdStan utilities the first time you need'

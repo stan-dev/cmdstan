@@ -20,7 +20,7 @@ src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -M -MG -MP -MF $@
 
-ifneq ($(filter test/% print-%,$(MAKECMDGOALS)),)
+ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
