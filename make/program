@@ -8,7 +8,7 @@ STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(
 ##
 # Precompiled header
 ##
-$(STAN)src/stan/model/model_header.d : DEPFLAGS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@ -M -MG -MP -MF $@
+$(STAN)src/stan/model/model_header.d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
 $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
 	@echo '--- Compiling pre-compiled header ---	'
@@ -41,7 +41,7 @@ endif
 # Dependencies file
 ##
 ifneq (,$(STAN_TARGETS))
-$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPFLAGS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
+$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 -include src/cmdstan/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
