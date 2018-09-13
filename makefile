@@ -161,7 +161,13 @@ build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) 
 ##
 # Clean up.
 ##
-.PHONY: clean clean-manual clean-all
+.PHONY: clean clean-deps clean-manual clean-all
+
+clean-deps:
+	@echo '  removing dependency files'
+	$(shell find src $(STAN) $(MATH) -type f -name '*.d' -exec rm {} +)
+	$(shell find src $(STAN) $(MATH) -type f -name '*.d.*' -exec rm {} +)
+	$(shell find src $(STAN) $(MATH) -type f -name '*.dSYM' -exec rm {} +)
 
 clean: clean-manual
 	$(RM) -r test
@@ -171,7 +177,7 @@ clean: clean-manual
 clean-manual:
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-all: clean clean-libraries
+clean-all: clean clean-deps clean-libraries
 	$(RM) -r bin
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
