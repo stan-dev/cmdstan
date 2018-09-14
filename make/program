@@ -45,4 +45,7 @@ $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EX
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 -include src/cmdstan/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+ifeq ($(CXX_TYPE),clang)
+-include $(STAN)src/stan/model/model_header.d
+endif
 endif
