@@ -1,19 +1,11 @@
-.PRECIOUS: bin/stanc$(EXE)
-bin/stanc$(EXE) : bin/cmdstan/stanc.o bin/libstanc.a $(LIBMPI)
+bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
-.PRECIOUS: bin/print$(EXE)
-bin/print$(EXE) : bin/cmdstan/print.o $(LIBMPI)
+.PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
-.PRECIOUS: bin/stansummary$(EXE)
-bin/stansummary$(EXE) : bin/cmdstan/stansummary.o $(LIBMPI)
-	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
-
-.PRECIOUS: bin/diagnose$(EXE)
-bin/diagnose$(EXE) : bin/cmdstan/diagnose.o $(LIBMPI)
-	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $<
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
