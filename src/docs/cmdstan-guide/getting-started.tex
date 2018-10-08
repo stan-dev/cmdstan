@@ -70,7 +70,7 @@ make               test-all.sh
     \end{quote}
     %
   \item \emph{Optional:} \, Set local \code{make} variables by editing
-    the file \verb+~/.config/cmdstan/make.local+ or
+    the file \verb+~/.config/stan/make.local+ or
     \verb+<cmdstan-home>/make/local+. See \refappendix{make-options}
     for a list of available options.  For most installations, this
     step can be skipped; the default configuration should work for
@@ -97,7 +97,7 @@ report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.17.0 built ---
+--- CmdStan v2.18.0 built ---
   \end{Verbatim}
 \end{quote}
 %
@@ -910,7 +910,7 @@ and on Windows with
 %% \emph{Warning}: \ The unit tests can take 30+ minutes and consume 3+
 %% GB of memory with the default compiler, \code{g++}.  The distribution
 %% test and model tests can take even longer.  It is faster to run the
-%% Clang compiler (option \code{CC=clang++}), and to run in multiple
+%% Clang compiler (option \code{CXX=clang++}), and to run in multiple
 %% processes in parallel (e.g., option \code{-j4} for four threads).
 
 %% \subsection{Compile-time Errors}

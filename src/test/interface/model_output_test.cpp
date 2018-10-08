@@ -16,7 +16,7 @@ TEST(interface, check_model_output) {
 
   std::string command 
     = convert_model_path(model_path)
-    + " sample num_warmup=0 num_samples=0"
+    + " sample num_warmup=1 num_samples=0"
     + " output file=" + convert_model_path(model_path) + ".csv";
   
   run_command_output out = run_command(command);

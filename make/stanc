@@ -1,0 +1,29 @@
+################################################################################
+# libstanc build rules
+
+STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
+STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
+
+bin/cmdstan/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
+	@mkdir -p $(dir $@)
+	$(AR) -rs $@ $^
+
+$(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
+$(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
+	@mkdir -p $(dir $@)
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+bin/stanc$(EXE) : O = $(O_STANC)
+bin/stanc$(EXE) : CPPFLAGS_MPI =
+bin/stanc$(EXE) : LDFLAGS_MPI =
+bin/stanc$(EXE) : LDLIBS_MPI =
+bin/stanc$(EXE) : bin/cmdstan/libstanc.a
+bin/stanc$(EXE) : bin/cmdstan/stanc.o
+	@mkdir -p $(dir $@)
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
+
+$(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@
+
+ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
