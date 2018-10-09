@@ -175,7 +175,7 @@ int main(int argc, const char* argv[]) {
   }
 
   if (bad_rhat_names.size() > 0) {
-    std::cout << "The following parameters had split R-hat less than 1.1:"
+    std::cout << "The following parameters had split R-hat greater than 1.1:"
               << std::endl;
     std::cout << "  ";
     for (size_t n = 0; n < bad_rhat_names.size() - 1; ++n)
