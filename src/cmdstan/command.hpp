@@ -54,29 +54,22 @@ namespace cmdstan {
   }
 #endif
 
-  std::shared_ptr<stan::io::var_context> get_var_context_rdump(const std::string file) {
+  std::shared_ptr<stan::io::var_context> get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
       std::stringstream msg;
       msg << "Can't open specified file, \"" << file << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
+    }
+    if (stan::io::ends_with(".json", file)) {
+      stan::json::json_data var_context(stream);
+      stream.close();
+      std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::json::json_data>(var_context);
+      return result;
     }
     stan::io::dump var_context(stream);
     stream.close();
     std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::io::dump>(var_context);
-    return result;
-  }
-
-  std::shared_ptr<stan::io::var_context> get_var_context_json(const std::string file) {
-    std::fstream stream(file.c_str(), std::fstream::in);
-    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      std::stringstream msg;
-      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    stan::json::json_data var_context(stream);
-    stream.close();
-    std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::json::json_data>(var_context);
     return result;
   }
 
@@ -134,11 +127,8 @@ namespace cmdstan {
     //////////////////////////////////////////////////
 
     std::string filename(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value());
-    std::shared_ptr<stan::io::var_context> var_context;
-    if (stan::io::ends_with(".json", filename))
-      var_context = get_var_context_json(filename);
-    else
-      var_context = get_var_context_rdump(filename);
+    std::shared_ptr<stan::io::var_context> var_context = get_var_context(filename);
+
     unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
 
     Model model(*var_context, random_seed, &std::cout);
@@ -162,11 +152,7 @@ namespace cmdstan {
       init = "";
     } catch (const boost::bad_lexical_cast& e) {
     }
-    std::shared_ptr<stan::io::var_context> init_context;
-    if (stan::io::ends_with(".json", init))
-      init_context = get_var_context_json(init);
-    else
-      init_context = get_var_context_rdump(init);
+    std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
 
     int return_code = stan::services::error_codes::CONFIG;
     if (parser.arg("method")->arg("diagnose")) {
@@ -285,19 +271,14 @@ namespace cmdstan {
                                                           diagnostic_writer);
       } else if (algo->value() == "hmc") {
         list_argument* engine = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("engine"));
+
         list_argument* metric = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("metric"));
         string_argument* metric_file = dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"));
-
-        std::string metric_filename(dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"))->value());
-        std::shared_ptr<stan::io::var_context> metric_context;
-        if (stan::io::ends_with(".json", metric_filename))
-          metric_context = get_var_context_json(metric_filename);
-        else
-          metric_context = get_var_context_rdump(metric_filename);
-
         bool metric_supplied = !metric_file->is_default();
-        categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
+        std::string metric_filename(dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"))->value());
+        std::shared_ptr<stan::io::var_context> metric_context = get_var_context(metric_filename);
 
+        categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
         categorical_argument* hmc = dynamic_cast<categorical_argument*>(algo->arg("hmc"));
         double stepsize = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
         double stepsize_jitter= dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
