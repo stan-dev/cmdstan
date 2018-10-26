@@ -798,7 +798,8 @@ If provided, the \code{metric\_file} should contain a single variable,
 of positive values, one for each parameter in the system. For a \code{dense\_e}
 metric, \code{inv\_metric} should be a positive-definite square matrix with
 number of rows and columns equal to the number of parameters in the model.
-The file pointed at by \code{metric\_file} should use the data dump format (the
+The file pointed at by \code{metric\_file} should use either JSON
+formate or the data dump format (the
 same format the input data uses). For examples of specifying a vector in the
 data dump format (as is needed for specifying a \code{diag\_e} metric),
 see \refsection{sequence-variables}. For examples of specifying a matrix in the
