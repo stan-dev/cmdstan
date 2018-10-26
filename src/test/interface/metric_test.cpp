@@ -66,7 +66,6 @@ TEST(StanUiCommand, metric_file_test) {
                 " metric=" + metric +
                 " metric_file=" + convert_model_path(metric_file_path) +
                 " stepsize=" + stepsize + " output file=test/output.csv";
-              std::cout << "command: " << command << std::endl;
 
               run_command_output out = run_command(command);
               if(adapt == "1" && num_warmup == "0") {
