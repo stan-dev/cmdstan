@@ -154,7 +154,9 @@ prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
 
 \subsection{Data Set}
 
-A data set of $\mbox{\code{N}}=10$ observations is coded as follows.
+A data set of $\mbox{\code{N}}=10$ observations is coded either
+using JSON notation or in the dump data format created by 
+the \code{stan\_rdump} in package \code{rstan}.
 %
 \footnote{
 The data is also available from the \code{example-models} repository
@@ -163,6 +165,15 @@ on GitHub,
 It is also included with the CmdStan distribution and can be found at path
 \nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}.
 }
+In JSON:
+%
+\begin{quote}
+\begin{Verbatim}
+{ "N" : 10, "y" : [ 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 ] }
+\end{Verbatim}
+\end{quote}
+%
+In \code{stan\_rdump} format:
 %
 \begin{quote}
 \begin{Verbatim}

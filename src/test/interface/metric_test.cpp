@@ -51,7 +51,14 @@ TEST(StanUiCommand, metric_file_test) {
               metric_file_path.push_back("test");
               metric_file_path.push_back("test-models");
               metric_file_path.push_back(model + "." + metric +
-                                         "_metric.dat.R");
+                                         "_metric.json");
+
+              std::string metric_file(convert_model_path(metric_file_path));
+              std::ifstream fs(metric_file.c_str());
+              if (fs.fail()) {
+                metric_file_path[3] = model + "." + metric + "_metric.dat.R";
+              }
+              metric_file = convert_model_path(metric_file_path);
 
               std::string command = convert_model_path(model_path) +
                 " method=sample num_samples=100 num_warmup=" + num_warmup +

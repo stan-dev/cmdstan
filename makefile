@@ -206,6 +206,7 @@ stan-revert:
 ##
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
+	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(VERSION_STRING).pdf
 
 ##
 # Debug target that allows you to print a variable

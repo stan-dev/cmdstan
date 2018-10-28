@@ -435,6 +435,24 @@ TEST(StanUiCommand, random_seed_specified_different) {
   EXPECT_NE(random1,random2);
 }
 
+TEST(StanUiCommand, json_input) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("ndim_array");
+  
+  std::string command = convert_model_path(model_path)
+    + " sample algorithm=fixed_param"
+    + " random seed=12345 "
+    + " data file=src/test/test-models/ndim_array.data.json"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+
+  EXPECT_EQ(1, count_matches("d1_1: [[0,1,2,3],[4,5,6,7],[8,9,10,11]]",cmd_output));
+  EXPECT_EQ(1, count_matches("d1_2: [[12,13,14,15],[16,17,18,19],[20,21,22,23]]",cmd_output));
+}
+
 
 
 // 
