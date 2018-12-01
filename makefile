@@ -176,9 +176,10 @@ clean-deps:
 	$(shell find src $(STAN)src/stan $(MATH)stan -type f -name '*.dSYM' -exec rm {} +)
 
 clean-manual:
+	$(RM) -r doc
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
-clean-all: clean clean-deps clean-libraries
+clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) -r bin
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
