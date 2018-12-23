@@ -45,9 +45,6 @@ endif
 
 CMDSTAN_VERSION := 2.18.0
 
--include $(STAN)make/manual
-
-
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
@@ -205,9 +202,16 @@ stan-revert:
 ##
 # Manual related
 ##
+
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
-	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(VERSION_STRING).pdf
+	mkdir -p doc
+	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION).pdf
+
+%.pdf: %.tex
+	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
+
+
 
 ##
 # Debug target that allows you to print a variable
