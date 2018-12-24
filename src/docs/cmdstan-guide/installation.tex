@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.18.1.tar.gz
+> tar --no-same-owner -xzf cmdstan-2.18.1.tar.gz 
 \end{Verbatim}
 \end{quote}
 %
@@ -519,10 +519,10 @@ versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the Stan source
-    directory. The default is \Verb|STAN=stan/|. Note: the
+    directory. The default is \Verb|STAN=stan_2.18.1/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/lib/stan_math/|.
+    default is \Verb|MATH=stan/l../stan_math_2.18.1/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
     \Verb|lib/boost_1.66.0/| folder within \Verb|MATH|.
