@@ -23,12 +23,37 @@ help:
 
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
-ifeq ($(OS),Windows_NT)
-  O_STANC ?= 3
-endif
-O_STANC ?= 0
-INC_FIRST ?= -I src -I $(STAN)src
+
+##########################
+## FIXME(DL): Default compiler options broken in math tagged v2.18.1.
+##            Once fixed, remove lines and replace with include
+#-include $(MATH)make/default_compiler_options
+O = 3
+O_STANC = 0
+AR = ar
+CPPFLAGS = -DNO_FPRINTF_OUTPUT -pipe
+# CXXFLAGS are just used for C++
+CXXFLAGS = -Wall -I . -isystem $(EIGEN) -isystem $(BOOST) -isystem $(SUNDIALS)/include -std=c++1y -DBOOST_RESULT_OF_USE_TR1 -DBOOST_NO_DECLTYPE -DBOOST_DISABLE_ASSERTS -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION -Wno-unused-function -Wno-uninitialized
+GTEST_CXXFLAGS = -DGTEST_USE_OWN_TR1_TUPLE
+LDLIBS =
+EXE =
+WINE =
+
+
+##########################
+
+
+CXXFLAGS += -I src -isystem $(STAN)src -isystem $(MATH)
+CXXFLAGS += -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
+CXXFLAGS += -DEIGEN_NO_DEBUG
+LDLIBS_STANC = -Lbin -lstanc
+STANCFLAGS ?=
 USER_HEADER ?= $(dir $<)user_header.hpp
+PATH_SEPARATOR = /
+CMDSTAN_VERSION := 2.18.1
+
+-include $(HOME)/.config/cmdstan/make.local  # define local variables
+-include make/local                       # overwrite local variables
 
 -include $(MATH)make/compiler_flags
 -include $(MATH)make/dependencies
@@ -43,7 +68,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.18.0
+CMDSTAN_VERSION := 2.18.1
 
 .PHONY: help
 help:
