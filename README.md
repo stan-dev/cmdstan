@@ -23,6 +23,7 @@ Stan's home page, with links to everything you'll need to use Stan is:
 There are separate repositories here on GitHub for interfaces:
 * RStan (R interface)
 * PyStan (Python interface)
+* CmdStan.jl (Julia interface)
 * CmdStan (command-line/shell interface)
 
 ### Source Repository
