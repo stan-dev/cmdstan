@@ -16,6 +16,8 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/stan_csv_reader.hpp>
+#include <stan/io/ends_with.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
@@ -36,6 +38,7 @@
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <Eigen/Dense>
 #include <fstream>
@@ -43,19 +46,34 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace cmdstan {
 
-  stan::io::dump get_var_context(const std::string file) {
+#ifdef STAN_MPI
+  stan::math::mpi_cluster& get_mpi_cluster() {
+    static stan::math::mpi_cluster cluster;
+    return cluster;
+  }
+#endif
+
+  std::shared_ptr<stan::io::var_context> get_var_context(const std::string file) {
     std::fstream stream(file.c_str(), std::fstream::in);
     if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
       std::stringstream msg;
       msg << "Can't open specified file, \"" << file << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
+    if (stan::io::ends_with(".json", file)) {
+      stan::json::json_data var_context(stream);
+      stream.close();
+      std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::json::json_data>(var_context);
+      return result;
+    }
     stan::io::dump var_context(stream);
     stream.close();
-    return var_context;
+    std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::io::dump>(var_context);
+    return result;
   }
 
   std::vector<std::vector<double>>  get_draws_csv(const std::string file) {
@@ -82,25 +100,18 @@ namespace cmdstan {
     return draws;
   }
 
-  std::vector<std::vector<double>>  get_draws_Rdump(const std::string file) {
-    std::fstream stream(file.c_str(), std::fstream::in);
-    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      std::stringstream msg;
-      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    stan::io::dump draws_var_context(stream);
-    stream.close();
-    // what is the name of this object in the draws_var_context object?
-    // how do we know what Nrow and Ncol are?
-  }
-
   template <class Model>
   int command(int argc, const char* argv[]) {
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
+
+#ifdef STAN_MPI
+    stan::math::mpi_cluster& cluster = get_mpi_cluster();
+    cluster.listen();
+    if (cluster.rank_ != 0) return 0;
+#endif
 
     // Read arguments
     std::vector<argument*> valid_arguments;
@@ -127,7 +138,6 @@ namespace cmdstan {
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
-    stan::io::dump data_var_context(get_var_context(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value()));
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
@@ -141,8 +151,14 @@ namespace cmdstan {
     //////////////////////////////////////////////////
     //                Initialize Model              //
     //////////////////////////////////////////////////
+
+    std::string filename(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value());
+    std::shared_ptr<stan::io::var_context> var_context = get_var_context(filename);
+
     unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
-    Model model(data_var_context, random_seed, &std::cout);
+
+    Model model(*var_context, random_seed, &std::cout);
+
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     parser.print(sample_writer);
@@ -156,12 +172,13 @@ namespace cmdstan {
 
     std::string init = dynamic_cast<string_argument*>(parser.arg("init"))->value();
     double init_radius = 2.0;
+    // argument "init" can be non-negative number of filename
     try {
       init_radius = boost::lexical_cast<double>(init);
       init = "";
     } catch (const boost::bad_lexical_cast& e) {
     }
-    stan::io::dump init_context(get_var_context(init));
+    std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
 
     int return_code = stan::services::error_codes::CONFIG;
     if (parser.arg("method")->arg("gen_quantities")) {
@@ -193,7 +210,7 @@ namespace cmdstan {
         double epsilon = dynamic_cast<real_argument*>(test->arg("gradient")->arg("epsilon"))->value();
         double error = dynamic_cast<real_argument*>(test->arg("gradient")->arg("error"))->value();
         return_code = stan::services::diagnose::diagnose(model,
-                                                         init_context,
+                                                         *init_context,
                                                          random_seed, id,
                                                          init_radius,
                                                          epsilon, error,
@@ -209,7 +226,7 @@ namespace cmdstan {
 
       if (algo->value() == "newton") {
         return_code = stan::services::optimize::newton(model,
-                                                       init_context,
+                                                       *init_context,
                                                        random_seed,
                                                        id,
                                                        init_radius,
@@ -228,7 +245,7 @@ namespace cmdstan {
         double tol_param = dynamic_cast<real_argument*>(algo->arg("bfgs")->arg("tol_param"))->value();
 
         return_code = stan::services::optimize::bfgs(model,
-                                                     init_context,
+                                                     *init_context,
                                                      random_seed,
                                                      id,
                                                      init_radius,
@@ -255,7 +272,7 @@ namespace cmdstan {
         double tol_param = dynamic_cast<real_argument*>(algo->arg("lbfgs")->arg("tol_param"))->value();
 
         return_code = stan::services::optimize::lbfgs(model,
-                                                      init_context,
+                                                      *init_context,
                                                       random_seed,
                                                       id,
                                                       init_radius,
@@ -288,7 +305,7 @@ namespace cmdstan {
         return_code = stan::services::error_codes::CONFIG;
       } else if (algo->value() == "fixed_param") {
         return_code = stan::services::sample::fixed_param(model,
-                                                          init_context,
+                                                          *init_context,
                                                           random_seed,
                                                           id,
                                                           init_radius,
@@ -302,20 +319,25 @@ namespace cmdstan {
                                                           diagnostic_writer);
       } else if (algo->value() == "hmc") {
         list_argument* engine = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("engine"));
+
         list_argument* metric = dynamic_cast<list_argument*>(algo->arg("hmc")->arg("metric"));
         string_argument* metric_file = dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"));
-        stan::io::dump metric_context(get_var_context(metric_file->value()));
         bool metric_supplied = !metric_file->is_default();
-        categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
+        std::string metric_filename(dynamic_cast<string_argument*>(algo->arg("hmc")->arg("metric_file"))->value());
+        std::shared_ptr<stan::io::var_context> metric_context = get_var_context(metric_filename);
 
+        categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
         categorical_argument* hmc = dynamic_cast<categorical_argument*>(algo->arg("hmc"));
         double stepsize = dynamic_cast<real_argument*>(hmc->arg("stepsize"))->value();
         double stepsize_jitter= dynamic_cast<real_argument*>(hmc->arg("stepsize_jitter"))->value();
 
-        if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
+        if (adapt_engaged == true && num_warmup == 0) {
+          info("The number of warmup samples (num_warmup) must be greater than zero if adaptation is enabled.");
+          return_code = stan::services::error_codes::CONFIG;
+        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
-                                                                 init_context,
+                                                                 *init_context,
                                                                  random_seed,
                                                                  id,
                                                                  init_radius,
@@ -335,8 +357,8 @@ namespace cmdstan {
         } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == true) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
-                                                                 init_context,
-                                                                 metric_context,
+                                                                 *init_context,
+                                                                 *metric_context,
                                                                  random_seed,
                                                                  id,
                                                                  init_radius,
@@ -363,7 +385,7 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e_adapt(model,
-                                                                       init_context,
+                                                                       *init_context,
                                                                        random_seed,
                                                                        id,
                                                                        init_radius,
@@ -397,8 +419,8 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e_adapt(model,
-                                                                       init_context,
-                                                                       metric_context,
+                                                                       *init_context,
+                                                                       *metric_context,
                                                                        random_seed,
                                                                        id,
                                                                        init_radius,
@@ -426,7 +448,7 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
           int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e(model,
-                                                                init_context,
+                                                                *init_context,
                                                                 random_seed,
                                                                 id,
                                                                 init_radius,
@@ -447,8 +469,8 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
           int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e(model,
-                                                                init_context,
-                                                                metric_context,
+                                                                *init_context,
+                                                                *metric_context,
                                                                 random_seed,
                                                                 id,
                                                                 init_radius,
@@ -476,7 +498,7 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e_adapt(model,
-                                                                      init_context,
+                                                                      *init_context,
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
@@ -511,8 +533,8 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_nuts_diag_e_adapt(model,
-                                                                      init_context,
-                                                                      metric_context,
+                                                                      *init_context,
+                                                                      *metric_context,
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
@@ -540,7 +562,7 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"));
           int max_depth = dynamic_cast<int_argument*>(base->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_unit_e(model,
-                                                                init_context,
+                                                                *init_context,
                                                                 random_seed,
                                                                 id,
                                                                 init_radius,
@@ -565,7 +587,7 @@ namespace cmdstan {
           double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
           double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
           return_code = stan::services::sample::hmc_nuts_unit_e_adapt(model,
-                                                                      init_context,
+                                                                      *init_context,
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
@@ -590,7 +612,7 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_dense_e(model,
-                                                                   init_context,
+                                                                   *init_context,
                                                                    random_seed,
                                                                    id,
                                                                    init_radius,
@@ -611,8 +633,8 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_dense_e(model,
-                                                                   init_context,
-                                                                   metric_context,
+                                                                   *init_context,
+                                                                   *metric_context,
                                                                    random_seed,
                                                                    id,
                                                                    init_radius,
@@ -640,7 +662,7 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_static_dense_e_adapt(model,
-                                                                         init_context,
+                                                                         *init_context,
                                                                          random_seed,
                                                                          id,
                                                                          init_radius,
@@ -675,8 +697,8 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_static_dense_e_adapt(model,
-                                                                         init_context,
-                                                                         metric_context,
+                                                                         *init_context,
+                                                                         *metric_context,
                                                                          random_seed,
                                                                          id,
                                                                          init_radius,
@@ -704,7 +726,7 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_diag_e(model,
-                                                                  init_context,
+                                                                  *init_context,
                                                                   random_seed,
                                                                   id,
                                                                   init_radius,
@@ -725,8 +747,8 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_diag_e(model,
-                                                                  init_context,
-                                                                  metric_context,
+                                                                  *init_context,
+                                                                  *metric_context,
                                                                   random_seed,
                                                                   id,
                                                                   init_radius,
@@ -754,7 +776,7 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_static_diag_e_adapt(model,
-                                                                        init_context,
+                                                                        *init_context,
                                                                         random_seed,
                                                                         id,
                                                                         init_radius,
@@ -789,8 +811,8 @@ namespace cmdstan {
           unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
           unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
           return_code = stan::services::sample::hmc_static_diag_e_adapt(model,
-                                                                        init_context,
-                                                                        metric_context,
+                                                                        *init_context,
+                                                                        *metric_context,
                                                                         random_seed,
                                                                         id,
                                                                         init_radius,
@@ -818,7 +840,7 @@ namespace cmdstan {
           categorical_argument* base = dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("static"));
           double int_time = dynamic_cast<real_argument*>(base->arg("int_time"))->value();
           return_code = stan::services::sample::hmc_static_unit_e(model,
-                                                                  init_context,
+                                                                  *init_context,
                                                                   random_seed,
                                                                   id,
                                                                   init_radius,
@@ -843,7 +865,7 @@ namespace cmdstan {
           double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
           double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
           return_code = stan::services::sample::hmc_static_unit_e_adapt(model,
-                                                                        init_context,
+                                                                        *init_context,
                                                                         random_seed,
                                                                         id,
                                                                         init_radius,
@@ -880,7 +902,7 @@ namespace cmdstan {
 
       if (algo->value() == "fullrank") {
         return_code = stan::services::experimental::advi::fullrank(model,
-                                                                   init_context,
+                                                                   *init_context,
                                                                    random_seed,
                                                                    id,
                                                                    init_radius,
@@ -900,7 +922,7 @@ namespace cmdstan {
                                                                    diagnostic_writer);
       } else if (algo->value() == "meanfield") {
         return_code = stan::services::experimental::advi::meanfield(model,
-                                                                    init_context,
+                                                                    *init_context,
                                                                     random_seed,
                                                                     id,
                                                                     init_radius,
@@ -925,6 +947,9 @@ namespace cmdstan {
     diagnostic_stream.close();
     for (size_t i = 0; i < valid_arguments.size(); ++i)
       delete valid_arguments.at(i);
+#ifdef STAN_MPI
+    cluster.stop_listen();
+#endif
     return return_code;
   }
 

@@ -70,7 +70,7 @@ make               test-all.sh
     \end{quote}
     %
   \item \emph{Optional:} \, Set local \code{make} variables by editing
-    the file \verb+~/.config/cmdstan/make.local+ or
+    the file \verb+~/.config/stan/make.local+ or
     \verb+<cmdstan-home>/make/local+. See \refappendix{make-options}
     for a list of available options.  For most installations, this
     step can be skipped; the default configuration should work for
@@ -97,7 +97,7 @@ report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.17.0 built ---
+--- CmdStan v2.18.1 built ---
   \end{Verbatim}
 \end{quote}
 %
@@ -154,7 +154,9 @@ prior on \code{theta} is \code{beta(1,1)} (i.e., uniform).
 
 \subsection{Data Set}
 
-A data set of $\mbox{\code{N}}=10$ observations is coded as follows.
+A data set of $\mbox{\code{N}}=10$ observations is coded either
+using JSON notation or in the dump data format created by 
+the \code{stan\_rdump} in package \code{rstan}.
 %
 \footnote{
 The data is also available from the \code{example-models} repository
@@ -163,6 +165,15 @@ on GitHub,
 It is also included with the CmdStan distribution and can be found at path
 \nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}.
 }
+In JSON:
+%
+\begin{quote}
+\begin{Verbatim}
+{ "N" : 10, "y" : [ 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 ] }
+\end{Verbatim}
+\end{quote}
+%
+In \code{stan\_rdump} format:
 %
 \begin{quote}
 \begin{Verbatim}
@@ -910,7 +921,7 @@ and on Windows with
 %% \emph{Warning}: \ The unit tests can take 30+ minutes and consume 3+
 %% GB of memory with the default compiler, \code{g++}.  The distribution
 %% test and model tests can take even longer.  It is faster to run the
-%% Clang compiler (option \code{CC=clang++}), and to run in multiple
+%% Clang compiler (option \code{CXX=clang++}), and to run in multiple
 %% processes in parallel (e.g., option \code{-j4} for four threads).
 
 %% \subsection{Compile-time Errors}

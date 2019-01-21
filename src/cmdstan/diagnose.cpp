@@ -74,18 +74,22 @@ int main(int argc, const char* argv[]) {
     int max_limit = 10;
 
     if (chains.param_name(i) == std::string("treedepth__")) {
-      int max = chains.samples(i).maxCoeff();
-      if (max >= max_limit) {
-        int n_max = 0;
-        Eigen::VectorXd t_samples = chains.samples(i);
-        for (long n = 0; n < t_samples.size(); ++n)
-          if (t_samples(n) == max) ++n_max;
+      int max_limit = stan_csv.metadata.max_depth;
 
+      long n_max = 0;
+      Eigen::VectorXd t_samples = chains.samples(i);
+      for (long n = 0; n < t_samples.size(); ++n) {
+        if (t_samples(n) >= max_limit) {
+          ++n_max;
+        }
+      }
+
+      if (n_max > 0) {
         std::cout << n_max << " of " << num_samples << " ("
                   << std::setprecision(2)
                   << 100 * static_cast<double>(n_max) / num_samples
                   << "%) transitions hit the maximum treedepth limit of "
-                  << max << ", or 2^" << max << " leapfrog steps."
+                  << max_limit << ", or 2^" << max_limit << " leapfrog steps."
                   << " Trajectories that are prematurely terminated due to this"
                   << " limit will result in slow exploration and you should"
                   << " increase the limit to ensure optimal performance."
@@ -171,7 +175,7 @@ int main(int argc, const char* argv[]) {
   }
 
   if (bad_rhat_names.size() > 0) {
-    std::cout << "The following parameters had split R-hat less than 1.1:"
+    std::cout << "The following parameters had split R-hat greater than 1.1:"
               << std::endl;
     std::cout << "  ";
     for (size_t n = 0; n < bad_rhat_names.size() - 1; ++n)
