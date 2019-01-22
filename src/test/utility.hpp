@@ -132,9 +132,6 @@ namespace cmdstan {
       using boost::posix_time::microsec_clock;
   
       FILE *in;
-      std::string new_command = command + " 2>&1"; 
-      // captures both std::cout amd std::err
-  
       in = popen(command.c_str(), "r");
   
       if(!in) {

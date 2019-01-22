@@ -76,29 +76,6 @@ namespace cmdstan {
     return result;
   }
 
-  std::vector<std::vector<double>>  get_draws_csv(const std::string file) {
-    std::fstream stream(file.c_str(), std::fstream::in);
-    if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      std::stringstream msg;
-      msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    stan::io::stan_csv draws_csv = stan::io::stan_csv_reader::parse(stream, &std::cout);
-    stream.close();
-    // convert EigenMatrixXd to vec?
-    int nrows = draws_csv.samples.rows();
-    int ncols = draws_csv.samples.cols();
-    std::vector<std::vector<double>> draws(nrows);
-    int idx = 0;
-    for (int i = 0; i < nrows; ++i) {
-      std::vector<double> tmp(ncols);
-      for (int j = 0; j < ncols; ++j) {
-        tmp[j] = draws_csv.samples(idx++);
-      }
-      draws[i] = tmp;
-    }
-    return draws;
-  }
 
   template <class Model>
   int command(int argc, const char* argv[]) {
@@ -181,28 +158,52 @@ namespace cmdstan {
     std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
 
     int return_code = stan::services::error_codes::CONFIG;
-    if (parser.arg("method")->arg("gen_quantities")) {
 
-    // need to be able to read samples from cmdstan csv output file
-    // or get samples from R dump file as matrix of reals -
-    // e.g.: dput(as.matrix(lm_fit), file="lm_draws.R")
-      string_argument* draws_file = dynamic_cast<string_argument*>(parser.arg("method")->arg("gen_quantities")->arg("draws_file"));
-      // if no draws file, quit with error message
-      if (draws_file->is_default()) {
-        info("Must specify argument draws_file which is a set of draws from the fitted model.");
+    if (parser.arg("method")->arg("generated_quantities")) {
+      // read sample from cmdstan csv output file
+      string_argument* fitted_params_file =
+        dynamic_cast<string_argument*>(parser.arg("method")->arg("generated_quantities")->arg("fitted_params"));
+      if (fitted_params_file->is_default()) {
+        info("Must specify argument fitted_params which is a csv file containing the sample.");
         return_code = stan::services::error_codes::CONFIG;
-      } else {
-        // if filename ends in ".csv" parse .csv file
-        // else if filename ends in ".R", dumpfile format, parse dump
-        // else error message
-        std::vector<std::vector<double>> draws(get_draws_csv(draws_file->value()));
-        stan::services::standalone_generate(model,
-                                            draws,
-                                            random_seed,
-                                            interrupt,
-                                            logger,
-                                            sample_writer);
-      }   
+      }
+      std::string fname(fitted_params_file->value());
+      std::fstream stream(fname.c_str(), std::fstream::in);
+      std::stringstream msg;
+      if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+        msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      stan::io::stan_csv fitted_params;
+      stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata, &msg);
+      if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header, &msg)) {
+        msg << "Error reading fitted param names from sample csv file \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation, &msg);
+      fitted_params.timing.warmup = 0;
+      fitted_params.timing.sampling = 0;
+      stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples, fitted_params.timing, &msg);
+      stream.close();
+      // get block size for just the param cols in the sample
+      size_t num_rows = fitted_params.metadata.num_samples;
+      // this should be a method on services
+      std::vector<std::string> param_names;
+      std::vector<std::vector<size_t>> param_dimss;
+      stan::services::get_model_parameters(model, param_names, param_dimss);
+      size_t num_cols = 0;
+      for (size_t i = 0; i < param_dimss.size(); ++i) {
+        int subtotal = 1;
+        for (size_t j = 0; j < param_dimss[i].size(); ++j)
+          subtotal *= param_dimss[i][j];
+        num_cols += subtotal;
+      }
+      return_code = stan::services::standalone_generate(model,
+                                          fitted_params.samples.block(0, 7, num_rows, num_cols),
+                                          random_seed,
+                                          interrupt,
+                                          logger,
+                                          sample_writer);
     } else if (parser.arg("method")->arg("diagnose")) {
       list_argument* test = dynamic_cast<list_argument*>(parser.arg("method")->arg("diagnose")->arg("test"));
 
