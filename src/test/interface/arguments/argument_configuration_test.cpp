@@ -106,6 +106,10 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
       
       if (argument.length() == 0) 
         continue;
+
+      // kludge - generate_quantities method doesn't fit test paradigm
+      size_t pos = 0; 
+      if ((pos = argument.find("generate")) != std::string::npos) continue;
       
       remove_duplicates(argument);
 

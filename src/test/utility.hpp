@@ -130,7 +130,6 @@ namespace cmdstan {
     run_command_output run_command(std::string command) {
       using boost::posix_time::ptime;
       using boost::posix_time::microsec_clock;
-  
       FILE *in;
       in = popen(command.c_str(), "r");
   

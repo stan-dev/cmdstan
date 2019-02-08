@@ -159,10 +159,10 @@ namespace cmdstan {
 
     int return_code = stan::services::error_codes::CONFIG;
 
-    if (parser.arg("method")->arg("generated_quantities")) {
+    if (parser.arg("method")->arg("generate_quantities")) {
       // read sample from cmdstan csv output file
       string_argument* fitted_params_file =
-        dynamic_cast<string_argument*>(parser.arg("method")->arg("generated_quantities")->arg("fitted_params"));
+        dynamic_cast<string_argument*>(parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
       if (fitted_params_file->is_default()) {
         info("Must specify argument fitted_params which is a csv file containing the sample.");
         return_code = stan::services::error_codes::CONFIG;
