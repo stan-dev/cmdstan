@@ -185,18 +185,22 @@ namespace cmdstan {
       fitted_params.timing.sampling = 0;
       stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples, fitted_params.timing, &msg);
       stream.close();
-      // get block size for just the param cols in the sample
-      size_t num_rows = fitted_params.metadata.num_samples;
-      // this should be a method on services
+
       std::vector<std::string> param_names;
-      std::vector<std::vector<size_t>> param_dimss;
-      stan::services::get_model_parameters(model, param_names, param_dimss);
-      size_t num_cols = 0;
-      for (size_t i = 0; i < param_dimss.size(); ++i) {
-        int subtotal = 1;
-        for (size_t j = 0; j < param_dimss[i].size(); ++j)
-          subtotal *= param_dimss[i][j];
-        num_cols += subtotal;
+      model.constrained_param_names(param_names, false, false);
+      size_t num_cols = param_names.size();
+      size_t num_rows = fitted_params.metadata.num_samples;
+
+      // check that all parameter names are in sample, in order 
+      if (num_cols + 7 > fitted_params.header.size()) {
+        msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      for (size_t i = 0; i < num_cols; ++i) {
+        if (param_names[i].compare(fitted_params.header[i + 7]) != 0) {
+          msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
+          throw std::invalid_argument(msg.str());
+        }
       }
       return_code = stan::services::standalone_generate(model,
                                           fitted_params.samples.block(0, 7, num_rows, num_cols),
