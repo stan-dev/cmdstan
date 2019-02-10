@@ -61,8 +61,8 @@ TEST_F(CmdStan, generate_quantities_good) {
   ss << convert_model_path(model_path)
      << " data file=" << convert_model_path(data_file_path)
      << " output file=" << convert_model_path(output_file_path)
-     << " method=generate_quantities "
-     << " fitted_params=" << convert_model_path(fitted_params_file_path);
+     << " method=generate_quantities fitted_params="
+     << convert_model_path(fitted_params_file_path);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
@@ -72,8 +72,9 @@ TEST_F(CmdStan, generate_quantities_bad_nodata) {
   std::stringstream ss;
   ss << convert_model_path(model_path)
      << " output file=" << convert_model_path(output_file_path)
-     << " method=generate_quantities "
-     << " fitted_params=" << convert_model_path(fitted_params_file_path_empty);
+     << " method=generate_quantities fitted_params="
+     << convert_model_path(fitted_params_file_path_empty)
+     << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_EQ(70, out.err_code);
@@ -84,7 +85,8 @@ TEST_F(CmdStan, generate_quantities_bad_no_gqs) {
   ss << convert_model_path(model_path_2)
      << " output file=" << convert_model_path(output_file_path)
      << " method=generate_quantities "
-     << " fitted_params=" << convert_model_path(fitted_params_file_path_2);
+     << " fitted_params=" << convert_model_path(fitted_params_file_path_2)
+     << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_EQ(78, out.err_code);
@@ -96,7 +98,8 @@ TEST_F(CmdStan, generate_quantities_wrong_csv) {
      << " data file=" << convert_model_path(data_file_path)
      << " output file=" << convert_model_path(output_file_path)
      << " method=generate_quantities fitted_params="
-     << convert_model_path(fitted_params_file_path_2);
+     << convert_model_path(fitted_params_file_path_2)
+     << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_EQ(70, out.err_code);
@@ -108,7 +111,8 @@ TEST_F(CmdStan, generate_quantities_wrong_csv_2) {
      << " data file=" << convert_model_path(data_file_path)
      << " output file=" << convert_model_path(output_file_path)
      << " method=generate_quantities fitted_params="
-     << convert_model_path(fitted_params_file_path);
+     << convert_model_path(fitted_params_file_path)
+     << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_EQ(70, out.err_code);
