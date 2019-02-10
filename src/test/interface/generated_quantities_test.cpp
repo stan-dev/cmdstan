@@ -89,7 +89,7 @@ TEST_F(CmdStan, generate_quantities_bad_no_gqs) {
      << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(78, out.err_code);  # stan::services::error_codes CONFIG
+  ASSERT_EQ(78, out.err_code);  // stan::services::error_codes CONFIG
 }
 
 TEST_F(CmdStan, generate_quantities_wrong_csv) {
