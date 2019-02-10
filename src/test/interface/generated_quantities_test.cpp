@@ -65,7 +65,7 @@ TEST_F(CmdStan, generate_quantities_good) {
      << convert_model_path(fitted_params_file_path);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(0, out.err_code);
+  ASSERT_EQ(false, out.hasError);
 }
 
 TEST_F(CmdStan, generate_quantities_bad_nodata) {
@@ -77,7 +77,7 @@ TEST_F(CmdStan, generate_quantities_bad_nodata) {
      << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(70, out.err_code);
+  ASSERT_EQ(true, out.hasError);
 }
 
 TEST_F(CmdStan, generate_quantities_bad_no_gqs) {
@@ -89,7 +89,7 @@ TEST_F(CmdStan, generate_quantities_bad_no_gqs) {
      << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(78, out.err_code);  // stan::services::error_codes CONFIG
+  ASSERT_EQ(true, out.hasError);
 }
 
 TEST_F(CmdStan, generate_quantities_wrong_csv) {
@@ -102,7 +102,7 @@ TEST_F(CmdStan, generate_quantities_wrong_csv) {
      << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(70, out.err_code);
+  ASSERT_EQ(true, out.hasError);
 }
 
 TEST_F(CmdStan, generate_quantities_wrong_csv_2) {
@@ -115,5 +115,5 @@ TEST_F(CmdStan, generate_quantities_wrong_csv_2) {
      << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_EQ(70, out.err_code);
+  ASSERT_EQ(true, out.hasError);
 }
