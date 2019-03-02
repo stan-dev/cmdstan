@@ -39,8 +39,8 @@
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <Eigen/Dense>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -75,6 +75,8 @@ namespace cmdstan {
     std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::io::dump>(var_context);
     return result;
   }
+
+  static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6 
 
 
   template <class Model>
@@ -168,13 +170,14 @@ namespace cmdstan {
         return_code = stan::services::error_codes::CONFIG;
       }
       std::string fname(fitted_params_file->value());
-      std::fstream stream(fname.c_str(), std::fstream::in);
-      std::stringstream msg;
+      std::ifstream stream(fname.c_str());
       if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+        std::stringstream msg;
         msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
         throw std::invalid_argument(msg.str());
       }
       stan::io::stan_csv fitted_params;
+      std::stringstream msg;
       stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata, &msg);
       if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header, &msg)) {
         msg << "Error reading fitted param names from sample csv file \"" << fname << "\"" << std::endl;
@@ -192,18 +195,20 @@ namespace cmdstan {
       size_t num_rows = fitted_params.metadata.num_samples;
 
       // check that all parameter names are in sample, in order 
-      if (num_cols + 7 > fitted_params.header.size()) {
+      if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
+        std::stringstream msg;
         msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
         throw std::invalid_argument(msg.str());
       }
       for (size_t i = 0; i < num_cols; ++i) {
-        if (param_names[i].compare(fitted_params.header[i + 7]) != 0) {
+        if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols]) != 0) {
+          std::stringstream msg;
           msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
           throw std::invalid_argument(msg.str());
         }
       }
       return_code = stan::services::standalone_generate(model,
-                                          fitted_params.samples.block(0, 7, num_rows, num_cols),
+                                          fitted_params.samples.block(0, hmc_fixed_cols, num_rows, num_cols),
                                           random_seed,
                                           interrupt,
                                           logger,

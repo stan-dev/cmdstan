@@ -12,38 +12,13 @@ using cmdstan::test::run_command_output;
 class CmdStan : public testing::Test {
 public:
   void SetUp() {
-    model_path.emplace_back("src");
-    model_path.emplace_back("test");
-    model_path.emplace_back("test-models");
-    model_path.emplace_back("gq_model");
-
-    data_file_path.emplace_back("src");
-    data_file_path.emplace_back("test");
-    data_file_path.emplace_back("test-models");
-    data_file_path.emplace_back("gq_model.data.json");
-
-    model_path_2.emplace_back("src");
-    model_path_2.emplace_back("test");
-    model_path_2.emplace_back("test-models");
-    model_path_2.emplace_back("test_model");
-
-    output_file_path.emplace_back("/dev");
-    output_file_path.emplace_back("null");
-
-    fitted_params_file_path.emplace_back("src");
-    fitted_params_file_path.emplace_back("test");
-    fitted_params_file_path.emplace_back("test-models");
-    fitted_params_file_path.emplace_back("gq_model_output.csv");
-
-    fitted_params_file_path_2.emplace_back("src");
-    fitted_params_file_path_2.emplace_back("test");
-    fitted_params_file_path_2.emplace_back("test-models");
-    fitted_params_file_path_2.emplace_back("test_model_output.csv");
-
-    fitted_params_file_path_empty.emplace_back("src");
-    fitted_params_file_path_empty.emplace_back("test");
-    fitted_params_file_path_empty.emplace_back("test-models");
-    fitted_params_file_path_empty.emplace_back("empty.csv");
+    model_path = {"src", "test", "test-models", "gq_model"};
+    data_file_path = {"src", "test", "test-models", "gq_model.data.json"};
+    model_path_2 = { "src", "test", "test-models", "test_model"};
+    output_file_path = { "/dev", "null"};
+    fitted_params_file_path = {"src", "test", "test-models", "gq_model_output.csv"};
+    fitted_params_file_path_2 = {"src", "test", "test-models", "test_model_output.csv"};
+    fitted_params_file_path_empty = {"src", "test", "test-models", "empty.csv"};
   }
 
   std::vector<std::string> model_path;
