@@ -91,6 +91,9 @@ pipeline {
                             warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
                         }
+                        success { script { utils.mailBuildResults("SUCCESSFUL") } }
+                        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+                        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
                     }
                 }
             }
