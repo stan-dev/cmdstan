@@ -15,6 +15,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
@@ -34,9 +35,11 @@
 #include <stan/services/sample/hmc_static_diag_e_adapt.hpp>
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
+#include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
@@ -73,6 +76,9 @@ namespace cmdstan {
     return result;
   }
 
+  static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6 
+
+
   template <class Model>
   int command(int argc, const char* argv[]) {
     stan::callbacks::stream_writer info(std::cout);
@@ -107,7 +113,6 @@ namespace cmdstan {
     }
     parser.print(info);
     info();
-
 
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
@@ -155,7 +160,60 @@ namespace cmdstan {
     std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
 
     int return_code = stan::services::error_codes::CONFIG;
-    if (parser.arg("method")->arg("diagnose")) {
+
+    if (parser.arg("method")->arg("generate_quantities")) {
+      // read sample from cmdstan csv output file
+      string_argument* fitted_params_file =
+        dynamic_cast<string_argument*>(parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
+      if (fitted_params_file->is_default()) {
+        info("Must specify argument fitted_params which is a csv file containing the sample.");
+        return_code = stan::services::error_codes::CONFIG;
+      }
+      std::string fname(fitted_params_file->value());
+      std::ifstream stream(fname.c_str());
+      if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+        std::stringstream msg;
+        msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      stan::io::stan_csv fitted_params;
+      std::stringstream msg;
+      stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata, &msg);
+      if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header, &msg)) {
+        msg << "Error reading fitted param names from sample csv file \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation, &msg);
+      fitted_params.timing.warmup = 0;
+      fitted_params.timing.sampling = 0;
+      stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples, fitted_params.timing, &msg);
+      stream.close();
+
+      std::vector<std::string> param_names;
+      model.constrained_param_names(param_names, false, false);
+      size_t num_cols = param_names.size();
+      size_t num_rows = fitted_params.metadata.num_samples;
+
+      // check that all parameter names are in sample, in order 
+      if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
+        std::stringstream msg;
+        msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      for (size_t i = 0; i < num_cols; ++i) {
+        if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols]) != 0) {
+          std::stringstream msg;
+          msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
+          throw std::invalid_argument(msg.str());
+        }
+      }
+      return_code = stan::services::standalone_generate(model,
+                                          fitted_params.samples.block(0, hmc_fixed_cols, num_rows, num_cols),
+                                          random_seed,
+                                          interrupt,
+                                          logger,
+                                          sample_writer);
+    } else if (parser.arg("method")->arg("diagnose")) {
       list_argument* test = dynamic_cast<list_argument*>(parser.arg("method")->arg("diagnose")->arg("test"));
 
       if (test->value() == "gradient") {
