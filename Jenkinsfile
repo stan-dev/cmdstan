@@ -99,7 +99,7 @@ pipeline {
                 stage('Non-windows interface tests with OpenCL') {
                     agent { label 'gpu' }
                     steps {
-                        sh "echo CXX=${env.CXX} -Werror > make/local"
+                        sh "echo CXX=${env.CXX} -Werror >> make/local"
                         sh "echo STAN_OPENCL=true>> make/local"
                         sh "echo OPENCL_PLATFORM_ID=0>> make/local"
                         sh "echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID}>> make/local"
