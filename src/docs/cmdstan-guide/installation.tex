@@ -296,7 +296,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.18.1.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.18.1.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -604,8 +604,10 @@ computations which ensure that divergent transitions are reported:
 \section{Optional Parallelization Support}
 
 \CmdStan has optional support for within-chain parallelization using
-threads or multiple processes which are linked via the message passing
-interface (MPI).
+threading and OpenCL or multiple processes which are linked via the message
+passing interface (MPI).
+
+\subsection{Threading and MPI}
 %
 \begin{description}
   \item[Threads] can utilize multiple cores on a single
@@ -618,12 +620,17 @@ interface (MPI).
     different machines. Please refer to
     \url{https://github.com/stan-dev/math/wiki/MPI-Parallelism} for
     more details.
+  \item[OpenCL] in \CmdStan enables Cholesky decompositions to utilize a GPU
+   for large parallel computations. Please refer to
+   \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for setup
+   instructions.
 \end{description}
 %
-The within-chain parallelization is used in the Stan language to
-parallelize the evaluation of the \Verb|map_rect| command. Note that
+The within-chain parallelization for threading and MPI is used in the Stan
+language to parallelize the evaluation of the \Verb|map_rect| command. Note that
 MPI parallelism will take precendence in case both features are
-enabled.
+enabled. Currently, OpenCL will only pass matrices over to the GPU if their
+dimensions are larger than 1250x1250.
 
 \section{Optional Components for Developers}
 

@@ -39,6 +39,7 @@
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#include <stan/math/opencl/opencl_context.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
@@ -76,7 +77,7 @@ namespace cmdstan {
     return result;
   }
 
-  static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6 
+  static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6
 
 
   template <class Model>
@@ -194,7 +195,7 @@ namespace cmdstan {
       size_t num_cols = param_names.size();
       size_t num_rows = fitted_params.metadata.num_samples;
 
-      // check that all parameter names are in sample, in order 
+      // check that all parameter names are in sample, in order
       if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
         std::stringstream msg;
         msg << "Mismatch between model and fitted_parameters csv file \"" << fname << "\"" << std::endl;
