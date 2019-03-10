@@ -1,7 +1,7 @@
-\chapter{Running a \CmdStan Program}\label{stan-cmd.chapter}
+\chapter{Running a CmdStan Program}\label{stan-cmd.chapter}
 
 \noindent
-Once a \CmdStan program is compiled, it can be run in many different
+Once a CmdStan program is compiled, it can be run in many different
 ways.  It can be used to sample or optimize parameters, or to diagnose
 a model.  Before diving into the detailed configurations, the first
 section provides some simple examples.
@@ -9,12 +9,12 @@ section provides some simple examples.
 
 \section{Getting Started by Example}\label{command-getting-started.section}
 
-Once a \CmdStan program has been converted to a \Cpp program for that
+Once a CmdStan program has been converted to a \Cpp program for that
 model (see \refchapter{stanc}) and the resulting \Cpp program compiled
 to a platform-specific executable (see \refchapter{compiling}),
 the model is ready to be run.
 
-All of the \CmdStan functionality is highly configurable from the command
+All of the CmdStan functionality is highly configurable from the command
 line; the options are defined later in this chapter.  Each command
 option also has defaults, which are used in this section.
 
@@ -105,9 +105,9 @@ DOS.
 
 \subsubsection{Combining Parallel Chains}
 
-\CmdStan has commands to analyze the output of multiple chains, each
+CmdStan has commands to analyze the output of multiple chains, each
 stored in their own file; see \refchapter{stansummary}.  RStan also
-has commands to read in multiple CSV files produced by \CmdStan's
+has commands to read in multiple CSV files produced by CmdStan's
 command-line sampler.
 
 To compute posterior quantities, it is sometimes easier to have the
@@ -138,7 +138,7 @@ dependency control such as makefiles.
 
 \subsection{Optimization}
 
-\CmdStan can find the posterior mode (assuming there is one).  If the
+CmdStan can find the posterior mode (assuming there is one).  If the
 posterior is not convex, there is no guarantee Stan will be able to
 find the global mode as opposed to a local optimum of log probability.
 
@@ -166,7 +166,7 @@ written.
 
 \subsection{Variational Inference}
 
-\CmdStan can fit a variational approximation to the posterior. The approximation
+CmdStan can fit a variational approximation to the posterior. The approximation
 is a Gaussian in the unconstrained variable space. Stan implements two
 variational algorithms. The \code{algorithm=meanfield} option uses a fully
 factorized Gaussian for the approximation. The \code{algorithm=fullrank} option
@@ -196,7 +196,7 @@ uses a Gaussian with a full-rank covariance matrix for the approximation.
 
 \section{Diagnostics}\label{diagnostics.section}
 
-\CmdStan has a basic diagnostic feature that will calculate gradients of
+CmdStan has a basic diagnostic feature that will calculate gradients of
 the initial state and compare them with those calculated with finite
 differences.  If there are discrepancies, there is a problem with the
 model or initial states (or a bug in Stan).  To run on the different
@@ -219,199 +219,103 @@ platforms, use one of the following.
 \end{quote}
 
 
+\section{Generate Quantities}
+
+CmdStan can be used to generate additional quantities of interest
+given a model, data, and a sample drawn from the model conditioned
+on the data.
+For each draw in the sample, CmdStan runs the \code{generated quantities}
+block using the parameter estimates for that draw as the parameter values.
+
+\subsubsection{Mac OS and Linux}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> ./my_model generate_quantities fitted_params=my_samples.csv \
+           data file=my_data
+\end{Verbatim}
+\end{quote}
+
+\subsubsection{Windows}
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> my_model generate_quantities fitted_params=my_samples.csv \
+           data file=my_data
+\end{Verbatim}
+\end{quote}
 
 
 \section{Command-Line Options}\label{stan-command-line-options.section}
 
-\CmdStan executables are highly configurable, allowing the user to specify
-and customize not only the calculation method but also the data, output,
-initialization, and random number generation.  The arguments are defined
-hierarchically so that, for example, optimization settings are not necessary
-when sampling.
-
-The atomic elements of the hierarchy (i.e., those without
-corresponding values) are \textit{categorical arguments} (sometimes
-called ``flags'') which define self-contained categories of arguments.
-
-\CmdStan's commands have more hierarchical structure than is typical of
-command line executables, which usually have at most two subgroups of
-commands.  Arguments grouped within a category are not ordered with
-respect to each other.  The only ordering is that the global options
-come before the method argument and subcommand-specific options after
-the method argument.  For example, the following four commands all
-define the same configuration:%
+A CmdStan program can be run in many different ways, e.g., sampling,
+optimization, variational inference.  As these different uses require
+different configuration options, CmdStan has its own syntax for
+specifying the configuration options in a way that follows the logical
+dependencies between the Stan program and the way in which is it to be
+run.  The command-line options are specified as a set of top-level set of
+general configuration categories which take further sets
+of keyword-value pairs as sub-arguments.  The top-level categorical
+keywords are:
 %
-\footnote{
-The backslash (\code{\textbackslash}) is used at the end of a line in
-a command to indicate that it continues on the next line.  The
-indentation to indicate the structure of the command is for
-pedagogical purposes only; the same result would be obtained writing
-each command on one line with single spaces separating the elements.
-}
+\begin{itemize}
+\itemsep0em
+\item{\code{method} - required, see below}
+\item{\code{id}  - optional, value is non-negative integer, specified as \code{id=\farg{int-value}}}
+\item{\code{random} - optional, single keyword with sub-arguments}
+\item{\code{data} - optional, , single keyword with sub-arguments}
+\item{\code{init} - optional, , single keyword with sub-arguments}
+\item{\code{output} - optional, , single keyword with sub-arguments}
+\end{itemize}
+%
+CmdStan also provides a \code{help} option described in the next section.
+
+The \code{method} argument has a nested set of sub-categories
+where all sub-arguments are appropriate to the choice of the method argument. 
+Default values are provided for all sub-argument options.
+All sub-arguments for a given argument can be specified in any order.
+Because \code{method} is the only mandatory argument, it can be
+specified either as \code{method=\farg{method\_name}} or simply as
+\farg{method\_name}, as seen in previous examples, i.e., the keywords
+\code{sample}, \code{optimize}, \code{variational}, \code{diagnose},
+or \code{generate\_quantities}.
+
+
+\subsection{Help}
+
+Informative output can be retrieved either globally, by requesting help
+at the top-level, or locally, by requesting help deeper into the hierarchy.
+Note that after any help has been displayed the execution immediately
+terminates, even if a method has been specified.
+
+If \code{help} is specified as the only argument then a usage message is
+displayed.  Similarly, specifying \code{help\_all} by itself displays the entire
+argument hierarchy.
+Specifying \code{help} after any argument displays a description and
+valid options for that argument.  For example,
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> ./model sample output file=samples.csv                \
-                        diagnostic_file=diagnostics.csv \
-                 random seed=1
-
-> ./model sample output diagnostic_file=diagnostics.csv \
-                        file=samples.csv                \
-                 random seed=1
-
-> ./model sample random seed=1                          \
-                 output file=samples.csv                \
-                        diagnostic_file=diagnostics.csv
-
-> ./model sample random seed=1                          \
-                 output diagnostic_file=diagnostics.csv \
-                        file=samples.csv
+./my_model method=sample help
 \end{Verbatim}
 \end{quote}
 %
-The categorical arguments \code{output} and \code{random} can be
-in any order provided that the subarguments follow their respective
-parent, here \code{diagnostic\_file} and \code{file} following \code{output}
-and \code{seed} coming after \code{random}.  These four configurations
-exhaust all valid combinations.
+provides the top-level options for the \code{sample} method.
 
-Categorical arguments may appear is isolation, for example when
-introducing \code{sample} or \code{random}, or they may appear as
-the values for other arguments, such as \code{hmc} which not only
-introduces a category of HMC related arguments but also defines the
-value of the argument \code{algorithm}.  A visual diagram of the available
-categorical arguments is shown in \reffigure{hierarchy}, with the mutual
-exclusivity of these arguments as values shown in \reffigure{configuration}.
-Specifying conflicting arguments
-causes the execution to immediately terminate.
-
-\begin{figure}
-\setlength{\unitlength}{0.01in}
-\centering
-\begin{picture}(480, 480)
-\small\tt
+Detailed information on the argument, and all arguments deriving
+from it, can accessed by specifying \code{help-all} instead,
 %
-\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
-%
-\put(0, 410) { \framebox(470, 45)\hss }
-\put(10, 440) { \makebox(50, 10)[l]{random} }
-\put(50, 420) { \makebox(50, 10)[l]{seed} }
-%
-\put(0, 360) { \framebox(470, 45)\hss }
-\put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(500, 10)[l]{file, diagnostic\_file, ... } } % refresh, save\_warmup} }
-%
-\put(10, 340) { \makebox(50, 10)[l]{method} }
-\put(20, 117.5) { \line(0, 1){212.5} }
-\put(20, 117.5) { \vector(1, 0){15} }
-\put(20, 257.5) { \vector(1, 0){15} }
-\put(20, 307.5) { \vector(1, 0){15} }
-%
-\put(40, 285) { \framebox(430, 45)\hss }
-\put(50, 315) { \makebox(65, 10)[l]{ diagnose } }
-\put(90, 295) { \makebox(50, 10)[l]{ $\ldots$ } }
-%
-\put(40, 235) { \framebox(430, 45)\hss }
-\put(50, 265) { \makebox(63, 10)[l]{ optimize } }
-\put(90, 245) { \makebox(50, 10)[l]{ $\ldots$ } }
-%
-\put(40, 5) { \framebox(430, 225)\hss }
-\put(50, 215) { \makebox(55, 10)[l]{sample} }
-\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
-%
-\put(80, 140) { \framebox(380, 45)\hss }
-\put(90, 170) { \makebox(55, 10)[l]{adapt} }
-\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
-%
-\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
-\put(100, 37.5) { \line(0, 1){70} }
-\put(100, 87.5) { \vector(1, 0){15} }
-\put(100, 37.5) { \vector(1, 0){15} }
-%
-\put(120, 65) { \framebox(340, 45)\hss }
-\put(130, 95) { \makebox(55, 10)[l]{hmc} }
-\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
-%
-\put(120, 15) { \framebox(340, 45)\hss }
-\put(130, 45) { \makebox(115, 10)[l]{nuts} }
-\put(170, 25) { \makebox(50, 10)[l]{ $\ldots$ } }
-\end{picture}
-\caption{\small\it In the hierarchical argument structure, certain
-  arguments, such as \code{random} and \code{output}, introduce new
-  categories of arguments.  Categorical arguments may also
-  appear as values of other arguments, such as \code{diagnose},
-  \code{optimize}, and \code{sample}, which define the mutually
-  exclusive values for the argument \code{method}. }%
-\label{hierarchy.figure}
-\end{figure}
-
-\begin{figure}
-\setlength{\unitlength}{0.01in}
-%\centering
-\begin{picture}(480, 480)
-%
-\small\tt
-\put(10, 460) { \makebox(50, 10)[l]{id, data, init} }
-%
-\put(0, 410){ \framebox(470, 45) \hss}
-\put(10, 440) { \makebox(50, 10)[l]{random} }
-\put(50, 420) { \makebox(50, 10)[l]{seed} }
-%
-\put(0, 360) { \framebox(470, 45)\hss }
-\put(10, 390) { \makebox(65, 10)[l]{output} }
-\put(50, 370) { \makebox(450, 10)[l]{file, diagnostic\_file, ...} }  % refresh, ...
-%
-\put(10, 340) { \makebox(50, 10)[l]{method} }
-\put(20, 117.5) { \line(0, 1){212.5} }
-\put(20, 117.5) { \vector(1, 0){15} }
-\put(20, 257.5) { \color{gray!30}\vector(1, 0){15} }
-\put(20, 307.5) { \color{gray!30}\vector(1, 0){15} }
-%
-\put(40, 285) { \color{gray!30}\framebox(430, 45)\hss }
-\put(50, 315) { \makebox(65, 10)[l]{ \textcolor{gray!30}{diagnose} } }
-\put(90, 295) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
-%
-\put(40, 235) { \color{gray!30}\framebox(430, 45)\hss }
-\put(50, 265) { \makebox(63, 10)[l]{ \textcolor{gray!30}{optimize} } }
-\put(90, 245) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
-%
-\put(40, 5) { \framebox(430, 225)\hss }
-\put(50, 215) { \makebox(55, 10)[l]{sample} }
-\put(90, 195) { \makebox(350, 10)[l]{num\_samples, num\_warmup, save\_warmup, thin} }
-%
-\put(80, 140) { \framebox(370, 45)\hss }
-\put(90, 170) { \makebox(55, 10)[l]{adapt} }
-\put(130, 150) { \makebox(50, 10)[l]{$\ldots$} }
-%
-\put(90, 120) { \makebox(55, 10)[l]{algorithm} }
-\put(100, 37.5) { \color{gray!30}\line(0, 1){70} }
-\put(100, 87.5) { \line(0, 1){20} }
-\put(100, 87.5) { \vector(1, 0){15} }
-\put(100, 37.5) { \color{gray!30}\vector(1, 0){15} }
-%
-\put(120, 65) { \framebox(330, 45)\hss }
-\put(130, 95) { \makebox(55, 10)[l]{hmc} }
-\put(170, 75) { \makebox(50, 10)[l]{$\ldots$} }
-%
-\put(120, 15){ \color{gray!30}\framebox(330, 45)\hss }
-\put(130, 45) { \makebox(95, 10)[l]{ \textcolor{gray!30}{nuts} } }
-\put(170, 25) { \makebox(50, 10)[l]{ \textcolor{gray!30}{$\ldots$} } }
-\end{picture}
-\caption{\small\it A valid argument configuration defines only one
-    mutually exclusive argument.  If conflicting arguments are
-    specified, for example \code{method=optimize method=sample}, then
-    execution immediately terminates with a warning
-    message.}\label{configuration.figure}
-\end{figure}
-
-Note that any valid argument configuration must either specify a method
-or a help request.
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+./my_model method=sample help-all
+\end{Verbatim}
+\end{quote}
 
 \subsection{Method}
 
 All commands other than \code{help} must include at least one
 method, specified explicitly as \code{method=\farg{method\_name}} or
-implicitly with only \farg{method\_name}.  Currently \CmdStan supports
+implicitly with only \farg{method\_name}.  Currently CmdStan supports
 the following methods:
 %
 \begin{center}
@@ -424,46 +328,11 @@ the following methods:
 {\tt variational} &  fit variational approximation (experimental)
 \\
 {\tt diagnose} &  diagnose models
+\\
+{\tt generate\_quantities}  &generate quantities of interest
 \end{tabular}
 \end{center}
 %
-All remaining configurations are optional, with default values
-provided for all arguments not explicitly specified.
-
-\subsection{Help}
-
-Informative output can be retrieved either globally, by requesting help
-at the top-level, or locally, by requesting help deeper into the hierarchy.
-Note that after any help has been displayed the execution immediately
-terminates, even if a method has been specified.
-
-\subsubsection{Top-Level Help}
-
-If \code{help} is specified as the only argument then a usage message is
-displayed.  Similarly, specifying \code{help\_all} by itself displays the entire
-argument hierarchy.
-
-\subsubsection{Context-Sensitive Help}
-
-Specifying \code{help} after any argument displays a description and
-valid options for that argument.  For example,
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-./my_model sample help
-\end{Verbatim}
-\end{quote}
-%
-provides the top-level options for the \code{sample} method.
-
-Detailed information on the argument, and all arguments deriving
-from it, can accessed by specifying \code{help-all} instead,
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-./my_model sample help-all
-\end{Verbatim}
-\end{quote}
 
 \section{Full Argument Hierarchy}\label{detailed-command-arguments.section}
 
@@ -494,14 +363,14 @@ Categorical arguments that appear as values to other arguments; displays all val
 
 \subsection{Top-Level Method Argument}
 
-Every command must have exactly one method specified as the very first
-argument.  The value type of \code{list element} means that the valid
+Every command must have exactly one method specified.
+The value type of \code{list element} means that the valid
 values are enumerated as a list.
 
 \begin{description}
 \hiercmdarg{}{method}{$$list element$$}
   {Analysis method (Note that \code{method=} is optional)}
-  {Valid values: \  \code{sample, optimize, variational, diagnose}}
+  {Valid values: \  \code{sample, optimize, variational, diagnose, generate\_quantities}}
   {Defaults to \code{sample}}
 \end{description}
 
@@ -817,7 +686,7 @@ adaptation enabled without specifying a stepsize is
 
 \begin{quote}
   \begin{Verbatim}[fontshape=sl]
-    > ./model sample algorithm=hmc  \
+    > ./model method=sample algorithm=hmc  \
               metric_file=model.metric.data.R  \
               data file=model.data.R init=model.init.R
   \end{Verbatim}
@@ -831,7 +700,7 @@ and \code{stepsize} with adaptation disabled is
 
 \begin{quote}
   \begin{Verbatim}[fontshape=sl]
-    > ./model sample adapt engaged=0 algorithm=hmc  \
+    > ./model method=sample adapt engaged=0 algorithm=hmc  \
               metric_file=model.metric.data.R  \
               stepsize=0.1 data file=model.data.R  \
               init=model.init.R
@@ -923,7 +792,7 @@ The following options are for the (L-)BFGS optimizer. L-BFGS is the default
 optimizer and also much faster than the other optimizers.
 
 Convergence monitoring in (L-)BFGS is controlled by a number of tolerance
-values, any one of which being satisified causes the algorithm to
+values, any one of which being satisfied causes the algorithm to
 terminate with a solution.
 %
 \begin{itemize}
@@ -1131,7 +1000,7 @@ configuration.
 % optimizer and also much faster than the other optimizers.
 
 % Convergence monitoring in (L-)BFGS is controlled by a number of tolerance
-% values, any one of which being satisified causes the algorithm to
+% values, any one of which being satisfied causes the algorithm to
 % terminate with a solution.
 
 \subsection{Diagnostic-Specific Arguments}
@@ -1140,7 +1009,7 @@ The following arguments are specific to diagnostics.  As of now, the
 only diagnostic is gradients of the log probability function.
 
 \begin{description}
-
+%
   \hierlongcmd{\indentarrow}{\farg{\bfseries diagnose}}
     {Model diagnostics}
     {Valid subarguments: \code{test}}
@@ -1165,6 +1034,28 @@ only diagnostic is gradients of the log probability function.
 	   {Defaults to \code{1e-6}}
 %
 \end{description}
+
+\subsection{Generate\_quantities-Specific Arguments}
+
+The following arguments are for the top-level method \code
+{generate\_quantities}.
+They specify the parameter values used to generate additional quantities of interest
+from the model conditioned on the data.
+
+\begin{description}
+%
+  \hierlongcmd{\indentarrow}{\farg{\bfseries generate\_quantities}}
+    {Generate quantities of interest using sample of fitted parameter values}
+    {Valid subarguments: \code{fitted\_params}}
+%
+    \hiercmdarg{\indentarrow\indentarrow}{fitted\_params}{$$string$$}
+      {Input file of sample of fitted parameter values for model conditioned on data}
+      {Valid values: \ Path to existing file}
+      {Defaults to empty path}
+%
+\end{description}
+
+
 
 \subsection{General-Purpose Arguments}
 
@@ -1206,7 +1097,7 @@ generated quantities are ignored.
 \begin{description}
 \hiercmdarg{}{init}{$$string$$}
   {Initialization method: \\
-        \hspace*{8pt} $\bullet$ \ real number $\mbox{\farg{x}} > 0$ initializes randomly bewteen [-\farg{x},
+        \hspace*{8pt} $\bullet$ \ real number $\mbox{\farg{x}} > 0$ initializes randomly between [-\farg{x},
         \farg{x}];
         \\
         \hspace*{8pt} $\bullet$ \  \code{0} initializes to 0;
@@ -1254,44 +1145,12 @@ generated quantities are ignored.
     {Defaults to empty path}
 %
   \hiercmdarg{\indentarrow}{refresh}{$$int$$}
-    {Number of interations between screen updates}
+    {Number of iterations between screen updates}
     {Valid values: \  $0 < \mbox{\code{refresh}}$}
     {Defaults to \code{100}}
 %
 \end{description}
 
-\section{Command-Line Option Examples}
-
-The hierarchical structure of the command-line options can be
-intimidating, and here we provide an example workflow to help ease the
-introduction to new users, especially those used to Stan 1.3 or
-earlier releases.  The examples in this section are for Mac OS and
-Linux; on Windows, just remove the \code{./} before the executable and
-change the line-continuation character from Unix's
-\code{\textbackslash} to DOS's \code{\textasciicircum}.  As in
-previous sections, the indentation on continued lines is for
-pedagogical purposes only and does not convey any content to the
-executable.
-
-Let's say that we've just built our model, \code{model}, and are ready to run.
-We begin by specifying data and init files,
-%
-\begin{quote}
-\begin{Verbatim}[fontshape=sl]
-> ./model data file=model.data.R init=model.init.R
-\end{Verbatim}
-\end{quote}
-%
-but our model doesn't run.  Instead, the above command prints
-%
-\begin{quote}
-\begin{Verbatim}
-A method must be specified!
-Failed to parse arguments, terminating Stan
-\end{Verbatim}
-\end{quote}
-%
-The problem is that we forgot to specify a method.
 
 All Stan arguments have default values, except for the method.  This
 is the only argument that must be specified by the user and a model
@@ -1732,7 +1591,7 @@ interdependence.
 
 \subsection{Optimization Templates}
 %
-\CmdStan supports several optimizers.  These share many of their
+CmdStan supports several optimizers.  These share many of their
 configuration options with the samplers.  The default optimizer is the
 the limited memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) method;
 \cite{NocedalWright:2006} contains an excellent overview of both the
@@ -1829,7 +1688,7 @@ having a stepsize argument, the skeleton for Newton's method shown in
 
 \subsection{Variational Inference Templates}
 %
-\CmdStan implements Automatic Differentiation Variational Inference
+CmdStan implements Automatic Differentiation Variational Inference
 \citep{Kucukelbir:2015}. The command skeleton for the \code{meanfield}
 algorithm is in \reffigure{meanfield-command}. The command skeleton for the
 \code{fullrank} algorithm is in \reffigure{fullrank-command}.
@@ -1919,5 +1778,29 @@ simple, and shown in \reffigure{diagnostic-command}.
   arguments and their default values are described in detail in
   \refsection{detailed-command-arguments}.}
 \label{diagnostic-command.figure}
+\end{figure}
+
+
+\subsection{Generate\_quantities Command Skeleton}
+
+The \code{generate\_quantities} method can be used to generate
+additional quantities of interest from the model conditioned on the data.
+The data used to fit the model should be specified as part of the command.
+
+%
+\begin{figure}
+\begin{quote}
+\begin{Verbatim}[fontshape=sl,fontsize=\small]
+> ./my_model generate\_quantities                  \
+                 [fitted\_params=<string>]       \
+             [data file=<string>]      \
+             [random seed=<int>]       \
+\end{Verbatim}
+\end{quote}
+\caption{\small\it Command skeleton for generating new quantities of interest
+from a set of fitted parameter values using \code{method=generate\_quantities}.  All
+  arguments and their default values are described in detail in
+  \refsection{detailed-command-arguments}.}
+\label{generate-quantities-command.figure}
 \end{figure}
 
