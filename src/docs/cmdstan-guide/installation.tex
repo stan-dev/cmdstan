@@ -620,17 +620,16 @@ passing interface (MPI).
     different machines. Please refer to
     \url{https://github.com/stan-dev/math/wiki/MPI-Parallelism} for
     more details.
-  \item[OpenCL] in \CmdStan enables Cholesky decompositions to utilize a GPU
-   for large parallel computations. Please refer to
-   \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for setup
-   instructions.
 \end{description}
 %
 The within-chain parallelization for threading and MPI is used in the Stan
 language to parallelize the evaluation of the \Verb|map_rect| command. Note that
 MPI parallelism will take precendence in case both features are
-enabled. Currently, OpenCL will only pass matrices over to the GPU if their
-dimensions are larger than 1250x1250.
+enabled.
+
+\subsection{OpenCL}
+
+OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. Please refer to \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for setup instructions. Currently, OpenCL will only pass matrices over to the GPU if their dimensions are larger than 1250x1250.
 
 \section{Optional Components for Developers}
 
