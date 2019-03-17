@@ -93,23 +93,6 @@ pipeline {
                         }
                     }
                 }
-                stage('Non-windows interface tests with OpenCL') {
-                    agent { label 'gpu' }
-                    steps {
-                        setupCXX()
-                        sh "echo STAN_OPENCL=true>> make/local"
-                        sh "echo OPENCL_PLATFORM_ID=0>> make/local"
-                        sh "echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID}>> make/local"
-                        sh runTests("./")
-                    }
-                    post {
-                        always {
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-                            deleteDir()
-                        }
-                    }
-                }
             }
         }
     }
