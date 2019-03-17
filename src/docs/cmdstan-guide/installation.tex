@@ -629,7 +629,26 @@ enabled.
 
 \subsection{OpenCL}
 
-OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. Please refer to \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for setup instructions. Currently, OpenCL will only pass matrices over to the GPU if their dimensions are larger than 1250x1250.
+OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. In order to use OpenCL, a few lines need to be added to \code{make/local}. 
+\begin{itemize}
+  \item \Verb|STAN_OPENCL=true| Enable the use of OpenCL.
+  \item \Verb|OPENCL_PLATFORM_ID=<int>| Set which OpenCL platform to use.  
+  \item \Verb|OPENCL_DEVICE_ID=<int>| Set which OpenCL device on the selected platform to use.
+\end{itemize}
+
+Windows users need to additionally specify the following two flags depending on the GPU you are running OpenCL on.
+
+\subsubsection{NVIDIA GPU}
+\begin{itemize}
+  \item \Verb|LDFLAGS_OPENCL= -L"\$(CUDA_PATH)\lib\x64" -lOpenCL|
+\end{itemize}
+
+\subsubsection{AMD GPU}
+\begin{itemize}
+  \item \Verb|LDFLAGS_OPENCL= -L"\$(AMDAPPSDKROOT)lib\x86_64" -lOpenCL|
+\end{itemize}
+
+If you are unsure if your devices support OpenCL, we suggest running the \code{clinfo} application that lists all available OpenCL supported devices. Please refer to \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for additional setup instructions. Currently, OpenCL will only pass matrices over to the GPU if their dimensions are larger than $1250\times 1250$.
 
 \section{Optional Components for Developers}
 
