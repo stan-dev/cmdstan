@@ -604,8 +604,7 @@ computations which ensure that divergent transitions are reported:
 \section{Optional Parallelization Support}
 
 \CmdStan has optional support for within-chain parallelization using
-threading and OpenCL or multiple processes which are linked via the message
-passing interface (MPI).
+threading, OpenCL, or MPI (Message Passing Interface).
 
 \subsection{Threading and MPI}
 %
@@ -616,7 +615,7 @@ passing interface (MPI).
     instructions on how to setup threading.
   \item[MPI] is typically used on large computing clusters. The MPI
     standard allows to link together a large number of processes which
-    can run locally on the same and/or accross potentially many
+    can run locally on one machine or across many
     different machines. Please refer to
     \url{https://github.com/stan-dev/math/wiki/MPI-Parallelism} for
     more details.
@@ -629,10 +628,10 @@ enabled.
 
 \subsection{OpenCL}
 
-OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. In order to use OpenCL, a few lines need to be added to \code{make/local}. 
+OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. In order to use OpenCL, a few lines need to be added to \code{make/local}.
 \begin{itemize}
   \item \Verb|STAN_OPENCL=true| Enable the use of OpenCL.
-  \item \Verb|OPENCL_PLATFORM_ID=<int>| Set which OpenCL platform to use.  
+  \item \Verb|OPENCL_PLATFORM_ID=<int>| Set which OpenCL platform to use.
   \item \Verb|OPENCL_DEVICE_ID=<int>| Set which OpenCL device on the selected platform to use.
 \end{itemize}
 
