@@ -118,7 +118,8 @@ int main(int argc, const char* argv[]) {
         }
       }
     }
-    // write sample - add last column 
+    // write sample - add last column
+    // get row from sample, convert to 
     // chain_ids.emplace_back(stan_csv.metadata.chain_id);
     // seeds.emplace_back(stan_csv.metadata.seed);
     // draws_per_chain.emplace_back(rows in sample);
