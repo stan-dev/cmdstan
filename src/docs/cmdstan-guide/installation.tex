@@ -20,8 +20,7 @@ on the compiler and linker.
 %
 \begin{itemize}
 \item Linux (Debian, Ubuntu, Red Hat)
-\item Mac OS X (10.10 ``Yosemite,'' 10.9 ``Mavericks,'' 10.8
-  ``Mountain Lion,'' 10.7 ``Lion,'' and 10.6 ``Snow Leopard'')
+\item Mac OS X (from 10.6 ``Snow Leopard''  through 10.14 ``Mojave'')
 \item Windows (XP, 7, 8).
 \end{itemize}
 %
@@ -71,7 +70,7 @@ algorithms are in the Stan library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org/stan.html}
 \item License: BSD
-\item Tested Version: 2.18.1
+\item Tested Version: 2.19.0
 \end{itemize}
 %
 The Stan source code is distributed with \CmdStan.
@@ -85,7 +84,7 @@ Library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org}
 \item License: BSD
-\item Tested Version: 2.18.1
+\item Tested Version: 2.19.0
 \end{itemize}
 %
 The Stan Math Library source code is distributed with \CmdStan
@@ -99,7 +98,7 @@ Library.
 \begin{itemize}
 \item Home: \url{http://www.boost.org/users/license.html}
 \item License: Boost Software License
-\item Tested Version: 1.58.0
+\item Tested Version: 1.69.0
 \end{itemize}
 %
 The Boost source code is distributed with \CmdStan.
@@ -113,7 +112,7 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.2.4
+\item Tested Version: 3.3.3
 \end{itemize}
 %
 The Eigen source code is distributed with \CmdStan.
@@ -296,7 +295,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.18.1.tar.gz 
+> tar --no-same-owner -xzf cmdstan-2.19.0.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -450,7 +449,7 @@ with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.18.1.tar.gz
+> tar -xzf cmdstan-2.19.0.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -519,10 +518,10 @@ versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the Stan source
-    directory. The default is \Verb|STAN=stan_2.18.1/|. Note: the
+    directory. The default is \Verb|STAN=stan_2.19.0/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.18.1/|.
+    default is \Verb|MATH=stan/l../stan_math_2.19.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
     \Verb|lib/boost_1.66.0/| folder within \Verb|MATH|.
@@ -604,8 +603,9 @@ computations which ensure that divergent transitions are reported:
 \section{Optional Parallelization Support}
 
 \CmdStan has optional support for within-chain parallelization using
-threads or multiple processes which are linked via the message passing
-interface (MPI).
+threading, OpenCL, or MPI (Message Passing Interface).
+
+\subsection{Threading and MPI}
 %
 \begin{description}
   \item[Threads] can utilize multiple cores on a single
@@ -614,16 +614,39 @@ interface (MPI).
     instructions on how to setup threading.
   \item[MPI] is typically used on large computing clusters. The MPI
     standard allows to link together a large number of processes which
-    can run locally on the same and/or accross potentially many
+    can run locally on one machine or across many
     different machines. Please refer to
     \url{https://github.com/stan-dev/math/wiki/MPI-Parallelism} for
     more details.
 \end{description}
 %
-The within-chain parallelization is used in the Stan language to
-parallelize the evaluation of the \Verb|map_rect| command. Note that
+The within-chain parallelization for threading and MPI is used in the Stan
+language to parallelize the evaluation of the \Verb|map_rect| command. Note that
 MPI parallelism will take precendence in case both features are
 enabled.
+
+\subsection{OpenCL}
+
+OpenCL in \CmdStan enables Cholesky decompositions to utilize a GPU for large parallel computations. In order to use OpenCL, a few lines need to be added to \code{make/local}.
+\begin{itemize}
+  \item \Verb|STAN_OPENCL=true| Enable the use of OpenCL.
+  \item \Verb|OPENCL_PLATFORM_ID=<int>| Set which OpenCL platform to use.
+  \item \Verb|OPENCL_DEVICE_ID=<int>| Set which OpenCL device on the selected platform to use.
+\end{itemize}
+
+Windows users need to additionally specify the following two flags depending on the GPU you are running OpenCL on.
+
+\subsubsection{NVIDIA GPU}
+\begin{itemize}
+  \item \Verb|LDFLAGS_OPENCL= -L"\$(CUDA_PATH)\lib\x64" -lOpenCL|
+\end{itemize}
+
+\subsubsection{AMD GPU}
+\begin{itemize}
+  \item \Verb|LDFLAGS_OPENCL= -L"\$(AMDAPPSDKROOT)lib\x86_64" -lOpenCL|
+\end{itemize}
+
+If you are unsure if your devices support OpenCL, we suggest running the \code{clinfo} application that lists all available OpenCL supported devices. Please refer to \url{https://github.com/stan-dev/math/wiki/OpenCL-GPU-Routines} for additional setup instructions. Currently, OpenCL will only pass matrices over to the GPU if their dimensions are larger than $1250\times 1250$.
 
 \section{Optional Components for Developers}
 
@@ -680,7 +703,7 @@ Home: \url{http://code.google.com/p/googletest/}
 \item
 License: BSD
 \item
-Tested Version(s): 1.7.0
+Tested Version(s): 1.8.1
 \end{itemize}
 %
 The Google Test framework is distributed with Stan.
