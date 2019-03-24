@@ -11,6 +11,20 @@
 #include <iomanip>
 #include <ios>
 
+void write_chain_config(stan::callbacks::stream_writer &writer,
+                        const std::string &label,
+                        const std::vector<size_t> &chain_config) {
+  std::stringstream ss;
+  ss << label;
+  for (size_t i = 0; i < chain_config.size(); ++i) {
+    ss << chain_config[i];
+    if (i < chain_config.size() - 1)
+      ss << ", ";
+  }
+  writer(ss.str());
+}  
+
+
 void collate_usage() {
   std::cout << "USAGE:  collate <options> <filename 1> [<filename 2> ... <filename N>]"
             << std::endl
@@ -77,7 +91,8 @@ int main(int argc, const char* argv[]) {
   // per-chain info
   std::vector<size_t> chain_ids;
   std::vector<size_t> seeds;
-  std::vector<size_t> draws_per_chain;
+  std::vector<size_t> draws;
+  std::vector<size_t> treedepths;
 
   // global info - must match across all sample files
   std::string model;
@@ -92,6 +107,11 @@ int main(int argc, const char* argv[]) {
       model = stan_csv.metadata.model;
       cmdstan::write_stan(collate_writer);
       cmdstan::write_model(collate_writer, model);
+      // diagnose utility needs treedepth
+      ss.str(std::string());
+      ss << " max_depth = " << stan_csv.metadata.max_depth;
+      collate_writer(ss.str());
+      treedepths.emplace_back(stan_csv.metadata.max_depth);
 
       for (size_t i = 0; i < stan_csv.header.size(); ++i) {
         model_headers.emplace_back(stan_csv.header[i]);
@@ -130,9 +150,10 @@ int main(int argc, const char* argv[]) {
     }
     chain_ids.emplace_back(stan_csv.metadata.chain_id);
     seeds.emplace_back(stan_csv.metadata.seed);
-    draws_per_chain.emplace_back(stan_csv.samples.rows());
+    draws.emplace_back(stan_csv.samples.rows());
+    treedepths.emplace_back(stan_csv.metadata.max_depth);
 
-    // write sample - add last column
+    // write sample
     for (size_t i = 0; i < stan_csv.samples.rows(); ++i) {
       Eigen::RowVectorXd rv;
       rv = stan_csv.samples.row(i);
@@ -142,31 +163,11 @@ int main(int argc, const char* argv[]) {
       cmdstan::write_draw(collate_writer, draw);
     }
   }
-  ss.str(std::string());
-  ss << "chain_ids: ";
-  for (size_t i = 0; i < chain_ids.size(); ++i) {
-    ss << chain_ids[i];
-    if (i < chain_ids.size() - 1)
-      ss << ", ";
-  }
-  collate_writer(ss.str());
-  ss.str(std::string());
-  ss << "chain_draws: ";
-  for (size_t i = 0; i < draws_per_chain.size(); ++i) {
-    ss << draws_per_chain[i];
-    if (i < draws_per_chain.size() - 1)
-      ss << ", ";
-  }
-  collate_writer(ss.str());
-  ss.str(std::string());
-  ss << "chain_seeds: ";
-  for (size_t i = 0; i < seeds.size(); ++i) {
-    ss << seeds[i];
-    if (i < seeds.size() - 1)
-      ss << ", ";
-  }
-  collate_writer(ss.str());
-  
+  write_chain_config(collate_writer, "chain_ids: ", chain_ids);
+  write_chain_config(collate_writer, "chain_draws: ", draws);
+  write_chain_config(collate_writer, "chain_seeds: ", seeds);
+  write_chain_config(collate_writer, "chain_max_treedepth: ", treedepths);
+
   output_stream.close();
   return 0;
 }

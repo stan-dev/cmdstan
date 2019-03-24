@@ -13,7 +13,6 @@ using cmdstan::test::run_command_output;
 class CmdStan : public testing::Test {
 public:
   void SetUp() {
-    std::string path_separator;
     path_separator.push_back(get_path_separator());
     command = "bin" + path_separator + "collate";
     test_dir = { "src", "test", "test-models"};
@@ -23,6 +22,7 @@ public:
     data_file_path = {"src", "test", "test-models", "gq_model.data.json"};
   }
 
+  std::string path_separator;
   std::string command;
   std::vector<std::string> test_dir;
   std::vector<std::string> null_output_file_path;
@@ -267,4 +267,36 @@ TEST_F(CmdStan, collate_generate) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+}
+
+TEST_F(CmdStan, collate_diagnose) {
+  std::stringstream ss;
+  std::string csv_out = convert_model_path(output_file_path);
+
+  std::vector<std::string> input_path = { "src",
+                                          "test",
+                                          "interface",
+                                          "example_output", 
+                                          "corr_gauss_output_depth8.csv" };
+  ss << command << " --collate_csv_file=" << csv_out
+     << " " << convert_model_path(input_path);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+
+  ASSERT_FALSE(out.hasError);
+  EXPECT_EQ(out.output, "");
+
+  ss.str(std::string());
+  ss << "bin" << path_separator << "diagnose" << " " << csv_out;
+  cmd = ss.str();
+  run_command_output out1 = run_command(cmd);
+  ASSERT_FALSE(out1.hasError);
+
+  ss.str(std::string());
+  ss << "bin" << path_separator << "diagnose" << " " << convert_model_path(input_path);
+  cmd = ss.str();
+  run_command_output out2 = run_command(cmd);
+  ASSERT_FALSE(out2.hasError);
+
+  EXPECT_EQ(out1.output, out2.output);
 }
