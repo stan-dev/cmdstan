@@ -78,6 +78,88 @@ TEST_F(CmdStan, collate_good_2) {
   EXPECT_EQ(stan_csv.samples.rows(), num_draws);
 }
 
+TEST_F(CmdStan, collate_good_3) {
+  std::stringstream ss;
+  std::string csv_out = convert_model_path(output_file_path);
+  ss << command << " --collate_csv_file=" << csv_out;
+
+  std::ifstream ifstream;
+  std::vector<std::string> input_path(test_dir);
+  stan::io::stan_csv stan_csv;
+  size_t num_draws = 0;
+  std::vector<size_t> draws_per_chain;
+  
+  input_path.emplace_back("bernoulli_1.csv");
+  std::string csv_in = convert_model_path(input_path);
+  ss << " " << csv_in;
+  ifstream.open(csv_in.c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  ifstream.close();
+  num_draws += stan_csv.samples.rows();
+  draws_per_chain.emplace_back(stan_csv.samples.rows());
+  
+  input_path[input_path.size() - 1] =  "bernoulli_2.csv";
+  csv_in = convert_model_path(input_path);
+  ss << " " << csv_in;
+  ifstream.open(csv_in.c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  ifstream.close();
+  num_draws += stan_csv.samples.rows();
+  draws_per_chain.emplace_back(stan_csv.samples.rows());
+  
+  input_path[input_path.size() - 1] =  "bernoulli_3.csv";
+  csv_in = convert_model_path(input_path);
+  ss << " " << csv_in;
+  ifstream.open(csv_in.c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  ifstream.close();
+  num_draws += stan_csv.samples.rows();
+  draws_per_chain.emplace_back(stan_csv.samples.rows());
+  
+  input_path[input_path.size() - 1] =  "bernoulli_4.csv";
+  csv_in = convert_model_path(input_path);
+  ss << " " << csv_in;
+  ifstream.open(csv_in.c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  ifstream.close();
+  num_draws += stan_csv.samples.rows();
+  draws_per_chain.emplace_back(stan_csv.samples.rows());
+  
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+  EXPECT_EQ(out.output, "");
+
+  ifstream.open(csv_out.c_str());
+  stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  ifstream.close();
+  EXPECT_EQ(stan_csv.samples.rows(), num_draws);
+
+  ifstream.open(csv_out.c_str());
+  std::string line;
+  // comments
+  while (ifstream.peek() == '#')
+    std::getline(ifstream, line);
+  // header
+  while (ifstream.peek() != '#')
+    std::getline(ifstream, line);
+  // adaptation
+  while (ifstream.peek() == '#')
+    std::getline(ifstream, line);
+  // sample
+  while (ifstream.peek() != '#')
+    std::getline(ifstream, line);
+
+  // chain ids
+  std::getline(ifstream, line);
+  EXPECT_EQ(line, "# chain_ids: 1, 2, 3, 4");
+
+  // chain draws
+  std::getline(ifstream, line);
+  EXPECT_EQ(line, "# chain_draws: 500, 500, 100, 5");
+  ifstream.close();
+}
+
 TEST_F(CmdStan, collate_bad_1) {
   std::stringstream ss;
   std::vector<std::string> input_path(test_dir);
