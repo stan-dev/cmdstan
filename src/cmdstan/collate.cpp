@@ -72,6 +72,7 @@ int main(int argc, const char* argv[]) {
   std::fstream output_stream(collate_filename.c_str(),
                              std::fstream::out);
   stan::callbacks::stream_writer collate_writer(output_stream, "# ");
+  std::stringstream ss;
 
   // per-chain info
   std::vector<size_t> chain_ids;
@@ -96,6 +97,19 @@ int main(int argc, const char* argv[]) {
       }
       model_headers.emplace_back("chain_id__");
       cmdstan::write_header(collate_writer, model_headers);
+      collate_writer("Adaptation metric chain 1");
+      collate_writer("Adaptation terminated");
+      ss.str(std::string());
+      ss << "Step size = " << stan_csv.adaptation.step_size;
+      collate_writer(ss.str());
+      collate_writer("Diagonal elements of inverse mass matrix:");
+      ss.str(std::string());
+      for (size_t i = 0; i < stan_csv.adaptation.metric.size(); ++i) {
+        ss << stan_csv.adaptation.metric(i);
+        if (i < stan_csv.adaptation.metric.size() - 1)
+          ss << ", ";
+      }
+      collate_writer(ss.str());
     } else {
       if (model.compare(stan_csv.metadata.model) != 0) {
         std::cout << "Error, file: " << filenames[chain]
@@ -137,7 +151,7 @@ int main(int argc, const char* argv[]) {
       cmdstan::write_draw(collate_writer, draw);
     }
   }
-  std::stringstream ss;
+  ss.str(std::string());
   ss << "chain_ids: ";
   for (size_t i = 0; i < chain_ids.size(); ++i) {
     ss << chain_ids[i];

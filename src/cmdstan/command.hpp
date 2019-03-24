@@ -177,23 +177,13 @@ namespace cmdstan {
         msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
         throw std::invalid_argument(msg.str());
       }
-      stan::io::stan_csv fitted_params;
-      std::stringstream msg;
-      stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata, &msg);
-      if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header, &msg)) {
-        msg << "Error reading fitted param names from sample csv file \"" << fname << "\"" << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
-      stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation, &msg);
-      fitted_params.timing.warmup = 0;
-      fitted_params.timing.sampling = 0;
-      stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples, fitted_params.timing, &msg);
+      stan::io::stan_csv fitted_params = stan::io::stan_csv_reader::parse(stream, &std::cout);
       stream.close();
 
       std::vector<std::string> param_names;
       model.constrained_param_names(param_names, false, false);
       size_t num_cols = param_names.size();
-      size_t num_rows = fitted_params.metadata.num_samples;
+      size_t num_rows = fitted_params.samples.rows();
 
       // check that all parameter names are in sample, in order
       if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
