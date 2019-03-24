@@ -19,12 +19,16 @@ public:
     test_dir = { "src", "test", "test-models"};
     null_output_file_path = { "/dev", "null"};
     output_file_path = { "test", "collated.csv"};
+    model_path = {"src", "test", "test-models", "gq_model"};
+    data_file_path = {"src", "test", "test-models", "gq_model.data.json"};
   }
 
   std::string command;
   std::vector<std::string> test_dir;
   std::vector<std::string> null_output_file_path;
   std::vector<std::string> output_file_path;
+  std::vector<std::string> model_path;
+  std::vector<std::string> data_file_path;
 };
 
 
@@ -185,7 +189,7 @@ TEST_F(CmdStan, collate_bad_2) {
   csv_in = convert_model_path(input_path);
   ss << " " << csv_in;
   
-  input_path[input_path.size() - 1] =  "proper.csv";
+  input_path[input_path.size() - 1] =  "collate_bad_model.csv";
   csv_in = convert_model_path(input_path);
   ss << " " << csv_in;
   
@@ -193,7 +197,7 @@ TEST_F(CmdStan, collate_bad_2) {
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
   EXPECT_EQ(out.output,
-            "Error, file: src/test/test-models/proper.csv, expecting sample from model bernoulli_model, found sample from model proper_model, exiting.\n");
+            "Error, file: src/test/test-models/collate_bad_model.csv, expecting sample from model bernoulli_model, found sample from model proper_model, exiting.\n");
 }
 
 TEST_F(CmdStan, collate_bad_3) {
@@ -238,4 +242,29 @@ TEST_F(CmdStan, collate_bad_4) {
   ASSERT_TRUE(out.hasError);
   EXPECT_EQ(out.output,
             "Error, file: src/test/test-models/collate_bad_columns.csv, wrong number of output columns, expecting 8 columns, found 9 columns, exiting.\n");
+}
+
+
+TEST_F(CmdStan, collate_generate) {
+  std::stringstream ss;
+  std::string csv_out = convert_model_path(output_file_path);
+
+  std::vector<std::string> input_path(test_dir);
+  input_path.emplace_back("bernoulli_*.csv");
+  ss << command << " --collate_csv_file=" << csv_out
+     << " " << convert_model_path(input_path);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+
+  ASSERT_FALSE(out.hasError);
+  EXPECT_EQ(out.output, "");
+
+  ss.str(std::string());
+  ss << convert_model_path(model_path)
+     << " data file=" << convert_model_path(data_file_path)
+     << " output file=" << convert_model_path(null_output_file_path)
+     << " method=generate_quantities fitted_params=" << csv_out;
+  cmd = ss.str();
+  out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
 }
