@@ -94,7 +94,7 @@ int main(int argc, const char* argv[]) {
       for (size_t i = 0; i < stan_csv.header.size(); ++i) {
         model_headers.emplace_back(stan_csv.header[i]);
       }
-      model_headers.emplace_back("chain");
+      model_headers.emplace_back("chain_id__");
       cmdstan::write_header(collate_writer, model_headers);
     } else {
       if (model.compare(stan_csv.metadata.model) != 0) {
