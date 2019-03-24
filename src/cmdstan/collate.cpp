@@ -43,7 +43,7 @@ int main(int argc, const char* argv[]) {
   // Parse arguments specifying filenames
   std::ifstream ifstream;
   std::vector<std::string> filenames;
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; ++i) {
 
     if (std::string(argv[i]).find("--collate_csv_file=") != std::string::npos) {
       collate_filename = std::string(argv[i]).substr(19).c_str();
@@ -56,7 +56,6 @@ int main(int argc, const char* argv[]) {
     }
     
     ifstream.open(argv[i]);
-    
     if (ifstream.good()) {
       filenames.push_back(argv[i]);
       ifstream.close();
@@ -74,16 +73,21 @@ int main(int argc, const char* argv[]) {
                              std::fstream::out);
   stan::callbacks::stream_writer collate_writer(output_stream, "# ");
 
+  // per-chain info
+  std::vector<size_t> chain_ids;
+  std::vector<size_t> seeds;
+  std::vector<size_t> draws_per_chain;
+
   // global info - must match across all sample files
   std::string model;
   std::vector<std::string> model_headers;
 
-  for (std::vector<std::string>::size_type chain = 1; 
-       chain < filenames.size(); chain++) {
+  double chain_id = 1;
+  for (size_t chain = 0; chain < filenames.size(); ++chain, ++chain_id) {
     ifstream.open(filenames[chain].c_str());
     stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
     ifstream.close();
-    if (chain == 1) {
+    if (chain == 0) {
       model = stan_csv.metadata.model;
       cmdstan::write_stan(collate_writer);
       cmdstan::write_model(collate_writer, model);
@@ -118,14 +122,46 @@ int main(int argc, const char* argv[]) {
         }
       }
     }
-    // write sample - add last column
-    // get row from sample, convert to 
-    // chain_ids.emplace_back(stan_csv.metadata.chain_id);
-    // seeds.emplace_back(stan_csv.metadata.seed);
-    // draws_per_chain.emplace_back(rows in sample);
-  }
+    chain_ids.emplace_back(stan_csv.metadata.chain_id);
+    seeds.emplace_back(stan_csv.metadata.seed);
+    draws_per_chain.emplace_back(stan_csv.samples.rows());
 
-  // write comments at end - seeds, chain_ids, num_draws
+    // write sample - add last column
+    for (size_t i = 0; i < stan_csv.samples.rows(); ++i) {
+      Eigen::RowVectorXd rv;
+      rv = stan_csv.samples.row(i);
+      std::vector<double> draw;
+      draw.resize(rv.size());
+      Eigen::VectorXd::Map(&draw[0], rv.size()) = rv;
+      draw.emplace_back(stan_csv.metadata.chain_id);
+      cmdstan::write_draw(collate_writer, draw);
+    }
+  }
+  std::stringstream ss;
+  ss << "chain_ids: ";
+  for (size_t i = 0; i < chain_ids.size(); ++i) {
+    ss << chain_ids[i];
+    if (i < chain_ids.size() - 1)
+      ss << ", ";
+  }
+  collate_writer(ss.str());
+  ss.str(std::string());
+  ss << "seeds: ";
+  for (size_t i = 0; i < seeds.size(); ++i) {
+    ss << seeds[i];
+    if (i < seeds.size() - 1)
+      ss << ", ";
+  }
+  collate_writer(ss.str());
+  ss.str(std::string());
+  ss << "draws_per_chain: ";
+  for (size_t i = 0; i < draws_per_chain.size(); ++i) {
+    ss << draws_per_chain[i];
+    if (i < draws_per_chain.size() - 1)
+      ss << ", ";
+  }
+  collate_writer(ss.str());
+  
   output_stream.close();
   return 0;
 }

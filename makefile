@@ -58,6 +58,7 @@ help:
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
+	@echo '    5. Build the collate utility bin/collate$(EXE)'
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make. '
 	@echo '    For 4 cores:'
@@ -151,7 +152,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) bin/collate$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
