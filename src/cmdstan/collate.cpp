@@ -92,11 +92,12 @@ int main(int argc, const char* argv[]) {
       model = stan_csv.metadata.model;
       cmdstan::write_stan(collate_writer);
       cmdstan::write_model(collate_writer, model);
+
       for (size_t i = 0; i < stan_csv.header.size(); ++i) {
         model_headers.emplace_back(stan_csv.header[i]);
       }
-      model_headers.emplace_back("chain_id__");
-      cmdstan::write_header(collate_writer, model_headers);
+      collate_writer(model_headers);
+
       // stan_csv_reader expects adaptation metric as comments - min 4 lines
       collate_writer("Adaptation terminated");
       collate_writer("");
@@ -109,7 +110,7 @@ int main(int argc, const char* argv[]) {
                   << ", exiting." << std::endl;
         return 0;
       }
-      if (model_headers.size() - 1 != stan_csv.header.size()) {
+      if (model_headers.size() != stan_csv.header.size()) {
         std::cout << "Error, file: " << filenames[chain]
                   << ", wrong number of output columns, expecting " << model_headers.size()
                   << " columns, found " << stan_csv.header.size()
@@ -138,7 +139,6 @@ int main(int argc, const char* argv[]) {
       std::vector<double> draw;
       draw.resize(rv.size());
       Eigen::VectorXd::Map(&draw[0], rv.size()) = rv;
-      draw.emplace_back(stan_csv.metadata.chain_id);
       cmdstan::write_draw(collate_writer, draw);
     }
   }
