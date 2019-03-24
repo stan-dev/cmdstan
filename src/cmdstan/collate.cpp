@@ -97,20 +97,11 @@ int main(int argc, const char* argv[]) {
       }
       model_headers.emplace_back("chain_id__");
       cmdstan::write_header(collate_writer, model_headers);
-      collate_writer("Adaptation metric chain 1");
+      // stan_csv_reader expects adaptation metric as comments - min 4 lines
       collate_writer("Adaptation terminated");
-      ss.str(std::string());
-      ss << "Step size = " << stan_csv.adaptation.step_size;
-      collate_writer(ss.str());
-      collate_writer("Diagonal elements of inverse mass matrix:");
-      ss.str(std::string());
-      for (size_t i = 0; i < stan_csv.adaptation.metric.size(); ++i) {
-        ss << stan_csv.adaptation.metric(i);
-        if (i < stan_csv.adaptation.metric.size() - 1)
-          ss << ", ";
-      }
-      collate_writer(ss.str());
-    } else {
+      collate_writer("");
+      collate_writer("");
+      collate_writer("");    } else {
       if (model.compare(stan_csv.metadata.model) != 0) {
         std::cout << "Error, file: " << filenames[chain]
                   << ", expecting sample from model " << model
