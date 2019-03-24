@@ -66,7 +66,7 @@ int main(int argc, const char* argv[]) {
   
   if (!filenames.size()) {
     std::cout << "No valid input files, exiting." << std::endl;
-    return 0;
+    return -1;
   }
   
   std::fstream output_stream(collate_filename.c_str(),
@@ -108,14 +108,14 @@ int main(int argc, const char* argv[]) {
                   << ", expecting sample from model " << model
                   << ", found sample from model " << stan_csv.metadata.model
                   << ", exiting." << std::endl;
-        return 0;
+        return -1;
       }
       if (model_headers.size() != stan_csv.header.size()) {
         std::cout << "Error, file: " << filenames[chain]
                   << ", wrong number of output columns, expecting " << model_headers.size()
                   << " columns, found " << stan_csv.header.size()
                   << " columns, exiting." << std::endl;
-        return 0;
+        return -1;
       }
       for (size_t i=0; i < stan_csv.header.size(); ++i) {
         if (model_headers[i].compare(stan_csv.header[i]) != 0) {
@@ -124,7 +124,7 @@ int main(int argc, const char* argv[]) {
                     << ", expecting name " << model_headers[i]
                     << ", found name "<< stan_csv.header[i]
                     << ", exiting." << std::endl;
-          return 0;
+          return -1;
         }
       }
     }
