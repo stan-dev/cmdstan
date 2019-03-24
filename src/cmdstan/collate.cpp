@@ -151,18 +151,18 @@ int main(int argc, const char* argv[]) {
   }
   collate_writer(ss.str());
   ss.str(std::string());
-  ss << "seeds: ";
-  for (size_t i = 0; i < seeds.size(); ++i) {
-    ss << seeds[i];
-    if (i < seeds.size() - 1)
+  ss << "chain_draws: ";
+  for (size_t i = 0; i < draws_per_chain.size(); ++i) {
+    ss << draws_per_chain[i];
+    if (i < draws_per_chain.size() - 1)
       ss << ", ";
   }
   collate_writer(ss.str());
   ss.str(std::string());
-  ss << "draws_per_chain: ";
-  for (size_t i = 0; i < draws_per_chain.size(); ++i) {
-    ss << draws_per_chain[i];
-    if (i < draws_per_chain.size() - 1)
+  ss << "chain_seeds: ";
+  for (size_t i = 0; i < seeds.size(); ++i) {
+    ss << seeds[i];
+    if (i < seeds.size() - 1)
       ss << ", ";
   }
   collate_writer(ss.str());
