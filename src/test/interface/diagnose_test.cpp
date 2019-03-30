@@ -19,7 +19,6 @@ TEST(CommandDiagnose, corr_gauss) {
       + "corr_gauss_output.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-
   ASSERT_FALSE(out.hasError)
     << "\"" << out.command << "\" quit with an error";
 
@@ -42,7 +41,6 @@ TEST(CommandDiagnose, corr_gauss_depth8) {
       + "corr_gauss_output_depth8.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-
   ASSERT_FALSE(out.hasError)
     << "\"" << out.command << "\" quit with an error";
 
@@ -65,7 +63,6 @@ TEST(CommandDiagnose, corr_gauss_depth15) {
       + "corr_gauss_output_depth15.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-
   ASSERT_FALSE(out.hasError)
     << "\"" << out.command << "\" quit with an error";
 
@@ -88,7 +85,6 @@ TEST(CommandDiagnose, eight_schools) {
   + "eight_schools_output.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-
   ASSERT_FALSE(out.hasError)
   << "\"" << out.command << "\" quit with an error";
 
@@ -111,7 +107,6 @@ TEST(CommandDiagnose, mix) {
   + "mix_output.*";
 
   run_command_output out = run_command(command + " " + csv_file);
-
   ASSERT_FALSE(out.hasError)
   << "\"" << out.command << "\" quit with an error";
 

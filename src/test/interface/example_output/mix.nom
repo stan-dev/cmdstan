@@ -1,3 +1,9 @@
+Processing csv files: src/test/interface/example_output/mix_output.1.csv, src/test/interface/example_output/mix_output.2.csv
+
+All transitions within treedepth limit.
+
+No divergent transitions.
+
 The following parameters had fewer than 0.001 effective samples per transition:
   mu[1], mu[2], theta
 Such low values indicate that the effective sample size estimators may be biased high and actual performance may be substantially lower than quoted.
@@ -6,3 +12,4 @@ The following parameters had split R-hat greater than 1.1:
   mu[1], mu[2], theta
 Such high values indicate incomplete mixing and biasedestimation.  You should consider regularization your model with additional prior information or looking for a more effective parameterization.
 
+Processing complete.

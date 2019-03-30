@@ -34,7 +34,6 @@ int main(int argc, const char* argv[]) {
 
   for (int i = 1; i < argc; ++i) {
     ifstream.open(argv[i]);
-
     if (ifstream.good()) {
       filenames.push_back(argv[i]);
       ifstream.close();
@@ -49,33 +48,36 @@ int main(int argc, const char* argv[]) {
   }
 
   // Parse specified files
+  std::cout << "Processing csv files: " << filenames[0];
   ifstream.open(filenames[0].c_str());
 
   stan::io::stan_csv stan_csv
     = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
   stan::mcmc::chains<> chains(stan_csv);
-
   ifstream.close();
+
+  if (filenames.size() > 1) std::cout << ", ";
+  else std::cout << std::endl << std::endl;
 
   for (std::vector<std::string>::size_type chain = 1;
        chain < filenames.size(); ++chain) {
+    std::cout << filenames[chain];
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
     chains.add(stan_csv);
     ifstream.close();
+    if (chain < filenames.size()-1) std::cout << ", ";
+    else std::cout << std::endl << std::endl;
   }
 
   int num_samples = chains.num_samples();
-
   std::vector<std::string> bad_n_eff_names;
   std::vector<std::string> bad_rhat_names;
 
   for (int i = 0; i < chains.num_params(); ++i) {
     int max_limit = 10;
-
     if (chains.param_name(i) == std::string("treedepth__")) {
       int max_limit = stan_csv.metadata.max_depth;
-
       long n_max = 0;
       Eigen::VectorXd t_samples = chains.samples(i);
       for (long n = 0; n < t_samples.size(); ++n) {
@@ -83,23 +85,22 @@ int main(int argc, const char* argv[]) {
           ++n_max;
         }
       }
-
       if (n_max > 0) {
-        std::cout << n_max << " of " << num_samples << " ("
-                  << std::setprecision(2)
-                  << 100 * static_cast<double>(n_max) / num_samples
-                  << "%) transitions hit the maximum treedepth limit of "
+        double pct = 100 * static_cast<double>(n_max) / num_samples;
+        std::cout << n_max << " of " << num_samples
+                  << " (" << std::setprecision(2) << pct << "%)"
+                  << " transitions hit the maximum treedepth limit of "
                   << max_limit << ", or 2^" << max_limit << " leapfrog steps."
                   << " Trajectories that are prematurely terminated due to this"
                   << " limit will result in slow exploration and you should"
                   << " increase the limit to ensure optimal performance."
                   << std::endl << std::endl;
+      } else {
+          std::cout << "All transitions within treedepth limit." << std::endl << std::endl;
       }
-
     } else if (chains.param_name(i) == std::string("divergent__")) {
-
       int n_divergent = chains.samples(i).sum();
-      if (n_divergent > 0)
+      if (n_divergent > 0) {
         std::cout << n_divergent << " of " << num_samples << " ("
                   << std::setprecision(2)
                   << 100 * static_cast<double>(n_divergent) / num_samples
@@ -111,34 +112,28 @@ int main(int argc, const char* argv[]) {
                   << " 1 does not remove the divergences then you will likely"
                   << " need to reparameterize your model."
                   << std::endl << std::endl;
-
+      } else {
+          std::cout << "No divergent transitions." << std::endl << std::endl;
+      }
     } else if (chains.param_name(i) == std::string("energy__")) {
-
       Eigen::VectorXd e_samples = chains.samples(i);
-
       double delta_e_sq_mean = 0;
       double e_mean = 0;
       double e_var = 0;
-
       e_mean += e_samples(0);
       e_var += e_samples(0) * (e_samples(0) - e_mean);
-
       for (long n = 1; n < e_samples.size(); ++n) {
         double e = e_samples(n);
-
         double delta_e_sq = (e - e_samples(n - 1)) * (e - e_samples(n - 1));
         double d = delta_e_sq - delta_e_sq_mean;
         delta_e_sq_mean += d / n;
-
         d = e - e_mean;
         e_mean += d / (n + 1);
         e_var += d * (e - e_mean);
       }
 
       e_var /= static_cast<double>(e_samples.size() - 1);
-
       double e_bfmi = delta_e_sq_mean / e_var;
-
       double e_bfmi_threshold = 0.3;
       if (e_bfmi < e_bfmi_threshold)
         std::cout << "The E-BFMI, " << e_bfmi << ", is below the nominal"
@@ -149,7 +144,6 @@ int main(int argc, const char* argv[]) {
                   << std::endl << std::endl;
 
     } else if (chains.param_name(i).find("__") == std::string::npos) {
-
       double n_eff = chains.effective_sample_size(i);
       if (n_eff / num_samples < 0.001)
         bad_n_eff_names.push_back(chains.param_name(i));
@@ -159,7 +153,6 @@ int main(int argc, const char* argv[]) {
         bad_rhat_names.push_back(chains.param_name(i));
     }
   }
-
   if (bad_n_eff_names.size() > 0) {
     std::cout << "The following parameters had fewer than 0.001 effective"
               << " samples per transition:" << std::endl;
@@ -188,7 +181,7 @@ int main(int argc, const char* argv[]) {
               << " effective parameterization."
               << std::endl << std::endl;
   }
-
+  std::cout << "Processing complete." << std::endl;
   return 0;
 
 }
