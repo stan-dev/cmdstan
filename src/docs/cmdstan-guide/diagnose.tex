@@ -35,9 +35,15 @@ makefile as follows.
 \section{Running the {\tt\bfseries diagnose} Command}
 
 The \code{diagnose} command is executed on one or more output files,
-which are provided as command-line arguments separated by spaces. As
-an example, the ``eight schools'' model from Stan's example models and
-its corresponding data will be used.%
+which are provided as command-line arguments separated by spaces.
+If there are no apparent problems with the output files passed to
+\code{bin/diagnose}, it outputs a message that all transitions
+are within treedepth limit and that no divergent transitions were found.
+
+It problems are detected, it outputs a summary of the problem along with
+possible ways to mitigate it. As an example,  we use the
+the ``eight schools'' model from Stan's example models and
+its corresponding data.%
 %
 \footnote{The model and associated data files are here:
   \begin{itemize}
@@ -85,8 +91,6 @@ suggests that the model perhaps should be rerun as follows:
 \end{Verbatim}
 \end{quote}
 
-If there are no apparent problems with the output files passed to
-\code{bin/diagnose}, it prints nothing.
 
 \begin{figure}
 \begin{Verbatim}[fontsize=\footnotesize]
@@ -111,7 +115,3 @@ and \url{https://arxiv.org/abs/1701.02434}) contain suggestions for
 other diagnostic warning; however the correct resolution is
 necessarily model specific, hence all suggestions general guidelines only.
 
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "cmdstan-guide"
-%%% End:
