@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <test/utility.hpp>
 
+using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
@@ -26,7 +27,7 @@ TEST(CommandDiagnose, corr_gauss) {
   std::stringstream ss;
   ss << expected_output.rdbuf();
 
-  EXPECT_EQ(ss.str(), out.output);
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
 TEST(CommandDiagnose, corr_gauss_depth8) {
@@ -48,7 +49,7 @@ TEST(CommandDiagnose, corr_gauss_depth8) {
   std::stringstream ss;
   ss << expected_output.rdbuf();
 
-  EXPECT_EQ(ss.str(), out.output);
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
 TEST(CommandDiagnose, corr_gauss_depth15) {
@@ -70,7 +71,7 @@ TEST(CommandDiagnose, corr_gauss_depth15) {
   std::stringstream ss;
   ss << expected_output.rdbuf();
 
-  EXPECT_EQ(ss.str(), out.output);
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
 TEST(CommandDiagnose, eight_schools) {
@@ -92,7 +93,7 @@ TEST(CommandDiagnose, eight_schools) {
   std::stringstream ss;
   ss << expected_output.rdbuf();
 
-  EXPECT_EQ(ss.str(), out.output);
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
 TEST(CommandDiagnose, mix) {
@@ -114,5 +115,5 @@ TEST(CommandDiagnose, mix) {
   std::stringstream ss;
   ss << expected_output.rdbuf();
 
-  EXPECT_EQ(ss.str(), out.output);
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
