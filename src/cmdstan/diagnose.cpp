@@ -73,6 +73,7 @@ int main(int argc, const char* argv[]) {
   int num_samples = chains.num_samples();
   std::vector<std::string> bad_n_eff_names;
   std::vector<std::string> bad_rhat_names;
+  bool has_errors = false;
 
   for (int i = 0; i < chains.num_params(); ++i) {
     int max_limit = 10;
@@ -86,14 +87,17 @@ int main(int argc, const char* argv[]) {
         }
       }
       if (n_max > 0) {
+        has_errors = true;
         double pct = 100 * static_cast<double>(n_max) / num_samples;
         std::cout << n_max << " of " << num_samples
                   << " (" << std::setprecision(2) << pct << "%)"
                   << " transitions hit the maximum treedepth limit of "
                   << max_limit << ", or 2^" << max_limit << " leapfrog steps."
-                  << " Trajectories that are prematurely terminated due to this"
-                  << " limit will result in slow exploration and you should"
-                  << " increase the limit to ensure optimal performance."
+                  << std::endl
+                  << "Trajectories that are prematurely terminated due to this"
+                  << " limit will result in slow exploration."
+                  << std::endl
+                  << "For optimal performance, increase this limit."
                   << std::endl << std::endl;
       } else {
           std::cout << "All transitions within treedepth limit." << std::endl << std::endl;
@@ -101,16 +105,19 @@ int main(int argc, const char* argv[]) {
     } else if (chains.param_name(i) == std::string("divergent__")) {
       int n_divergent = chains.samples(i).sum();
       if (n_divergent > 0) {
+        has_errors = true;
         std::cout << n_divergent << " of " << num_samples << " ("
                   << std::setprecision(2)
                   << 100 * static_cast<double>(n_divergent) / num_samples
-                  << "%) transitions ended with a divergence.  These divergent"
-                  << " transitions indicate that HMC is not fully able to"
-                  << " explore the posterior distribution.  Try rerunning with"
-                  << " adapt delta set to a larger value and see if the"
-                  << " divergences vanish.  If increasing adapt delta towards"
-                  << " 1 does not remove the divergences then you will likely"
-                  << " need to reparameterize your model."
+                  << "%) transitions ended with a divergence."
+                  << std::endl
+                  << "These divergent transitions indicate that HMC is not fully able to"
+                  << " explore the posterior distribution."
+                  << std::endl
+                  << "Try increasing adapt delta closer to 1."
+                  << std::endl
+                  << "If this doesn't remove all"
+                  << " divergences, try to reparameterize the model."
                   << std::endl << std::endl;
       } else {
           std::cout << "No divergent transitions." << std::endl << std::endl;
@@ -135,14 +142,16 @@ int main(int argc, const char* argv[]) {
       e_var /= static_cast<double>(e_samples.size() - 1);
       double e_bfmi = delta_e_sq_mean / e_var;
       double e_bfmi_threshold = 0.3;
-      if (e_bfmi < e_bfmi_threshold)
+      if (e_bfmi < e_bfmi_threshold) {
+        has_errors = true;
         std::cout << "The E-BFMI, " << e_bfmi << ", is below the nominal"
                   << " threshold of " << e_bfmi_threshold << " which suggests"
                   << " that HMC may have trouble exploring the target"
-                  << " distribution.  You should consider any"
-                  << " reparameterizations if possible."
+                  << " distribution."
+                  << std::endl
+                  << "If possible, try to reparameterize the model."
                   << std::endl << std::endl;
-
+      }
     } else if (chains.param_name(i).find("__") == std::string::npos) {
       double n_eff = chains.effective_sample_size(i);
       if (n_eff / num_samples < 0.001)
@@ -154,6 +163,7 @@ int main(int argc, const char* argv[]) {
     }
   }
   if (bad_n_eff_names.size() > 0) {
+    has_errors = true;
     std::cout << "The following parameters had fewer than 0.001 effective"
               << " samples per transition:" << std::endl;
     std::cout << "  ";
@@ -168,6 +178,7 @@ int main(int argc, const char* argv[]) {
   }
 
   if (bad_rhat_names.size() > 0) {
+    has_errors = true;
     std::cout << "The following parameters had split R-hat greater than 1.1:"
               << std::endl;
     std::cout << "  ";
@@ -176,12 +187,15 @@ int main(int argc, const char* argv[]) {
     std::cout << bad_rhat_names.back() << std::endl;
 
     std::cout << "Such high values indicate incomplete mixing and biased"
-              << "estimation.  You should consider regularization your model"
-              << " with additional prior information or looking for a more"
+              << "estimation."
+              << std::endl
+              << "You should consider regularizating your model"
+              << " with additional prior information or a more"
               << " effective parameterization."
               << std::endl << std::endl;
   }
-  std::cout << "Processing complete." << std::endl;
+  if (!has_errors)
+    std::cout << "Processing complete, no problems detected." << std::endl;
   return 0;
 
 }

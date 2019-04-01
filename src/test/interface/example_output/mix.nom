@@ -8,6 +8,6 @@ Such low values indicate that the effective sample size estimators may be biased
 
 The following parameters had split R-hat greater than 1.1:
   mu[1], mu[2], theta
-Such high values indicate incomplete mixing and biasedestimation.  You should consider regularization your model with additional prior information or looking for a more effective parameterization.
+Such high values indicate incomplete mixing and biasedestimation.
+You should consider regularizating your model with additional prior information or a more effective parameterization.
 
-Processing complete.

@@ -26,7 +26,6 @@ TEST(CommandDiagnose, corr_gauss) {
   std::ifstream expected_output("src/test/interface/example_output/corr_gauss.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
-
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
@@ -48,7 +47,6 @@ TEST(CommandDiagnose, corr_gauss_depth8) {
   std::ifstream expected_output("src/test/interface/example_output/corr_gauss_depth8.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
-
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
@@ -70,7 +68,6 @@ TEST(CommandDiagnose, corr_gauss_depth15) {
   std::ifstream expected_output("src/test/interface/example_output/corr_gauss_depth15.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
-
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
@@ -92,7 +89,6 @@ TEST(CommandDiagnose, eight_schools) {
   std::ifstream expected_output("src/test/interface/example_output/eight_schools.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
-
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
@@ -114,6 +110,5 @@ TEST(CommandDiagnose, mix) {
   std::ifstream expected_output("src/test/interface/example_output/mix.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
-
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
