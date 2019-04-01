@@ -2,5 +2,3 @@
 Trajectories that are prematurely terminated due to this limit will result in slow exploration.
 For optimal performance, increase this limit.
 
-No divergent transitions.
-

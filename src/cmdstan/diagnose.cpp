@@ -99,8 +99,6 @@ int main(int argc, const char* argv[]) {
                   << std::endl
                   << "For optimal performance, increase this limit."
                   << std::endl << std::endl;
-      } else {
-          std::cout << "All transitions within treedepth limit." << std::endl << std::endl;
       }
     } else if (chains.param_name(i) == std::string("divergent__")) {
       int n_divergent = chains.samples(i).sum();
@@ -119,8 +117,6 @@ int main(int argc, const char* argv[]) {
                   << "If this doesn't remove all"
                   << " divergences, try to reparameterize the model."
                   << std::endl << std::endl;
-      } else {
-          std::cout << "No divergent transitions." << std::endl << std::endl;
       }
     } else if (chains.param_name(i) == std::string("energy__")) {
       Eigen::VectorXd e_samples = chains.samples(i);
