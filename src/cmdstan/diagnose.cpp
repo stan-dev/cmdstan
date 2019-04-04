@@ -6,6 +6,8 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <fstream>
 
+double RHAT_MAX = 1.05;
+
 void diagnose_usage() {
   std::cout << "USAGE:  diagnose <filename 1> [<filename 2> ... <filename N>]"
             << std::endl
@@ -78,6 +80,7 @@ int main(int argc, const char* argv[]) {
   for (int i = 0; i < chains.num_params(); ++i) {
     int max_limit = 10;
     if (chains.param_name(i) == std::string("treedepth__")) {
+      std::cout << "Checking sampler transitions treedepth." << std::endl;
       int max_limit = stan_csv.metadata.max_depth;
       long n_max = 0;
       Eigen::VectorXd t_samples = chains.samples(i);
@@ -99,8 +102,11 @@ int main(int argc, const char* argv[]) {
                   << std::endl
                   << "For optimal performance, increase this limit."
                   << std::endl << std::endl;
+      } else {
+        std::cout << "Treedepth satisfactory for all transitions." << std::endl << std::endl;
       }
     } else if (chains.param_name(i) == std::string("divergent__")) {
+      std::cout << "Checking sampler transitions for divergences." << std::endl;
       int n_divergent = chains.samples(i).sum();
       if (n_divergent > 0) {
         has_errors = true;
@@ -117,8 +123,11 @@ int main(int argc, const char* argv[]) {
                   << "If this doesn't remove all"
                   << " divergences, try to reparameterize the model."
                   << std::endl << std::endl;
+      } else {
+        std::cout << "No divergent transitions found." << std::endl << std::endl;
       }
     } else if (chains.param_name(i) == std::string("energy__")) {
+      std::cout << "Checking E-BFMI - sampler transitions HMC potential energy." << std::endl;
       Eigen::VectorXd e_samples = chains.samples(i);
       double delta_e_sq_mean = 0;
       double e_mean = 0;
@@ -147,6 +156,8 @@ int main(int argc, const char* argv[]) {
                   << std::endl
                   << "If possible, try to reparameterize the model."
                   << std::endl << std::endl;
+      } else {
+        std::cout << "E-BFMI satisfactory for all transitions." << std::endl << std::endl;
       }
     } else if (chains.param_name(i).find("__") == std::string::npos) {
       double n_eff = chains.effective_sample_size(i);
@@ -154,14 +165,14 @@ int main(int argc, const char* argv[]) {
         bad_n_eff_names.push_back(chains.param_name(i));
 
       double split_rhat = chains.split_potential_scale_reduction(i);
-      if (split_rhat > 1.1)
+      if (split_rhat > RHAT_MAX)
         bad_rhat_names.push_back(chains.param_name(i));
     }
   }
   if (bad_n_eff_names.size() > 0) {
     has_errors = true;
     std::cout << "The following parameters had fewer than 0.001 effective"
-              << " samples per transition:" << std::endl;
+              << " draws per transition:" << std::endl;
     std::cout << "  ";
     for (size_t n = 0; n < bad_n_eff_names.size() - 1; ++n)
       std::cout << bad_n_eff_names.at(n) << ", ";
@@ -171,12 +182,15 @@ int main(int argc, const char* argv[]) {
               << " estimators may be biased high and actual performance"
               << " may be substantially lower than quoted."
               << std::endl << std::endl;
+  } else {
+    std::cout << "Effective sample size satisfactory."
+              << std::endl << std::endl;
   }
 
   if (bad_rhat_names.size() > 0) {
     has_errors = true;
-    std::cout << "The following parameters had split R-hat greater than 1.1:"
-              << std::endl;
+    std::cout << "The following parameters had split R-hat greater than "
+              << RHAT_MAX << ":" << std::endl;
     std::cout << "  ";
     for (size_t n = 0; n < bad_rhat_names.size() - 1; ++n)
       std::cout << bad_rhat_names.at(n) << ", ";
@@ -189,9 +203,15 @@ int main(int argc, const char* argv[]) {
               << " with additional prior information or a more"
               << " effective parameterization."
               << std::endl << std::endl;
+  } else {
+    std::cout << "Split R-hat values satisfactory all parameters."
+              << std::endl << std::endl;
   }
   if (!has_errors)
     std::cout << "Processing complete, no problems detected." << std::endl;
+  else
+    std::cout << "Processing complete." << std::endl;
+    
   return 0;
 
 }
