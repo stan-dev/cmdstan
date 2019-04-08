@@ -67,9 +67,9 @@ pipeline {
                         always {
                             echo "1"
 
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4()
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang()
-                            
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4(), id: "non_windows_gcc4"
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang(), id: "non_windows_clang"
+
                             deleteDir()
                         }
                     }
@@ -94,8 +94,8 @@ pipeline {
                             echo "2"
                             archiveArtifacts 'build-mpi.log'
 
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4()
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang()
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4(), id: "non_windows_mpi_gcc4"
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang(), id: "non_windows_mpi_clang"
 
                             deleteDir()
                         }
