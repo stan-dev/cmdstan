@@ -65,10 +65,13 @@ pipeline {
                     post {
                         
                         always {
-                            echo "1"
 
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4(), id: "non_windows_gcc4"
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang(), id: "non_windows_clang"
+                            recordIssues enabledForFailure: true, 
+                            aggregatingResults : false, 
+                            tools: [
+                                gcc4(id: "non_windows_gcc4", name: "Non-windows interface tests@GCC4"),
+                                clang(id: "non_windows_clang", name: "Non-windows interface tests@CLANG")
+                            ]
 
                             deleteDir()
                         }
@@ -91,11 +94,14 @@ pipeline {
                     post {
                         
                         always {
-                            echo "2"
                             archiveArtifacts 'build-mpi.log'
-
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4(), id: "non_windows_mpi_gcc4"
-                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang(), id: "non_windows_mpi_clang"
+                           
+                            recordIssues enabledForFailure: true, 
+                            aggregatingResults : false, 
+                            tools: [
+                                gcc4(id: "non_windows_mpi_gcc4", name: "Non-windows interface tests with MPI@GCC4"),
+                                clang(id: "non_windows_mpi_clang", name: "Non-windows interface tests with MPI@CLANG")
+                            ]
 
                             deleteDir()
                         }
