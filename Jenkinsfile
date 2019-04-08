@@ -67,7 +67,7 @@ pipeline {
                         always {
 
                             recordIssues id: "non_windows", 
-                            name: "Non-windows interface tests"
+                            name: "Non-windows interface tests",
                             enabledForFailure: true, 
                             aggregatingResults : true, 
                             tools: [
