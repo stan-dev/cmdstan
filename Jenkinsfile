@@ -30,9 +30,7 @@ pipeline {
                 not { branch 'master' }
                 not { branch 'downstream_tests' }
             }
-            steps { 
-                echo 'CmdStan/' + env.BRANCH_NAME
-                script { utils.killOldBuilds() } }
+            steps { script { utils.killOldBuilds() } }
         }
         stage('Clean & Setup') {
             agent any
@@ -79,7 +77,7 @@ pipeline {
                             blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: 'CmdStan/' + env.BRANCH_NAME
+                            referenceJobName: env.BRANCH_NAME
 
                             deleteDir()
                         }
@@ -115,7 +113,7 @@ pipeline {
                             ],
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: 'CmdStan/' + env.BRANCH_NAME
+                            referenceJobName: env.BRANCH_NAME
 
                             deleteDir()
                         }
