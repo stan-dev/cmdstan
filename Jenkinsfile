@@ -90,10 +90,10 @@ pipeline {
                     post {
                         always {
                             archiveArtifacts 'build-mpi.log'
-                            recordIssues enabledForFailure: true, failedTotalAll: 0,
+                            recordIssues enabledForFailure: true, failedTotalAll: 0, name: 'Code Analysis', id: 'analysis',
                             tools: [
-                                [tool: [name: 'Clang (LLVM based)', id: 'clang']],
-                                [tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4']]
+                                [tool: [name: 'Clang (LLVM based)', id: 'clang', $class: 'clang']],
+                                [tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4', $class: 'gcc4']]
                                 ]
                             deleteDir()
                         }
