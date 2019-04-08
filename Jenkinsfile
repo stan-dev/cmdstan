@@ -64,7 +64,11 @@ pipeline {
                     }
                     post {
                         always {
-                            recordIssues enabledForFailure: false, name: 'Code Analysis', id: 'analysis', tools: [[tool: [name: 'Clang (LLVM based)', id: 'clang']],[tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4']]], failedTotalAll: 0, usePreviousBuildAsReference: false
+                            recordIssues enabledForFailure: true, failedTotalAll: 0,
+                            tools: [
+                                [tool: [name: 'Clang (LLVM based)', id: 'clang']],
+                                [tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4']]
+                                ]
                             deleteDir()
                         }
                     }
@@ -86,7 +90,11 @@ pipeline {
                     post {
                         always {
                             archiveArtifacts 'build-mpi.log'
-                            recordIssues enabledForFailure: false, name: 'Code Analysis', id: 'analysis', tools: [[tool: [name: 'Clang (LLVM based)', id: 'clang']],[tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4']]], failedTotalAll: 0, usePreviousBuildAsReference: false
+                            recordIssues enabledForFailure: true, failedTotalAll: 0,
+                            tools: [
+                                [tool: [name: 'Clang (LLVM based)', id: 'clang']],
+                                [tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4']]
+                                ]
                             deleteDir()
                         }
                     }
