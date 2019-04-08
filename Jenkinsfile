@@ -24,13 +24,15 @@ pipeline {
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
     stages {
-        stage('Kill previous builds') {
+        stage('Kill previous builds') {          
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
                 not { branch 'downstream_tests' }
             }
-            steps { script { utils.killOldBuilds() } }
+            steps { 
+                echo 'CmdStan/' + env.BRANCH_NAME
+                script { utils.killOldBuilds() } }
         }
         stage('Clean & Setup') {
             agent any
@@ -76,7 +78,8 @@ pipeline {
                             ],
                             blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 0, unhealthy: 100, minimumSeverity: 'HIGH'
+                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                            referenceJobName: 'CmdStan/' + env.BRANCH_NAME
 
                             deleteDir()
                         }
@@ -111,7 +114,8 @@ pipeline {
                                 clang(id: "non_windows_mpi_clang", name: "Non-windows interface tests with MPI@CLANG")
                             ],
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 0, unhealthy: 100, minimumSeverity: 'HIGH'
+                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                            referenceJobName: 'CmdStan/' + env.BRANCH_NAME
 
                             deleteDir()
                         }
