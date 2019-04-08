@@ -66,7 +66,9 @@ pipeline {
                         
                         always {
 
-                            recordIssues enabledForFailure: true, 
+                            recordIssues id: "non_windows", 
+                            name: "Non-windows interface tests"
+                            enabledForFailure: true, 
                             aggregatingResults : true, 
                             tools: [
                                 gcc4(id: "non_windows_gcc4", name: "Non-windows interface tests@GCC4"),
@@ -99,7 +101,9 @@ pipeline {
                         always {
                             archiveArtifacts 'build-mpi.log'
                            
-                            recordIssues enabledForFailure: true, 
+                            recordIssues id: "non_windows_mpi", 
+                            name: "Non-windows interface tests with MPI",
+                            enabledForFailure: true, 
                             aggregatingResults : true,
                             blameDisabled: false,
                             tools: [
