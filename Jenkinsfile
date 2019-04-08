@@ -64,8 +64,8 @@ pipeline {
                     }
                     post {
                         always {
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            recordIssues consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            recordIssues consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
                         }
                     }
@@ -87,8 +87,8 @@ pipeline {
                     post {
                         always {
                             archiveArtifacts 'build-mpi.log'
-                            warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
-                            warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            recordIssues consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
+                            recordIssues consoleParsers: [[parserName: 'Clang (LLVM based)']], failedTotalAll: '0', usePreviousBuildAsReference: false, canRunOnFailed: true
                             deleteDir()
                         }
                     }
@@ -96,9 +96,9 @@ pipeline {
             }
         }
     }
-    post {
-        success { script { utils.mailBuildResults("SUCCESSFUL") } }
-        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
-        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
-    }
+    ///post {
+    ///    success { script { utils.mailBuildResults("SUCCESSFUL") } }
+    ///    unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+    ///    failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
+    ///}
 }
