@@ -63,12 +63,13 @@ pipeline {
                         sh runTests("./")
                     }
                     post {
+                        
                         always {
-                            recordIssues enabledForFailure: true, failedTotalAll: 0, name: 'Code Analysis', id: 'analysis',
-                            tools: [
-                                [tool: [name: 'Clang (LLVM based)', id: 'clang', $class: 'clang']],
-                                [tool: [name: 'GNU C Compiler 4 (gcc)', id: 'gcc4', $class: 'gcc4']]
-                                ]
+                            echo "1"
+
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4()
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang()
+                            
                             deleteDir()
                         }
                     }
@@ -88,14 +89,14 @@ pipeline {
                         sh runTests("./")
                     }
                     post {
+                        
                         always {
+                            echo "2"
                             archiveArtifacts 'build-mpi.log'
-                            recordIssues enabledForFailure: true, 
-                            aggregatingResults: false,
-                            tools: [
-                                [tool: [$class: 'clang']],
-                                [tool: [$class: 'gcc4']]
-                                ]
+
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: gcc4()
+                            recordIssues enabledForFailure: true, aggregatingResults : false, tool: clang()
+
                             deleteDir()
                         }
                     }
