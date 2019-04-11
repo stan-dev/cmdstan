@@ -121,7 +121,13 @@ pipeline {
         }
     }
     post {
-        success { script { utils.mailBuildResults("SUCCESSFUL") } }
+        success { 
+            script { 
+                utils.mailBuildResults("SUCCESSFUL") 
+            }
+            // Use wait=false to detach CmdStan Performance Tests from the current Job when starting
+            build job: 'CmdStan Performance Tests', wait: false
+        }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
