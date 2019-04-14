@@ -130,7 +130,8 @@ pipeline {
                 parameters: [
                     string(name: 'math_pr', value: params.stan_pr),
                     string(name: 'cmdstan_pr', value: params.math_pr)
-                    ]
+                    ],
+                wait=false
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
