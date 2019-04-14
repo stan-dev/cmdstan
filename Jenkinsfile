@@ -126,7 +126,7 @@ pipeline {
                 utils.mailBuildResults("SUCCESSFUL") 
             }
             // Use wait=false to detach CmdStan Performance Tests from the current Job when starting
-            build job: 'CmdStan Performance Tests', 
+            build job: '../CmdStan Performance Tests', 
                 parameters: [
                     string(name: 'math_pr', value: params.stan_pr),
                     string(name: 'cmdstan_pr', value: params.math_pr)
