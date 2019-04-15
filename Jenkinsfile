@@ -122,19 +122,14 @@ pipeline {
     }
     post {
         success { 
-            //script { 
-                //utils.mailBuildResults("SUCCESSFUL") 
-            //}
-            //"CmdStan Performance Tests/$env.BRANCH_NAME"
-            build job: "../CmdStan/downstream_tests", 
-                parameters: [
-                    string(name: 'math_pr', value: params.math_pr),
-                    string(name: 'cmdstan_pr', value: params.stan_pr)
-                    ],
+            script { 
+                utils.mailBuildResults("SUCCESSFUL") 
+            }
+            build job: "CmdStan Performance Tests/master", 
                 propagate: true,
                 wait:true
         }
-        //unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
-        //failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
+        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }
