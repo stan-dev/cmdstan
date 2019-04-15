@@ -117,6 +117,22 @@ pipeline {
                         }
                     }
                 }
+                stage('Upstream CmdStan Performance tests') {
+                    when { 
+                            expression { 
+                                env.BRANCH_NAME ==~ /PR-\d+/ ||
+                                env.BRANCH_NAME == "downstream_tests" ||
+                                env.BRANCH_NAME == "downstream_hotfix" 
+                            } 
+                        }
+                    steps {
+                        build(
+                            job: "CmdStan Performance Tests/downstream_tests",
+                            propagate: true,
+                            wait:true
+                        )
+                    }
+                }
             }
         }
     }
