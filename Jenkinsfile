@@ -125,7 +125,8 @@ pipeline {
             script { 
                 utils.mailBuildResults("SUCCESSFUL") 
             }
-            build job: "CmdStan Performance Tests/$env.BRANCH_NAME", 
+            //"CmdStan Performance Tests/$env.BRANCH_NAME"
+            build job: "CmdStan Performance Tests/master", 
                 propagate: true,
                 wait:true
         }
