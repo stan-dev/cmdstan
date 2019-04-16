@@ -14,6 +14,8 @@ def runTests(String prefix = "") {
     """
 }
 
+performance_log=""
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
@@ -126,14 +128,20 @@ pipeline {
                             } 
                         }
                     steps {
-                        build(
-                            job: "CmdStan Performance Tests/downstream_tests",
-                            parameters: [
-                                string(name: 'cmdstan_hash', value: env.BRANCH_NAME)
-                            ],
-                            propagate: true,
-                            wait:true
-                        )
+                        script{
+
+                            build_log = build(
+                                job: "CmdStan Performance Tests/downstream_tests",
+                                parameters: [
+                                    string(name: 'cmdstan_hash', value: env.BRANCH_NAME)
+                                ],
+                                propagate: true,
+                                wait:true
+                            )
+
+                            performance_log = Jenkins.getInstance().getItemByFullName("CmdStan Performance Tests/downstream_tests").getBuildByNumber(build_log.getNumber()).logFile.text
+
+                        }
                     }
                 }
             }
@@ -142,6 +150,7 @@ pipeline {
     post {
         always {           
             script{
+                echo performance_log
                 def comment = pullRequest.comment('This PR is highly illogical..')
             }
         }
