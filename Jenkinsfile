@@ -140,6 +140,11 @@ pipeline {
         }
     }
     post {
+        always {           
+            script{
+                def comment = pullRequest.comment('This PR is highly illogical..')
+            }
+        }
         success { 
             script { 
                 if (env.BRANCH_NAME == "develop") {                                          
