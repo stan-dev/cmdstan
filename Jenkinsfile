@@ -139,11 +139,11 @@ pipeline {
     post {
         success { 
             script { 
+                if (env.BRANCH_NAME == "develop") {                                          
+                    build job: "CmdStan Performance Tests/master", wait:false
+                }
                 utils.mailBuildResults("SUCCESSFUL") 
-            }
-            build job: "CmdStan Performance Tests/master", 
-                propagate: true,
-                wait:true
+            }          
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
