@@ -128,6 +128,9 @@ pipeline {
                     steps {
                         build(
                             job: "CmdStan Performance Tests/downstream_tests",
+                            parameters: [
+                                string(name: 'cmdstan_hash', value: env.BRANCH_NAME)
+                            ],
                             propagate: true,
                             wait:true
                         )
