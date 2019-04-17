@@ -162,7 +162,7 @@ pipeline {
                 }
 
                 //Regex to get the final result of tests
-                def result_match = (result =~ /(\d{1}\.?\d{11})/)
+                def result_match = (performance_log =~ /(\d{1}\.?\d{11})/)
                 //Append final result to comment
                 comment += "Result: " + result_match[0].toString() + "\r\n" 
 
