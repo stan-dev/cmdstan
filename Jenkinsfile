@@ -150,6 +150,10 @@ pipeline {
     post {
         always {           
             script{
+
+                //echoes performance_log
+                echo performance_log
+
                 //Init comment string
                 def comment = ""
 
