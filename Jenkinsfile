@@ -150,8 +150,24 @@ pipeline {
     post {
         always {           
             script{
-                echo performance_log
-                def comment = pullRequest.comment('This is just a test coming from Jenkins. Please ignore.')
+                //Init comment string
+                def comment = ""
+
+                //Regex to get all the test results
+                def test_matches = (performance_log =~ /\('(.*)\)/)
+                //Iterating over our regex matches and extract full match
+                for(item in test_matches){
+                    //Adding each result to our comment string
+                    comment += item[0] + "\r\n"
+                }
+
+                //Regex to get the final result of tests
+                def result_match = (result =~ /(\d{1}\.?\d{11})/)
+                //Append final result to comment
+                comment += "Result: " + result_match[0].toString() + "\r\n" 
+
+                //Issuing our comment to GitHub PR
+                def github_comment = pullRequest.comment(comment)
             }
         }
         success { 
