@@ -139,7 +139,7 @@ pipeline {
                                 wait:true
                             )
 
-                            performance_log = Jenkins.getInstance().getItemByFullName("CmdStan Performance Tests/downstream_tests").getBuildByNumber(build_log.getNumber()).logFile.text
+                            performance_log = build_log.rawBuild.log
 
                         }
                     }
