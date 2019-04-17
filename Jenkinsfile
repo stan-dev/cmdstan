@@ -151,7 +151,7 @@ pipeline {
         always {           
             script{
                 echo performance_log
-                def comment = pullRequest.comment('This PR is highly illogical..')
+                def comment = pullRequest.comment('This is just a test coming from Jenkins. Please ignore.')
             }
         }
         success { 
