@@ -168,7 +168,7 @@ pipeline {
                 //Regex to get the final result of tests
                 def result_match = (performance_log =~ /(\d{1}\.?\d{11})/)
                 //Append final result to comment
-                comment += "Result: " + result_match[0].toString() + "\r\n" 
+                comment += "Result: " + result_match[0][0].toString() + "\r\n" 
 
                 //Issuing our comment to GitHub PR
                 def github_comment = pullRequest.comment(comment)
