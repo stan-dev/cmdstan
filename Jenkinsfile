@@ -150,10 +150,6 @@ pipeline {
     post {
         always {           
             script{
-
-                //echoes performance_log
-                echo performance_log
-
                 //Init comment string
                 def comment = ""
 
@@ -169,6 +165,10 @@ pipeline {
                 def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})/)
                 //Append final result to comment
                 comment += "Result: " + result_match[0][1].toString() + "\r\n" 
+
+                def result_match_hash = (performance_log =~ /develop (.*?) stat_comp_benchmarks/)
+
+                comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n" 
 
                 //Issuing our comment to GitHub PR
                 def github_comment = pullRequest.comment(comment)
