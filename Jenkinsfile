@@ -166,7 +166,7 @@ pipeline {
                 //Append final result to comment
                 comment += "Result: " + result_match[0][1].toString() + "\r\n" 
 
-                def result_match_hash = (performance_log =~ /develop (.*?) stat_comp_benchmarks/)
+                def result_match_hash = (performance_log =~ /'cmdstan': checked out '(.*?)'/)
 
                 comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n" 
 
