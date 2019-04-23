@@ -153,6 +153,10 @@ pipeline {
                 //Init comment string
                 def comment = ""
 
+                echo performance_log
+
+                echo "Parsing test results ..."
+
                 //Regex to get all the test results
                 def test_matches = (performance_log =~ /\('(.*)\)/)
                 //Iterating over our regex matches and extract full match
@@ -161,10 +165,14 @@ pipeline {
                     comment += item[0] + "\r\n"
                 }
 
+                echo "Parsing final test result ..."
+
                 //Regex to get the final result of tests
                 def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})/)
                 //Append final result to comment
                 comment += "Result: " + result_match[0][1].toString() + "\r\n" 
+
+                echo "Parsing commit hash ..."
 
                 def result_match_hash = (performance_log =~ /'cmdstan': checked out '(.*?)'/)
 
