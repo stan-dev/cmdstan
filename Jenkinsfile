@@ -133,7 +133,7 @@ pipeline {
                             build_log = build(
                                 job: "CmdStan Performance Tests/downstream_tests",
                                 parameters: [
-                                    string(name: 'cmdstan_hash', value: env.BRANCH_NAME)
+                                    string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
                                 ],
                                 propagate: true,
                                 wait:true
@@ -178,12 +178,10 @@ pipeline {
                     comment += "Result: " + "Unk" + "\r\n" 
                 }
 
-
                 echo "Parsing commit hash ..."
 
                 def result_match_hash = (performance_log =~ /'cmdstan': checked out '(.*?)'/)
-
-                
+         
                 try{
                     //Append commit hash
                     comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n" 
