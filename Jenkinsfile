@@ -168,26 +168,26 @@ pipeline {
                 echo "Parsing final test result ..."
 
                 //Regex to get the final result of tests
-                def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})$/)
+                def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})/)
 
                 try{
                     //Append final result to comment
                     comment += "Result: " + result_match[0][1].toString() + "\r\n" 
                 }
                 catch(Exception ex){
-                    comment += "Result: " + "Unk" + "\r\n" 
+                    comment += "Result: " + "Regex did not match anything" + "\r\n" 
                 }
 
                 echo "Parsing commit hash ..."
 
-                def result_match_hash = (performance_log =~ /'cmdstan': checked out '(.*?)'/)
+                def result_match_hash = (performance_log =~ /Merge (.*?) into/)
          
                 try{
                     //Append commit hash
                     comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n" 
                 }
                 catch(Exception ex){
-                    comment += "Commit hash: " + "Unk" + "\r\n" 
+                    comment += "Commit hash: " + "Regex did not match anything" + "\r\n" 
                 }
 
                 //Issuing our comment to GitHub PR
