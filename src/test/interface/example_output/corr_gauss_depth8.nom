@@ -1,2 +1,16 @@
-424 of 1000 (42%) transitions hit the maximum treedepth limit of 8, or 2^8 leapfrog steps. Trajectories that are prematurely terminated due to this limit will result in slow exploration and you should increase the limit to ensure optimal performance.
+Checking sampler transitions treedepth.
+424 of 1000 (42%) transitions hit the maximum treedepth limit of 8, or 2^8 leapfrog steps.
+Trajectories that are prematurely terminated due to this limit will result in slow exploration.
+For optimal performance, increase this limit.
 
+Checking sampler transitions for divergences.
+No divergent transitions found.
+
+Checking E-BFMI - sampler transitions HMC potential energy.
+E-BFMI satisfactory for all transitions.
+
+Effective sample size satisfactory.
+
+Split R-hat values satisfactory all parameters.
+
+Processing complete.
