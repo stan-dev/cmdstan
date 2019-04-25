@@ -108,6 +108,7 @@ namespace cmdstan {
     }
     if (parser.help_printed())
       return err_code;
+
     u_int_argument* random_arg = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
     if (random_arg->is_default()) {
       random_arg->set_value((boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds());
