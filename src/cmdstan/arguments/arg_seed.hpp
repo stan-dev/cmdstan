@@ -13,7 +13,7 @@ namespace cmdstan {
       _description = "Random number generator seed";
       _validity = "integer > 0 or -1 to generate seed from sys clock time";
       _default = "-1";
-      _default_value = 0 - 1;  // -1 as unsigned int
+      _default_value = -1;
       _constrained = true;
       _good_value = 18383;
       _bad_value = -2;
