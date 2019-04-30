@@ -14,6 +14,8 @@ def runTests(String prefix = "") {
     """
 }
 
+performance_log=""
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
@@ -117,16 +119,88 @@ pipeline {
                         }
                     }
                 }
+                stage('Upstream CmdStan Performance tests') {
+                    when { 
+                            expression { 
+                                env.BRANCH_NAME ==~ /PR-\d+/ ||
+                                env.BRANCH_NAME == "downstream_tests" ||
+                                env.BRANCH_NAME == "downstream_hotfix" 
+                            } 
+                        }
+                    steps {
+                        script{
+
+                            build_log = build(
+                                job: "CmdStan Performance Tests/downstream_tests",
+                                parameters: [
+                                    string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
+                                ],
+                                propagate: true,
+                                wait:true
+                            )
+
+                            performance_log = build_log.rawBuild.log
+
+                        }
+                    }
+                }
             }
         }
     }
     post {
+        always {           
+            script{
+                //Init comment string
+                def comment = ""
+
+                echo performance_log
+
+                echo "Parsing test results ..."
+
+                //Regex to get all the test results
+                def test_matches = (performance_log =~ /\('(.*)\)/)
+                //Iterating over our regex matches and extract full match
+                for(item in test_matches){
+                    //Adding each result to our comment string
+                    comment += item[0] + "\r\n"
+                }
+
+                echo "Parsing final test result ..."
+
+                //Regex to get the final result of tests
+                def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})/)
+
+                try{
+                    //Append final result to comment
+                    comment += "Result: " + result_match[0][1].toString() + "\r\n" 
+                }
+                catch(Exception ex){
+                    comment += "Result: " + "Regex did not match anything" + "\r\n" 
+                }
+
+                echo "Parsing commit hash ..."
+
+                def result_match_hash = (performance_log =~ /Merge (.*?) into/)
+         
+                try{
+                    //Append commit hash
+                    comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n" 
+                }
+                catch(Exception ex){
+                    comment += "Commit hash: " + "Regex did not match anything" + "\r\n" 
+                }
+
+                //Issuing our comment to GitHub PR
+                def github_comment = pullRequest.comment(comment)
+            }
+        }
         success { 
             script { 
+                if (env.BRANCH_NAME == "develop") {                                          
+                    build job: "CmdStan Performance Tests/master", wait:false
+                }
                 utils.mailBuildResults("SUCCESSFUL") 
-            }
-            // Use wait=false to detach CmdStan Performance Tests from the current Job when starting
-            build job: 'CmdStan Performance Tests', wait: false
+            }          
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
