@@ -190,8 +190,10 @@ pipeline {
                     comment += "Commit hash: " + "Regex did not match anything" + "\r\n" 
                 }
 
-                //Issuing our comment to GitHub PR
-                def github_comment = pullRequest.comment(comment)
+                if (env.BRANCH_NAME.contains("PR-")) {                                          
+                    //Issuing our comment to GitHub PR
+                    def github_comment = pullRequest.comment(comment)
+                }
             }
         }
         success { 
