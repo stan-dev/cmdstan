@@ -152,7 +152,7 @@ pipeline {
             script {
                 if (env.BRANCH_NAME == "develop") {
                     build job: "CmdStan Performance Tests/master", wait:false
-                } else if (env.CHANGE_ID) {
+                } else if (false) { //TODO env.CHANGE_ID) {
                     //Init comment string
                     def comment = ""
 
