@@ -119,31 +119,31 @@ pipeline {
                         }
                     }
                 }
-                stage('Upstream CmdStan Performance tests') {
-                    when {
-                            expression {
-                                env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" ||
-                                env.BRANCH_NAME == "downstream_hotfix"
-                            }
-                        }
-                    steps {
-                        script{
+                // stage('Upstream CmdStan Performance tests') {
+                //     when {
+                //             expression {
+                //                 env.BRANCH_NAME ==~ /PR-\d+/ ||
+                //                 env.BRANCH_NAME == "downstream_tests" ||
+                //                 env.BRANCH_NAME == "downstream_hotfix"
+                //             }
+                //         }
+                //     steps {
+                //         script{
 
-                            build_log = build(
-                                job: "CmdStan Performance Tests/downstream_tests",
-                                parameters: [
-                                    string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
-                                ],
-                                propagate: true,
-                                wait:true
-                            )
+                //             build_log = build(
+                //                 job: "CmdStan Performance Tests/downstream_tests",
+                //                 parameters: [
+                //                     string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
+                //                 ],
+                //                 propagate: true,
+                //                 wait:true
+                //             )
 
-                            performance_log = build_log.rawBuild.log
+                //             performance_log = build_log.rawBuild.log
 
-                        }
-                    }
-                }
+                //         }
+                //     }
+                // }
             }
         }
     }
@@ -152,12 +152,10 @@ pipeline {
             script {
                 if (env.BRANCH_NAME == "develop") {
                     build job: "CmdStan Performance Tests/master", wait:false
-                } else if (env.CHANGE_ID) {
+                } else if (false) { //TODO env.CHANGE_ID) {
                     //Init comment string
                     def comment = ""
-
                     echo performance_log
-
                     echo "Parsing test results ..."
 
                     //Regex to get all the test results
@@ -169,10 +167,8 @@ pipeline {
                     }
 
                     echo "Parsing final test result ..."
-
                     //Regex to get the final result of tests
                     def result_match = (performance_log =~ /(?s)\).(\d{1}\.?\d{11})/)
-
                     try{
                         //Append final result to comment
                         comment += "Result: " + result_match[0][1].toString() + "\r\n"
@@ -182,9 +178,7 @@ pipeline {
                     }
 
                     echo "Parsing commit hash ..."
-
                     def result_match_hash = (performance_log =~ /Merge (.*?) into/)
-
                     try{
                         //Append commit hash
                         comment += "Commit hash: " + result_match_hash[0][1].toString() + "\r\n"
