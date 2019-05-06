@@ -119,31 +119,28 @@ pipeline {
                         }
                     }
                 }
-                // stage('Upstream CmdStan Performance tests') {
-                //     when {
-                //             expression {
-                //                 env.BRANCH_NAME ==~ /PR-\d+/ ||
-                //                 env.BRANCH_NAME == "downstream_tests" ||
-                //                 env.BRANCH_NAME == "downstream_hotfix"
-                //             }
-                //         }
-                //     steps {
-                //         script{
-
-                //             build_log = build(
-                //                 job: "CmdStan Performance Tests/downstream_tests",
-                //                 parameters: [
-                //                     string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
-                //                 ],
-                //                 propagate: true,
-                //                 wait:true
-                //             )
-
-                //             performance_log = build_log.rawBuild.log
-
-                //         }
-                //     }
-                // }
+                stage('Upstream CmdStan Performance tests') {
+                    when {
+                            expression {
+                                env.BRANCH_NAME ==~ /PR-\d+/ ||
+                                env.BRANCH_NAME == "downstream_tests" ||
+                                env.BRANCH_NAME == "downstream_hotfix"
+                            }
+                        }
+                    steps {
+                        script{
+                            build_log = build(
+                                job: "CmdStan Performance Tests/downstream_tests",
+                                parameters: [
+                                    string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
+                                ],
+                                propagate: true,
+                                wait:true
+                            )
+                            performance_log = build_log.rawBuild.log
+                        }
+                    }
+                }
             }
         }
     }
