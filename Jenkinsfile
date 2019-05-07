@@ -132,7 +132,9 @@ pipeline {
                             build_log = build(
                                 job: "CmdStan Performance Tests/downstream_tests",
                                 parameters: [
-                                    string(name: 'cmdstan_compare_hash', value: env.BRANCH_NAME)
+                                    string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
+                                    string(name: 'stan_pr', value: params.stan_pr),
+                                    string(name: 'math_pr', value: params.math_pr)
                                 ],
                                 propagate: true,
                                 wait:true
