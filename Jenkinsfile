@@ -5,7 +5,7 @@ def utils = new org.stan.Utils()
 
 def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CXX=${CXX}")
+    writeFile(file: "make/local", text: "CXX = ${CXX} \n")
 }
 
 def runTests(String prefix = "") {
