@@ -3,15 +3,14 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCXX(failOnError = true, CXX = env.CXX) {
+def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
-    errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX}")
 }
 
-def runTests(String prefix = "", String testPath) {
+def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
-      ${prefix}runCmdStanTests.py -j${env.PARALLEL} ${testPath}
+      ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
 }
 
@@ -59,7 +58,7 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat runTests("src/test/interface")
+                        bat runTests()
                     }
                     post { 
                         always { 
@@ -85,8 +84,8 @@ pipeline {
                 stage('Linux interface tests') {
                     agent {label 'linux'}
                     steps {
-                        setupCXX(true, "${env.GCC}")
-                        sh runTests("./", "src/test/interface")
+                        setupCXX("${env.GCC}")
+                        sh runTests("./")
                     }
                     post {
                         always {
@@ -112,8 +111,8 @@ pipeline {
                 stage('Mac interface tests') {
                     agent {label 'osx'}
                     steps {
-                        setupCXX(true, "${env.GCC}")
-                        sh runTests("./", "src/test/interface")
+                        setupCXX("${env.GCC}")
+                        sh runTests("./")
                     }
                     post {
                         always {
