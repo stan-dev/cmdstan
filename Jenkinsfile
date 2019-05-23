@@ -3,15 +3,21 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCXX(CXX = env.CXX) {
+def setupCXX(failOnError = true, CXX = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CXX = ${CXX}\n")
+    errorStr = failOnError ? "-Werror " : ""
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
 
-def runTests(String prefix = "") {
+def runTests(String prefix = "", String testPath) {
     """ make -j${env.PARALLEL} build
-  ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+      ${prefix}runCmdStanTests.py -j${env.PARALLEL} ${testPath}
     """
+}
+
+def deleteDirWin() {
+    bat "attrib -r -s /s /d"
+    deleteDir()
 }
 
 pipeline {
@@ -48,30 +54,50 @@ pipeline {
         }
         stage('Parallel tests') {
             parallel {
+                
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat runTests()
+                        bat runTests("src/test/interface")
                     }
-                    post { always { deleteDir() }}
+                    post { 
+                        always { 
+
+                            recordIssues id: "Windows",
+                            name: "Windows interface tests",
+                            enabledForFailure: true,
+                            aggregatingResults : true,
+                            tools: [
+                                gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
+                                clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
+                            ],
+                            blameDisabled: false,
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                            referenceJobName: env.BRANCH_NAME
+
+                            deleteDirWin()
+                        }
+                    }
                 }
-                stage('Non-windows interface tests') {
-                    agent any
+
+                stage('Linux interface tests') {
+                    agent {label 'linux'}
                     steps {
-                        setupCXX()
-                        sh runTests("./")
+                        setupCXX(true, "${env.GCC}")
+                        sh runTests("./", "src/test/interface")
                     }
                     post {
                         always {
 
-                            recordIssues id: "non_windows",
-                            name: "Non-windows interface tests",
+                            recordIssues id: "Linux",
+                            name: "Linux interface tests",
                             enabledForFailure: true,
                             aggregatingResults : true,
                             tools: [
-                                gcc4(id: "non_windows_gcc4", name: "Non-windows interface tests@GCC4"),
-                                clang(id: "non_windows_clang", name: "Non-windows interface tests@CLANG")
+                                gcc4(id: "Linux_gcc4", name: "Linux interface tests@GCC4"),
+                                clang(id: "Linux_clang", name: "Linux interface tests@CLANG")
                             ],
                             blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
@@ -82,33 +108,25 @@ pipeline {
                         }
                     }
                 }
-                stage('Non-windows interface tests with MPI') {
-                    agent { label 'linux' }
-                    /* use system default compiler used to build MPI
-                     environment {
-                     OMPI_CXX = "${env.CXX}"
-                     MPICH_CXX = "${env.CXX}"
-                 }
-                     */
+
+                stage('Mac interface tests') {
+                    agent {label 'osx'}
                     steps {
-                        setupCXX("${MPICXX}")
-                        sh "echo STAN_MPI=true >> make/local"
-                        sh "make build-mpi > build-mpi.log 2>&1"
-                        sh runTests("./")
+                        setupCXX(true, "${env.GCC}")
+                        sh runTests("./", "src/test/interface")
                     }
                     post {
                         always {
-                            archiveArtifacts 'build-mpi.log'
 
-                            recordIssues id: "non_windows_mpi",
-                            name: "Non-windows interface tests with MPI",
+                            recordIssues id: "Mac",
+                            name: "Mac interface tests",
                             enabledForFailure: true,
                             aggregatingResults : true,
-                            blameDisabled: false,
                             tools: [
-                                gcc4(id: "non_windows_mpi_gcc4", name: "Non-windows interface tests with MPI@GCC4"),
-                                clang(id: "non_windows_mpi_clang", name: "Non-windows interface tests with MPI@CLANG")
+                                gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
+                                clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
                             ],
+                            blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
                             referenceJobName: env.BRANCH_NAME
@@ -117,6 +135,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Upstream CmdStan Performance tests') {
                     when {
                             expression {
@@ -139,6 +158,7 @@ pipeline {
                         }
                     }
                 }
+
             }
         }
     }
