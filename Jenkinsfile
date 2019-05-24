@@ -5,7 +5,7 @@ def utils = new org.stan.Utils()
 
 def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CXX = ${CXX} \n")
+    writeFile(file: "make/local", text: "CXX = ${CXX}\n")
 }
 
 def runTests(String prefix = "") {
@@ -84,7 +84,7 @@ pipeline {
                 stage('Linux interface tests') {
                     agent {label 'linux'}
                     steps {
-                        setupCXX("${env.GCC}")
+                        setupCXX(env.GCC)
                         sh runTests("./")
                     }
                     post {
@@ -111,7 +111,7 @@ pipeline {
                 stage('Mac interface tests') {
                     agent {label 'osx'}
                     steps {
-                        setupCXX("${env.GCC}")
+                        setupCXX()
                         sh runTests("./")
                     }
                     post {
