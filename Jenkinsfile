@@ -81,22 +81,24 @@ pipeline {
                     }
                 }
 
-                stage('Linux interface tests') {
-                    agent {label 'linux'}
+                stage('Linux interface tests with MPI') {
+                    agent {label 'linux & mpi'}
                     steps {
-                        setupCXX(env.GCC)
+                        setupCXX("${MPICXX}")
+                        sh "echo STAN_MPI=true >> make/local"
+                        sh "make build-mpi > build-mpi.log 2>&1"
                         sh runTests("./")
                     }
                     post {
                         always {
 
-                            recordIssues id: "Linux",
-                            name: "Linux interface tests",
+                            recordIssues id: "Linux_mpi",
+                            name: "Linux interface tests with MPI",
                             enabledForFailure: true,
                             aggregatingResults : true,
                             tools: [
-                                gcc4(id: "Linux_gcc4", name: "Linux interface tests@GCC4"),
-                                clang(id: "Linux_clang", name: "Linux interface tests@CLANG")
+                                gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
+                                clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
                             ],
                             blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
