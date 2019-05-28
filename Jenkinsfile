@@ -82,7 +82,7 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent {label 'linux & mpi'}
+                    agent {label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
