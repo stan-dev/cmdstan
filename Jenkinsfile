@@ -10,8 +10,13 @@ def setupCXX(CXX = env.CXX) {
 
 def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
-  ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+      ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
+}
+
+def deleteDirWin() {
+    bat "attrib -r -s /s /d"
+    deleteDir()
 }
 
 pipeline {
@@ -48,48 +53,36 @@ pipeline {
         }
         stage('Parallel tests') {
             parallel {
+                
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
                         bat runTests()
                     }
-                    post { always { deleteDir() }}
-                }
-                stage('Non-windows interface tests') {
-                    agent any
-                    steps {
-                        setupCXX()
-                        sh runTests("./")
-                    }
-                    post {
-                        always {
+                    post { 
+                        always { 
 
-                            recordIssues id: "non_windows",
-                            name: "Non-windows interface tests",
+                            recordIssues id: "Windows",
+                            name: "Windows interface tests",
                             enabledForFailure: true,
                             aggregatingResults : true,
                             tools: [
-                                gcc4(id: "non_windows_gcc4", name: "Non-windows interface tests@GCC4"),
-                                clang(id: "non_windows_clang", name: "Non-windows interface tests@CLANG")
+                                gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
+                                clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
                             ],
                             blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
                             referenceJobName: env.BRANCH_NAME
 
-                            deleteDir()
+                            deleteDirWin()
                         }
                     }
                 }
-                stage('Non-windows interface tests with MPI') {
-                    agent { label 'linux' }
-                    /* use system default compiler used to build MPI
-                     environment {
-                     OMPI_CXX = "${env.CXX}"
-                     MPICH_CXX = "${env.CXX}"
-                 }
-                     */
+
+                stage('Linux interface tests with MPI') {
+                    agent {label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
@@ -98,17 +91,16 @@ pipeline {
                     }
                     post {
                         always {
-                            archiveArtifacts 'build-mpi.log'
 
-                            recordIssues id: "non_windows_mpi",
-                            name: "Non-windows interface tests with MPI",
+                            recordIssues id: "Linux_mpi",
+                            name: "Linux interface tests with MPI",
                             enabledForFailure: true,
                             aggregatingResults : true,
-                            blameDisabled: false,
                             tools: [
-                                gcc4(id: "non_windows_mpi_gcc4", name: "Non-windows interface tests with MPI@GCC4"),
-                                clang(id: "non_windows_mpi_clang", name: "Non-windows interface tests with MPI@CLANG")
+                                gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
+                                clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
                             ],
+                            blameDisabled: false,
                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
                             referenceJobName: env.BRANCH_NAME
@@ -117,6 +109,34 @@ pipeline {
                         }
                     }
                 }
+
+                stage('Mac interface tests') {
+                    agent {label 'osx'}
+                    steps {
+                        setupCXX()
+                        sh runTests("./")
+                    }
+                    post {
+                        always {
+
+                            recordIssues id: "Mac",
+                            name: "Mac interface tests",
+                            enabledForFailure: true,
+                            aggregatingResults : true,
+                            tools: [
+                                gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
+                                clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
+                            ],
+                            blameDisabled: false,
+                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                            referenceJobName: env.BRANCH_NAME
+
+                            deleteDir()
+                        }
+                    }
+                }
+
                 stage('Upstream CmdStan Performance tests') {
                     when {
                             expression {
@@ -139,6 +159,7 @@ pipeline {
                         }
                     }
                 }
+
             }
         }
     }
