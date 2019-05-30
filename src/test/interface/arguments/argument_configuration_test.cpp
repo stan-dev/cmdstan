@@ -838,20 +838,81 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   
   // Check argument consistency
   bool expected_success = false;
-
-  // check good
-  std::string random_arg_good("random seed=18383");
-  std::string random_arg_bad("random seed=-2");
-
-  run_command_output out = run_command(command + " " + method_argument + " " + random_arg_good);
-  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
-  out = run_command(command + " "  + random_arg_good + " " + method_argument);
-  EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
-
-  out = run_command(command + " " + method_argument + " " + random_arg_bad);
-  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
-  out = run_command(command + " "  + random_arg_bad + " " + method_argument);
-  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
+  
+  std::string l1;
+  std::stringstream expected_output;
+  std::stringstream output;
+  
+  while (s.good()) {
+    
+    std::getline(s, l1);
+    if (!s.good()) continue;
+    
+    if      (l1 == "good") expected_success = true;
+    else if (l1 == "bad") expected_success = false;
+    else if (l1 != "") expected_output << l1 << std::endl;
+    else {
+      
+      int n_output = 0;
+      
+      std::string l2;
+      std::string argument("");
+      
+      while (expected_output.good()) {
+        std::getline(expected_output, l2);
+        if (!expected_output.good()) continue;
+        clean_line(l2);
+        argument += " " + l2;
+        ++n_output;
+      }
+      
+      if (argument.length() == 0) continue;
+      remove_duplicates(argument);
+      argument = method_argument + argument;
+      
+      run_command_output out = run_command(command + argument);
+      
+      expected_output.clear();
+      expected_output.seekg(std::ios_base::beg);
+      expected_output.str( method_output.str() + expected_output.str() );
+      
+      if (expected_success == false) {
+        
+        unsigned int c1 = out.output.find("is not");
+        out.output.erase(0, c1);
+        unsigned int c2 = out.output.find(" \"");
+        unsigned int c3 = out.output.find("Failed to parse");
+        out.output.replace(c2, c3 - c2, "\n");
+        
+        expected_output.str(std::string());
+        expected_output << "is not a valid value for" << std::endl;
+        expected_output << "Failed to parse arguments, terminating Stan" << std::endl;
+        n_output = 2;
+        
+      } else {
+        EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code) 
+          << "command: " << out.command;
+      }
+      
+      output.str(out.output);
+      std::string actual_line;
+      
+      for (int i = 0; i < n_output; ++i) {
+        std::string expected_line;
+        std::getline(expected_output, expected_line);
+        
+        std::getline(output, actual_line);
+        
+        EXPECT_EQ(expected_line, actual_line);
+      }
+      
+    }
+    
+  }
+  
+  for (size_t i = 0; i < valid_arguments.size(); ++i)
+    delete valid_arguments.at(i);
+  
 }
 
 
