@@ -154,6 +154,9 @@ build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) 
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
+ifeq ($(CXX_TYPE),clang)
+build: $(STAN)src/stan/model/model_header.hpp.gch
+endif
 
 ##
 # Clean up.
