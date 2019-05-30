@@ -212,8 +212,12 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
 
 
+.PHONY: compile_info
+compile_info:
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable
 ##
+.PHONY: print-%
 print-%  : ; @echo $* = $($*)
