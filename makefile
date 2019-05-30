@@ -139,6 +139,7 @@ help-dev:
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
+	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
 	@echo ''
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
