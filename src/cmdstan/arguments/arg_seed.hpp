@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 
-  class arg_seed: public u_int_argument {
+  class arg_seed: public int_argument {
   public:
-    arg_seed(): u_int_argument() {
+    arg_seed(): int_argument() {
       _name = "seed";
       _description = "Random number generator seed";
-      _validity = "integer > 0 or -1 to generate seed from sys clock time";
+      _validity = "integer > 0 or -1 to generate seed from system time";
       _default = "-1";
       _default_value = -1;
       _constrained = true;
@@ -20,9 +20,8 @@ namespace cmdstan {
       _value = _default_value;
     }
 
-    bool is_valid(unsigned int value) {
-      return (value > 0 && value <= std::numeric_limits<int>::max())
-        || (value == _default_value);
+    bool is_valid(int value) {
+      return value > 0 || value == _default_value;
     }
   };
 
