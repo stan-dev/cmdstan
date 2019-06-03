@@ -139,6 +139,7 @@ help-dev:
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
+	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
 	@echo ''
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
@@ -215,8 +216,12 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
 
 
+.PHONY: compile_info
+compile_info:
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable
 ##
+.PHONY: print-%
 print-%  : ; @echo $* = $($*)
