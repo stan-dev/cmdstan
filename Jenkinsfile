@@ -53,15 +53,15 @@ pipeline {
         }
         stage('Parallel tests') {
             parallel {
-                
+
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
                         bat runTests()
                     }
-                    post { 
-                        always { 
+                    post {
+                        always {
 
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
@@ -164,7 +164,14 @@ pipeline {
         }
     }
     post {
-        success { script { utils.mailBuildResults("SUCCESSFUL") } }
+        success {
+            script {
+                if (env.BRANCH_NAME == "develop") {
+                    build job: "CmdStan Performance Tests/master", wait:false
+                }
+                utils.mailBuildResults("SUCCESSFUL")
+            }
+        }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
