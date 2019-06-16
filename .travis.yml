@@ -7,6 +7,7 @@ before_script:
   - ${CXX} --version
   - echo "CXX=$CXX" > make/local
   - echo "CXXFLAGS+=$CXXFLAGS" >> make/local
+  - echo "CXX_TYPE=$CXX_TYPE" >> make/local
 
 linux_clang: &linux_clang
   os: linux
@@ -50,20 +51,24 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=clang++-3.8"
           CXXFLAGS="-stdlib=libc++"
+          CXX_TYPE="clang"
           PARALLEL=2
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
+          CXX_TYPE="gcc"
           PARALLEL=1
     - <<: *mpi_linux_clang
       env:
         - MATRIX_EVAL="CXX=\"mpicxx -cxx=clang++-3.8\""
           CXXFLAGS="-stdlib=libc++"
+          CXX_TYPE="clang"
           STAN_MPI=true
           PARALLEL=2
     - <<: *mpi_linux_gcc
       env:
         - MATRIX_EVAL="CXX=\"mpicxx -cxx=g++-4.9\""
+          CXX_TYPE="gcc"
           STAN_MPI=true
           PARALLEL=1
 
