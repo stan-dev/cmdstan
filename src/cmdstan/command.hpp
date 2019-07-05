@@ -49,6 +49,12 @@
 #include <vector>
 #include <memory>
 
+
+// forward declaration for function defined in another translation unit
+stan::model::model_base& new_model(stan::io::var_context& data_context,
+                                   unsigned int seed,
+                                   std::ostream* msg_stream);
+
 namespace cmdstan {
 
 #ifdef STAN_MPI
@@ -137,7 +143,7 @@ namespace cmdstan {
 
     unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
 
-    Model model(*var_context, random_seed, &std::cout);
+    stan::model::model_base& model = new_model(*var_context, random_seed, &std::cout);
 
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
