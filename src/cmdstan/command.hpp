@@ -18,6 +18,7 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
+#include <stan/model/model_base.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
