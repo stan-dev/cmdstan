@@ -86,7 +86,6 @@ namespace cmdstan {
   static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6
 
 
-  template <class Model>
   int command(int argc, const char* argv[]) {
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
