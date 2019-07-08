@@ -29,23 +29,16 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$@ $<
 
-
-%.o : %.hpp
-	@echo ''
-	cp $*.hpp $*.cpp
-	@echo '--- Compiling C++ model ---'
-	$(LINK.cpp) -c -o $*.o $*.cpp
-	rm $*.d $*.cpp
-
 .PRECIOUS: %.hpp
-%$(EXE) : %.o $(CMDSTAN_MAIN) $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN) $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
-	@echo '--- Linking C++ model ---'
-	$(CXX) $(CXXFLAGS_PROGRAM) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
+	@echo '--- Compiling, linking C++ code ---'
+	cp $*.hpp $*.cpp; $(LINK.cpp) -c -o $*.o $*.cpp ; $(CXX) $(CXXFLAGS_PROGRAM) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
+
 
 
 ##
-# Dependencies file
+# Dependencies file for precompiled header
 ##
 ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
