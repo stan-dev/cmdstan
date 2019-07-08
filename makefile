@@ -21,6 +21,7 @@ help:
 -include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
 
+
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
 ifeq ($(OS),Windows_NT)
@@ -151,7 +152,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O) $(STAN)src/stan/model/model_header.d
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
