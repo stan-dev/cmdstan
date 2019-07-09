@@ -182,6 +182,7 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) -r bin
+	$(RM) -r src/cmdstan/main.o
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
 ##
