@@ -33,7 +33,7 @@ endif
 %$(EXE) : %.hpp $(CMDSTAN_MAIN) $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
-	cp $*.hpp $*.cpp; $(LINK.cpp) -c -o $*.o $*.cpp ; $(CXX) $(CXXFLAGS_PROGRAM) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
+	cp $*.hpp $*.cpp; $(LINK.cpp) -include-pch stan/src/stan/model/model_header.hpp.gch -c -o $*.o $*.cpp ; $(CXX) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
 
 
 
