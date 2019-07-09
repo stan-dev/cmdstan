@@ -29,6 +29,8 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$@ $<
 
+%.d: %.hpp
+
 .PRECIOUS: %.hpp
 %$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
