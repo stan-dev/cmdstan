@@ -35,7 +35,10 @@ endif
 %$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
-	cp $*.hpp $*.cpp; $(LINK.cpp) $(CXXFLAGS_PROGRAM) -c -o $*.o $*.cpp ; $(CXX) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
+	cp $*.hpp $*.cpp; \
+    $(LINK.cpp) $(CXXFLAGS_PROGRAM) -c -o $*.o $*.cpp ; \
+    $(CXX) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o; \
+    rm $*.cpp $*.o
 
 
 
