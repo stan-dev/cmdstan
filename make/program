@@ -30,10 +30,10 @@ endif
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$@ $<
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN) $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
-	cp $*.hpp $*.cpp; $(LINK.cpp) -include-pch stan/src/stan/model/model_header.hpp.gch -c -o $*.o $*.cpp ; $(CXX) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
+	cp $*.hpp $*.cpp; $(LINK.cpp) $(CXXFLAGS_PROGRAM) -c -o $*.o $*.cpp ; $(CXX) -include $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) -o $@ $(CMDSTAN_MAIN_O) $*.o
 
 
 
