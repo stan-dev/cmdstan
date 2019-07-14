@@ -2,7 +2,7 @@
 # Models (to be passed through stanc)
 ##
 CMDSTAN_MAIN ?= src/cmdstan/main.cpp
-CMDSTAN_MAIN_O ?= src/cmdstan/main.o
+CMDSTAN_MAIN_O = $(patsubst %.cpp,%.o,$(CMDSTAN_MAIN))
 
 STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(MAKECMDGOALS))))
 
