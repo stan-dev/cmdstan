@@ -15,6 +15,10 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
+
+%.d: %.hpp
+
+
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
@@ -25,7 +29,10 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f)
+TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
+
+.PHONY: test-models-hpp
+test-models-hpp: $(TEST_MODELS_HPP)
 
 ############################################################
 #
@@ -50,7 +57,6 @@ test/dummy.cpp:
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
-
 
 ##
 # Tests that depend on compiled models
