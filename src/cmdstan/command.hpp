@@ -50,6 +50,10 @@
 #include <vector>
 #include <memory>
 
+#ifdef STAN_MPI
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#endif
+
 
 // forward declaration for function defined in another translation unit
 stan::model::model_base& new_model(stan::io::var_context& data_context,
