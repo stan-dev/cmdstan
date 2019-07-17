@@ -151,7 +151,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O) $(STAN)src/stan/model/model_header.d
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
