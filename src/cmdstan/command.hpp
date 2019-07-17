@@ -52,6 +52,8 @@
 
 #ifdef STAN_MPI
 #include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#include <stan/math/prim/arr/functor/mpi_command.hpp>
+#include <stan/math/prim/arr/functor/mpi_distributed_apply.hpp>
 #endif
 
 
