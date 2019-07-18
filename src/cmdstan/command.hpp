@@ -119,7 +119,8 @@ namespace cmdstan {
     }
     if (parser.help_printed())
       return err_code;
-    u_int_argument* random_arg = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
+
+    int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
     if (random_arg->is_default()) {
       random_arg->set_value((boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds());
     }
@@ -146,7 +147,7 @@ namespace cmdstan {
     std::string filename(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value());
     std::shared_ptr<stan::io::var_context> var_context = get_var_context(filename);
 
-    unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
+    int random_seed = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"))->value();
 
     stan::model::model_base& model = new_model(*var_context, random_seed, &std::cout);
 
