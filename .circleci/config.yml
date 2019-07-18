@@ -5,7 +5,6 @@ jobs:
       - image: seantalts/bookdown
     steps:
       - checkout
-      - run: git submodule update --init --recursive
 
 workflows:
   version: 2
