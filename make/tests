@@ -68,6 +68,7 @@ test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_heade
 test/interface/diagnose_test$(EXE): bin/diagnose$(EXE)
 test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
 test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
+test/interface/mpi_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, proper))
 test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
 test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
 test/interface/print_test$(EXE): bin/print$(EXE)
