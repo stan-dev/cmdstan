@@ -6,17 +6,22 @@
 namespace cmdstan {
 
 
-  class arg_seed: public u_int_argument {
+  class arg_seed: public int_argument {
   public:
-    arg_seed(): u_int_argument() {
+    arg_seed(): int_argument() {
       _name = "seed";
       _description = "Random number generator seed";
-      _validity = "seed > 0, if negative seed is generated from time";
+      _validity = "integer > 0 or -1 to generate seed from system time";
       _default = "-1";
       _default_value = -1;
-      _constrained = false;
+      _constrained = true;
       _good_value = 18383;
+      _bad_value = -2;
       _value = _default_value;
+    }
+
+    bool is_valid(int value) {
+      return value > 0 || value == _default_value;
     }
   };
 
