@@ -39,7 +39,6 @@
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
-#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <stan/math/opencl/opencl_context.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
