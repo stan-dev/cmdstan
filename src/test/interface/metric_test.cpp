@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <test/utility.hpp>
+#include <test/test-models/proper.hpp>
 #include <stdexcept>
 #include <boost/math/policies/error_handling.hpp>
 #include <stan/callbacks/stream_writer.hpp>

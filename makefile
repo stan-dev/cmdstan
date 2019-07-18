@@ -151,7 +151,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
@@ -182,6 +182,7 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) -r bin
+	$(RM) -r $(CMDSTAN_MAIN_O)
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
 ##
@@ -218,7 +219,7 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 
 .PHONY: compile_info
 compile_info:
-	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable
