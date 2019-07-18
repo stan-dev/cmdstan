@@ -7,7 +7,7 @@ CMDSTAN_MAIN_O = $(patsubst %.cpp,%.o,$(CMDSTAN_MAIN))
 STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(MAKECMDGOALS))))
 
 ##
-# Precompiled header
+# Precompiled model header
 ##
 
 $(STAN)src/stan/model/model_header.d : $(STAN)src/stan/model/model_header.hpp
