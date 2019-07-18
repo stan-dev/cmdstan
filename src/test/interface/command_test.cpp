@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <test/utility.hpp>
+#include <test/test-models/proper.hpp>
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
 #include <boost/math/policies/error_handling.hpp>
@@ -433,6 +434,68 @@ TEST(StanUiCommand, random_seed_specified_different) {
     }
   }
   EXPECT_NE(random1,random2);
+}
+
+TEST(StanUiCommand, random_seed_fail_1) {
+  std::string expected_message
+    = "is not a valid value for \"seed\"";
+
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=0 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  run_command_output out = run_command(command);
+  EXPECT_EQ(1, count_matches(expected_message, out.body));
+}
+
+TEST(StanUiCommand, random_seed_fail_2) {
+  std::string expected_message
+    = "is not a valid value for \"seed\"";
+
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+  
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=-2 "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  run_command_output out = run_command(command);
+  EXPECT_EQ(1, count_matches(expected_message, out.body));
+}
+
+TEST(StanUiCommand, random_seed_fail_3) {
+  std::string expected_message
+    = "is not a valid value for \"seed\"";
+
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+
+  int max = std::numeric_limits<int>::max();
+  unsigned int maxplus =  max + 100;
+  std::string command = convert_model_path(model_path)
+    + " sample num_samples=10 num_warmup=10 init=0 "
+    + " random seed=" + std::to_string(maxplus) + " "
+    + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+    + " output refresh=0 file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
+  run_command_output out = run_command(command);
+  EXPECT_EQ(1, count_matches(expected_message, out.body));
 }
 
 TEST(StanUiCommand, json_input) {

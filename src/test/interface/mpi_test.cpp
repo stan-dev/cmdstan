@@ -3,6 +3,7 @@
 #include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
 #include <stan/math/prim/arr.hpp>
+#include <test/test-models/proper.hpp>
 
 TEST(StanUiCommand, mpi_ready) {
   // The initialization has all worked if we get to here on the rank=0

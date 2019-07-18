@@ -74,20 +74,24 @@ namespace cmdstan {
       if (_name == name) {
         args.pop_back();
 
-        T proposed_value = boost::lexical_cast<T>(value);
+	try {
+	  T proposed_value = boost::lexical_cast<T>(value);
+	  if (set_value(proposed_value)) {
+	    return true;
+	  }
+        } catch (...) {
+	  // intentionally empty.
+	}
+	std::stringstream message;
+	message << value
+		<< " is not a valid value for "
+		<< "\"" << _name << "\"";
+	err(message.str());
+	err(std::string(indent_width, ' ')
+	    + "Valid values:" + print_valid());
 
-        if (!set_value(proposed_value)) {
-          std::stringstream message;
-          message << proposed_value
-                  << " is not a valid value for "
-                  << "\"" << _name << "\"";
-          err(message.str());
-          err(std::string(indent_width, ' ')
-              + "Valid values:" + print_valid());
-
-          args.clear();
-          return false;
-        }
+	args.clear();
+	return false;
       }
       return true;
     }
