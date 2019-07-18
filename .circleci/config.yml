@@ -1,0 +1,14 @@
+version: 2.0
+jobs:
+  manual:
+    docker:
+      - image: seantalts/bookdown
+    steps:
+      - checkout
+      - run: git submodule update --init --recursive
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - manual
