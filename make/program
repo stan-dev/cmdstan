@@ -38,11 +38,11 @@ endif
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $*.o $<
-	$(LINK.cpp) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O) $*.o $(OUTPUT_OPTION)
+	$(LINK.cpp) $(LDLIBS) $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $*.o $(OUTPUT_OPTION)
 
 
 ##
-# Dependencies file for precompiled header
+# Dependencies file
 ##
 ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
