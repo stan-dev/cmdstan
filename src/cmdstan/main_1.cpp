@@ -13,7 +13,16 @@ int main(int argc, const char* argv[]) {
   stan::io::dump context(data_file);
   
   stan::model::model_base& model = new_model(context, 1, NULL);
-  std::cout << "here" << std::endl;
+
+  std::cout << "model name: " << model.model_name() << std::endl;
+
+  Eigen::VectorXd theta(1);
+  theta << 0;
+
+  std::cout << "eval:       " << model.log_prob(theta, &std::cout) << std::endl;
+  // R
+  // > dbinom(0, 1, 0.5, log=TRUE)
+  // [1] -0.6931472
 
   return 0;
 }
