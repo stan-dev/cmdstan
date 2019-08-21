@@ -93,6 +93,9 @@ namespace cmdstan {
 
 
   int command(int argc, const char* argv[]) {
+    	  std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl
+		    << "HERE!!!" << std::endl;
+
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
