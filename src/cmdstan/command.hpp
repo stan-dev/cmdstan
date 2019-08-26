@@ -9,6 +9,7 @@
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
+#include <cmdstan/io/json/json_data.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -17,7 +18,6 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/ends_with.hpp>
-#include <stan/io/json/json_data.hpp>
 #include <stan/model/model_base.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
