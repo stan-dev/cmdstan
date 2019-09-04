@@ -43,7 +43,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.19.0
+CMDSTAN_VERSION := 2.20.0
 
 .PHONY: help
 help:
@@ -139,6 +139,7 @@ help-dev:
 	@echo '                   bin/stanc$(EXE))'
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
+	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
 	@echo ''
 	@echo 'Documentation:'
 	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
@@ -150,10 +151,13 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
+ifeq ($(CXX_TYPE),clang)
+build: $(STAN)src/stan/model/model_header.hpp.gch
+endif
 
 ##
 # Clean up.
@@ -178,6 +182,7 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) -r bin
+	$(RM) -r $(CMDSTAN_MAIN_O)
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
 ##
@@ -212,8 +217,12 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
 
 
+.PHONY: compile_info
+compile_info:
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable
 ##
+.PHONY: print-%
 print-%  : ; @echo $* = $($*)

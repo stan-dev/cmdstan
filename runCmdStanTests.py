@@ -34,7 +34,7 @@ def isWin():
         return True
     return False
 
-# set up good makefile target name    
+# set up good makefile target name
 def mungeName(name):
     if (debug):
         print("munge input: %s" % name)
@@ -76,6 +76,14 @@ def makeBuild(j):
     doCommand(command)
 
 
+def makeTestModelsHpp(j):
+    if (j == None):
+        command = 'make test-models-hpp'
+    else:
+        command = 'make -j%d test-models-hpp' % j
+    doCommand(command)
+
+
 def makeTestModel(target, j):
     if (j == None):
         command = 'make %s' % target
@@ -83,7 +91,7 @@ def makeTestModel(target, j):
         command = 'make -j%d %s' % (j,target)
     doCommand(command)
 
-    
+
 def makeTests(dirname, filenames, j):
     targets = list()
     for name in filenames:
@@ -110,14 +118,14 @@ def makeTests(dirname, filenames, j):
             endIdx = startIdx + batchSize
             if (endIdx > len(targets)):
                 endIdx = len(targets)
-         
+
 def commandExists(command):
     p = subprocess.Popen(command, shell=True,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     p.wait()
     return p.returncode != 127
-                
+
 def runTest(name, mpi=False, j=1):
     executable = mungeName(name).replace("/",os.sep)
     xml = mungeName(name).replace(winsfx, "")
@@ -141,7 +149,7 @@ def main():
             stan_mpi =  "STAN_MPI" in f.read()
     except IOError:
         stan_mpi = False
-    
+
     argsIdx = 1
     j = None
     if (sys.argv[1].startswith("-j")):
@@ -152,8 +160,8 @@ def main():
             j = sys.argv[1].replace("-j","")
             try:
                 jprime = int(j)
-                if (jprime < 1 or jprime > 16):
-                    stopErr("bad value for -j flag",-1)                    
+                if (jprime < 1):
+                    stopErr("bad value for -j flag",-1)
                 j = jprime
             except ValueError:
                 stopErr("bad value for -j flag",-1)
@@ -161,6 +169,7 @@ def main():
 
     # pass 0:  make build
     makeBuild(j)
+    makeTestModelsHpp(j)
 
     # pass 1:  call make to compile test targets
     for i in range(argsIdx,len(sys.argv)):
@@ -196,6 +205,6 @@ def main():
                             print("run dir,test: %s,%s" % (root,name))
                         runTest(os.sep.join([root,name]), mpi = stan_mpi, j = j)
 
-    
+
 if __name__ == "__main__":
     main()

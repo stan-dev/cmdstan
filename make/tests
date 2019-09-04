@@ -15,6 +15,10 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
+
+%.d: %.hpp
+
+
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
@@ -25,7 +29,10 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-TEST_MODELS := $(shell find src/test/test-models -name '*.stan' -type f)
+TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
+
+.PHONY: test-models-hpp
+test-models-hpp: $(TEST_MODELS_HPP)
 
 ############################################################
 #
@@ -51,7 +58,6 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
 
-
 ##
 # Tests that depend on compiled models
 ##
@@ -62,6 +68,7 @@ test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_heade
 test/interface/diagnose_test$(EXE): bin/diagnose$(EXE)
 test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
 test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
+test/interface/mpi_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, proper))
 test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
 test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
 test/interface/print_test$(EXE): bin/print$(EXE)
