@@ -10,18 +10,17 @@ processor cores.
 
 \section{Operating System}
 
-\CmdStan is written in portable \Cpp without {\Cpp}11 features, as are the
+\CmdStan is written in portable \Cpp with {\Cpp}11 and {\Cpp}14 features, as are the
 libraries on which it depends.  Therefore, \CmdStan should run on any machine
-for which a suitable \Cpp compiler is available.  In practice, \CmdStan,
-like the Boost and Eigen libraries on which it depends, is very hard
-on the compiler and linker.
+for which a suitable \Cpp compiler supporting C++1y or C++14 features is available. In practice, \CmdStan,
+like the Boost and Eigen libraries on which it depends, is very hard on the compiler and linker.
 
 \CmdStan has been tested on the following operating systems.
 %
 \begin{itemize}
-\item Linux (Debian, Ubuntu, Red Hat)
+\item Linux (Debian, Ubuntu)
 \item Mac OS X (from 10.6 ``Snow Leopard''  through 10.14 ``Mojave'')
-\item Windows (XP, 7, 8).
+\item Windows (7, 8, 10).
 \end{itemize}
 %
 \CmdStan should work on other versions of these operating systems if
@@ -333,7 +332,7 @@ To test, open the Terminal application and enter
 \end{quote}
 %
 Verify that \code{make} is at version 3.81 or later and \code{g++}
-is at 4.2.1 or later.
+is at 4.9.3 or later.
 
 
 \subsection{Download and Unpack \CmdStan Source}
@@ -379,18 +378,18 @@ are already installed, use the commands
 \end{Verbatim}
 \end{quote}
 %
-If these are at least at \code{g++} version 4.2.1 or later and
+If these are at least at \code{g++} version 4.9.3 or later and
 \code{make} version 3.81 or later, no additional installations are
 necessary.  It may still be desirable to update the \Cpp compiler
 \code{g++}, because later versions are faster.
 
-To install the latest version of these
-tools (or upgrade an older version), use the commands
+To install the latest version of these 
+tools (or upgrade an older version), use the following commands or their equivalent for your distribution: 
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> sudo apt-get install g++
-> sudo apt-get install make
+> sudo apt install g++
+> sudo apt install make
 \end{Verbatim}
 \end{quote}
 %
