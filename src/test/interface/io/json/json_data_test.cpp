@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
 
-#include <cmdstan/io/json//json_data.hpp>
-#include <cmdstan/io/json//json_data_handler.hpp>
-#include <cmdstan/io/json//json_error.hpp>
-#include <cmdstan/io/json//json_handler.hpp>
-#include <cmdstan/io/json//json_parser.hpp>
+#include <cmdstan/io/json/json_data.hpp>
+#include <cmdstan/io/json/json_data_handler.hpp>
+#include <cmdstan/io/json/json_error.hpp>
+#include <cmdstan/io/json/json_handler.hpp>
+#include <cmdstan/io/json/json_parser.hpp>
 
 #include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-void test_int_var(stan::json::json_data& jdata,
+void test_int_var(cmdstan::json::json_data& jdata,
                   const std::string& text,
                   const std::string& name,
                   const std::vector<int>& expected_vals,
@@ -26,7 +26,7 @@ void test_int_var(stan::json::json_data& jdata,
     EXPECT_EQ(expected_vals[i],vals[i]);
 }
 
-void test_real_var(stan::json::json_data& jdata,
+void test_real_var(cmdstan::json::json_data& jdata,
                   const std::string& text,
                   const std::string& name,
                   const std::vector<double>& expected_vals,
@@ -46,7 +46,7 @@ void test_exception(const std::string& input,
                     const std::string& exception_text) {
   try {
     std::stringstream s(input);
-    stan::json::json_data jdata(s);
+    cmdstan::json::json_data jdata(s);
   } catch (const std::exception& e) {
     EXPECT_EQ(e.what(), exception_text);
     return;
@@ -60,7 +60,7 @@ void test_exception(const std::string& input,
 TEST(ioJson,jsonData_scalar_int) {
   std::string txt = "{ \"foo\" : 1 }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals;
   expected_vals.push_back(1);
   std::vector<size_t> expected_dims;
@@ -70,7 +70,7 @@ TEST(ioJson,jsonData_scalar_int) {
 TEST(ioJson,jsonData_scalar_real) {
   std::string txt = "{ \"foo\" : 1.1 }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   std::vector<size_t> expected_dims;
@@ -80,7 +80,7 @@ TEST(ioJson,jsonData_scalar_real) {
 TEST(ioJson,jsonData_mult_vars) {
   std::string txt = "{ \"foo\" : 1, \"bar\" : 0.1 }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals_i;
   expected_vals_i.push_back(1);
   std::vector<size_t> expected_dims;
@@ -93,7 +93,7 @@ TEST(ioJson,jsonData_mult_vars) {
 TEST(ioJson,jsonData_mult_vars2) {
   std::string txt = "{ \"foo\" : \"-Inf\", \"bar\" : 0.1 }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -109,7 +109,7 @@ TEST(ioJson,jsonData_mult_vars3) {
     "                  \"bar\" : 0.1 ," 
     "                  \"baz\" : [ \"-Inf\", 0.1 , 1 ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -129,7 +129,7 @@ TEST(ioJson,jsonData_mult_vars3) {
 TEST(ioJson,jsonData_real_array_1D) {
   std::string txt = "{ \"foo\" : [ 1.1, 2.2 ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   expected_vals.push_back(2.2);
@@ -142,7 +142,7 @@ TEST(ioJson,jsonData_real_array_1D) {
 TEST(ioJson,jsonData_array_1D_inf) {
   std::string txt = "{ \"foo\" : [ 1.1, \"Inf\" ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   expected_vals.push_back(std::numeric_limits<double>::infinity());
@@ -154,7 +154,7 @@ TEST(ioJson,jsonData_array_1D_inf) {
 TEST(ioJson,jsonData_array_1D_inf2) {
   std::string txt = "{ \"foo\" : [ 1, \"Inf\" ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1);
   expected_vals.push_back(std::numeric_limits<double>::infinity());
@@ -166,7 +166,7 @@ TEST(ioJson,jsonData_array_1D_inf2) {
 TEST(ioJson,jsonData_array_1D_neg_inf) {
   std::string txt = "{ \"foo\" : [ 1.1, \"-Inf\" ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   expected_vals.push_back(-std::numeric_limits<double>::infinity());
@@ -178,7 +178,7 @@ TEST(ioJson,jsonData_array_1D_neg_inf) {
 TEST(ioJson,jsonData_real_array_2D) {
   std::string txt = "{ \"foo\" : [ [ 1.1, 1.2 ], [ 2.1, 2.2 ], [ 3.1, 3.2] ]  }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   expected_vals.push_back(2.1);
@@ -197,7 +197,7 @@ TEST(ioJson,jsonData_real_array_3D) {
   std::string txt = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
     "                            [ [ 21.1, 21.2, 21.3, 21.4 ], [ 22.1, 22.2, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
   expected_vals.push_back(11.1);
   expected_vals.push_back(21.1);
@@ -234,7 +234,7 @@ TEST(ioJson,jsonData_int_array_3D) {
   std::string txt = "{ \"foo\" : [ [ [ 111, 112, 113, 114 ], [ 121, 122, 123, 124 ], [ 131, 132, 133, 134] ],"
     "                            [ [ 211, 212, 213, 214 ], [ 221, 222, 223, 224 ], [ 231, 232, 233, 234] ] ] }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals;
   expected_vals.push_back(111);  
   expected_vals.push_back(211);
@@ -267,6 +267,40 @@ TEST(ioJson,jsonData_int_array_3D) {
   test_int_var(jdata,txt,"foo",expected_vals,expected_dims);
 }
 
+TEST(ioJson,jsonData_empty_1D_array) {
+  std::string txt = "{ \"foo\" : [] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(0);
+  test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
+}
+
+TEST(ioJson,jsonData_empty_2D_array) {
+  std::string txt = "{ \"foo\" : [[]] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(1);
+  expected_dims.push_back(0);
+  test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
+}
+
+TEST(ioJson,jsonData_empty_3D_array) {
+  std::string txt = "{ \"foo\" : [[[]]] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(1);
+  expected_dims.push_back(1);
+  expected_dims.push_back(0);
+  test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
+}
+
+
 TEST(ioJson,jsonData_array_err1) {
   std::string txt = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
     "                            [ [ 21.1, 21.2, 21.3, 21.4 ], [ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
@@ -281,47 +315,37 @@ TEST(ioJson,jsonData_array_err2) {
 }
 
 TEST(ioJson,jsonData_array_err3) {
-  std::string txt = "{ \"foo\" : [] }";
-  test_exception(txt,"variable: foo, error: empty array not allowed");
-}
-
-TEST(ioJson,jsonData_array_err4) {
-  std::string txt = "{ \"foo\" : [[[]]] }";
-  test_exception(txt,"variable: foo, error: empty array not allowed");
-}
-
-TEST(ioJson,jsonData_array_err5) {
   std::string txt = "{ \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 
-TEST(ioJson,jsonData_array_err6) {
+TEST(ioJson,jsonData_array_err4) {
   std::string txt = "{ \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
   test_exception(txt,"variable: foo, error: non-rectangular array");
 }
 
-TEST(ioJson,jsonData_array_err7) {
+TEST(ioJson,jsonData_array_err5) {
   std::string txt = "{  \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 
 
-TEST(ioJson,jsonData_array_err8) {
+TEST(ioJson,jsonData_array_err6) {
   std::string txt = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 
-TEST(ioJson,jsonData_array_err9) {
+TEST(ioJson,jsonData_array_err7) {
   std::string txt = "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
   test_exception(txt,"variable: foo, error: non-rectangular array");
 }
 
-TEST(ioJson,jsonData_array_err10) {
+TEST(ioJson,jsonData_array_err8) {
   std::string txt = "{  \"baz\":[1,2,\"-Inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
 }
 
-TEST(ioJson,jsonData_array_err11) {
+TEST(ioJson,jsonData_array_err9) {
   std::string txt = "{\"a\":1,  \"baz\":[1,2,\"-Inf\"], \"b\":2.0, "
     "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt,"variable: foo, error: non-scalar array value");
@@ -385,7 +409,7 @@ TEST(ioJson,jsonData_err_array_of_obj) {
 TEST(ioJson,jsonData_parse_empty_obj) {
   std::string txt = "{}";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_r(var_names);
   EXPECT_EQ(0U,var_names.size());
@@ -398,7 +422,7 @@ TEST(ioJson,jsonData_parse_empty_obj) {
 TEST(ioJson,jsonData_parse_mult_objects) {
   std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<std::string> var_names;
   jdata.names_i(var_names);
   EXPECT_EQ(1U,var_names.size());
@@ -409,7 +433,7 @@ TEST(ioJson,jsonData_parse_mult_objects) {
 TEST(ioJson,jsonData_NaN_str) {
   std::string txt = "{ \"foo\" : \"NaN\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> vals = jdata.vals_r("foo");
   EXPECT_TRUE(boost::math::isnan(vals[0]));
 }
@@ -417,7 +441,7 @@ TEST(ioJson,jsonData_NaN_str) {
 TEST(ioJson,jsonData_unsigned_Inf_str) {
   std::string txt = "{ \"foo\" : \"Inf\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -427,7 +451,7 @@ TEST(ioJson,jsonData_unsigned_Inf_str) {
 TEST(ioJson,jsonData_signed_neg_Inf_str) {
   std::string txt = "{ \"foo\" : \"-Inf\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -439,7 +463,7 @@ TEST(ioJson,jsonData_signed_neg_Inf_str) {
 TEST(ioJson,jsonData_NaN_bare) {
   std::string txt = "{ \"foo\" : NaN }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> vals = jdata.vals_r("foo");
   EXPECT_TRUE(boost::math::isnan(vals[0]));
 }
@@ -447,7 +471,7 @@ TEST(ioJson,jsonData_NaN_bare) {
 TEST(ioJson,jsonData_unsigned_Infinity_bare) {
   std::string txt = "{ \"foo\" : Infinity }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -457,7 +481,7 @@ TEST(ioJson,jsonData_unsigned_Infinity_bare) {
 TEST(ioJson,jsonData_pos_Infinity_bare) {
   std::string txt = "{ \"foo\" : Infinity }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -467,7 +491,7 @@ TEST(ioJson,jsonData_pos_Infinity_bare) {
 TEST(ioJson,jsonData_signed_neg_Infinity_bare) {
   std::string txt = "{ \"foo\" : -Infinity }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -477,7 +501,7 @@ TEST(ioJson,jsonData_signed_neg_Infinity_bare) {
 TEST(ioJson,jsonData_unsigned_Infinity_str) {
   std::string txt = "{ \"foo\" : \"Infinity\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -487,7 +511,7 @@ TEST(ioJson,jsonData_unsigned_Infinity_str) {
 TEST(ioJson,jsonData_pos_Infinity_str) {
   std::string txt = "{ \"foo\" : \"Infinity\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
@@ -497,7 +521,7 @@ TEST(ioJson,jsonData_pos_Infinity_str) {
 TEST(ioJson,jsonData_signed_neg_Infinity_str) {
   std::string txt = "{ \"foo\" : \"-Infinity\" }";
   std::stringstream in(txt);
-  stan::json::json_data jdata(in);
+  cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;

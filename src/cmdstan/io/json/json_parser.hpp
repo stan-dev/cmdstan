@@ -1,10 +1,10 @@
-#ifndef STAN_IO_JSON_JSON_PARSER_HPP
-#define STAN_IO_JSON_JSON_PARSER_HPP
+#ifndef CMDSTAN_IO_JSON_JSON_PARSER_HPP
+#define CMDSTAN_IO_JSON_JSON_PARSER_HPP
 
 #include <boost/lexical_cast.hpp>
 
 #include <stan/io/validate_zero_buf.hpp>
-#include <stan/io/json/json_error.hpp>
+#include <cmdstan/io/json/json_error.hpp>
 
 #include <stdexcept>
 #include <iostream>
@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string>
 
-namespace stan {
+namespace cmdstan {
 
   namespace json {
 
@@ -225,7 +225,7 @@ namespace stan {
             std::string ss_str = ss.str();
             x = boost::lexical_cast<double>(ss_str);
             if (x == 0)
-              io::validate_zero_buf(ss_str);
+              stan::io::validate_zero_buf(ss_str);
           } catch (const boost::bad_lexical_cast & ) {
             throw json_exception("number exceeds double range");
           }

@@ -6,7 +6,7 @@
 #include <cmdstan/io/json//json_handler.hpp>
 #include <cmdstan/io/json//json_parser.hpp>
 
-class recording_handler : public stan::json::json_handler {
+class recording_handler : public cmdstan::json::json_handler {
 public:
   std::stringstream os_;
   recording_handler() : json_handler(), os_() {
@@ -64,7 +64,7 @@ void test_parser(const std::string& input,
                  const std::string& expected_output) {
   recording_handler handler;
   std::stringstream s(input);
-  stan::json::parse(s, handler);
+  cmdstan::json::parse(s, handler);
   EXPECT_EQ(expected_output, handler.os_.str());
 }
 
@@ -73,7 +73,7 @@ void test_exception(const std::string& input,
   try {
     recording_handler handler;
     std::stringstream s(input);
-    stan::json::parse(s, handler);
+    cmdstan::json::parse(s, handler);
   } catch (const std::exception& e) {
     EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;

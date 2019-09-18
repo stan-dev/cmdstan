@@ -1,12 +1,12 @@
-#ifndef STAN_IO_JSON_JSON_DATA_HPP
-#define STAN_IO_JSON_JSON_DATA_HPP
+#ifndef CMDSTAN_IO_JSON_JSON_DATA_HPP
+#define CMDSTAN_IO_JSON_JSON_DATA_HPP
 
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/io/json/json_error.hpp>
-#include <stan/io/json/json_parser.hpp>
-#include <stan/io/json/json_data_handler.hpp>
+#include <cmdstan/io/json/json_error.hpp>
+#include <cmdstan/io/json/json_parser.hpp>
+#include <cmdstan/io/json/json_data_handler.hpp>
 #include <cctype>
 #include <iostream>
 #include <limits>
@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace stan {
+namespace cmdstan {
 
   namespace json {
 
@@ -23,8 +23,8 @@ namespace stan {
      * A <code>json_data</code> is a <code>var_context</code> object
      * that represents a set of named values which are typed to either
      * <code>double</code> or <code>int</code> and can be either scalar
-     * value or a non-empty array of values of any dimensionality.
-     * Arrays must be retangular and the values of an array are all of
+     * value or an array of values of any dimensionality.
+     * Arrays must be rectangular and the values of an array are all of
      * the same type, either double or int.
      *
      * <p>The dimensions and values of variables are accessed by variable name.
@@ -74,7 +74,7 @@ namespace stan {
        */
       explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
-        stan::json::parse(in, handler);
+        parse(in, handler);
       }
 
       /**

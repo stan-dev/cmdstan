@@ -1,10 +1,10 @@
-#ifndef STAN_IO_JSON_JSON_ERROR_HPP
-#define STAN_IO_JSON_JSON_ERROR_HPP
+#ifndef CMDSTAN_IO_JSON_JSON_ERROR_HPP
+#define CMDSTAN_IO_JSON_JSON_ERROR_HPP
 
 #include <stdexcept>
 #include <string>
 
-namespace stan {
+namespace cmdstan {
 
   namespace json {
 

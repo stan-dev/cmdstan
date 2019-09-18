@@ -1,12 +1,12 @@
-#ifndef STAN_IO_JSON_JSON_DATA_HANDLER_HPP
-#define STAN_IO_JSON_JSON_DATA_HANDLER_HPP
+#ifndef CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
+#define CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
 
 #include <boost/throw_exception.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/io/json/json_error.hpp>
-#include <stan/io/json/json_parser.hpp>
-#include <stan/io/json/json_handler.hpp>
+#include <cmdstan/io/json/json_error.hpp>
+#include <cmdstan/io/json/json_parser.hpp>
+#include <cmdstan/io/json/json_handler.hpp>
 #include <cctype>
 #include <iostream>
 #include <limits>
@@ -16,7 +16,7 @@
 #include <vector>
 #include <utility>
 
-namespace stan {
+namespace cmdstan {
 
   namespace json {
 
@@ -44,13 +44,12 @@ namespace stan {
      * JSON object contains a set of name-value pairs
      * where the values can be either numeric scalar objects or
      * or numeric arrays of any dimensionality. Arrays must be rectangular.
-     * Empty arrays are not allowed, nor are arrays of empty arrays.
      * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
      * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
      * and the string \"NaN\" is mapped to not-a-number.
      * Bare versions of Infinity, -Infinity, and NaN are also allowed.
      */
-    class json_data_handler : public stan::json::json_handler {
+    class json_data_handler : public cmdstan::json::json_handler {
     private:
       vars_map_r& vars_r_;
       vars_map_i& vars_i_;
@@ -137,12 +136,6 @@ namespace stan {
       }
 
       void end_array() {
-        if (dims_[dim_idx_-1] == 0) {
-          std::stringstream errorMsg;
-          errorMsg << "variable: " << key_
-                   << ", error: empty array not allowed";
-          throw json_error(errorMsg.str());
-        }
         if (dims_unknown_[dim_idx_-1] == true) {
           dims_unknown_[dim_idx_-1] = false;
         } else if (dims_verify_[dim_idx_-1] != dims_[dim_idx_-1]) {

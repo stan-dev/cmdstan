@@ -1,9 +1,9 @@
-#ifndef STAN_IO_JSON_JSON_HANDLER_HPP
-#define STAN_IO_JSON_JSON_HANDLER_HPP
+#ifndef CMDSTAN_IO_JSON_JSON_HANDLER_HPP
+#define CMDSTAN_IO_JSON_JSON_HANDLER_HPP
 
 #include <string>
 
-namespace stan {
+namespace cmdstan {
 
   namespace json {
 

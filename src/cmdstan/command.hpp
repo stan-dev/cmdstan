@@ -78,9 +78,9 @@ namespace cmdstan {
       throw std::invalid_argument(msg.str());
     }
     if (stan::io::ends_with(".json", file)) {
-      stan::json::json_data var_context(stream);
+      cmdstan::json::json_data var_context(stream);
       stream.close();
-      std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::json::json_data>(var_context);
+      std::shared_ptr<stan::io::var_context> result = std::make_shared<cmdstan::json::json_data>(var_context);
       return result;
     }
     stan::io::dump var_context(stream);

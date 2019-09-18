@@ -9,9 +9,9 @@
 void test_rtl_2_ltr(size_t idx_rtl,
                     size_t idx_ltr,
                     const std::vector<size_t>& dims) {
-  stan::json::vars_map_r vars_r;
-  stan::json::vars_map_i vars_i;
-  stan::json::json_data_handler handler(vars_r, vars_i);
+  cmdstan::json::vars_map_r vars_r;
+  cmdstan::json::vars_map_i vars_i;
+  cmdstan::json::json_data_handler handler(vars_r, vars_i);
 
   size_t idx = handler.convert_offset_rtl_2_ltr(idx_rtl,dims);
   EXPECT_EQ(idx, idx_ltr);
@@ -20,9 +20,9 @@ void test_rtl_2_ltr(size_t idx_rtl,
 void test_exception(size_t idx_rtl,
                     const std::string& exception_text,
                     const std::vector<size_t>& dims) {
-  stan::json::vars_map_r vars_r;
-  stan::json::vars_map_i vars_i;
-  stan::json::json_data_handler handler(vars_r, vars_i);
+  cmdstan::json::vars_map_r vars_r;
+  cmdstan::json::vars_map_i vars_i;
+  cmdstan::json::json_data_handler handler(vars_r, vars_i);
   try {
     handler.convert_offset_rtl_2_ltr(idx_rtl,dims);
   } catch (const std::exception& e) {
