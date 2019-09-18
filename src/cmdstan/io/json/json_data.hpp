@@ -74,7 +74,7 @@ namespace cmdstan {
        */
       explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
-        parse(in, handler);
+        rapidjson_parse(in, handler);
       }
 
       /**

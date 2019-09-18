@@ -4,7 +4,7 @@
 #include <cmdstan/io/json/json_data_handler.hpp>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/json_handler.hpp>
-#include <cmdstan/io/json/json_parser.hpp>
+#include <cmdstan/io/json/rapidjson_parser.hpp>
 
 #include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
@@ -405,6 +405,10 @@ TEST(ioJson,jsonData_err_array_of_obj) {
   test_exception(txt,"expecting JSON object, found array");
 }
 
+TEST(ioJson,jsonData_parse_mult_objects_err) {
+  std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
+  test_exception(txt,"Error in JSON parsing \nat offset 11: \nThe document root must not be followed by other values.\n");
+}
 
 TEST(ioJson,jsonData_parse_empty_obj) {
   std::string txt = "{}";
@@ -415,18 +419,6 @@ TEST(ioJson,jsonData_parse_empty_obj) {
   EXPECT_EQ(0U,var_names.size());
   jdata.names_i(var_names);
   EXPECT_EQ(0U,var_names.size());
-}
-
-
-// parser only reads one top-level object
-TEST(ioJson,jsonData_parse_mult_objects) {
-  std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
-  std::stringstream in(txt);
-  cmdstan::json::json_data jdata(in);
-  std::vector<std::string> var_names;
-  jdata.names_i(var_names);
-  EXPECT_EQ(1U,var_names.size());
-  EXPECT_EQ("foo",var_names[0]);
 }
 
 // R: strings "NaN", "Inf", "-Inf"
