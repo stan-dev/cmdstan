@@ -6,7 +6,7 @@
 #include <rapidjson/error/en.h>
 #include <rapidjson/encodings.h>
 #include <stan/io/validate_zero_buf.hpp>
-#include <stan/io/json/json_error.hpp>
+#include <cmdstan/io/json/json_error.hpp>
 
 #include <cerrno>
 #include <stdexcept>

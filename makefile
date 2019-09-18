@@ -28,7 +28,7 @@ ifeq ($(OS),Windows_NT)
   O_STANC ?= 3
 endif
 O_STANC ?= 0
-INC_FIRST ?= -I src -I $(STAN)src
+INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
 -include $(MATH)make/compiler_flags

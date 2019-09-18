@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <stan/io/var_context.hpp>
 #include <cmdstan/io/json/json_error.hpp>
-#include <cmdstan/io/json/json_parser.hpp>
+#include <cmdstan/io/json/rapidjson_parser.hpp>
 #include <cmdstan/io/json/json_data_handler.hpp>
 #include <cctype>
 #include <iostream>
