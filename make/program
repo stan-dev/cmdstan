@@ -37,7 +37,7 @@ endif
 %$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
-	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $*.o $<
+	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -I $(RAPIDJSON) -x c++ -o $*.o $<
 	$(LINK.cpp) $*.o $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(OUTPUT_OPTION)
 
 

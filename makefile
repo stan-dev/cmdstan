@@ -23,6 +23,7 @@ help:
 
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
+RAPIDJSON ?= lib/rapidjson_1.1.0/
 ifeq ($(OS),Windows_NT)
   O_STANC ?= 3
 endif
