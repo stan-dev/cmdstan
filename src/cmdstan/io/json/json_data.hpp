@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <stan/io/var_context.hpp>
 #include <cmdstan/io/json/json_error.hpp>
-#include <cmdstan/io/json/json_parser.hpp>
+#include <cmdstan/io/json/rapidjson_parser.hpp>
 #include <cmdstan/io/json/json_data_handler.hpp>
 #include <cctype>
 #include <iostream>
@@ -74,7 +74,7 @@ namespace cmdstan {
        */
       explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
-        parse(in, handler);
+        rapidjson_parse(in, handler);
       }
 
       /**
