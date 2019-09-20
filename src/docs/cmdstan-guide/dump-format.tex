@@ -30,8 +30,7 @@ valid dump file defining a single scalar variable \code{y} with value
 %
 \begin{quote}
 \begin{Verbatim}
-y <- 
-17.2
+y <- 17.2
 \end{Verbatim}
 \end{quote}
 %
@@ -255,8 +254,7 @@ The following dump file declares an integer value for \code{y}.
 %
 \begin{quote}
 \begin{Verbatim} 
-y <- 
-2
+y <- 2
 \end{Verbatim}
 \end{quote}
 % 
@@ -270,8 +268,7 @@ explicit, is equivalent to the above.
 %
 \begin{quote}
 \begin{Verbatim} 
-y <- 
-2L
+y <- 2L
 \end{Verbatim}
 \end{quote}
 
@@ -279,8 +276,7 @@ The following dump file provides a real value for \code{y}.
 %
 \begin{quote}
 \begin{Verbatim}
-y <-
-2.0
+y <- 2.0
 \end{Verbatim}
 \end{quote}
 %
@@ -329,8 +325,7 @@ For instance, the following definition is legal in a dump file.
 %
 \begin{quote}
 \begin{Verbatim}
-"y" <-
-c(1,2,3)
+"y" <- c(1,2,3)
 \end{Verbatim}
 \end{quote}
 
@@ -387,7 +382,7 @@ by the following (mildly templated) Backus-Naur form grammar.
 \begin{verbatim}
  definitions ::= definition+
 
- definition ::= name ("<-" | '=') value optional_semicolon
+ definition ::= name <- value optional_semicolon
 
  name ::= char* 
         | ''' char* ''' 
