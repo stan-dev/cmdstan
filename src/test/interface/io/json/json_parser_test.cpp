@@ -368,34 +368,34 @@ TEST(ioJson,jsonParserErr02) {
 
 TEST(ioJson,jsonParserErr02a) {
   test_exception("[ 0",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParserErr02b) {
   test_exception("[ 0.",
-                 "Miss fraction part in number.\n");
+                 "Missing fraction part in number.\n");
 }
 
 
 TEST(ioJson,jsonParserErr02c) {
   test_exception("[ 99.9",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 
 TEST(ioJson,jsonParserErr03) {
   test_exception("[ 000.005 ]",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParserErr04) {
   test_exception("[ 1. ]",
-                 "Miss fraction part in number.\n");
+                 "Missing fraction part in number.\n");
 }
 
 TEST(ioJson,jsonParserErr05) {
   test_exception("[ 1.009e ]",
-                 "Miss exponent in number.\n");
+                 "Missing exponent in number.\n");
 }
 
 TEST(ioJson,jsonParserErr06b) {
@@ -449,7 +449,7 @@ TEST(ioJson,jsonParserErr11) {
 
 TEST(ioJson,jsonParserErr12) {
   test_exception("[5}",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParserErr12a) {
@@ -504,17 +504,17 @@ TEST(ioJson,jsonParserErr14b) {
 
 TEST(ioJson,jsonParserErr14c) {
   test_exception("{ \"bar\" : [ \"foo\": -1.0100e09 , }",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParseErr14d) {
   test_exception("{  \"foo\" : [ { \"bar\": { \"baz\": [ 1, 2]  } }, -3, -4.44  }  ",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParseErr14e) {
   test_exception("{  \"foo\" : [ { \"bar\": { \"baz\": [ 1, 2]  } }, -3, -4.44 } } } ] }  ",
-                 "Missing a comma or ']' after an array element.\n");
+                 "Missing a comma or ']' after an array element or found a zero padded number.\n");
 }
 
 TEST(ioJson,jsonParserErr14f) {
@@ -543,6 +543,10 @@ TEST(ioJson,jsonParserErr18) {
                  "Invalid value.\n");
 }
 
+TEST(ioJson,jsonParserErr19a) {
+  test_exception("[ 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111 ]",
+                 "Number too big to be stored in double.\n");
+}
 TEST(ioJson,jsonParserErr19d) {
   test_exception("[ 9.19191919191919e1000000000000 ]",
                  "Number too big to be stored in double.\n");
