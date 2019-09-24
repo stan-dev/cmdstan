@@ -39,11 +39,6 @@ include make/program
 include make/tests
 include make/command
 
-ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-update stan-pr/%,$(MAKECMDGOALS)),)
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
--include src/cmdstan/stanc.d
-endif
-
 CMDSTAN_VERSION := 2.20.0
 
 .PHONY: help
@@ -55,7 +50,7 @@ help:
 	@echo '    > make build'
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Build the Stan compiler bin/stanc$(EXE).'
+	@echo '    1. Download the Stan compiler bin/stanc$(EXE).'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
