@@ -14,5 +14,9 @@ endif
 
 bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
+ifeq ($(OS_TAG),windows)
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+else
 	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
 	chmod +x bin/stanc
+endif
