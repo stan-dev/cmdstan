@@ -147,7 +147,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
+build: check-submodule bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
@@ -158,8 +158,10 @@ endif
 ##
 # Clean up.
 ##
-.PHONY: clean clean-deps clean-manual clean-all
+.PHONY: check-submodule clean clean-deps clean-manual clean-all
 
+check-submodule:
+	@[ -e stan/src ] && : || echo "No stan/src folder found. Missing Stan submodule. Please run the following commands to fix \n git submodule init\n git submodule update --recursive\n"
 
 clean: clean-manual
 	$(RM) -r test
