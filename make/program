@@ -1,5 +1,5 @@
 ##
-# Models (to be passed through stanc)
+#Models(to be passed through stanc)
 ##
 CMDSTAN_MAIN ?= src/cmdstan/main.cpp
 CMDSTAN_MAIN_O = $(patsubst %.cpp,%.o,$(CMDSTAN_MAIN))
@@ -7,7 +7,7 @@ CMDSTAN_MAIN_O = $(patsubst %.cpp,%.o,$(CMDSTAN_MAIN))
 STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(MAKECMDGOALS))))
 
 ##
-# Precompiled model header
+#Precompiled model header
 ##
 
 $(STAN)src/stan/model/model_header.d : $(STAN)src/stan/model/model_header.hpp
