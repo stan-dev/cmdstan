@@ -154,6 +154,9 @@ build-mpi: $(MPI_TARGETS)
 .PHONY: build
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
+	@if [ "$(OS)" == "Windows_NT" ]; then \
+		echo 'Please add $(TBB_ABSOLUTE_PATH)/lib to your PATH variable.';\
+	fi
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
 ifeq ($(CXX_TYPE),clang)
