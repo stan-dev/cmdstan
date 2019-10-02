@@ -10,7 +10,7 @@ namespace cmdstan {
     arg_id(): int_argument() {
       _name = "id";
       _description = "Unique process identifier";
-      _validity = "id > 0";
+      _validity = "id >= 0";
       _default = "0";
       _default_value = 0;
       _constrained = true;
@@ -19,7 +19,7 @@ namespace cmdstan {
       _value = _default_value;
     }
 
-    bool is_valid(int value) { return value > 0; }
+    bool is_valid(int value) { return value >= 0; }
   };
 
 }

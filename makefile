@@ -23,11 +23,12 @@ help:
 
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
+RAPIDJSON ?= lib/rapidjson_1.1.0/
 ifeq ($(OS),Windows_NT)
   O_STANC ?= 3
 endif
 O_STANC ?= 0
-INC_FIRST ?= -I src -I $(STAN)src
+INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
 -include $(MATH)make/compiler_flags
@@ -43,7 +44,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.19.1
+CMDSTAN_VERSION := 2.20.0
 
 .PHONY: help
 help:
@@ -151,7 +152,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
@@ -182,6 +183,7 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) -r bin
+	$(RM) -r $(CMDSTAN_MAIN_O)
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
 ##
@@ -218,7 +220,7 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 
 .PHONY: compile_info
 compile_info:
-	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)'
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable

@@ -9,6 +9,7 @@
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
+#include <cmdstan/io/json/json_data.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -17,7 +18,7 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/ends_with.hpp>
-#include <stan/io/json/json_data.hpp>
+#include <stan/model/model_base.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
@@ -38,7 +39,6 @@
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
-#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <stan/math/opencl/opencl_context.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -48,6 +48,18 @@
 #include <string>
 #include <vector>
 #include <memory>
+
+#ifdef STAN_MPI
+#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
+#include <stan/math/prim/arr/functor/mpi_command.hpp>
+#include <stan/math/prim/arr/functor/mpi_distributed_apply.hpp>
+#endif
+
+
+// forward declaration for function defined in another translation unit
+stan::model::model_base& new_model(stan::io::var_context& data_context,
+                                   unsigned int seed,
+                                   std::ostream* msg_stream);
 
 namespace cmdstan {
 
@@ -66,9 +78,9 @@ namespace cmdstan {
       throw std::invalid_argument(msg.str());
     }
     if (stan::io::ends_with(".json", file)) {
-      stan::json::json_data var_context(stream);
+      cmdstan::json::json_data var_context(stream);
       stream.close();
-      std::shared_ptr<stan::io::var_context> result = std::make_shared<stan::json::json_data>(var_context);
+      std::shared_ptr<stan::io::var_context> result = std::make_shared<cmdstan::json::json_data>(var_context);
       return result;
     }
     stan::io::dump var_context(stream);
@@ -80,7 +92,6 @@ namespace cmdstan {
   static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6
 
 
-  template <class Model>
   int command(int argc, const char* argv[]) {
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
@@ -108,9 +119,13 @@ namespace cmdstan {
     }
     if (parser.help_printed())
       return err_code;
-    u_int_argument* random_arg = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"));
+
+    int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
+    unsigned int random_seed;
     if (random_arg->is_default()) {
-      random_arg->set_value((boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds());
+      random_seed = (boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds();
+    } else {
+      random_seed = static_cast<unsigned int>(random_arg->value());
     }
     parser.print(info);
     info();
@@ -135,9 +150,7 @@ namespace cmdstan {
     std::string filename(dynamic_cast<string_argument*>(parser.arg("data")->arg("file"))->value());
     std::shared_ptr<stan::io::var_context> var_context = get_var_context(filename);
 
-    unsigned int random_seed = dynamic_cast<u_int_argument*>(parser.arg("random")->arg("seed"))->value();
-
-    Model model(*var_context, random_seed, &std::cout);
+    stan::model::model_base& model = new_model(*var_context, random_seed, &std::cout);
 
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());

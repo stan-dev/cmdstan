@@ -10,18 +10,17 @@ processor cores.
 
 \section{Operating System}
 
-\CmdStan is written in portable \Cpp without {\Cpp}11 features, as are the
+\CmdStan is written in portable \Cpp with {\Cpp}11 and {\Cpp}14 features, as are the
 libraries on which it depends.  Therefore, \CmdStan should run on any machine
-for which a suitable \Cpp compiler is available.  In practice, \CmdStan,
-like the Boost and Eigen libraries on which it depends, is very hard
-on the compiler and linker.
+for which a suitable \Cpp compiler supporting C++1y or C++14 features is available. In practice, \CmdStan,
+like the Boost and Eigen libraries on which it depends, is very hard on the compiler and linker.
 
 \CmdStan has been tested on the following operating systems.
 %
 \begin{itemize}
-\item Linux (Debian, Ubuntu, Red Hat)
+\item Linux (Debian, Ubuntu)
 \item Mac OS X (from 10.6 ``Snow Leopard''  through 10.14 ``Mojave'')
-\item Windows (XP, 7, 8).
+\item Windows (7, 8, 10).
 \end{itemize}
 %
 \CmdStan should work on other versions of these operating systems if
@@ -70,7 +69,7 @@ algorithms are in the Stan library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org/stan.html}
 \item License: BSD
-\item Tested Version: 2.19.1
+\item Tested Version: 2.20.0
 \end{itemize}
 %
 The Stan source code is distributed with \CmdStan.
@@ -84,7 +83,7 @@ Library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org}
 \item License: BSD
-\item Tested Version: 2.19.1
+\item Tested Version: 2.20.0
 \end{itemize}
 %
 The Stan Math Library source code is distributed with \CmdStan
@@ -123,29 +122,8 @@ The Eigen source code is distributed with \CmdStan.
 Compiling \CmdStan programs requires a \Cpp compiler.  \CmdStan has been
 primarily developed with \clang and \gpp and no promises are made for
 other compilers.  The full set of compilers for which \CmdStan has been
-tested is
-%
-\begin{itemize}
-%
-\item \gpp
-\\
-Tested Versions: Mac 4.2.1, 4.6, Linux 4.4--4.7 (plus trunk 4.8, 4.9), Windows 4.6.3
-\\
-Home: \url{http://gcc.gnu.org/}
-\\
-License: GPL3+
-%
-\item \clang, Mac 2.9--3.1, 6.1, Linux 2.9--3.1
-\\
-Home: \url{http://clang.llvm.org/}
-\\
-License: BSD
-%
-\item mingw-64, version 2.0 (Windows 7, cross-compiled from Debian Linux)
-%
-\end{itemize}
-%
-
+tested is listed here:
+\url {https://github.com/stan-dev/stan/wiki/Supported-C---Compilers-and-Language-Features}
 
 \section{Step-by-Step Windows Install Instructions}\label{install-windows.appendix}
 
@@ -295,7 +273,7 @@ is installed as part of Rtools).
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.19.1.tar.gz
+> tar --no-same-owner -xzf cmdstan-2.20.0.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -354,7 +332,7 @@ To test, open the Terminal application and enter
 \end{quote}
 %
 Verify that \code{make} is at version 3.81 or later and \code{g++}
-is at 4.2.1 or later.
+is at 4.9.3 or later.
 
 
 \subsection{Download and Unpack \CmdStan Source}
@@ -400,18 +378,18 @@ are already installed, use the commands
 \end{Verbatim}
 \end{quote}
 %
-If these are at least at \code{g++} version 4.2.1 or later and
+If these are at least at \code{g++} version 4.9.3 or later and
 \code{make} version 3.81 or later, no additional installations are
 necessary.  It may still be desirable to update the \Cpp compiler
 \code{g++}, because later versions are faster.
 
-To install the latest version of these
-tools (or upgrade an older version), use the commands
+To install the latest version of these 
+tools (or upgrade an older version), use the following commands or their equivalent for your distribution: 
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> sudo apt-get install g++
-> sudo apt-get install make
+> sudo apt install g++
+> sudo apt install make
 \end{Verbatim}
 \end{quote}
 %
@@ -449,7 +427,7 @@ with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.19.1.tar.gz
+> tar -xzf cmdstan-2.20.0.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -518,10 +496,10 @@ versions of these libraries in other directories.
 %
 \begin{itemize}
   \item \Verb|STAN|. The location of the Stan source
-    directory. The default is \Verb|STAN=stan_2.19.1/|. Note: the
+    directory. The default is \Verb|STAN=stan_2.20.0/|. Note: the
     trailing forward slash is necessary.
   \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.19.1/|.
+    default is \Verb|MATH=stan/l../stan_math_2.20.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
     \Verb|lib/boost_1.66.0/| folder within \Verb|MATH|.

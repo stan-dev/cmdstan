@@ -5,10 +5,6 @@ jobs:
       - image: seantalts/bookdown
     steps:
       - checkout
-      - run: git submodule update --init --recursive
-      - run: make manual
-      - store_artifacts:
-          path: doc
 
 workflows:
   version: 2
