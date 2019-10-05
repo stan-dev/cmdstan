@@ -15,7 +15,11 @@ Installation of \CmdStan is simple. \CmdStan requires:
   download.
 \item The \code{make} utility program. \\
   This is not strictly necessary, but will make the build process
-  easy. The rest of the documentation assumes \code{make} is available.
+  easy. On the Windows platform the \code{mingw32-make} variant is
+  needed to build \CmdStan. This \code{make} variant is part of RTools
+  (\url{https://cran.rstudio.com/bin/windows/Rtools/}). The rest of
+  the documentation assumes \code{make} (\code{mingw32-make} on
+  Windows) is available.
 \item A \Cpp compiler.
 \end{itemize}
 
@@ -89,7 +93,8 @@ make               test-all.sh
     \end{quote}
     %
     \textbf{Warning:} \ The \code{make} program may take 10+ minutes and
-    consume 2+ GB of memory to build \CmdStan.
+    consume 2+ GB of memory to build \CmdStan. Please use
+    \code{mingw32-make} on Windows (available from RTools).
 \end{enumerate}
 %
 When \CmdStan is successfully built, the \code{make} program will
