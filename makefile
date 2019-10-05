@@ -163,6 +163,11 @@ ifeq ($(CXX_TYPE),clang)
 build: $(STAN)src/stan/model/model_header.hpp.gch
 endif
 
+.PHONY: install-tbb
+install-tbb: build
+	@echo "Setting the Path user environment variable: "
+	$(shell echo "cmd.exe /C install-tbb.bat")
+
 ##
 # Clean up.
 ##
