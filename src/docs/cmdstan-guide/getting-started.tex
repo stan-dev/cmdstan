@@ -15,11 +15,11 @@ Installation of \CmdStan is simple. \CmdStan requires:
   download.
 \item The \code{make} utility program. \\
   This is not strictly necessary, but will make the build process
-  easy. On the Windows platform the \code{mingw32-make} variant is
-  needed to build \CmdStan. This \code{make} variant is part of RTools
-  (\url{https://cran.rstudio.com/bin/windows/Rtools/}). The rest of
-  the documentation assumes \code{make} (\code{mingw32-make} on
-  Windows) is available.
+  easy. On Windows the \code{mingw32-make} variant is needed to build
+  \CmdStan. This is a \code{make} variant and can be installed as part
+  of RTools (\url{https://cran.rstudio.com/bin/windows/Rtools/}). The
+  rest of the documentation assumes \code{make} (\code{mingw32-make}
+  on Windows) is available.
 \item A \Cpp compiler.
 \end{itemize}
 
@@ -95,6 +95,23 @@ make               test-all.sh
     \textbf{Warning:} \ The \code{make} program may take 10+ minutes and
     consume 2+ GB of memory to build \CmdStan. Please use
     \code{mingw32-make} on Windows (available from RTools).
+  \item \emph{Windows only:} \, \CmdStan requires that the Intel TBB
+    library, which is build by the above command, can be found by the
+    Windows system. This requires that the directory
+    \verb+<cmdstan-home>/stan/lib/stan_math/lib/tbb+ is part of the
+    \code{PATH} environment variable. To permanently make this setting
+    for the current user, you may execute:
+    %
+    \begin{quote}
+      \begin{Verbatim}[fontshape=sl]
+> mingw32-make install-tbb
+      \end{Verbatim}
+    \end{quote}
+    %
+    Don't forget to open a new shell where these new settings will
+    take effect. For other platforms this step is not needed, since
+    the absolute path to the Intel TBB library is linked into Stan
+    programs (not possible on Windows).
 \end{enumerate}
 %
 When \CmdStan is successfully built, the \code{make} program will
