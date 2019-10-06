@@ -1,6 +1,9 @@
-:: this batch script assumes that you have the basic GNU tools (installed with RTools)
 @ECHO off
-reg query HKEY_CURRENT_USER\Environment /v path | sed -n 's/.*REG_SZ[ ]*//p' > temp.txt
-set /p VAR=<temp.txt
-SETX Path %~dp0lib\tbb;%VAR%
-rm temp.txt
+echo Permanently setting the PATH user environment variable:
+
+for /F "tokens=2* delims= " %%f IN ('reg query HKCU\Environment /v PATH ^| findstr /i path') do set OLD_SYSTEM_PATH=%%g
+setx Path %~dp0stan\lib\stan_math\lib\tbb;%OLD_SYSTEM_PATH%
+
+echo Please close this shell and open a new shell.
+echo This will make the changes to the PATH variable
+echo become active.
