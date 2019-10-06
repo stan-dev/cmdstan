@@ -154,14 +154,14 @@ build-mpi: $(MPI_TARGETS)
 .PHONY: build
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
-	@if [ "$(OS)" == "Windows_NT" ]; then \
-		echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'; \
-		echo 'You may call'; \
-		echo ''; \
-		echo 'mingw32-make install-tbb'; \
-		echo ''; \
-		echo 'to automatically update your user configuration.'; \
-	fi
+ifeq ($(OS),Windows_NT)
+		echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
+		echo 'You may call'
+		echo ''
+		echo 'mingw32-make install-tbb'
+		echo ''
+		echo 'to automatically update your user configuration.'
+endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
 ifeq ($(CXX_TYPE),clang)
@@ -170,10 +170,9 @@ endif
 
 .PHONY: install-tbb
 install-tbb: $(TBB_TARGETS)
-	@if ! [ "$(OS)" == "Windows_NT" ]; then \
-		exit 0; \
-	fi
+ifeq ($(OS),Windows_NT)
 	$(shell echo "cmd.exe /C install-tbb.bat")
+endif
 
 ##
 # Clean up.
