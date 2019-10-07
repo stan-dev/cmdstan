@@ -14,6 +14,14 @@ def runTests(String prefix = "") {
     """
 }
 
+def runWinTests(String prefix = "") {
+    withEnv(['PATH+TBB=./stan/lib/stan_math/lib/tbb']) {
+       """ mingw32-make -j${env.PARALLEL} build
+         ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+       """
+    }
+}
+
 def deleteDirWin() {
     bat "attrib -r -s /s /d"
     deleteDir()
@@ -58,7 +66,7 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat runTests()
+                        bat runWinTests()
                     }
                     post {
                         always {
@@ -86,6 +94,7 @@ pipeline {
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
+                        sh "echo CXX_TYPE=gcc >> make/local"
                         sh "make build-mpi > build-mpi.log 2>&1"
                         sh runTests("./")
                     }
