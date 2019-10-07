@@ -54,7 +54,7 @@ def mungeName(name):
 
 def doCommand(command):
     print("------------------------------------------------------------")
-    if command.startswith("make "):
+    if isWin() and command.startswith("make "):
       command = command.replace("make ", "mingw32-make ")
     print("%s" % command)
     p1 = subprocess.Popen(command,shell=True)
