@@ -32,8 +32,6 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
-TBB_FOUND=$(notdir $(shell where tbb2.dll))
-
 .PRECIOUS: %.hpp
 %$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	@echo ''
