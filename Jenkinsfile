@@ -16,7 +16,7 @@ def runTests(String prefix = "") {
 
 def runWinTests(String prefix = "") {
        """ mingw32-make -j${env.PARALLEL} build
-	setenv "THIS_DIR=%cd%"
+	setenv "THIS_DIR=%cd%\stan\lib\stan_math\lib\tbb"
 	setenv "PATH=%THIS_DIR%;%PATH%"
 	echo %PATH%
          ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
