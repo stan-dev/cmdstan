@@ -39,6 +39,11 @@ include make/program
 include make/tests
 include make/command
 
+ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-update stan-pr/%,$(MAKECMDGOALS)),)
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+-include src/cmdstan/stanc.d
+endif
+
 CMDSTAN_VERSION := 2.20.0
 
 .PHONY: help
