@@ -155,12 +155,12 @@ build-mpi: $(MPI_TARGETS)
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 ifeq ($(OS),Windows_NT)
-		echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
-		echo 'You may call'
-		echo ''
-		echo 'mingw32-make install-tbb'
-		echo ''
-		echo 'to automatically update your user configuration.'
+		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
+		@echo 'You may call'
+		@echo ''
+		@echo 'mingw32-make install-tbb'
+		@echo ''
+		@echo 'to automatically update your user configuration.'
 endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
