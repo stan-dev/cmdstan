@@ -15,12 +15,14 @@ def runTests(String prefix = "") {
 }
 
 def runWinTests(String prefix = "") {
-    withEnv(["PATH+TBB=${env.WORKSPACE}\stan\lib\stan_math\lib\tbb"]) {
+##    withEnv(["PATH+TBB=${env.WORKSPACE}\stan\lib\stan_math\lib\tbb"]) {
        """ mingw32-make -j${env.PARALLEL} build
-	echo ${PATH}
+	setenv "THIS_DIR=%cd%"
+	setenv "PATH=%THIS_DIR%;%PATH%"
+	echo %PATH%
          ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
        """
-    }
+##    }
 }
 
 def deleteDirWin() {
