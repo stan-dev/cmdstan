@@ -40,7 +40,7 @@ For Linux and Mac:
 \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
 > bin/stanc --name=bernoulli --o=bernoulli.hpp \
-  stan/example-models/basic_estimators/bernoulli.stan 
+  examples/bernoulli/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
@@ -53,7 +53,7 @@ For Windows:
 \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
 > bin\stanc.exe --name=bernoulli --o=bernoulli.hpp ^
-    stan/example-models/basic_estimators/bernoulli.stan 
+    examples/bernoulli/bernoulli.stan 
 \end{Verbatim}
 \end{quote}
 %
@@ -146,9 +146,8 @@ parameters {
   real<lower=0,upper=1> theta;
 }
 model {
-  theta ~ beta(1,1);
-  for (n in 1:N)
-    y[n] ~ bernoulli(theta);
+  theta ~ beta(1,1);  // uniform prior on interval 0,1
+  y ~ bernoulli(theta);
 }
 generated quantities {
   real odds;

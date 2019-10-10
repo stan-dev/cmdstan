@@ -147,10 +147,7 @@ simple Bayesian model.
 The following is a simple, complete Stan program for a Bernoulli model
 of binary data.%
 %
-\footnote{The model is distributed with Stan's example models
-  repository,
-  \url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.stan},
-  and is also available with the CmdStan distribution at the path
+\footnote{The model is available with the CmdStan distribution at the path
   \nolinkurl{examples/bernoulli/bernoulli.stan}.  }
 %
 \begin{quote}
@@ -163,9 +160,8 @@ parameters {
   real<lower=0,upper=1> theta;
 }
 model {
-  theta ~ beta(1,1);
-  for (n in 1:N)
-    y[n] ~ bernoulli(theta);
+  theta ~ beta(1,1);  // uniform prior on interval 0,1
+  y ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
@@ -181,11 +177,8 @@ using JSON notation or in the dump data format created by
 the \code{stan\_rdump} in package \code{rstan}.
 %
 \footnote{
-The data is also available from the \code{example-models} repository
-on GitHub,
-\url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.data.R}.
-It is also included with the CmdStan distribution and can be found at path
-\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}.
+The data is also included with the CmdStan distribution and can be found at path
+\nolinkurl{examples/bernoulli/bernoulli.data.R} and \nolinkurl{examples/bernoulli/bernoulli.data.json} .
 }
 In JSON:
 %
@@ -836,160 +829,3 @@ and on Windows with
 \end{Verbatim}
 \end{quote}
 %
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \chapter{--- sections cut out of this chapter ---}
-%% \section{For BUGS Users}
-
-%% An appendix in the language user's guide and reference manual
-%% describes some similarities and important differences between Stan and
-%% BUGS (including WinBUGS, OpenBUGs, and JAGS).
-
-
-
-
-%% \subsubsection{Implicit Uniform Priors}
-
-%% If no prior is specified for a parameter, it is implicitly given a
-%% uniform prior on its support. For parameters such as \code{theta} in
-%% the example, which are constrained to fall between 0 and 1, this
-%% produces a proper uniform distribution on the support of \code{theta}.
-%% Because $\distro{Beta}(1,1)$ is the uniform distribution, the
-%% following sampling statement can be eliminated from the model without
-%% changing the log probability calculation.
-%% %
-%% \begin{quote}
-%% \begin{Verbatim}
-%%   theta ~ beta(1,1);
-%% \end{Verbatim}
-%% \end{quote}
-
-%% For parameters with unbounded support, the implicit uniform prior is
-%% improper.  Stan allows improper priors to be specified in models, but
-%% posteriors must be proper in order for sampling to succeed.
-
-
-%% \subsubsection{Constraints on Parameters}
-
-%% The variable \code{theta} is defined with lower and upper bounds,
-%% which constrain its value.  Parameters with constrained support should
-%% always specify appropriate constraints in the parameter declaration;
-%% if the constraints are absent, sampling will either slow down or stop
-%% altogether based on whether the initial values satisfy the constraints.
-
-%% \subsubsection{Vectorizing Sampling Statements}
-
-%% Iterations of the model will be faster if the loop over sampling
-%% statements is \textit{vectorized} by replacing
-%% %
-%% \begin{quote}
-%% \begin{Verbatim}
-%%   for (n in 1:N)
-%%     y[n] ~ bernoulli(theta);
-%% \end{Verbatim}
-%% \end{quote}
-%% %
-%% with the equivalent vectorized form,
-%% %
-%% \begin{quote}
-%% \begin{Verbatim}
-%%   y ~ bernoulli(theta);
-%% \end{Verbatim}
-%% \end{quote}
-%% %
-%% Performance gains from vectorization are not because loops are slow in
-%% Stan, but because calls to sampling statements are slow.
-%% Vectorization allows multiple calls to a sampling statement to be
-%% replaced with a single call that can share common calculations for the
-%% log probability function, its gradients, and error checking.  For more
-%% tips on optimizing the performance of Stan models, see the chapter in
-%% the language user's guide and reference manual on optimization.
-
-
-
-%% \subsection{Testing Stan}\label{testing-stan.section}
-
-%% To run the Stan unit tests of basic functionality, run the following
-%% commands from a shell (where \code{<stan-home>} is replaced top-level
-%% directory into which Stan was unpacked; it should contain a file named
-%% \code{makefile}).%
-%% %
-%% \footnote{Although command-line Stan runs with earlier versions of
-%%   \code{make}, the unit tests require version 3.81 or higher; see
-%%   \refsection{windows-make-install} for installation instructions.}
-%% %
-%% \begin{quote}
-%% \begin{Verbatim}[fontshape=sl]
-%% > cd <stan-home>
-%% > make -j4 O=0 test-headers
-%% > make -j4 O=0 src/test/unit
-%% > make -j4 O=0 src/test/unit-agrad-rev
-%% > make -j4 O=0 src/test/unit-agrad-fwd
-%% > make -j4 O=0 src/test/unit-distribution
-%% > make -j4 O=3 src/test/CmdStan/models
-%% \end{Verbatim}
-%% \end{quote}
-%% %
-%% As before, \code{-j4} indicates that four processes should be run in
-%% parallel; adjust the value \code{4} to correspond to the number of CPU
-%% cores available. Code optimization is specified by the letter `O'
-%% followed by an equal sign followed by the digit `0' for no
-%% optimization and `3' for more optimization; optimization slows down
-%% compilation of the executable but reduces its execution time.
-%% Warnings can be safely ignored if the tests complete without a
-%% \code{FAIL} error.
-
-%% \emph{Warning}: \ The unit tests can take 30+ minutes and consume 3+
-%% GB of memory with the default compiler, \code{g++}.  The distribution
-%% test and model tests can take even longer.  It is faster to run the
-%% Clang compiler (option \code{CXX=clang++}), and to run in multiple
-%% processes in parallel (e.g., option \code{-j4} for four threads).
-
-%% \subsection{Compile-time Errors}
-
-%% Stan tries to report errors and warnings in order to help users
-%% correctly formulate and debug models. Compile-time errors occur when
-%% Stan programs are not syntaxtically valid. These errors prevent \Cpp
-%% code from being generated and must be addressed before proceeding. See
-%% the user's guide for more details.
-
-%% \subsection{Run-time Warnings}
-
-%% Run-time warnings occur while the program is executing.
-
-%% \subsubsection{Metropolis Rejection Warning}
-
-%% The Metropolis sampler may reject a proposal due to an error arising
-%% in the evaluation of the log probability function.  Such errors are
-%% typically due to underflow or overflow in numerical computations that
-%% are the unavoidable consequence of floating-point approximations to
-%% continuous real values.  The following is an example of such a
-%% message.
-%% %
-%% \begin{quote}\small
-%% \begin{Verbatim}
-%% Informational Message: The current Metropolis proposal is about
-%% to be rejected because of the following issue:
-%%   stan::prob::normal_log(d): Scale parameter is 0, but must be > 0!
-%% If this warning occurs sporadically, such as for highly constrained
-%% variable types like covariance matrices, then the sampler is fine,
-%% but if this warning occurs often then your model may be either severely
-%% ill-conditioned or misspecified.
-%% \end{Verbatim}
-%% \end{quote}
-%% %
-%% This is just an \emph{informational message} \, (i.e., a warning); if
-%% the message only occurs sporadically, then {\it the sampler is fine}
-%% and the user need not worry.  Particularly in early stages of sampler
-%% adaptation before adaptation has converged on the high-mass volume of
-%% the posterior, the numerical approximation to functions and to the
-%% Hamiltonian dynamics followed by the sampler can lead to numerical
-%% issues. The post-adaptation draws are still valid with the presence of
-%% these messages.
-
-%% If this message occurs repeatedly, the model may have a poorly
-%% conditioned constraint (typically with covariance or correlation
-%% matrices) or may be misformulated.  In a future version of Stan, we
-%% plan to rank such messages by severity and turn this one off by
-%% default so as not to needlessly worry users.
