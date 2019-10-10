@@ -39,6 +39,11 @@ include make/program
 include make/tests
 include make/command
 
+ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-update stan-pr/%,$(MAKECMDGOALS)),)
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+-include src/cmdstan/stanc.d
+endif
+
 CMDSTAN_VERSION := 2.20.0
 
 .PHONY: help
@@ -147,12 +152,26 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: stan-submodule-check bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
+ifeq ($(OS),Windows_NT)
+		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
+		@echo 'You may call'
+		@echo ''
+		@echo 'mingw32-make install-tbb'
+		@echo ''
+		@echo 'to automatically update your user configuration.'
+endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
 ifeq ($(CXX_TYPE),clang)
 build: $(STAN)src/stan/model/model_header.hpp.gch
+endif
+
+.PHONY: install-tbb
+install-tbb: $(TBB_TARGETS)
+ifeq ($(OS),Windows_NT)
+	$(shell echo "cmd.exe /C install-tbb.bat")
 endif
 
 ##
@@ -194,10 +213,6 @@ stan-update/%: stan-update
 stan-pr/%: stan-update
 	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
 
-stan-submodule-check:
-	@[ -e stan/src ] && : || echo "No stan/src folder found. Missing Stan submodule. Please run the following commands to fix \n git submodule init\n git submodule update --recursive\n"
-
-
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init --recursive
@@ -218,7 +233,7 @@ manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 
 .PHONY: compile_info
 compile_info:
-	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS)'
+	@echo '$(LINK.cpp) $(CXXFLAGS_PROGRAM) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)'
 
 ##
 # Debug target that allows you to print a variable
