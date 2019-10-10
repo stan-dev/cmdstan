@@ -16,7 +16,7 @@ def runTests(String prefix = "") {
 
 def runWinTests(String prefix = "") {
     """ mingw32-make -j${env.PARALLEL} build
-      ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+     ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
 }
 
