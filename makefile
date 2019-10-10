@@ -147,7 +147,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: stan-submodule-check bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 
@@ -193,10 +193,6 @@ stan-update/%: stan-update
 
 stan-pr/%: stan-update
 	cd stan && git reset --hard origin/develop && git checkout $* && git checkout develop && git merge $* --ff --no-edit --strategy=ours
-
-stan-submodule-check:
-	@[ -e stan/src ] && : || echo "No stan/src folder found. Missing Stan submodule. Please run the following commands to fix \n git submodule init\n git submodule update --recursive\n"
-
 
 .PHONY: stan-revert
 stan-revert:
