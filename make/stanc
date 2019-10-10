@@ -1,16 +1,26 @@
 ################################################################################
 # stanc build rules
 
+# if nothing was set to $(OS) that means that the Stan Math submodule is missing
+# used to creat breaks in error messages
+define n
+
+
+endef
+
+OS ?= missing-submodules
+
 ifeq ($(OS),Windows_NT)
   OS_TAG := windows
 else ifeq ($(OS),Darwin)
   OS_TAG := mac
 else ifeq ($(OS),Linux)
   OS_TAG := linux
+else ifeq ($(OS),missing-submodules)
+  $(error $n ERROR: Missing Stan submodules. $n Please run the following commands to fix: $n$n git submodule init $n git submodule update --recursive $n$n Then try again)
 else
-  $(error Can't detect OS properly. This will impede automatically downloading the correct stanc. Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
+  $(error $n Can't detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
 endif
-
 
 ifeq ($(STANC3),)
 bin/stanc$(EXE) :
