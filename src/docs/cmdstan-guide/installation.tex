@@ -39,8 +39,8 @@ In order to compile Stan program, the \CmdStan source code is
 required.  The \CmdStan source code distribution includes \CmdStan's
 source code, Stan's source code, documentation, build scripts, unit
 tests, documentation and source for the required libraries, Stan Math
-Library, Boost, Eigen, Sundials, Intel TBB, and the source for an
-optional testing library, Google Test.
+Library, Boost, and Eigen, and the source for an optional testing
+library, Google Test.
 
 \subsubsection{CmdStan: Stable Releases}
 
@@ -115,31 +115,6 @@ algebra library.
 \end{itemize}
 %
 The Eigen source code is distributed with \CmdStan.
-
-\subsubsection{SUite of Nonlinear and DIfferential/ALgebraic Equation Solvers}
-
-Some of Stan's ordinary differenetial equation (ODE) solvers and
-implicit function solvers use the Sundials library.
-%
-\begin{itemize}
-\item Home: \url{https://computing.llnl.gov/projects/sundials}
-\item License: BSD
-\item Tested Version: 4.1.0
-\end{itemize}
-%
-The Sundials source code is distributed with \CmdStan.
-
-\subsubsection{Intel Threading Building Blocks}
-
-Stan uses the Intel TBB library for advanced threading support.
-%
-\begin{itemize}
-\item Home: \url{https://software.intel.com/en-us/tbb}
-\item License: Apache 2.0
-\item Tested Version: 2019 update 8
-\end{itemize}
-%
-The Intel TBB source code is distributed with \CmdStan.
 
 
 \subsection{\Cpp Compiler}
@@ -229,10 +204,10 @@ To verify that \gpp is installed, use the following command.
 \end{quote}
 %
 This should report version information for \gpp.  Next, verify that
-make variant \code{mingw32-make} is installed with the following command.
+\code{make} is installed with the following command.
 %
 \begin{quote}
-  \Verb|> mingw32-make -v|
+  \Verb|> make -v|
 \end{quote}
 %
 This should print version information for make.
@@ -509,10 +484,10 @@ There are two options for controlling \stanc:
 \subsubsection{Changing Library Locations}
 
 The next set of variables allow for easy replacement of dependent
-libraries. \CmdStan depends on Stan, Boost, Eigen, Sundials, and Intel
-TBB. Although \CmdStan is bundled with a particular verison of
+libraries. \CmdStan depends on Stan, Boost, Eigen, and
+CVODES. Although \CmdStan is bundled with a particular verison of
 Stan, other versions can be used. The same is true with Boost, Eigen,
-Sundials, and Intel TBB.
+and CVODES.
 
 The Stan developers typically replace the tagged version of Stan in
 \code{<cmdstan-home>/stan} with an updated version and do not set
@@ -527,16 +502,13 @@ versions of these libraries in other directories.
     default is \Verb|MATH=stan/l../stan_math_2.20.0/|.
   \item \Verb|BOOST|. The location of the Boost library. If
     \Verb|BOOST| is not explicitly set, this will default to the
-    \Verb|lib/boost_1.69.0/| folder within \Verb|MATH|.
+    \Verb|lib/boost_1.66.0/| folder within \Verb|MATH|.
   \item \Verb|EIGEN|. The location of the Eigen library. If
     \Verb|EIGEN| is not explicitly set, this will default to the
     \Verb|lib/eigen_3.3.3/| folder within \Verb|MATH|.
   \item \Verb|SUNDIALS|. The location of the SUNDIALS library. If
     \Verb|SUNDIALS| is not explicity set, this will default to the
-    \Verb|lib/sundials_4.1.0/| folder within \Verb|MATH|.
-  \item \Verb|TBB|. The location of the Intel TBB library. If
-    \Verb|TBB| is not explicity set, this will default to the
-    \Verb|lib/tbb_2019_U8| folder within \Verb|MATH|.
+    \Verb|lib/sundials_3.1.0/| folder with \Verb|MATH|.
 \end{itemize}
 %
 
@@ -672,9 +644,6 @@ using scripts in the form of makefiles to run with GNU Make.
 \item Tested Versions: 3.81 (Mac OS X), 3.79 (Windows 7)
 \end{itemize}
 %
-On Windows \code{mingw32-make} variant must be used as a requirement
-to build the Intel TBB. This variant of \code{make} is available as
-part of RTools \url{https://cran.rstudio.com/bin/windows/Rtools/}.
 
 
 \subsection{Doxygen Documentation Generator}
