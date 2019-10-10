@@ -32,14 +32,20 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
-
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
-	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $*.o $<
-	$(LINK.cpp) $*.o $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(OUTPUT_OPTION)
-
+	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
+	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
+ifeq ($(OS),Windows_NT)
+ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
+	@echo 'Intel TBB is not in PATH. Consider calling '
+	@echo 'make install-tbb'
+	@echo 'to avoid copying Intel TBB library files.'
+	cp -v $(TBB_TARGETS) $(@D)
+endif
+endif
 
 ##
 # Dependencies file
