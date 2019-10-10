@@ -54,6 +54,8 @@ def mungeName(name):
 
 def doCommand(command):
     print("------------------------------------------------------------")
+    if isWin() and command.startswith("make "):
+      command = command.replace("make ", "mingw32-make ")
     print("%s" % command)
     p1 = subprocess.Popen(command,shell=True)
     p1.wait()
@@ -70,16 +72,9 @@ def makeTest(name, j):
 
 def makeBuild(j):
     if (j == None):
-        if isWin():
-          command = 'mingw32-make build'
-        else:
-          command = 'make build'
+        command = 'make build'
     else:
-        if isWin():
-          command = 'mingw32-make -j%d build' % j
-        else:
-          command = 'make -j%d build' % j
-        
+        command = 'make -j%d build' % j
     doCommand(command)
 
 
