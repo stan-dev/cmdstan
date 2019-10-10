@@ -147,10 +147,7 @@ simple Bayesian model.
 The following is a simple, complete Stan program for a Bernoulli model
 of binary data.%
 %
-\footnote{The model is distributed with Stan's example models
-  repository,
-  \url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.stan},
-  and is also available with the CmdStan distribution at the path
+\footnote{The model is available with the CmdStan distribution at the path
   \nolinkurl{examples/bernoulli/bernoulli.stan}.  }
 %
 \begin{quote}
@@ -163,9 +160,8 @@ parameters {
   real<lower=0,upper=1> theta;
 }
 model {
-  theta ~ beta(1,1);
-  for (n in 1:N)
-    y[n] ~ bernoulli(theta);
+  theta ~ beta(1,1);  // uniform prior on interval 0,1
+  y ~ bernoulli(theta);
 }
 \end{Verbatim}
 \end{quote}
@@ -181,11 +177,8 @@ using JSON notation or in the dump data format created by
 the \code{stan\_rdump} in package \code{rstan}.
 %
 \footnote{
-The data is also available from the \code{example-models} repository
-on GitHub,
-\url{https://github.com/stan-dev/example-models/blob/master/basic_estimators/bernoulli.data.R}.
-It is also included with the CmdStan distribution and can be found at path
-\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R}.
+The data is also included with the CmdStan distribution and can be found at path
+\nolinkurl{stan/example-models/basic_estimators/bernoulli.data.R} and \nolinkurl{stan/example-models/basic_estimators/bernoulli.data.json} .
 }
 In JSON:
 %
