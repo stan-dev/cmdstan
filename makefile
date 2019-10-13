@@ -52,18 +52,33 @@ help:
 	@echo 'CmdStan v$(CMDSTAN_VERSION) help'
 	@echo ''
 	@echo '  Build CmdStan utilities:'
+ifeq ($(OS),Windows_NT)
+	@echo '    > mingw32-make build'
+else
 	@echo '    > make build'
+endif
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Download the Stan compiler bin/stanc$(EXE).'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
+	@echo '    5. Build all dependencies of Stan'
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make. '
 	@echo '    For 4 cores:'
+ifeq ($(OS),Windows_NT)
+	@echo '    > mingw32-make build -j4'
+else
 	@echo '    > make build -j4'
+endif
 	@echo ''
+ifeq ($(OS),Windows_NT)
+	@echo '    On Windows it is recommended to include with the PATH environment'
+	@echo '    variable the directory of the Intel TBB library.'
+	@echo '    This can be setup permanently for the user with'
+	@echo '    > mingw32-make install-tbb'
+endif
 	@echo ''
 	@echo '  Build a Stan program:'
 	@echo ''

@@ -2,22 +2,24 @@
 # Build test executables
 ##
 
-LIB_DIRS_FULL=$(filter %/, $(wildcard src/test/interface/*/) src/test/interface/)
-LIB_DIRS_TBB=$(LIB_DIRS_FULL:src/%/=%/tbb-lib)
-LIB_DIRS_TBB_TARGETS=$(foreach subdir, $(LIB_DIRS_TBB), tests-tbb-install/$(subdir))
-
-tests-tbb-install/% : 
-	@mkdir -p $(dir $*)
 ifeq ($(OS),Windows_NT)
-	cp -v $(TBB_TARGETS) $(dir $*)
+LIB_DIRS_FULL=$(filter %/, $(wildcard src/test/interface/*/) src/test/interface/)
+LIB_DIRS_TBB=$(LIB_DIRS_FULL:src/%/=%/tbb.dll)
+else
+LIB_DIRS_TBB=
 endif
-	@touch $*
+
+test/%/tbb.dll : $(TBB_TARGETS)
+	@mkdir -p test/$*
+	cp -v $(TBB_TARGETS) test/$*
+
+.PRECIOUS: $(LIB_DIRS_TBB)
 
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
 test/%$(EXE) : INC += $(INC_GTEST) -I $(RAPIDJSON)
-test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(LIB_DIRS_TBB_TARGETS)
-	$(LINK.cpp) $(filter-out src/test/test-models/% src/%.csv bin/% test/%.hpp %.hpp-test %/tbb-lib,$^) $(LDLIBS) $(OUTPUT_OPTION)
+test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)  $(LIB_DIRS_TBB)
+	$(LINK.cpp) $(filter-out src/test/test-models/% src/%.csv bin/% test/%.hpp %.hpp-test test/%/tbb.dll,$^) $(LDLIBS) $(OUTPUT_OPTION)
 
 test/%.o : src/test/%.cpp
 	@mkdir -p $(dir $@)
