@@ -44,10 +44,19 @@ endif
 	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
 ifeq ($(OS),Windows_NT)
 ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
-	@echo 'Intel TBB is not in PATH. Consider calling '
+ifneq ("$(wildcard $(@D)/tbb.dll)","")
+	@echo 'Intel TBB is not in PATH.'
+	@echo 'Consider calling '
 	@echo 'make install-tbb'
 	@echo 'to avoid copying Intel TBB library files.'
 	cp -v $(TBB_TARGETS) $(@D)
+else
+	@echo 'Intel TBB is not in PATH, but found tbb.dll in model directory.'
+	@echo 'Using $(@D)/tbb.dll'
+	@echo 'Consider calling '
+	@echo 'make install-tbb'
+	@echo 'to ensure usage of correct Intel TBB version.'
+endif
 endif
 endif
 

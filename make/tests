@@ -6,12 +6,12 @@ LIB_DIRS_FULL=$(filter %/, $(wildcard src/test/interface/*/) src/test/interface/
 LIB_DIRS_TBB=$(LIB_DIRS_FULL:src/%/=%/tbb-lib)
 LIB_DIRS_TBB_TARGETS=$(foreach subdir, $(LIB_DIRS_TBB), tests-tbb-install/$(subdir))
 
-tests-tbb-install/% : 
+tests-tbb-install/% : $(TBB_TARGETS)
 	@mkdir -p $(dir $*)
+	@touch $*
 ifeq ($(OS),Windows_NT)
 	cp -v $(TBB_TARGETS) $(dir $*)
 endif
-	@touch $*
 
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
