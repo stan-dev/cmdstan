@@ -74,7 +74,7 @@ else
 endif
 	@echo ''
 ifeq ($(OS),Windows_NT)
-	@echo '    On Windows it is recommended include in the PATH environment'
+	@echo '    On Windows it is recommended to include with the PATH environment'
 	@echo '    variable the directory of the Intel TBB library.'
 	@echo '    This can be setup permanently for the user with'
 	@echo '    > mingw32-make install-tbb'
