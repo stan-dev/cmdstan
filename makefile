@@ -67,7 +67,11 @@ endif
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make. '
 	@echo '    For 4 cores:'
+ifeq ($(OS),Windows_NT)
+	@echo '    > mingw32-make build -j4'
+else
 	@echo '    > make build -j4'
+endif
 	@echo ''
 ifeq ($(OS),Windows_NT)
 	@echo '    On Windows it is recommended include in the PATH environment'
