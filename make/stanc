@@ -23,7 +23,6 @@ else
 endif
 else
 bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
-	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
 endif
