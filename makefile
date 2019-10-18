@@ -44,7 +44,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.20.0
+CMDSTAN_VERSION := 2.21.0
 
 .PHONY: help
 help:
