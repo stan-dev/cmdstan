@@ -1,6 +1,35 @@
 ################################################################################
-# libstanc build rules
+# stanc build rules
 
+ifeq ($(OS),Windows_NT)
+  OS_TAG := windows
+else ifeq ($(OS),Darwin)
+  OS_TAG := mac
+else ifeq ($(OS),Linux)
+  OS_TAG := linux
+else
+  $(error Can't detect OS properly. This will impede automatically downloading the correct stanc. Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
+endif
+
+
+ifeq ($(STANC3),)
+bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+ifeq ($(OS_TAG),windows)
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+else
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
+	chmod +x bin/stanc
+endif
+else
+bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
+	@mkdir -p $(dir $@)
+	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
+	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
+endif
+
+# libstanc build rules
+# just used by cmdstan tests and should soon be replaced with tests based on stanc$(EXE)
 STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
 STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
 
@@ -12,15 +41,6 @@ $(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
 $(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
-
-bin/stanc$(EXE) : O = $(O_STANC)
-bin/stanc$(EXE) : CPPFLAGS_MPI =
-bin/stanc$(EXE) : LDFLAGS_MPI =
-bin/stanc$(EXE) : LDLIBS_MPI =
-bin/stanc$(EXE) : bin/cmdstan/libstanc.a
-bin/stanc$(EXE) : bin/cmdstan/stanc.o
-	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
 $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@
 
