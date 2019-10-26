@@ -144,10 +144,12 @@ namespace cmdstan {
 #ifdef STAN_OPENCL
     
     std::stringstream msg_opencl;
-    msg_opencl << "STAN_OPENCL is enabled. OpenCL supported functions will use:" << std::endl;
-    msg_opencl << "Platform: " << stan::math::opencl_context.platform()[0].getInfo<CL_PLATFORM_NAME>() << std::endl;    
-    msg_opencl << "Device: " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
-    info(msg_opencl.str());
+    if((stan::math::opencl_context.platform() > 0) && (stan::math::opencl_context.device() > 0)) {
+      msg_opencl << "STAN_OPENCL is enabled. OpenCL supported functions will use:" << std::endl;
+      msg_opencl << "Platform: " << stan::math::opencl_context.platform()[0].getInfo<CL_PLATFORM_NAME>() << std::endl;    
+      msg_opencl << "Device: " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
+      info(msg_opencl.str());
+    }    
 #endif
 
     stan::callbacks::writer init_writer;
