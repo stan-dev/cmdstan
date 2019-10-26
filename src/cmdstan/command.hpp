@@ -132,6 +132,23 @@ namespace cmdstan {
     }
     parser.print(info);
     info();
+  
+#ifdef STAN_THREADS
+    std::stringstream msg_threads;
+    msg_threads << "STAN_THREADS is enabled. map_rect will run with at most ";
+    msg_threads << stan::math::internal::get_num_threads();
+    msg_threads << " thread(s)." << std::endl;
+    info(msg_threads.str());
+#endif
+
+#ifdef STAN_OPENCL
+    
+    std::stringstream msg_opencl;
+    msg_opencl << "STAN_OPENCL is enabled. OpenCL supported functions will use:" << std::endl;
+    msg_opencl << "Platform: " << stan::math::opencl_context.platform()[0].getInfo<CL_PLATFORM_NAME>() << std::endl;    
+    msg_opencl << "Device: " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
+    info(msg_opencl.str());
+#endif
 
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
