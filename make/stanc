@@ -37,7 +37,7 @@ bin/cmdstan/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs $@ $^
 
-$(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
+$(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC) -flto=full
 $(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<

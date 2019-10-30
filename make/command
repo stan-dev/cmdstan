@@ -1,6 +1,6 @@
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+	$(COMPILE.cpp) $(OUTPUT_OPTION) -flto=full $<
 
 .PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
@@ -8,4 +8,4 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $^ $(LDLIBS) -flto=full $(OUTPUT_OPTION)
