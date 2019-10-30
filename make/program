@@ -16,7 +16,7 @@ $(STAN)src/stan/model/model_header.d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch
 $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
 	@echo '--- Compiling pre-compiled header ---	'
-	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
+	$(COMPILE.cpp) -flto=full $< $(OUTPUT_OPTION)
 
 ifeq ($(CXX_TYPE),clang)
 CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header.hpp.gch
@@ -37,7 +37,7 @@ endif
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) -flto=full
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
