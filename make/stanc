@@ -9,6 +9,7 @@ define n
 endef
 
 OS ?= missing-submodules
+CMDSTAN_SUBMODULES = 1
 
 ifeq ($(OS),Windows_NT)
   OS_TAG := windows
@@ -17,11 +18,12 @@ else ifeq ($(OS),Darwin)
 else ifeq ($(OS),Linux)
   OS_TAG := linux
 else ifeq ($(OS),missing-submodules)
-  $(error $n ERROR: Missing Stan submodules. $n Please run the following commands to fix: $n$n git submodule init $n git submodule update --recursive $n$n Then try again)
+  CMDSTAN_SUBMODULES = 0
 else
   $(error $n Can't detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
 endif
 
+ifeq ($(CMDSTAN_SUBMODULES),1)
 ifeq ($(STANC3),)
 bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
@@ -56,4 +58,5 @@ $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(p
 
 ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
 endif

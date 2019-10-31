@@ -166,6 +166,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo ''
 	@echo '--- boost mpi bindings built ---'
 
+ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
 build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
@@ -178,6 +179,18 @@ ifeq ($(OS),Windows_NT)
 		@echo 'to automatically update your user configuration.'
 endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
+else
+.PHONY: build
+build: 
+	@echo 'ERROR: Missing Stan submodules.'
+	@echo 'Please run the following commands to fix:'
+	@echo ''
+	@echo 'git submodule init'
+	@echo 'git submodule update --recursive'
+	@echo ''
+	@echo 'And try building again'
+	@exit 1
+endif
 
 ifeq ($(CXX_TYPE),clang)
 build: $(STAN)src/stan/model/model_header.hpp.gch
