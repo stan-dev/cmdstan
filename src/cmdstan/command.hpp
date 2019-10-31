@@ -108,6 +108,9 @@ namespace cmdstan {
 
     stan::math::init_threadpool_tbb();
 
+    // make this a proper option
+    const unsigned int num_chains = stan::math::internal::get_num_threads();
+
     // Read arguments
     std::vector<argument*> valid_arguments;
     valid_arguments.push_back(new arg_id());
@@ -530,6 +533,7 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_chains,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -566,6 +570,7 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_chains,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
