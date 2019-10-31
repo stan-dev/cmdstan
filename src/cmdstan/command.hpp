@@ -49,6 +49,8 @@
 #include <vector>
 #include <memory>
 
+#include <stan/math/prim/core/init_threadpool_tbb.hpp>
+
 #ifdef STAN_MPI
 #include <stan/math/prim/arr/functor/mpi_cluster.hpp>
 #include <stan/math/prim/arr/functor/mpi_command.hpp>
@@ -103,6 +105,8 @@ namespace cmdstan {
     cluster.listen();
     if (cluster.rank_ != 0) return 0;
 #endif
+
+    stan::math::init_threadpool_tbb();
 
     // Read arguments
     std::vector<argument*> valid_arguments;
