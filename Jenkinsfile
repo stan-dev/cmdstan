@@ -169,6 +169,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Upstream CmdStan Performance tests') {
                     when {
                             expression {
