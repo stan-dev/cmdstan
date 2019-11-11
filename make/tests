@@ -28,10 +28,7 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
-
-%.d: %.hpp
-
-
+src/test/*.d : src/test/*.hpp
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
@@ -42,10 +39,10 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
+TEST_MODELS_EXE := $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan))
 
-.PHONY: test-models-hpp
-test-models-hpp: $(TEST_MODELS_HPP)
+.PHONY: test-models-exe
+test-models-exe: $(TEST_MODELS_EXE)
 
 ############################################################
 #
@@ -70,22 +67,3 @@ test/dummy.cpp:
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
-
-##
-# Tests that depend on compiled models
-##
-test/interface/generated_quantities_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, gq_model test_model))
-test/interface/command_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test ndim_array))
-test/interface/metric_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, test_model proper))
-test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_header_consistency$(EXE)
-test/interface/diagnose_test$(EXE): bin/diagnose$(EXE)
-test/interface/elapsed_time_test$(EXE): src/test/test-models/test_model$(EXE)
-test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, empty proper))
-test/interface/mpi_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, proper))
-test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
-test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
-test/interface/print_test$(EXE): bin/print$(EXE)
-test/interface/print_uninitialized_test$(EXE): src/test/test-models/print_uninitialized$(EXE)
-test/interface/arguments/argument_configuration_test$(EXE): src/test/test-models/test_model$(EXE)
-test/interface/stansummary_test$(EXE): bin/stansummary$(EXE)
-test/interface/variational_output_test$(EXE): src/test/test-models/variational_output$(EXE)

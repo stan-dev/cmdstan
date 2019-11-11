@@ -78,11 +78,11 @@ def makeBuild(j):
     doCommand(command)
 
 
-def makeTestModelsHpp(j):
+def makeTestModels(j):
     if (j == None):
-        command = 'make test-models-hpp'
+        command = 'make test-models-exe'
     else:
-        command = 'make -j%d test-models-hpp' % j
+        command = 'make -j%d test-models-exe' % j
     doCommand(command)
 
 
@@ -171,7 +171,7 @@ def main():
 
     # pass 0:  make build
     makeBuild(j)
-    makeTestModelsHpp(j)
+    makeTestModels(j)
 
     # pass 1:  call make to compile test targets
     for i in range(argsIdx,len(sys.argv)):
