@@ -39,10 +39,10 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
+TEST_MODELS_EXE := $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan))
 
-.PHONY: test-models-hpp
-test-models-hpp: $(TEST_MODELS_HPP)
+.PHONY: test-models-exe
+test-models-exe: $(TEST_MODELS_EXE)
 
 ############################################################
 #
