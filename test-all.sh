@@ -21,7 +21,7 @@ popd
 echo ''
 echo '------------------------------------------------------------'
 echo 'Stan Math Library tests'
-pushd stan/lib/stan_math_2.15.0/
+pushd stan/lib/stan_math/
 ./runTests.py test/unit
 ./runTests.py test/prob
 popd
