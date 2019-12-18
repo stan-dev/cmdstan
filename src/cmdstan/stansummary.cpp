@@ -106,7 +106,7 @@ int main(int argc, const char* argv[]) {
 
 
   // Prepare values
-  const int n = 9;
+  static const int n = 9;
   
   Eigen::MatrixXd values(chains.num_params(), n);
   values.setZero();
@@ -128,9 +128,9 @@ int main(int argc, const char* argv[]) {
   }
   
   // Prepare header
-  std::vector<std::string> headers = {"Mean", "MCSE", "StdDev",
-                                      "5%", "50%", "95%",
-                                      "N_Eff", "N_Eff/s", "R_hat"};
+  std::vector<std::string> headers{ "Mean", "MCSE", "StdDev",
+                                    "5%", "50%", "95%",
+                                    "N_Eff", "N_Eff/s", "R_hat" };
 
   // Set sig figs
   Eigen::VectorXi column_sig_figs(n);
