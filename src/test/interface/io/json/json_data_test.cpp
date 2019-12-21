@@ -277,8 +277,19 @@ TEST(ioJson,jsonData_empty_1D_array) {
   test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
 }
 
-TEST(ioJson,jsonData_empty_2D_array) {
-  std::string txt = "{ \"foo\" : [[]] }";
+TEST(ioJson,jsonData_empty_2D_array_0_0) {
+  std::string txt = "{ \"foo\" : [] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(0);
+  expected_dims.push_back(0);
+  test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
+}
+
+TEST(ioJson,jsonData_empty_2D_array_1_0) {
+  std::string txt = "{ \"foo\" : [] }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals_i;
@@ -288,13 +299,25 @@ TEST(ioJson,jsonData_empty_2D_array) {
   test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
 }
 
-TEST(ioJson,jsonData_empty_3D_array) {
-  std::string txt = "{ \"foo\" : [[[]]] }";
+TEST(ioJson,jsonData_empty_3D_array_0_0_0) {
+  std::string txt = "{ \"foo\" : [] }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals_i;
   std::vector<size_t> expected_dims;
-  expected_dims.push_back(1);
+  expected_dims.push_back(0);
+  expected_dims.push_back(0);
+  expected_dims.push_back(0);
+  test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
+}
+
+TEST(ioJson,jsonData_empty_3D_array_2_1_0) {
+  std::string txt = "{ \"foo\" : [] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
   expected_dims.push_back(1);
   expected_dims.push_back(0);
   test_int_var(jdata,txt,"foo",expected_vals_i,expected_dims);
