@@ -231,10 +231,10 @@ clean-program:
 ifndef STANPROG
 	$(error STANPROG not set)
 endif
-	$(RM) $(wildcard $(patsubst %.stan,%.d,$(basename ${STANPROG}).stan))
-	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(basename ${STANPROG}).stan))
-	$(RM) $(wildcard $(patsubst %.stan,%.o,$(basename ${STANPROG}).stan))
-	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(basename ${STANPROG}).stan))
+	$(RM) "$(wildcard $(patsubst %.stan,%.d,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%.hpp,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%.o,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%$(EXE),$(basename ${STANPROG}).stan))"
 
 ##
 # Submodule related tasks
