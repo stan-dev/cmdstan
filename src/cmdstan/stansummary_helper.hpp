@@ -85,7 +85,7 @@ using Eigen::Dynamic;
 
 Eigen::VectorXi
 calculate_column_widths(const Eigen::MatrixXd& values,
-                        const Eigen::Matrix<std::string, Dynamic, 1>& headers,
+                        const std::vector<std::string>& headers,
                         const int sig_figs,
                         Eigen::Matrix<std::ios_base::fmtflags, Dynamic, 1>&
                         formats) {
@@ -93,7 +93,7 @@ calculate_column_widths(const Eigen::MatrixXd& values,
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) = calculate_column_width(values.col(i), headers(i),
+    column_widths(i) = calculate_column_width(values.col(i), headers[i],
                                               sig_figs, formats(i));
   }
   return column_widths;
