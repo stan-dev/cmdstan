@@ -209,7 +209,9 @@ endif
 
 clean: clean-manual
 	$(RM) -r test
+	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.o,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-deps:
