@@ -207,7 +207,6 @@ namespace cmdstan {
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
-    std::cout << "validate dims" << std::endl;
     bool is_int_type = base_type == "int";
     if (is_int_type) {
       if (!contains_i(name)) {
@@ -235,7 +234,6 @@ namespace cmdstan {
     for (size_t i = 0; i < dims.size(); ++i) {
       num_elements *= dims[i];
     }
-    std::cout << "num_elements: " << num_elements << std::endl;
     if (num_elements == 0)
       return;
 
