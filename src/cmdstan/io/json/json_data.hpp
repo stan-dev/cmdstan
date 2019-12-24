@@ -203,6 +203,66 @@ namespace cmdstan {
         return (vars_i_.erase(name) > 0)
           || (vars_r_.erase(name) > 0);
       }
+
+  void validate_dims(const std::string& stage, const std::string& name,
+                     const std::string& base_type,
+                     const std::vector<size_t>& dims_declared) const {
+    bool is_int_type = base_type == "int";
+    if (is_int_type) {
+      if (!contains_i(name)) {
+        std::stringstream msg;
+        msg << (contains_r(name) ? "int variable contained non-int values"
+                                 : "variable does not exist")
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
+    } else {
+      if (!contains_r(name)) {
+        std::stringstream msg;
+        msg << "variable does not exist"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
+    }
+
+    std::vector<size_t> dims = dims_r(name);
+
+    // JSON '[ ]' is ambiguous - any multi-dim variable with len 0 dim
+    size_t num_elements = 1;
+    for (size_t i = 0; i < dims.size(); ++i) {
+      num_elements *= dims[i];
+    }
+    if (num_elements == 0)
+      return;
+
+    if (dims.size() != dims_declared.size()) {
+      std::stringstream msg;
+      msg << "mismatch in number dimensions declared and found in context"
+          << "; processing stage=" << stage << "; variable name=" << name
+          << "; dims declared=";
+      dims_msg(msg, dims_declared);
+      msg << "; dims found=";
+      dims_msg(msg, dims);
+      throw std::runtime_error(msg.str());
+    }
+    for (size_t i = 0; i < dims.size(); ++i) {
+      if (dims_declared[i] != dims[i]) {
+        std::stringstream msg;
+        msg << "mismatch in dimension declared and found in context"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; position=" << i << "; dims declared=";
+        dims_msg(msg, dims_declared);
+        msg << "; dims found=";
+        dims_msg(msg, dims);
+        throw std::runtime_error(msg.str());
+      }
+    }
+  }
+
+
+
     };
 
   }
