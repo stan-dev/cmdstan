@@ -17,7 +17,6 @@ def runTests(String prefix = "") {
 def runWinTests(String prefix = "") {
     withEnv(['PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb']) {
        bat "echo ${WORKSPACE}"
-       bat "echo ${PWD}"
        bat "echo %PATH%"
        bat "mingw32-make -j${env.PARALLEL} build"
        bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
