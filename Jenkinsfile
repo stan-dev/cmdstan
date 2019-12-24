@@ -15,9 +15,10 @@ def runTests(String prefix = "") {
 }
 
 def runWinTests(String prefix = "") {
-    """ mingw32-make -j${env.PARALLEL} build
-     ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
-    """
+    withEnv(['PATH+TBB=./stan/lib/stan_math/lib/tbb']) {
+       bat "mingw32-make -j${env.PARALLEL} build"
+       bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
+    }
 }
 
 def deleteDirWin() {
@@ -64,7 +65,7 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat runWinTests()
+                        runWinTests()
                     }
                     post {
                         always {
