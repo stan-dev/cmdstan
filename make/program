@@ -9,9 +9,6 @@ STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(
 ##
 # Precompiled model header
 ##
-
-$(STAN)src/stan/model/model_header.d : $(STAN)src/stan/model/model_header.hpp
-	$(COMPILE.cpp) $(DEPFLAGS) $<
 $(STAN)src/stan/model/model_header.d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
 $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
@@ -27,6 +24,10 @@ ifneq ($(findstring allow_undefined,$(STANCFLAGS)),)
 $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
 endif
 
+##
+# Model executable
+##
+
 ifdef STAN_OPENCL
 STANCFLAGS+= --use-opencl
 endif
@@ -37,7 +38,7 @@ endif
 	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
+%$(EXE) : %.hpp %.d $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
@@ -64,6 +65,7 @@ $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EX
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 -include src/cmdstan/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+-include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
 ifeq ($(CXX_TYPE),clang)
 -include $(STAN)src/stan/model/model_header.d
 endif
