@@ -52,9 +52,9 @@
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 
 #ifdef STAN_MPI
-#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
-#include <stan/math/prim/arr/functor/mpi_command.hpp>
-#include <stan/math/prim/arr/functor/mpi_distributed_apply.hpp>
+#include <stan/math/prim/functor/mpi_cluster.hpp>
+#include <stan/math/prim/functor/mpi_command.hpp>
+#include <stan/math/prim/functor/mpi_distributed_apply.hpp>
 #endif
 
 // forward declaration for function defined in another translation unit
