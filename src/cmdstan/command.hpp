@@ -40,7 +40,7 @@
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/opencl/opencl_context.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
@@ -52,9 +52,9 @@
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 
 #ifdef STAN_MPI
-#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
-#include <stan/math/prim/arr/functor/mpi_command.hpp>
-#include <stan/math/prim/arr/functor/mpi_distributed_apply.hpp>
+#include <stan/math/prim/functor/mpi_cluster.hpp>
+#include <stan/math/prim/functor/mpi_command.hpp>
+#include <stan/math/prim/functor/mpi_distributed_apply.hpp>
 #endif
 
 // forward declaration for function defined in another translation unit
