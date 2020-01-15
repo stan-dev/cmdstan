@@ -1,4 +1,28 @@
+** Get the repo & depdencies
 #+BEGIN_SRC bash
-CXXFLAGS += -isystem /usr/local/include -DSTAN_LANG_MPI -DMPI_ADAPTED_WARMUP
+git clone --recurse-submodules --single-branch --branch mpi_warmup_framework git@github.com:stan-dev/cmdstan.git
 #+END_SRC
 
+** Edit make/local
+#+BEGIN_SRC bash
+  CXXFLAGS += -isystem /path/to/mpi/include -DSTAN_LANG_MPI -DMPI_ADAPTED_WARMUP
+  CC=mpicxx
+  CXX=mpicxx
+  TBB_CXX_TYPE=clang              # your cpp compiler
+#+END_SRC
+
+** Compile
+#+BEGIN_SRC bash
+make clean-all;
+make -j4 examples/radon/radon
+#+END_SRC
+
+** Run
+#+BEGIN_SRC bash
+  mpiexec -n 4 -l ./radon sample data file=radon.data.R # MPICH
+#+END_SRC
+or
+#+BEGIN_SRC bash
+  mpiexec -n 4 --tag-output ./radon sample data file=radon.data.R # OpenMPI
+#+END_SRC
+runs 4 chains with cross-chain warmup, using 4 processes.
