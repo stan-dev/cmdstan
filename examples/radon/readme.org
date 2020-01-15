@@ -1,0 +1,4 @@
+#+BEGIN_SRC bash
+CXXFLAGS += -isystem /usr/local/include -DSTAN_LANG_MPI -DMPI_ADAPTED_WARMUP
+#+END_SRC
+
