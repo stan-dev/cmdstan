@@ -134,13 +134,15 @@ namespace cmdstan {
     info();
   
 #ifdef STAN_THREADS
-#ifndef STAN_MPI
     std::stringstream msg_threads;
+#ifndef STAN_MPI
     msg_threads << "Threading is enabled. map_rect will run with at most ";
+#else
+    msg_threads << "MPI and threading is enabled. Nested map_rect will run with at most ";
+#endif
     msg_threads << stan::math::internal::get_num_threads();
     msg_threads << " thread(s)." << std::endl;
     info(msg_threads.str());
-#endif
 #endif
 
 #ifdef STAN_OPENCL
