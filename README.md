@@ -50,4 +50,4 @@ As of version 2.22, CmdStan has swithced to the new Stan-to-C++ compiler, called
 ```
 STANC2=true
 ```
-to the `make/local` file. Then run `make clean-all` and `make build` again to build the old compiler. If these steps fix the issues in your model please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to either the [Cmdstan](https://github.com/stan-dev/cmdstan) repository.
+to the `make/local` file. Then run `make clean-all` and `make build` again to build the old compiler. If these steps fix the issues in your model please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [Cmdstan](https://github.com/stan-dev/cmdstan) repository.
