@@ -23,8 +23,8 @@ else
   $(error $n Can't detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
 endif
 
+# bin/stanc build rules - requires stan, stan_math submodules in place
 ifeq ($(CMDSTAN_SUBMODULES),1)
-# bin/stanc build rules
 ifneq ($(STANC2),)
 bin/stanc$(EXE) : O = $(O_STANC)
 bin/stanc$(EXE) : CPPFLAGS_MPI =
@@ -49,11 +49,10 @@ bin/stanc$(EXE) :
 else ifeq ($(OS_TAG),windows)
 bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-https://github.com/stan-dev/stan/releases/latest
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/latest/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
 else
 bin/stanc$(EXE) :
-	curl -L https://github.com/stan-dev/stanc3/releases/download/latest/$(OS_TAG)-stanc -o bin/stanc
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
 	chmod +x bin/stanc
 endif
 
@@ -75,7 +74,8 @@ $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(p
 ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
+# end libstanc build rules
 
-# end bin/stanc build rules
 endif
+# end bin/stanc build rules
 
