@@ -25,7 +25,7 @@ endif
 
 ifeq ($(CMDSTAN_SUBMODULES),1)
 # bin/stanc build rules
-ifneq (,$(STANC2))
+ifneq ($(STANC2),)
 bin/stanc$(EXE) : O = $(O_STANC)
 bin/stanc$(EXE) : CPPFLAGS_MPI =
 bin/stanc$(EXE) : LDFLAGS_MPI =
