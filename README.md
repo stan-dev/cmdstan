@@ -4,7 +4,7 @@
 
 # CmdStan
 
-<b>CmdStan</b> is the command line interface to Stan, a C++ package providing
+<b>CmdStan</b> is the command line interface to Stan, a package providing
 
 * full Bayesian inference using the No-U-Turn sampler (NUTS), a variant of Hamiltonian Monte Carlo (HMC),
 * approximate Bayesian inference using automatic differentiation variational inference (ADVI),
@@ -21,15 +21,17 @@ Stan's home page, with links to everything you'll need to use Stan is:
 
 ### Interfaces
 There are separate repositories here on GitHub for interfaces:
-* RStan (R interface)
-* PyStan (Python interface)
-* CmdStan (command-line/shell interface)
+* [RStan](https://github.com/stan-dev/rstan) (R interface)
+* [PyStan](https://github.com/stan-dev/pystan) (Python interface)
+* [CmdStan](https://github.com/stan-dev/cmdstan) (command-line/shell interface)
+* [cmdstanpy](https://github.com/stan-dev/cmdstanpy) (a lightweight interface to CmdStan for Python users)
+* [cmdstanr](https://github.com/stan-dev/cmdstanr) (a lightweight interface to CmdStan for R users)
 
 ### Source Repository
 CmdStan's source-code repository is hosted here on GitHub.
 
 ### Licensing
-The core Stan C++ code and CmdStan are licensed under new BSD.
+The Stan-to-C++ compiler written in OCaml, core Stan C++ code, and CmdStan are licensed under new BSD.
 
 Note that the Stan math library depends on the Intel TBB library which is licensed under the Apache 2.0 license. This dependency implies an additional restriction as compared to the new BSD lincense alone. The Apache 2.0 license is incompatible with GPL-2 licensed code if distributed as a unitary binary. You may refer to the Apache 2.0 evaluation page on the [Stan Math wiki](https://github.com/stan-dev/math/wiki/Apache-2.0-License-Evaluation).
 

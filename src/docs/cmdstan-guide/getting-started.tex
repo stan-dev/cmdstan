@@ -35,12 +35,15 @@ instructions of the prerequisites, see
 
 \section{Building \CmdStan}
 
-Building \CmdStan involves building two executable programs:
+Building \CmdStan involves preparing two executable programs:
 %
 \begin{itemize}
-\item \code{stanc}: the Stan compiler (translates Stan language to \Cpp)
-\item \code{stansummary}: a basic posterior analysis tool
+\item \code{stanc}: the Stan compiler (translates Stan language to \Cpp).
+\item \code{stansummary}: a basic posterior analysis tool.
 \end{itemize}
+%
+\CmdStan releases include binaries for three operating systems: \code{bin/linux-stanc}, \code{bin/mac-stanc} and \code{bin/windows-stanc}. When building \CmdStan, the appropriate binary is copied to \code{bin/stanc}. If no \code{stanc} binaries are found, the build step will download the appropriate binary of the Stan-to-C++ compiler's nightly release.
+ \code{stanc}
 %
 The build process utilizes the \code{make} command-line
 utility and these instructions are applicable for any of our supported
