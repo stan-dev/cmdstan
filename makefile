@@ -225,9 +225,10 @@ clean-manual:
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-all: clean clean-deps clean-libraries clean-manual
-	$(RM) -r bin
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	$(RM) -r $(CMDSTAN_MAIN_O)
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
+
 
 clean-program:
 ifndef STANPROG

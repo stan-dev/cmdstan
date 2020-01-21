@@ -1,13 +1,13 @@
 ################################################################################
 # stanc build rules
 
-# if nothing was set to $(OS) that means that the Stan Math submodule is missing
 # used to creat breaks in error messages
 define n
 
 
 endef
 
+# if nothing was set to $(OS) that means that the Stan Math submodule is missing
 OS ?= missing-submodules
 CMDSTAN_SUBMODULES = 1
 
@@ -23,25 +23,40 @@ else
   $(error $n Can't detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
 endif
 
+# bin/stanc build rules - requires stan, stan_math submodules in place
 ifeq ($(CMDSTAN_SUBMODULES),1)
-ifeq ($(STANC3),)
-bin/stanc$(EXE) :
+ifneq ($(STANC2),)
+bin/stanc$(EXE) : O = $(O_STANC)
+bin/stanc$(EXE) : CPPFLAGS_MPI =
+bin/stanc$(EXE) : LDFLAGS_MPI =
+bin/stanc$(EXE) : LDLIBS_MPI =
+bin/stanc$(EXE) : bin/cmdstan/libstanc.a
+bin/stanc$(EXE) : bin/cmdstan/stanc.o
 	@mkdir -p $(dir $@)
-ifeq ($(OS_TAG),windows)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
-else
-	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
-	chmod +x bin/stanc
-endif
-else
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
+
+else ifneq ($(STANC3),)
 bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
 	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
+
+else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
+bin/stanc$(EXE) :
+	cp bin/$(OS_TAG)-stanc) bin/stanc$(EXE)
+	chmod +x bin/stanc
+
+else ifeq ($(OS_TAG),windows)
+bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+else
+bin/stanc$(EXE) :
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
+	chmod +x bin/stanc
 endif
 
 # libstanc build rules
-# just used by cmdstan tests and should soon be replaced with tests based on stanc$(EXE)
 STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
 STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
 
@@ -59,4 +74,8 @@ $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(p
 ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
+# end libstanc build rules
+
 endif
+# end bin/stanc build rules
+
