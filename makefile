@@ -86,7 +86,7 @@ endif
 	@echo '    > make foo/bar$(EXE)'
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Download the Stan compiler binary and build the print utility if not built.'
+	@echo '    1. Download the Stan compiler binary and build the utility binaries if not built.'
 	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
 	@echo ''
@@ -180,7 +180,7 @@ endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 else
 .PHONY: build
-build: 
+build:
 	@echo 'ERROR: Missing Stan submodules.'
 	@echo 'Please run the following commands to fix:'
 	@echo ''
