@@ -44,7 +44,7 @@ Building \CmdStan involves preparing a set of executable programs:
 \end{itemize}
 %
 \CmdStan releases include pre-built binaries of the Stan language compiler
-\url {https://github.com/stan-dev/stanc3: \code{bin/linux-stanc}, \code{bin/mac-stanc} and \code{bin/windows-stanc}.
+\url {https://github.com/stan-dev/stanc3}: \code{bin/linux-stanc}, \code{bin/mac-stanc} and \code{bin/windows-stanc}.
 The CmdStan makefile \code{build} task copies the appropriate binary to \code{bin/stanc}.  For CmdStan installations
 which have been cloned of downloaded from the CmdStan GitHub repository, 
 the makefile task will download the appropriate OS-specific binary
@@ -65,23 +65,6 @@ Steps to build \CmdStan:
 > cd <cmdstan-home>
       \end{Verbatim}
     \end{quote}
-    %
-    \noindent
-    A listing of the files and directory of this folder should show these files:
-\begin{itemize}
-\item Jenkinsfile
-\item LICENSE
-\item README.md
-\item examples
-\item install-tbb.bat
-\item lib
-\item make
-\item makefile
-\item runCmdStanTests.py
-\item src
-\item stan
-\item test-all.sh
-\end{itemize}
     %
   \item \emph{Optional:} \, Set local \code{make} variables by editing
     the file \verb+~/.config/stan/make.local+ or
@@ -129,7 +112,7 @@ report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.22.0 built ---
+--- CmdStan v2.21.0 built ---
   \end{Verbatim}
 \end{quote}
 %
