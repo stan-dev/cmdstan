@@ -46,8 +46,8 @@ CmdStan](https://github.com/stan-dev/cmdstan/wiki/Getting-Started-with-CmdStan) 
 
 ## Troubleshooting
 
-As of version 2.22, CmdStan has swithced to the new Stan-to-C++ compiler, called [stanc3](https://github.com/stan-dev/stanc3). The new parser is backwards compatible with the old compiler that was used until CmdStan 2.21. If you experience an unwanted change of behaviour in your model when switching to CmdStan 2.22 you can temporarily enable the compiler used in CmdStan 2.21. This can be done by adding a line 
+As of version 2.22, CmdStan has swithced to the new Stan-to-C++ compiler, called [stanc3](https://github.com/stan-dev/stanc3). The new parser is backwards compatible with the old compiler that was used until CmdStan 2.21, though also see this [list of bug fixes](https://github.com/stan-dev/stanc3/wiki/changes-from-stanc2). If you experience an unwanted change of behaviour in your model when switching to CmdStan 2.22 you can temporarily enable the compiler used in CmdStan 2.21. This can be done by adding a line
 ```
 STANC2=true
 ```
-to the `make/local` file. Then run `make clean-all` and `make build` again to build the old compiler. If these steps fix the issues in your model please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [Cmdstan](https://github.com/stan-dev/cmdstan) repository.
+to the `make/local` file. Then run `make clean-all` and `make build` again to build the old compiler. If these steps fix the issues in your model please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [Cmdstan](https://github.com/stan-dev/cmdstan) repository. Please include the output of `./bin/stanc --version` in your report.

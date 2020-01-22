@@ -180,7 +180,7 @@ endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 else
 .PHONY: build
-build: 
+build:
 	@echo 'ERROR: Missing Stan submodules.'
 	@echo 'Please run the following commands to fix:'
 	@echo ''
