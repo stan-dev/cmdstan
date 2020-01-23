@@ -6,6 +6,7 @@
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
+#include <cmdstan/arguments/mpi_cross_chain_set_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
@@ -137,6 +138,8 @@ namespace cmdstan {
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
+    // Each MPI chain appends chain rank to output file name.
+    mpi_cross_chain_set_output(parser);
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
