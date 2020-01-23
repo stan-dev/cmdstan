@@ -7,6 +7,7 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/mpi_cross_chain_set_output.hpp>
+#include <cmdstan/arguments/mpi_cross_chain_set_seed.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
@@ -132,6 +133,10 @@ namespace cmdstan {
     } else {
       random_seed = static_cast<unsigned int>(random_arg->value());
     }
+
+    // For MPI cross-chain, random seed is updated with MPI rank
+    mpi_cross_chain_set_seed(random_seed);
+
     parser.print(info);
     info();
 
