@@ -49,10 +49,10 @@ bin/stanc$(EXE) :
 else ifeq ($(OS_TAG),windows)
 bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/2.22.0/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
 else
 bin/stanc$(EXE) :
-	curl -L https://github.com/stan-dev/stanc3/releases/download/2.22.0/$(OS_TAG)-stanc -o bin/stanc
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
 	chmod +x bin/stanc
 endif
 
