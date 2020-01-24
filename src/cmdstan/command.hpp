@@ -134,8 +134,9 @@ namespace cmdstan {
       random_seed = static_cast<unsigned int>(random_arg->value());
     }
 
-    // For MPI cross-chain, random seed is updated with MPI rank
-    mpi_cross_chain_set_seed(random_seed);
+    // number of chains for cross-chain warmup
+    int num_cross_chains = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_cross_chains"))->value();
+    mpi_cross_chain_set_seed(random_seed, num_cross_chains);
 
     parser.print(info);
     info();
@@ -144,7 +145,7 @@ namespace cmdstan {
     stan::callbacks::interrupt interrupt;
 
     // Each MPI chain appends chain rank to output file name.
-    mpi_cross_chain_set_output(parser);
+    mpi_cross_chain_set_output(parser, num_cross_chains);
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
@@ -330,6 +331,7 @@ namespace cmdstan {
     } else if (parser.arg("method")->arg("sample")) {
       int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
       int num_samples = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_samples"))->value();
+
       int num_thin = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("thin"))->value();
       bool save_warmup = dynamic_cast<bool_argument*>(parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
       list_argument* algo = dynamic_cast<list_argument*>(parser.arg("method")->arg("sample")->arg("algorithm"));
@@ -538,6 +540,7 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -574,6 +577,7 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -627,6 +631,7 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,

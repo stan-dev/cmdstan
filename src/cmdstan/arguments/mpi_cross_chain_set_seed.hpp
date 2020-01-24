@@ -8,13 +8,11 @@
 
 namespace cmdstan {
 
-  void mpi_cross_chain_set_seed(unsigned int& seed) {
+  void mpi_cross_chain_set_seed(unsigned int& seed, int num_chains) {
 #ifdef MPI_ADAPTED_WARMUP
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
-    // hard-coded nb. of chains
-    const int num_chains = 4;
     const Communicator& inter_comm = Session::inter_chain_comm(num_chains);
     const Communicator& intra_comm = Session::intra_chain_comm(num_chains);
     MPI_Bcast(&seed, 1, MPI_UNSIGNED, 0, MPI_COMM_STAN);

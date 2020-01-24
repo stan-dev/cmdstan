@@ -9,17 +9,18 @@
 
 namespace cmdstan {
 
-  void mpi_cross_chain_set_output(argument_parser& parser) {
+  void mpi_cross_chain_set_output(argument_parser& parser, int num_chains) {
 #ifdef MPI_ADAPTED_WARMUP
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
     // hard-coded nb. of chains
-    const int num_chains = 4;
-    const Communicator& comm = Session::inter_chain_comm(num_chains);
-    string_argument* p = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
-    std::string chain_output_name = p -> value() + ".mpi." + std::to_string(comm.rank());
-    p -> set_value(chain_output_name);
+    if (Session::is_in_inter_chain_comm(num_chains)) {
+      const Communicator& comm = Session::inter_chain_comm(num_chains);
+      string_argument* p = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
+      std::string chain_output_name = p -> value() + ".mpi." + std::to_string(comm.rank());
+      p -> set_value(chain_output_name);
+    }
 #endif
   }
 }

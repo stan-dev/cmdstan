@@ -4,6 +4,7 @@
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <cmdstan/arguments/arg_num_samples.hpp>
 #include <cmdstan/arguments/arg_num_warmup.hpp>
+#include <cmdstan/arguments/arg_num_cross_chains.hpp>
 #include <cmdstan/arguments/arg_save_warmup.hpp>
 #include <cmdstan/arguments/arg_thin.hpp>
 #include <cmdstan/arguments/arg_adapt.hpp>
@@ -19,6 +20,7 @@ namespace cmdstan {
 
       _subarguments.push_back(new arg_num_samples());
       _subarguments.push_back(new arg_num_warmup());
+      _subarguments.push_back(new arg_num_cross_chains());
       _subarguments.push_back(new arg_save_warmup());
       _subarguments.push_back(new arg_thin());
       _subarguments.push_back(new arg_adapt());
