@@ -5,7 +5,10 @@
 #include <cmdstan/arguments/arg_output_file.hpp>
 #include <cmdstan/arguments/arg_diagnostic_file.hpp>
 #include <cmdstan/arguments/arg_refresh.hpp>
+
+#ifdef STAN_LANG_MPI
 #include <stan/math/mpi/envionment.hpp>
+#endif
 
 namespace cmdstan {
 
