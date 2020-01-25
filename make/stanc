@@ -52,6 +52,7 @@ bin/stanc$(EXE) :
 	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
 else
 bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
 	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
 	chmod +x bin/stanc
 endif
@@ -78,4 +79,3 @@ endif
 
 endif
 # end bin/stanc build rules
-

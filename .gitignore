@@ -10,6 +10,9 @@
 # built tests
 /test/
 
+# main intermediate
+src/cmdstan/main.o
+
 # test models
 /src/test/test-models/*
 !/src/test/test-models/*.stan
