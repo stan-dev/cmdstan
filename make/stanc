@@ -43,7 +43,7 @@ bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
 
 else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
 bin/stanc$(EXE) :
-	cp bin/$(OS_TAG)-stanc) bin/stanc$(EXE)
+	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
 	chmod +x bin/stanc
 
 else ifeq ($(OS_TAG),windows)
