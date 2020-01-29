@@ -5,9 +5,8 @@ git clone --recurse-submodules --single-branch --branch mpi_warmup_framework git
 
 ** Edit make/local
 #+BEGIN_SRC bash
-  CXXFLAGS += -isystem /path/to/mpi/include -DSTAN_LANG_MPI -DMPI_ADAPTED_WARMUP
-  CC=mpicxx
-  CXX=mpicxx
+  MPI_ADAPTED_WARMUP = 1
+  CXXFLAGS += -isystem /path/to/mpi/include
   TBB_CXX_TYPE=clang              # your cpp compiler
 #+END_SRC
 
@@ -19,10 +18,10 @@ make -j4 examples/radon/radon
 
 ** Run
 #+BEGIN_SRC bash
-  mpiexec -n 4 -l ./radon sample data file=radon.data.R # MPICH
+  mpiexec -n 4 -l ./radon sample num_cross_chains=4 data file=radon.data.R # MPICH
 #+END_SRC
 or
 #+BEGIN_SRC bash
-  mpiexec -n 4 --tag-output ./radon sample data file=radon.data.R # OpenMPI
+  mpiexec -n 4 --tag-output ./radon sample num_cross_chains=4 data file=radon.data.R # OpenMPI
 #+END_SRC
 runs 4 chains with cross-chain warmup, using 4 processes.

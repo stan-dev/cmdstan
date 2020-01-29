@@ -1,10 +1,10 @@
-- [Get the repo & depdencies](#orgc68ef57)
-  - [Edit make/local](#org510d4b1)
-  - [Compile](#org03fc0e3)
-  - [Run](#org54cb72d)
+- [Get the repo & depdencies](#org524895a)
+  - [Edit make/local](#org07db622)
+  - [Compile](#org7992c43)
+  - [Run](#org3eb1b7d)
 
 
-<a id="orgc68ef57"></a>
+<a id="org524895a"></a>
 
 # Get the repo & depdencies
 
@@ -13,19 +13,18 @@ git clone --recurse-submodules --single-branch --branch mpi_warmup_framework git
 ```
 
 
-<a id="org510d4b1"></a>
+<a id="org07db622"></a>
 
 # Edit make/local
 
 ```bash
-CXXFLAGS += -isystem /path/to/mpi/include -DSTAN_LANG_MPI -DMPI_ADAPTED_WARMUP
-CC=mpicxx
-CXX=mpicxx
+MPI_ADAPTED_WARMUP = 1
+CXXFLAGS += -isystem /path/to/mpi/include
 TBB_CXX_TYPE=clang              # your cpp compiler
 ```
 
 
-<a id="org03fc0e3"></a>
+<a id="org7992c43"></a>
 
 # Compile
 
@@ -35,18 +34,18 @@ make -j4 examples/radon/radon
 ```
 
 
-<a id="org54cb72d"></a>
+<a id="org3eb1b7d"></a>
 
 # Run
 
 ```bash
-mpiexec -n 4 -l ./radon sample data file=radon.data.R # MPICH
+mpiexec -n 4 -l ./radon sample num_cross_chains=4 data file=radon.data.R # MPICH
 ```
 
 or
 
 ```bash
-mpiexec -n 4 --tag-output ./radon sample data file=radon.data.R # OpenMPI
+mpiexec -n 4 --tag-output ./radon sample num_cross_chains=4 data file=radon.data.R # OpenMPI
 ```
 
 runs 4 chains with cross-chain warmup, using 4 processes.
