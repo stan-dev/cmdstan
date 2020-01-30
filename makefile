@@ -44,7 +44,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.21.0
+CMDSTAN_VERSION := 2.22.0
 
 .PHONY: help
 help:
@@ -59,14 +59,14 @@ else
 endif
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Download the Stan compiler bin/stanc$(EXE).'
+	@echo '    1. Install the Stan compiler bin/stanc$(EXE), either from stanc3 binaries or from stanc2 source code'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
-	@echo '    5. Build all dependencies of Stan'
+	@echo '    5. Build all libraries and object files compile and link an executable Stan program'
 	@echo ''
-	@echo '    Note: to build using multiple cores, use the -j option to make. '
-	@echo '    For 4 cores:'
+	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
+	@echo '    for 4 cores:'
 ifeq ($(OS),Windows_NT)
 	@echo '    > mingw32-make build -j4'
 else
@@ -86,7 +86,7 @@ endif
 	@echo '    > make foo/bar$(EXE)'
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Build the Stan compiler and the print utility if not built.'
+	@echo '    1. Install the Stan compiler (bin/stanc), as needed.'
 	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
 	@echo ''
@@ -147,12 +147,11 @@ help-dev:
 	@echo '                     what is in the repository.'
 	@echo ''
 	@echo 'Model related:'
-	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary$(EXE): Build the print utility.'
 	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
-	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
-	@echo '                   bin/stanc$(EXE))'
+	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
 	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
@@ -181,7 +180,7 @@ endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
 else
 .PHONY: build
-build: 
+build:
 	@echo 'ERROR: Missing Stan submodules.'
 	@echo 'Please run the following commands to fix:'
 	@echo ''
