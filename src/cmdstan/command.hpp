@@ -135,8 +135,14 @@ namespace cmdstan {
     }
 
     // number of chains for cross-chain warmup
-    int num_cross_chains = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_cross_chains"))->value();
-    mpi_cross_chain_set_seed(random_seed, num_cross_chains);
+    unsigned int num_cross_chains = 0;
+    unsigned int cross_chain_window = 0;
+    if (parser.arg("method")->arg("sample")) {
+      categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
+      num_cross_chains = dynamic_cast<u_int_argument*>(adapt->arg("num_cross_chains"))->value();
+      cross_chain_window = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_window"))->value();
+      mpi_cross_chain_set_seed(random_seed, num_cross_chains);
+    }
 
     parser.print(info);
     info();
@@ -145,7 +151,9 @@ namespace cmdstan {
     stan::callbacks::interrupt interrupt;
 
     // Each MPI chain appends chain rank to output file name.
-    mpi_cross_chain_set_output(parser, num_cross_chains);
+    if (parser.arg("method")->arg("sample")) {
+      mpi_cross_chain_set_output(parser, num_cross_chains);
+    }
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
@@ -541,6 +549,7 @@ namespace cmdstan {
                                                                       id,
                                                                       init_radius,
                                                                       num_cross_chains,
+                                                                      cross_chain_window,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -578,6 +587,7 @@ namespace cmdstan {
                                                                       id,
                                                                       init_radius,
                                                                       num_cross_chains,
+                                                                      cross_chain_window,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -632,6 +642,7 @@ namespace cmdstan {
                                                                       id,
                                                                       init_radius,
                                                                       num_cross_chains,
+                                                                      cross_chain_window,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
