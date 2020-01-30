@@ -12,6 +12,7 @@
 #include <cmdstan/arguments/arg_adapt_window.hpp>
 #include <cmdstan/arguments/arg_adapt_num_cross_chains.hpp>
 #include <cmdstan/arguments/arg_adapt_cross_chain_window.hpp>
+#include <cmdstan/arguments/arg_adapt_cross_chain_ess.hpp>
 
 namespace cmdstan {
   class arg_adapt: public categorical_argument {
@@ -30,6 +31,7 @@ namespace cmdstan {
       _subarguments.push_back(new arg_adapt_window());
       _subarguments.push_back(new arg_adapt_num_cross_chains());
       _subarguments.push_back(new arg_adapt_cross_chain_window());
+      _subarguments.push_back(new arg_adapt_cross_chain_ess());
     }
   };
 
