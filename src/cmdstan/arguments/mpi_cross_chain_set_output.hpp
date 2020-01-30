@@ -21,7 +21,7 @@ namespace cmdstan {
     if (Session::is_in_inter_chain_comm(num_chains)) {
       const Communicator& comm = Session::inter_chain_comm(num_chains);
       string_argument* p = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
-      std::string chain_output_name = p -> value() + ".mpi." + std::to_string(comm.rank());
+      std::string chain_output_name = "mpi." + std::to_string(comm.rank()) + "." + p -> value();
       p -> set_value(chain_output_name);
     }
 #endif
