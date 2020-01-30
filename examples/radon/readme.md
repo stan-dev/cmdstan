@@ -1,10 +1,10 @@
-- [Get the repo & depdencies](#org8acc209)
-  - [Edit make/local](#org54c4f9d)
-  - [Compile](#org7ba40bc)
-  - [Run](#orge0eed06)
+- [Get the repo & depdencies](#org5557ab1)
+  - [Edit make/local](#org32e15b8)
+  - [Compile](#org5d3f69c)
+  - [Run](#orgafcbab4)
 
 
-<a id="org8acc209"></a>
+<a id="org5557ab1"></a>
 
 # Get the repo & depdencies
 
@@ -13,7 +13,7 @@ git clone --recurse-submodules --single-branch --branch mpi_warmup_framework git
 ```
 
 
-<a id="org54c4f9d"></a>
+<a id="org32e15b8"></a>
 
 # Edit make/local
 
@@ -24,7 +24,7 @@ TBB_CXX_TYPE=clang              # your cpp compiler
 ```
 
 
-<a id="org7ba40bc"></a>
+<a id="org5d3f69c"></a>
 
 # Compile
 
@@ -34,18 +34,12 @@ make -j4 examples/radon/radon
 ```
 
 
-<a id="orge0eed06"></a>
+<a id="orgafcbab4"></a>
 
 # Run
 
 ```bash
 mpiexec -n 4 -l ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # MPICH
-```
-
-or
-
-```bash
-mpiexec -n 4 -l  # MPICH
 mpiexec -n 4 --tag-output ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # OpenMPI
 ```
 
@@ -61,4 +55,4 @@ specifies the number of parallel chains used in cross-chain warmup(default 4), a
 cross_chain_window=
 ```
 
-specifies that every `=cross_chain_window=` iterations(default 100) the convergence check is performed using data collected from the chains. See <https://discourse.mc-stan.org/t/new-adaptive-warmup-proposal-looking-for-feedback/12039> for details.
+specifies that every `cross_chain_window` iterations(default 100) the convergence check is performed using data collected from the chains. See <https://discourse.mc-stan.org/t/new-adaptive-warmup-proposal-looking-for-feedback/12039> for details.

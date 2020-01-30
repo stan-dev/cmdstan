@@ -19,10 +19,6 @@ make -j4 examples/radon/radon
 ** Run
 #+BEGIN_SRC bash
   mpiexec -n 4 -l ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # MPICH
-#+END_SRC
-or
-#+BEGIN_SRC bash
-  mpiexec -n 4 -l  # MPICH
   mpiexec -n 4 --tag-output ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # OpenMPI
 #+END_SRC
 runs 4 chains with cross-chain warmup, using 4
@@ -35,7 +31,7 @@ warmup(default 4), and
 #+BEGIN_SRC bash
 cross_chain_window=
 #+END_SRC
-specifies that every ==cross_chain_window==
+specifies that every =cross_chain_window=
 iterations(default 100) the
 convergence check is performed using data collected from the
 chains. See https://discourse.mc-stan.org/t/new-adaptive-warmup-proposal-looking-for-feedback/12039
