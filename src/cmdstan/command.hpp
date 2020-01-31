@@ -16,6 +16,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/mpi_stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -97,8 +98,13 @@ namespace cmdstan {
 
 
   int command(int argc, const char* argv[]) {
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer info(1, std::cout);
+    stan::callbacks::mpi_stream_writer err(1, std::cout);
+#else
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
+#endif
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
 
@@ -139,6 +145,7 @@ namespace cmdstan {
     unsigned int cross_chain_window = 0;
     double cross_chain_rhat = 0.0;
     unsigned int cross_chain_ess = 0;
+#ifdef MPI_ADAPTED_WARMUP
     if (parser.arg("method")->arg("sample")) {
       categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
       num_cross_chains = dynamic_cast<u_int_argument*>(adapt->arg("num_cross_chains"))->value();
@@ -146,7 +153,10 @@ namespace cmdstan {
       cross_chain_rhat = dynamic_cast<real_argument*>(adapt->arg("cross_chain_rhat"))->value();
       cross_chain_ess = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_ess"))->value();
       mpi_cross_chain_set_seed(random_seed, num_cross_chains);
+      info.set_num_chains(num_cross_chains);
+      err.set_num_chains(num_cross_chains);
     }
+#endif
 
     parser.print(info);
     info();
@@ -161,12 +171,20 @@ namespace cmdstan {
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer sample_writer(num_cross_chains, output_stream, "# ");
+#else
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
+#endif    
+
 
     std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value().c_str(),
                                    std::fstream::out);
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer diagnostic_writer(num_cross_chains, diagnostic_stream, "# ");
+#else
     stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
-
+#endif
 
     //////////////////////////////////////////////////
     //                Initialize Model              //
