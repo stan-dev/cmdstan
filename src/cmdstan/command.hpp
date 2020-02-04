@@ -171,8 +171,9 @@ namespace cmdstan {
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
+    std::string output_file_name(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value());
 #ifdef MPI_ADAPTED_WARMUP
-    stan::callbacks::mpi_stream_writer sample_writer(num_cross_chains, output_stream, "# ");
+    stan::callbacks::mpi_fstream_writer sample_writer(num_cross_chains, output_stream, output_file_name, "# ");
 #else
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 #endif    
