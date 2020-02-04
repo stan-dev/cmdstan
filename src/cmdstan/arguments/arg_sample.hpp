@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <cmdstan/arguments/arg_num_samples.hpp>
+#include <cmdstan/arguments/arg_max_num_warmup.hpp>
 #include <cmdstan/arguments/arg_num_warmup.hpp>
 #include <cmdstan/arguments/arg_save_warmup.hpp>
 #include <cmdstan/arguments/arg_thin.hpp>
@@ -18,7 +19,11 @@ namespace cmdstan {
       _description = "Bayesian inference with Markov Chain Monte Carlo";
 
       _subarguments.push_back(new arg_num_samples());
+#ifdef MPI_ADAPTED_WARMUP
+      _subarguments.push_back(new arg_max_num_warmup());
+#else
       _subarguments.push_back(new arg_num_warmup());
+#endif
       _subarguments.push_back(new arg_save_warmup());
       _subarguments.push_back(new arg_thin());
       _subarguments.push_back(new arg_adapt());

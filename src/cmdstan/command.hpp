@@ -359,7 +359,11 @@ namespace cmdstan {
                                                       sample_writer);
       }
     } else if (parser.arg("method")->arg("sample")) {
+#ifdef MPI_ADAPTED_WARMUP
+      int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("max_num_warmup"))->value();
+#else
       int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
+#endif
       int num_samples = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_samples"))->value();
 
       int num_thin = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("thin"))->value();
