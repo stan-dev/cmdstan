@@ -1,9 +1,25 @@
 \chapter{{\tt\bfseries stanc}: Translating Stan to C++}\label{stanc.chapter}
 
+
+CmdStan  translates Stan programs to C++ using the Stan compiler program which
+is included in the CmdStan release `bin` directory as program `stanc`.
+
+As of release 2.22, the CmdStan Stan to C++ compiler is 
+written in OCaml.
+This compiler is called ``stanc3'' and has has its own repository
+https://github.com/stan-dev/stanc3, from which pre-built binaries
+for Linux, Mac, and Windows can be downloaded.
+
+Prior to release 2.22, the Stan compiler program was compiled from C++ source code
+that was part of the core Stan library.
+This C++ compiler is now referred to as ``stanc2''.
+The stanc2 compiler is still available, but may be removed in future releases.
+
 \section{Preparing the \stanc Compiler Binary}
 
+
 Before the Stan compiler can be used, the binary \stanc must be created, either from
-the pre-built binaries included with the release or downloaded from the nightly build.
+stanc3 pre-built binaries or from the stanc2 source code.
 This can be done using the makefile as follows. For Mac and Linux:
 %
 \begin{quote}
@@ -21,12 +37,20 @@ For Windows:
 \end{quote}
 %
 
+Using the make flag `STANC2` will build the \stanc binary from the C++ sources:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make STANC2=TRUE bin/stanc
+\end{Verbatim}
+\end{quote}
+%
+
+
 \section{The \stanc Compiler}
 
-The \stanc compiler converts Stan programs to \Cpp concepts. The
-first stage of compilation involves parsing the text of the Stan
-program.  If the parser is successful, the second stage of compilation
-generates \Cpp code.  If the parser fails, it will provide an error
+The \stanc compiler converts Stan programs to \Cpp concepts.
+If the parser fails, it will provide an error
 message indicating the location in the input where the failure
 occurred and reason for the failure.
 
@@ -68,12 +92,141 @@ any \Cpp reserved keyword.
 
 The \Cpp code implementing the class is written to the file
 \code{bernoulli.hpp} in the current directory.  The final argument,
-\code{bernoulli.stan}, is the file from which to read the Stan
-program.
+\code{bernoulli.stan}, is the file from which to read the Stan program.
 
-\section{Command-Line Options for {\tt\bfseries stanc}}
+\section{Command-Line Options for {\tt\bfseries stanc3}}
 
-The \stanc  program has the following command-line syntax:
+The stanc2 compiler has the following command-line syntax:
+%
+\begin{quote}
+\code{> stanc [options] {\slshape model\_file}}
+\end{quote}
+%
+The argument \code{\slshape model\_file} is a path to a Stan model
+file ending in suffix \code{.stan}.  The options are as follows.
+%
+\begin{description}
+%
+\item[\tt {-}-help] 
+\mbox{ } \\ 
+Displays the complete list of stanc3 options.
+If this option is selected, nothing else is done.
+%
+\item[\tt  --version]
+\mbox{ } \\ 
+ Display stanc version number
+%
+\item[\tt  --allow\_undefined]
+\mbox{ } \\ 
+Do not fail if a function is declared but not defined.
+%
+\item[\tt --auto-format]
+\mbox{ } \\ 
+ Pretty prints the program to the console.
+%
+\item[\tt  --include\_paths]
+\mbox{ } \\ 
+Takes a comma-separated list of directories that may contain a file in an \#include directive (default = "")
+%
+\item[\tt  --name]
+\mbox{ } \\ 
+Take a string to set the model name (default = "\$model\_filename\_model")
+%
+\item[\tt  --O ]
+\mbox{ } \\ 
+Allow the compiler to apply all optimizations to the Stan code.WARNING: This is currently an experimental feature!
+%
+\item[\tt  --o]
+\mbox{} \\
+Take the path to an output file for generated C++ code (default = "\$name.hpp")
+
+%
+\item[\tt  --print-canonical]
+\mbox{ } \\ 
+ Prints the canonicalized program to the console.
+
+%
+\item[\tt  --print-cpp]
+\mbox{ } \\ 
+If set, output the generated C++ Stan model class to stdout.
+
+%
+\item[\tt  --warn-uninitialized]
+\mbox{ } \\ 
+Emit warnings about uninitialized variables to stderr. Currently an experimental feature.
+
+%
+\item[\tt  --use-opencl]
+\mbox{ } \\ 
+ If set, try to use matrix\_cl signatures.
+
+%
+\item[\tt  --debug-lex]
+\mbox{} \\
+For debugging purposes: print the lexer actions.
+
+%
+\item[\tt  --debug-parse]
+\mbox{} \\
+For debugging purposes: print the parser actions.
+
+%
+\item[\tt  --debug-ast]
+\mbox{} \\
+For debugging purposes: print the undecorated AST, before semantic checking.
+
+%
+\item[\tt  --debug-decorated-ast]
+\mbox{} \\
+For debugging purposes: print the decorated AST, after semantic checking.
+
+%
+\item[\tt  --debug-generate-data]
+\mbox{} \\
+For debugging purposes: generate a mock dataset to run the model on.
+
+%
+\item[\tt  --debug-mir]
+\mbox{} \\
+For debugging purposes: print the MIR as an S-expression..
+
+%
+\item[\tt  --debug-mir-pretty]
+\mbox{} \\
+For debugging purposes: pretty-print the MIR..
+
+%
+\item[\tt  --debug-optimized-mir]
+\mbox{} \\
+For debugging purposes: print the MIR after it's been optimized. Only has an effect when optimizations are turned on..
+
+%
+\item[\tt  --debug-optimized-mir-pretty]
+\mbox{} \\
+For debugging purposes: pretty print the MIR after it's been optimized. Only has an effect when optimizations are turned on..
+
+%
+\item[\tt  --debug-transformed-mir]
+\mbox{} \\
+For debugging purposes: print the MIR after the backend has transformed it..
+
+%
+\item[\tt  --debug-transformed-mir-pretty]
+\mbox{} \\
+For debugging purposes: pretty print the MIR after the backend has transformed it..
+
+%
+\item[\tt  --dump-stan-math-signatures]
+\mbox{} \\
+ Dump out the list of supported type signatures for Stan Math backend.
+%
+\end{description}
+%
+
+
+\section{Command-Line Options for {\tt\bfseries stanc2}}
+
+The stanc2 compiler has the following command-line syntax:
 %
 \begin{quote}
 \code{> stanc [options] {\slshape model\_file}}
