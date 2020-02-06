@@ -14,9 +14,7 @@ Prior to release 2.22, the Stan compiler program was compiled from C++ source co
 that was part of the core Stan library.
 This C++ compiler is now referred to as ``stanc2''.
 The stanc2 compiler is still available, but may be removed in future releases.
-
 \section{Preparing the \stanc Compiler Binary}
-
 
 Before the Stan compiler can be used, the binary \stanc must be created, either from
 stanc3 pre-built binaries or from the stanc2 source code.
@@ -45,7 +43,6 @@ Using the make flag `STANC2` will build the \stanc binary from the C++ sources:
 \end{Verbatim}
 \end{quote}
 %
-
 
 \section{The \stanc Compiler}
 
@@ -94,6 +91,31 @@ The \Cpp code implementing the class is written to the file
 \code{bernoulli.hpp} in the current directory.  The final argument,
 \code{bernoulli.stan}, is the file from which to read the Stan program.
 
+In practice, \stanc is invoked indirectly, via the GNU Make utility,
+which contains rules that compile a Stan program
+to its corresponding executable.
+To build the simple Bernoulli model via the makefile rules
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make examples/bernoulli/bernoulli
+\end{Verbatim}
+\end{quote}
+%
+The makefile rules first invoke the \stanc compiler to translate the Stan model to C++ ,
+then compiles and links the C++ code to a binary executable.
+The makefile variable {\tt STANCFLAGS } can be used to
+to override the default arguments to \stanc, e.g.,
+
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make STANCFLAGS="--include_paths=~/foo" examples/bernoulli/bernoulli
+\end{Verbatim}
+\end{quote}
+%
+
+
 \section{Command-Line Options for {\tt\bfseries stanc3}}
 
 The stanc2 compiler has the following command-line syntax:
@@ -109,120 +131,58 @@ file ending in suffix \code{.stan}.  The options are as follows.
 %
 \item[\tt {-}-help] 
 \mbox{ } \\ 
-Displays the complete list of stanc3 options.
-If this option is selected, nothing else is done.
+Displays the complete list of stanc3 options, then exits.
 %
 \item[\tt  --version]
 \mbox{ } \\ 
  Display stanc version number
 %
+\item[\tt  --name={\slshape class\_name}]
+\mbox{ } \\ 
+Specify the name of the class used for the implementation of the
+Stan model in the generated \Cpp code.  
+%
+\item[\tt --o={\slshape cpp\_file\_name}]
+\mbox{} \\
+Specify the name of the file into which the generated \Cpp is written.
+%
 \item[\tt  --allow\_undefined]
 \mbox{ } \\ 
-Do not fail if a function is declared but not defined.
+Do not throw a parser error if there is a function in the Stan program
+that is declared but not defined in the functions block.
+%
+\item[\tt  --include\_paths={\slshape dir1,...dirN}]]
+\mbox{ } \\ 
+Takes a comma-separated list of directories that may contain a file in an \#include directive (default = "")
+%
+\item[\tt  --use-opencl]
+\mbox{ } \\ 
+If set, will use additional Stan OpenCL features enabled in the Stan-to-C++ compiler. The flag is automatically used when {\tt STAN\_OPENCL} is set in CmdStan.
 %
 \item[\tt --auto-format]
 \mbox{ } \\ 
  Pretty prints the program to the console.
 %
-\item[\tt  --include\_paths]
+\item[\tt  --print-canonical]
 \mbox{ } \\ 
-Takes a comma-separated list of directories that may contain a file in an \#include directive (default = "")
+ Prints the canonicalized program to the console.
 %
-\item[\tt  --name]
+\item[\tt  --print-cpp]
 \mbox{ } \\ 
-Take a string to set the model name (default = "\$model\_filename\_model")
+If set, output the generated C++ Stan model class to stdout.
 %
 \item[\tt  --O ]
 \mbox{ } \\ 
 Allow the compiler to apply all optimizations to the Stan code.WARNING: This is currently an experimental feature!
 %
-\item[\tt  --o]
-\mbox{} \\
-Take the path to an output file for generated C++ code (default = "\$name.hpp")
-
-%
-\item[\tt  --print-canonical]
-\mbox{ } \\ 
- Prints the canonicalized program to the console.
-
-%
-\item[\tt  --print-cpp]
-\mbox{ } \\ 
-If set, output the generated C++ Stan model class to stdout.
-
-%
 \item[\tt  --warn-uninitialized]
 \mbox{ } \\ 
 Emit warnings about uninitialized variables to stderr. Currently an experimental feature.
-
-%
-\item[\tt  --use-opencl]
-\mbox{ } \\ 
- If set, try to use matrix\_cl signatures.
-
-%
-\item[\tt  --debug-lex]
-\mbox{} \\
-For debugging purposes: print the lexer actions.
-
-%
-\item[\tt  --debug-parse]
-\mbox{} \\
-For debugging purposes: print the parser actions.
-
-%
-\item[\tt  --debug-ast]
-\mbox{} \\
-For debugging purposes: print the undecorated AST, before semantic checking.
-
-%
-\item[\tt  --debug-decorated-ast]
-\mbox{} \\
-For debugging purposes: print the decorated AST, after semantic checking.
-
-%
-\item[\tt  --debug-generate-data]
-\mbox{} \\
-For debugging purposes: generate a mock dataset to run the model on.
-
-%
-\item[\tt  --debug-mir]
-\mbox{} \\
-For debugging purposes: print the MIR as an S-expression..
-
-%
-\item[\tt  --debug-mir-pretty]
-\mbox{} \\
-For debugging purposes: pretty-print the MIR..
-
-%
-\item[\tt  --debug-optimized-mir]
-\mbox{} \\
-For debugging purposes: print the MIR after it's been optimized. Only has an effect when optimizations are turned on..
-
-%
-\item[\tt  --debug-optimized-mir-pretty]
-\mbox{} \\
-For debugging purposes: pretty print the MIR after it's been optimized. Only has an effect when optimizations are turned on..
-
-%
-\item[\tt  --debug-transformed-mir]
-\mbox{} \\
-For debugging purposes: print the MIR after the backend has transformed it..
-
-%
-\item[\tt  --debug-transformed-mir-pretty]
-\mbox{} \\
-For debugging purposes: pretty print the MIR after the backend has transformed it..
-
-%
-\item[\tt  --dump-stan-math-signatures]
-\mbox{} \\
- Dump out the list of supported type signatures for Stan Math backend.
-%
 \end{description}
 %
-
+The compiler also provides a number of debug options which are
+primarily of interest to stanc3 developers; use the {\tt --help}  option
+to see the full set.
 
 \section{Command-Line Options for {\tt\bfseries stanc2}}
 
@@ -239,8 +199,7 @@ file ending in suffix \code{.stan}.  The options are as follows.
 %
 \item[\tt {-}-help] 
 \mbox{ } \\ 
-Displays the manual page for \stanc.  If this option is selected,
-nothing else is done.
+Displays the complete list of stanc2 options, then exits.
 %
 \item[\tt {-}-version]
 \mbox{ } \\ 
@@ -255,7 +214,7 @@ Stan model in the generated \Cpp code.
 Default: {\tt {\slshape class\_name = model\_file}\_model}
 %
 \item[\tt {-}-o={\slshape cpp\_file\_name}]
-\mbox{ } \\ 
+  \mbox{ } \\ 
 Specify the name of the file into which the generated \Cpp is written.
 \\[2pt]
 Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.hpp}
@@ -264,6 +223,10 @@ Default: {\tt {\slshape cpp\_file\_name} = {\slshape class\_name}.hpp}
 \mbox{ } \\ 
 Do not throw a parser error if there is a function in the Stan program
 that is declared but not defined in the functions block.
+%
+\item[\tt  --include\_paths={\slshape dir1,...dirN}]]
+\mbox{ } \\ 
+Takes a comma-separated list of directories that may contain a file in an \#include directive (default = "")
 %
 \end{description}
 
