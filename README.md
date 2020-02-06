@@ -71,3 +71,5 @@ to the `make/local` file. Then run `make clean-all` and `make build` again to bu
 If using the old compiler fixes the issues in your model, please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [CmdStan](https://github.com/stan-dev/cmdstan) repository.
 
 To switch back to the stanc3 compiler, just remove the existing `bin/stanc` program and re-run the make task `bin/stanc`.  By default, this installs the latest version of the stanc3 compiler.
+
+Further information is available on the CmdStan wiki page https://github.com/stan-dev/cmdstan/wiki/Troubleshooting-the-stanc3-compiler
