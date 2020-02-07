@@ -6,8 +6,6 @@
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
-#include <cmdstan/arguments/mpi_cross_chain_set_output.hpp>
-#include <cmdstan/arguments/mpi_cross_chain_set_seed.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_stan.hpp>
@@ -40,6 +38,7 @@
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
+#include <stan/services/util/mpi_cross_chain.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/opencl/opencl_context.hpp>
@@ -152,7 +151,15 @@ namespace cmdstan {
       cross_chain_window = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_window"))->value();
       cross_chain_rhat = dynamic_cast<real_argument*>(adapt->arg("cross_chain_rhat"))->value();
       cross_chain_ess = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_ess"))->value();
-      mpi_cross_chain_set_seed(random_seed, num_cross_chains);
+
+      stan::services::util::mpi_cross_chain::set_seed(random_seed, num_cross_chains);
+      random_arg -> set_value(static_cast<int>(random_seed));
+
+      string_argument* ptr_out = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
+      std::string f_out = ptr_out -> value();
+      stan::services::util::mpi_cross_chain::set_file(f_out, num_cross_chains);
+      ptr_out -> set_value(f_out);
+
       info.set_num_chains(num_cross_chains);
       err.set_num_chains(num_cross_chains);
     }
@@ -163,11 +170,6 @@ namespace cmdstan {
 
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
-
-    // Each MPI chain appends chain rank to output file name.
-    if (parser.arg("method")->arg("sample")) {
-      mpi_cross_chain_set_output(parser, num_cross_chains);
-    }
 
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
