@@ -127,6 +127,7 @@ namespace cmdstan {
     unsigned int random_seed;
     if (random_arg->is_default()) {
       random_seed = (boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds();
+      random_arg->set_value(random_seed);
     } else {
       random_seed = static_cast<unsigned int>(random_arg->value());
     }

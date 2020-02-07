@@ -404,36 +404,38 @@ TEST(StanUiCommand, random_seed_specified_different) {
     + " data file=src/test/test-models/transformed_data_rng_test.init.R"
     + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
-  EXPECT_EQ(1, count_matches("y values:", cmd_output));
-  std::vector<std::string> lines;
-  split(lines, cmd_output, boost::is_any_of("\n"));
-  std::string random1;
-  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
-    if (boost::starts_with(*it,"y values:")) {
-      random1.assign(*it,9,std::string::npos);
-      EXPECT_EQ(1, count_matches("[", random1));
-      EXPECT_EQ(1, count_matches("]", random1));
-      break;
-    }
-  }
-  command = convert_model_path(model_path)
+
+}
+
+TEST(StanUiCommand, stored_random_seed_is_random) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("transformed_data_rng_test");
+  
+  std::string command = convert_model_path(model_path)
     + " sample num_samples=10 num_warmup=10 init=0 "
-    + " random seed=45678 "
+    + " random seed=-1 "
     + " data file=src/test/test-models/transformed_data_rng_test.init.R"
     + " output refresh=0 file=test/output.csv";
-  cmd_output = run_command(command).output;
-  EXPECT_EQ(1, count_matches("y values:", cmd_output));
-  split(lines, cmd_output, boost::is_any_of("\n"));
-  std::string random2;
-  for (std::vector<std::string>::iterator it = lines.begin() ; it != lines.end(); ++it) {
-    if (boost::starts_with(*it,"y values:")) {
-      random2.assign(*it,9,std::string::npos);
-      EXPECT_EQ(1, count_matches("[", random2));
-      EXPECT_EQ(1, count_matches("]", random2));
-      break;
-    }
-  }
-  EXPECT_NE(random1,random2);
+  std::string cmd_output = run_command(command).output;
+  stan::io::stan_csv test_csv;
+  std::stringstream out;
+  std::ifstream csv_stream;
+  csv_stream.open("test/output.csv");
+  test_csv = stan::io::stan_csv_reader::parse(csv_stream, &out);
+  csv_stream.close();
+
+  std::string cmd_output_2 = run_command(command).output;
+  stan::io::stan_csv test_csv_2;
+  std::stringstream out_2;
+  std::ifstream csv_stream_2;
+  csv_stream_2.open("test/output.csv");
+  test_csv_2 = stan::io::stan_csv_reader::parse(csv_stream_2, &out);
+  csv_stream_2.close();
+
+  EXPECT_NE(test_csv.metadata.seed, test_csv_2.metadata.seed);
 }
 
 TEST(StanUiCommand, random_seed_fail_1) {
@@ -497,6 +499,8 @@ TEST(StanUiCommand, random_seed_fail_3) {
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body));
 }
+
+
 
 TEST(StanUiCommand, json_input) {
   std::vector<std::string> model_path;
