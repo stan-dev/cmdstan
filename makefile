@@ -225,7 +225,7 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
-	$(RM) -r $(CMDSTAN_MAIN_O)
+	$(RM) -r $(CMDSTAN_MAIN_O) bin/cmdstan
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 
 
