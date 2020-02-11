@@ -10,8 +10,8 @@ namespace cmdstan {
     arg_adapt_cross_chain_ess(): u_int_argument() {
       _name = "cross_chain_ess";
       _description = "Target ESS for cross-chain warmup";
-      _default = "50";
-      _default_value = 50;
+      _default = "200";
+      _default_value = 200;
       _value = _default_value;
     }
   };
