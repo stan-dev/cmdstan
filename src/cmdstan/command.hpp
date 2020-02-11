@@ -152,8 +152,10 @@ namespace cmdstan {
       cross_chain_rhat = dynamic_cast<real_argument*>(adapt->arg("cross_chain_rhat"))->value();
       cross_chain_ess = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_ess"))->value();
 
-      stan::services::util::set_cross_chain_seed(random_seed, num_cross_chains);
-      random_arg -> set_value(static_cast<int>(random_seed));
+      int_argument* id_arg = dynamic_cast<int_argument*>(parser.arg("id"));
+      unsigned int id = id_arg->value();
+      stan::services::util::set_cross_chain_id(id, num_cross_chains);
+      id_arg -> set_value(static_cast<int>(id));
 
       string_argument* ptr_out = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
       std::string f_out = ptr_out -> value();
