@@ -50,6 +50,7 @@ endif
 
 
 # bin/stanc2 build rules
+bin/stanc2$(EXE) : $(TBB_TARGETS)
 bin/stanc2$(EXE) : O = $(O_STANC)
 bin/stanc2$(EXE) : CPPFLAGS_MPI =
 bin/stanc2$(EXE) : LDFLAGS_MPI =
