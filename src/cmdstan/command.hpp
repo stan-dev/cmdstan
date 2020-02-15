@@ -144,6 +144,9 @@ namespace cmdstan {
     unsigned int cross_chain_window = 0;
     double cross_chain_rhat = 0.0;
     unsigned int cross_chain_ess = 0;
+    std::string output_file = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value();
+    std::string diagnostic_file = dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value();
+      
 #ifdef MPI_ADAPTED_WARMUP
     if (parser.arg("method")->arg("sample")) {
       categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
@@ -157,10 +160,8 @@ namespace cmdstan {
       stan::services::util::set_cross_chain_id(id, num_cross_chains);
       id_arg -> set_value(static_cast<int>(id));
 
-      string_argument* ptr_out = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
-      std::string f_out = ptr_out -> value();
-      stan::services::util::set_cross_chain_file(f_out, num_cross_chains);
-      ptr_out -> set_value(f_out);
+      stan::services::util::set_cross_chain_file(output_file, num_cross_chains);  
+      stan::services::util::set_cross_chain_file(diagnostic_file, num_cross_chains);
 
       info.set_num_chains(num_cross_chains);
       err.set_num_chains(num_cross_chains);
@@ -173,17 +174,14 @@ namespace cmdstan {
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
-    std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
-                               std::fstream::out);
+    std::fstream output_stream(output_file.c_str(), std::fstream::out);
 #ifdef MPI_ADAPTED_WARMUP
     stan::callbacks::mpi_stream_writer sample_writer(num_cross_chains, output_stream, "# ");
 #else
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 #endif    
 
-
-    std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value().c_str(),
-                                   std::fstream::out);
+    std::fstream diagnostic_stream(diagnostic_file.c_str(), std::fstream::out);
 #ifdef MPI_ADAPTED_WARMUP
     stan::callbacks::mpi_stream_writer diagnostic_writer(num_cross_chains, diagnostic_stream, "# ");
 #else
