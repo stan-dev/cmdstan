@@ -25,6 +25,7 @@
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/newton.hpp>
 #include <stan/services/sample/fixed_param.hpp>
+#include <stan/services/sample/hmc_nuts_auto_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_diag_e.hpp>
@@ -408,7 +409,7 @@ namespace cmdstan {
         if (adapt_engaged == true && num_warmup == 0) {
           info("The number of warmup samples (num_warmup) must be greater than zero if adaptation is enabled.");
           return_code = stan::services::error_codes::CONFIG;
-        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == false) {
+        } else if (engine->value() == "nuts" && (metric->value() == "dense_e" || metric->value() == "auto_e") && adapt_engaged == false && metric_supplied == false) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
                                                                  *init_context,
@@ -428,7 +429,7 @@ namespace cmdstan {
                                                                  init_writer,
                                                                  sample_writer,
                                                                  diagnostic_writer);
-        } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == false && metric_supplied == true) {
+        } else if (engine->value() == "nuts" && (metric->value() == "dense_e" || metric->value() == "auto_e") && adapt_engaged == false && metric_supplied == true) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           return_code = stan::services::sample::hmc_nuts_dense_e(model,
                                                                  *init_context,
@@ -487,6 +488,40 @@ namespace cmdstan {
                                                                        init_writer,
                                                                        sample_writer,
                                                                        diagnostic_writer);
+        } else if (engine->value() == "nuts" && metric->value() == "auto_e" && adapt_engaged == true && metric_supplied == false) {
+          int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
+          double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
+          double gamma = dynamic_cast<real_argument*>(adapt->arg("gamma"))->value();
+          double kappa = dynamic_cast<real_argument*>(adapt->arg("kappa"))->value();
+          double t0 = dynamic_cast<real_argument*>(adapt->arg("t0"))->value();
+          unsigned int init_buffer = dynamic_cast<u_int_argument*>(adapt->arg("init_buffer"))->value();
+          unsigned int term_buffer = dynamic_cast<u_int_argument*>(adapt->arg("term_buffer"))->value();
+          unsigned int window = dynamic_cast<u_int_argument*>(adapt->arg("window"))->value();
+          return_code = stan::services::sample::hmc_nuts_auto_e_adapt(model,
+								      *init_context,
+								      random_seed,
+								      id,
+								      init_radius,
+								      num_warmup,
+								      num_samples,
+								      num_thin,
+								      save_warmup,
+								      refresh,
+								      stepsize,
+								      stepsize_jitter,
+								      max_depth,
+								      delta,
+								      gamma,
+								      kappa,
+								      t0,
+								      init_buffer,
+								      term_buffer,
+								      window,
+								      interrupt,
+								      logger,
+								      init_writer,
+								      sample_writer,
+								      diagnostic_writer);
         } else if (engine->value() == "nuts" && metric->value() == "dense_e" && adapt_engaged == true && metric_supplied == true) {
           int max_depth = dynamic_cast<int_argument*>(dynamic_cast<categorical_argument*>(algo->arg("hmc")->arg("engine")->arg("nuts"))->arg("max_depth"))->value();
           double delta = dynamic_cast<real_argument*>(adapt->arg("delta"))->value();
