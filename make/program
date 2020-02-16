@@ -32,10 +32,16 @@ ifdef STAN_OPENCL
 STANCFLAGS+= --use-opencl
 endif
 
-%.hpp : %.stan bin/stanc$(EXE)
+ifneq ($(STANC2),)
+  BINSTANC = bin/stanc2$(EXE)
+else
+  BINSTANC = bin/stanc$(EXE)
+endif
+
+%.hpp : %.stan $(BINSTANC)
 	@echo ''
 	@echo '--- Translating Stan model to C++ code ---'
-	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
+	$(WINE) $(BINSTANC) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
 .PRECIOUS: %.hpp
 %$(EXE) : %.hpp %.d $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)

@@ -36,7 +36,7 @@ make <flags> <variable=value> <name>
 When invoked without any arguments at all, {\tt make} prints a help message
 %
 \begin{quote}
-\begin{Verbatim}[fontshape=sl]
+\begin{Verbatim}[fontshape=sl, fontsize=\footnotesize]
 --------------------------------------------------------------------------------
 CmdStan v2.22.0 help
 
@@ -44,7 +44,7 @@ CmdStan v2.22.0 help
     > make build
 
     This target will:
-    1. Install the Stan compiler bin/stanc, either from stanc3 binaries or from stanc2 source code
+    1. Install the Stan compiler bin/stanc from stanc3 binaries and build bin/stanc2.
     2. Build the print utility bin/print (deprecated; will be removed in v3.0)
     3. Build the stansummary utility bin/stansummary
     4. Build the diagnose utility bin/diagnose
@@ -73,7 +73,7 @@ CmdStan v2.22.0 help
     USER_HEADER: when STANCFLAGS has --allow_undefined, this is the name of the
       header file that is included. This defaults to "user_header.hpp" in the
       directory of the Stan program.
-
+    STANC2: When set, use bin/stanc2 to generate C++ code.
 
   Example - bernoulli model: examples/bernoulli/bernoulli.stan
 
