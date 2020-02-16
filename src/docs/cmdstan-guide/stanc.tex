@@ -12,12 +12,14 @@ for Linux, Mac, and Windows can be downloaded.
 
 Prior to release 2.22, the Stan compiler program was compiled from C++ source code
 that was part of the core Stan library.
-This C++ compiler is now referred to as ``stanc2''.
-The stanc2 compiler is still available, but may be removed in future releases.
+This C++ compiler is still available as program `bin/stanc2`.
+This compiler is not longer being maintained, i.e., existing bugs will not be fixed
+and new functions and features are only available in the stanc3 compiler.
+Its intended use is as a diagnostic tool and backup for the new stanc3 compiler and
+
 \section{Preparing the \stanc Compiler Binary}
 
-Before the Stan compiler can be used, the binary \stanc must be created, either from
-stanc3 pre-built binaries or from the stanc2 source code.
+Before the Stan compiler can be used, the binary \stanc must be created.
 This can be done using the makefile as follows. For Mac and Linux:
 %
 \begin{quote}
@@ -34,15 +36,15 @@ For Windows:
 \end{Verbatim}
 \end{quote}
 %
-
-Using the make flag `STANC2` will build the \stanc binary from the C++ sources:
+To build the `bin/stanc2` program,  specify:
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
-> make STANC2=TRUE bin/stanc
+> make bin/stanc2
 \end{Verbatim}
 \end{quote}
 %
+
 
 \section{The \stanc Compiler}
 
@@ -111,6 +113,16 @@ to override the default arguments to \stanc, e.g.,
 \begin{quote}
 \begin{Verbatim}[fontshape=sl]
 > make STANCFLAGS="--include_paths=~/foo" examples/bernoulli/bernoulli
+\end{Verbatim}
+\end{quote}
+%
+
+To use the stanc2 compiler instead of the stanc3 compiler,
+set the make option `STANC2`:
+%
+\begin{quote}
+\begin{Verbatim}[fontshape=sl]
+> make STANC2=TRUE examples/bernoulli/bernoulli
 \end{Verbatim}
 \end{quote}
 %

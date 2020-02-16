@@ -19,7 +19,7 @@ like the Boost and Eigen libraries on which it depends, is very hard on the comp
 %
 \begin{itemize}
 \item Linux (Debian, Ubuntu)
-\item Mac OS X (from 10.6 ``Snow Leopard''  through 10.14 ``Mojave'')
+\item Mac OS X (from 10.6 ``Snow Leopard''  through 10.15 ``Catalina'')
 \item Windows (7, 8, 10).
 \end{itemize}
 %
@@ -69,7 +69,6 @@ algorithms are in the Stan library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org/stan.html}
 \item License: BSD
-\item Tested Version: 2.22.0
 \end{itemize}
 %
 The Stan source code is distributed with \CmdStan.
@@ -83,7 +82,6 @@ Library.
 \begin{itemize}
 \item Home: \url{http://mc-stan.org}
 \item License: BSD
-\item Tested Version: 2.22.0
 \end{itemize}
 %
 The Stan Math Library source code is distributed with \CmdStan
@@ -97,7 +95,6 @@ Library.
 \begin{itemize}
 \item Home: \url{http://www.boost.org/users/license.html}
 \item License: Boost Software License
-\item Tested Version: 1.69.0
 \end{itemize}
 %
 The Boost source code is distributed with \CmdStan.
@@ -111,7 +108,6 @@ algebra library.
 \begin{itemize}
 \item Home: \url{http://eigen.tuxfamily.org}
 \item License: Mozilla Public License, version 2.0
-\item Tested Version: 3.3.3
 \end{itemize}
 %
 The Eigen source code is distributed with \CmdStan.
@@ -124,7 +120,6 @@ implicit function solvers use the Sundials library.
 \begin{itemize}
 \item Home: \url{https://computing.llnl.gov/projects/sundials}
 \item License: BSD
-\item Tested Version: 4.1.0
 \end{itemize}
 %
 The Sundials source code is distributed with \CmdStan.
@@ -136,7 +131,6 @@ Stan uses the Intel TBB library for advanced threading support.
 \begin{itemize}
 \item Home: \url{https://software.intel.com/en-us/tbb}
 \item License: Apache 2.0
-\item Tested Version: 2019 update 8
 \end{itemize}
 %
 The Intel TBB source code is distributed with \CmdStan.
@@ -147,8 +141,8 @@ The Intel TBB source code is distributed with \CmdStan.
 Compiling \CmdStan programs requires a \Cpp compiler.  \CmdStan has been
 primarily developed with \clang and \gpp and no promises are made for
 other compilers.  The full set of compilers for which \CmdStan has been
-tested is listed here:
-\url {https://github.com/stan-dev/stan/wiki/Supported-C---Compilers-and-Language-Features}
+tested is listed on the
+\href {https://github.com/stan-dev/stan/wiki/Supported-C---Compilers-and-Language-Features}{CmdStan wiki}.
 
 \section{Step-by-Step Windows Install Instructions}\label{install-windows.appendix}
 
@@ -240,9 +234,11 @@ This should print version information for make.
 \subsection{Downloading and Unpacking \CmdStan}
 
 The \CmdStan source code distribution is named
-\code{cmdstan-\cmdstanversion.tar.gz}; the versions here are major
-version 2, minor version 7, and patch level 0.  Download the latest
+\code{cmdstan-M.m.x.tar.gz} where \code{M} is the major version number,
+\code{m} is the minor version number, and \code{x} is the patch level.
+Download the latest
 \CmdStan source tarball from the \CmdStan downloads page,
+i.e. the file which has the highest major, minor, patch numbers,
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -293,12 +289,11 @@ list the directory contents using:
 \end{Verbatim}
 \end{quote}
 
-Finally, unpack the distribution using the \code{tar} command (which
-is installed as part of Rtools).
+Finally, unpack the distribution using the \code{tar} command.
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar --no-same-owner -xzf cmdstan-2.22.0.tar.gz
+> tar --no-same-owner -xzf cmdstan-2.22.1.tar.gz
 \end{Verbatim}
 \end{quote}
 %
@@ -362,8 +357,9 @@ is at 4.9.3 or later.
 
 \subsection{Download and Unpack \CmdStan Source}
 
-Download the most recent version of \code{cmdstan-\cmdstanversion.tar.gz} from
-the \CmdStan downloads list,
+Download the most recent \CmdStan release,
+i.e., the file\code{cmdstan-M.m.x.tar.gz},
+from the \CmdStan downloads list:
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -372,12 +368,12 @@ the \CmdStan downloads list,
 Open the folder containing the download in the Finder
 (typically, the user's top-level \code{Downloads} folder).
 
-If the Mac OS has not automatically unpacked the \code{.tar.gz}
-file into file \code{cmdstan-\cmdstanversion.tar},
+If the Mac OS has not automatically unpacked compressed \code{.tar.gz}
+file into a tarfile \code{.tar},
 double-click the \code{.tar.gz} file to unpack.
 
 Double click on the \code{.tar} file to unarchive
-directory \code{cmdstan-\cmdstanversion}.
+directory \code{cmdstan-M.m.x}.
 
 Move the resulting directory to a location where it will not be
 deleted, henceforth called \code{<cmdstan-home>}.
@@ -424,7 +420,11 @@ A password will likely be required by the superuser command \code{sudo}.
 \subsection{Downloading and Unpacking \CmdStan Source}
 
 Download the most recent stable version of \CmdStan,
-\code{cmdstan-\cmdstanversion.tar.gz}, from the \CmdStan downloads page,
+from the \CmdStan downloads page.
+This is a file named \code{cmdstan-M.m.x.tar.gz} 
+where \code{M} is the major version number,
+\code{m} is the minor version number, and \code{x} is the patch level,
+which has the highest major, minor, patch numbers,
 %
 \begin{quote}
 \url{https://github.com/stan-dev/cmdstan/releases}
@@ -445,14 +445,14 @@ where \code{<download-dir>} is replaced with the actual path to the directory.
 
 Then, unpack the distribution into the subdirectory
 \begin{quote}
-\nolinkurl{<download-dir>/cmdstan-\cmdstanversion}
+\nolinkurl{<download-dir>/cmdstan-M.m.x}
 \end{quote}
 %
 with
 %
 \begin{quote}
 \begin{Verbatim}[fontshape=sl,fontsize=\small]
-> tar -xzf cmdstan-2.22.0.tar.gz
+> tar -xzf cmdstan-2.22.1.tar.gz
 \end{Verbatim}
 \end{quote}
 
@@ -518,25 +518,19 @@ The Stan developers typically replace the tagged version of Stan in
 \code{<cmdstan-home>/stan} with an updated version and do not set
 these variables. That said, it is easy to point \CmdStan to other
 versions of these libraries in other directories.
+Note that a forward slash at the end of the directory name is necessary.
 %
 \begin{itemize}
-  \item \Verb|STAN|. The location of the Stan source
-    directory. The default is \Verb|STAN=stan_2.22.0/|. Note: the
-    trailing forward slash is necessary.
-  \item \Verb|MATH|. The location of the Stan Math Library. The
-    default is \Verb|MATH=stan/l../stan_math_2.22.0/|.
-  \item \Verb|BOOST|. The location of the Boost library. If
-    \Verb|BOOST| is not explicitly set, this will default to the
-    \Verb|lib/boost_1.69.0/| folder within \Verb|MATH|.
-  \item \Verb|EIGEN|. The location of the Eigen library. If
-    \Verb|EIGEN| is not explicitly set, this will default to the
-    \Verb|lib/eigen_3.3.3/| folder within \Verb|MATH|.
-  \item \Verb|SUNDIALS|. The location of the SUNDIALS library. If
-    \Verb|SUNDIALS| is not explicity set, this will default to the
-    \Verb|lib/sundials_4.1.0/| folder within \Verb|MATH|.
-  \item \Verb|TBB|. The location of the Intel TBB library. If
-    \Verb|TBB| is not explicity set, this will default to the
-    \Verb|lib/tbb_2019_U8| folder within \Verb|MATH|.
+  \item \Verb|STAN|. The location of the Stan source directory.
+  \item \Verb|MATH|. The location of the Stan Math Library.
+  \item \Verb|BOOST|. The location of the Boost library.
+    The default location is within \Verb|MATH| \Verb|lib| directory.
+  \item \Verb|EIGEN|. The location of the Eigen library.
+    The default location is within \Verb|MATH| \Verb|lib| directory.
+  \item \Verb|SUNDIALS|. The location of the SUNDIALS library.
+    The default location is within \Verb|MATH| \Verb|lib| directory.
+  \item \Verb|TBB|. The location of the Intel TBB library.
+    The default location is within \Verb|MATH| \Verb|lib| directory.
 \end{itemize}
 %
 
