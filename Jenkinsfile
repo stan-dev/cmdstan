@@ -45,6 +45,9 @@ def skipRemainingStages = true
 pipeline {
     agent none
     options { skipDefaultCheckout() }
+    environment {
+        scPaths = sourceCodePaths()
+    }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
@@ -60,34 +63,7 @@ pipeline {
             }
             steps { script { utils.killOldBuilds() } }
         }
-        stage('Verify changes') {
-            agent any
-            steps {
-                script {         
-                    def bashScript = """
-                        #!/bin/bash
-                        for i in \$SCPATHS;
-                        do
-                            commit_hash=`git rev-parse HEAD`
-                            differences=`git diff \${commit_hash} develop -- \$i`
-                            if [ -n "\$differences" ]
-                            then
-                                echo "\$differences"
-                            fi
-                        done
-                    """
-
-                    def differences = sh(script: bashScript, returnStdout: true)
-                    skipRemainingStages = differences?.trim() ? false : true
-                }
-            }
-        }
         stage('Clean & Setup') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
             agent any
             steps {
                 retry(3) { checkout scm }
@@ -97,7 +73,35 @@ pipeline {
                     utils.checkout_pr("stan", "stan", params.stan_pr)
                     utils.checkout_pr("math", "stan/lib/stan_math", params.math_pr)
                 }
+
                 stash 'CmdStanSetup'
+
+                script {         
+
+                    def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
+                    sh(script: "git pull && git checkout develop", returnStdout: false)
+
+                    def bashScript = """
+                        for i in ${scPaths};
+                        do
+                            git diff ${commitHash}develop -- \$i
+                        done
+                    """
+
+                    def differences = sh(script: bashScript, returnStdout: true)
+
+                    println differences
+
+                    if (differences?.trim()) {
+                        println "There are differences in the source code, CI/CD will run."
+                        skipRemainingStages = false
+                    }
+                    else{
+                        println "There aren't any differences in the source code, CI/CD will not run."
+                        skipRemainingStages = true
+                    }
+                }
+
             }
             post { always { deleteDir() }}
         }
@@ -220,12 +224,12 @@ pipeline {
     }
     post {
         success {
-            script {
-                if (env.BRANCH_NAME == "develop") {
-                    build job: "CmdStan Performance Tests/master", wait:false
-                }
-                utils.mailBuildResults("SUCCESSFUL")
-            }
+           script {
+               if (env.BRANCH_NAME == "develop") {
+                   build job: "CmdStan Performance Tests/master", wait:false
+               }
+               utils.mailBuildResults("SUCCESSFUL")
+           }
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
