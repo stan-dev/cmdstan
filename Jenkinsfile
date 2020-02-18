@@ -68,7 +68,7 @@ pipeline {
                         #!/bin/bash
                         for i in \$SCPATHS;
                         do
-                            differences=`git diff ${GIT_COMMIT} develop -- \$i`
+                            differences=`git diff \${GIT_COMMIT} develop -- \$i`
                             if [ -n "\$differences" ]
                             then
                                 echo "\$differences"
