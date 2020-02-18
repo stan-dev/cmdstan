@@ -68,7 +68,8 @@ pipeline {
                         #!/bin/bash
                         for i in \$SCPATHS;
                         do
-                            differences=`git diff \${GIT_COMMIT} develop -- \$i`
+                            commit_hash=`git rev-parse HEAD`
+                            differences=`git diff \${commit_hash} develop -- \$i`
                             if [ -n "\$differences" ]
                             then
                                 echo "\$differences"
