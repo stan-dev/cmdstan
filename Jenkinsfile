@@ -27,6 +27,21 @@ def deleteDirWin() {
     deleteDir()
 }
 
+def sourceCodePaths(){
+    // These paths will be passed to git diff
+    // If there are changes to them, CI/CD will continue else skip
+    def paths = ['src', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile']
+    def bashArray = ""
+
+    for(path in paths){
+        bashArray += path + (path != paths[paths.size() - 1] ? " " : "")
+    }
+
+    return bashArray
+}
+
+def skipRemainingStages = true
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
@@ -45,7 +60,33 @@ pipeline {
             }
             steps { script { utils.killOldBuilds() } }
         }
+        stage('Verify changes') {
+            agent any
+            steps {
+                script {         
+                    def bashScript = """
+                        #!/bin/bash
+                        for i in \$SCPATHS;
+                        do
+                            differences=`git diff \$i`
+                            if [ -n "\$differences" ]
+                            then
+                                echo "\$differences"
+                            fi
+                        done
+                    """
+
+                    def differences = sh(script: bashScript, returnStdout: true)
+                    skipRemainingStages = differences?.trim() ? false : true
+                }
+            }
+        }
         stage('Clean & Setup') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             agent any
             steps {
                 retry(3) { checkout scm }
@@ -60,8 +101,12 @@ pipeline {
             post { always { deleteDir() }}
         }
         stage('Parallel tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             parallel {
-
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
