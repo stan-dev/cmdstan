@@ -83,6 +83,8 @@ pipeline {
             steps {
                 script {         
 
+                    unstash 'CmdStanSetup'
+
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
                     def changeTarget = ""
 
