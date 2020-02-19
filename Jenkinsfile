@@ -79,12 +79,12 @@ pipeline {
                 script {         
 
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
-                    sh(script: "git pull && git checkout ${CHANGE_TARGET}", returnStdout: false)
+                    sh(script: "git pull && git checkout ${env.CHANGE_TARGET}", returnStdout: false)
 
                     def bashScript = """
-                        for i in ${scPaths};
+                        for i in ${env.scPaths};
                         do
-                            git diff ${commitHash} ${CHANGE_TARGET} -- \$i
+                            git diff ${commitHash} ${env.CHANGE_TARGET} -- \$i
                         done
                     """
 
