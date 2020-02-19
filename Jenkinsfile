@@ -79,8 +79,8 @@ pipeline {
             post { always { deleteDir() }}
         }
         stage('Verify changes') {
+            agent { label 'linux' }
             steps {
-                agent { label 'linux' }
                 script {         
 
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
