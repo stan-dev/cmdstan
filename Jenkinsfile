@@ -80,6 +80,7 @@ pipeline {
         }
         stage('Verify changes') {
             steps {
+                agent { label 'linux' }
                 script {         
 
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
@@ -155,7 +156,7 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent {label 'linux && mpi'}
+                    agent { label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
@@ -185,7 +186,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent {label 'osx'}
+                    agent { label 'osx'}
                     steps {
                         setupCXX()
                         sh runTests("./")
