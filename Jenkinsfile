@@ -83,7 +83,8 @@ pipeline {
             steps {
                 script {         
 
-                    unstash 'CmdStanSetup'
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
 
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
                     def changeTarget = ""
