@@ -27,9 +27,27 @@ def deleteDirWin() {
     deleteDir()
 }
 
+def sourceCodePaths(){
+    // These paths will be passed to git diff
+    // If there are changes to them, CI/CD will continue else skip
+    def paths = ['src/cmdstan', 'src/test', 'lib', 'examples', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile']
+    def bashArray = ""
+
+    for(path in paths){
+        bashArray += path + (path != paths[paths.size() - 1] ? " " : "")
+    }
+
+    return bashArray
+}
+
+def skipRemainingStages = true
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
+    environment {
+        scPaths = sourceCodePaths()
+    }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
@@ -55,13 +73,45 @@ pipeline {
                     utils.checkout_pr("stan", "stan", params.stan_pr)
                     utils.checkout_pr("math", "stan/lib/stan_math", params.math_pr)
                 }
+
                 stash 'CmdStanSetup'
+
+                script {         
+
+                    def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
+                    sh(script: "git pull && git checkout ${CHANGE_TARGET}", returnStdout: false)
+
+                    def bashScript = """
+                        for i in ${scPaths};
+                        do
+                            git diff ${commitHash} ${CHANGE_TARGET} -- \$i
+                        done
+                    """
+
+                    def differences = sh(script: bashScript, returnStdout: true)
+
+                    println differences
+
+                    if (differences?.trim()) {
+                        println "There are differences in the source code, CI/CD will run."
+                        skipRemainingStages = false
+                    }
+                    else{
+                        println "There aren't any differences in the source code, CI/CD will not run."
+                        skipRemainingStages = true
+                    }
+                }
+
             }
             post { always { deleteDir() }}
         }
         stage('Parallel tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             parallel {
-
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
@@ -174,12 +224,12 @@ pipeline {
     }
     post {
         success {
-            script {
-                if (env.BRANCH_NAME == "develop") {
-                    build job: "CmdStan Performance Tests/master", wait:false
-                }
-                utils.mailBuildResults("SUCCESSFUL")
-            }
+           script {
+               if (env.BRANCH_NAME == "develop") {
+                   build job: "CmdStan Performance Tests/master", wait:false
+               }
+               utils.mailBuildResults("SUCCESSFUL")
+           }
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
