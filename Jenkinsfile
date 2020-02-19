@@ -75,8 +75,11 @@ pipeline {
                 }
 
                 stash 'CmdStanSetup'
-
-                script {         
+            }
+            post { always { deleteDir() }}
+        }
+        stage('Verify changes') {
+            script {         
 
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
                     def changeTarget = ""
@@ -113,10 +116,7 @@ pipeline {
                         println "There aren't any differences in the source code, CI/CD will not run."
                         skipRemainingStages = true
                     }
-                }
-
             }
-            post { always { deleteDir() }}
         }
         stage('Parallel tests') {
             when {
