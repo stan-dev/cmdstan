@@ -30,7 +30,7 @@ def deleteDirWin() {
 def sourceCodePaths(){
     // These paths will be passed to git diff
     // If there are changes to them, CI/CD will continue else skip
-    def paths = ['src', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile']
+    def paths = ['src/cmdstan', 'src/test', 'lib', 'examples', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile']
     def bashArray = ""
 
     for(path in paths){
