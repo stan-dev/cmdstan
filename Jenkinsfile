@@ -106,7 +106,7 @@ pipeline {
                         }
                     }
 
-                    println "Comparing differences between current ${commitHash} and target ${changeTarget}"
+                    println "Comparing differences between current ${commitHash} and target ${changeTarget}."
 
                     def bashScript = """
                         for i in ${env.scPaths};
