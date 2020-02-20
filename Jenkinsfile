@@ -95,9 +95,15 @@ pipeline {
                         sh(script: "git pull && git checkout ${changeTarget}", returnStdout: false)
                     }
                     else{
-                        println "This build is not PR, checking out current branch and extract HEAD^1 commit to compare changes."
-                        sh(script: "git pull && git checkout ${env.BRANCH_NAME}", returnStdout: false)
-                        changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                        println "This build is not PR, checking out current branch and extract HEAD^1 commit to compare changes or develop when downstream_tests."
+                        if (env.BRANCH_NAME == "downstream_tests"){
+                            sh(script: "git checkout develop && git pull && git checkout ${commitHash}", returnStdout: false)
+                            changeTarget = "develop"
+                        }
+                        else{
+                            sh(script: "git pull && git checkout ${branchName}", returnStdout: false)
+                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                        }
                     }
 
                     println "Comparing differences between current ${commitHash} and target ${changeTarget}"
@@ -121,6 +127,11 @@ pipeline {
                         println "There aren't any differences in the source code, CI/CD will not run."
                         skipRemainingStages = true
                     }
+                }
+            }
+            post {
+                always {
+                    deleteDir()
                 }
             }
         }
