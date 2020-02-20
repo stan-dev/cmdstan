@@ -101,7 +101,7 @@ pipeline {
                             changeTarget = "develop"
                         }
                         else{
-                            sh(script: "git pull && git checkout ${branchName}", returnStdout: false)
+                            sh(script: "git pull && git checkout ${env.BRANCH_NAME}", returnStdout: false)
                             changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
                         }
                     }
