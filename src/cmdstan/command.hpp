@@ -14,6 +14,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/mpi_stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -37,6 +38,7 @@
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
+#include <stan/services/util/mpi_cross_chain.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/opencl/opencl_context.hpp>
@@ -95,8 +97,13 @@ namespace cmdstan {
 
 
   int command(int argc, const char* argv[]) {
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer info(1, std::cout);
+    stan::callbacks::mpi_stream_writer err(1, std::cout);
+#else
     stan::callbacks::stream_writer info(std::cout);
     stan::callbacks::stream_writer err(std::cout);
+#endif
     stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                           std::cerr, std::cerr);
 
@@ -131,21 +138,59 @@ namespace cmdstan {
     } else {
       random_seed = static_cast<unsigned int>(random_arg->value());
     }
+
+    // number of chains for cross-chain warmup
+    unsigned int num_cross_chains = 0;
+    unsigned int cross_chain_window = 0;
+    double cross_chain_rhat = 0.0;
+    unsigned int cross_chain_ess = 0;
+#ifdef MPI_ADAPTED_WARMUP
+    if (parser.arg("method")->arg("sample")) {
+      categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
+      num_cross_chains = dynamic_cast<u_int_argument*>(adapt->arg("num_cross_chains"))->value();
+      cross_chain_window = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_window"))->value();
+      cross_chain_rhat = dynamic_cast<real_argument*>(adapt->arg("cross_chain_rhat"))->value();
+      cross_chain_ess = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_ess"))->value();
+
+      if (num_cross_chains > 1) {
+        int_argument* id_arg = dynamic_cast<int_argument*>(parser.arg("id"));
+        unsigned int id = id_arg->value();
+        stan::services::util::set_cross_chain_id(id, num_cross_chains);
+        id_arg -> set_value(static_cast<int>(id));
+
+        string_argument* ptr_out = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"));
+        std::string f_out = ptr_out -> value();
+        stan::services::util::set_cross_chain_file(f_out, num_cross_chains);
+        ptr_out -> set_value(f_out);
+
+        info.set_num_chains(num_cross_chains);
+        err.set_num_chains(num_cross_chains);
+      }
+    }
+#endif
+
     parser.print(info);
     info();
 
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
-
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer sample_writer(num_cross_chains, output_stream, "# ");
+#else
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
+#endif    
+
 
     std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value().c_str(),
                                    std::fstream::out);
+#ifdef MPI_ADAPTED_WARMUP
+    stan::callbacks::mpi_stream_writer diagnostic_writer(num_cross_chains, diagnostic_stream, "# ");
+#else
     stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
-
+#endif
 
     //////////////////////////////////////////////////
     //                Initialize Model              //
@@ -320,8 +365,14 @@ namespace cmdstan {
                                                       sample_writer);
       }
     } else if (parser.arg("method")->arg("sample")) {
+#ifdef MPI_ADAPTED_WARMUP
+      int num_warmup =
+        dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("max_num_warmup"))->value();
+#else
       int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
+#endif
       int num_samples = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_samples"))->value();
+
       int num_thin = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("thin"))->value();
       bool save_warmup = dynamic_cast<bool_argument*>(parser.arg("method")->arg("sample")->arg("save_warmup"))->value();
       list_argument* algo = dynamic_cast<list_argument*>(parser.arg("method")->arg("sample")->arg("algorithm"));
@@ -417,6 +468,10 @@ namespace cmdstan {
                                                                        random_seed,
                                                                        id,
                                                                        init_radius,
+                                                                       num_cross_chains,
+                                                                       cross_chain_window,
+                                                                       cross_chain_rhat,
+                                                                       cross_chain_ess,
                                                                        num_warmup,
                                                                        num_samples,
                                                                        num_thin,
@@ -452,6 +507,10 @@ namespace cmdstan {
                                                                        random_seed,
                                                                        id,
                                                                        init_radius,
+                                                                       num_cross_chains,
+                                                                       cross_chain_window,
+                                                                       cross_chain_rhat,
+                                                                       cross_chain_ess,
                                                                        num_warmup,
                                                                        num_samples,
                                                                        num_thin,
@@ -530,6 +589,10 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
+                                                                      cross_chain_window,
+                                                                      cross_chain_rhat,
+                                                                      cross_chain_ess,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -566,6 +629,10 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
+                                                                      cross_chain_window,
+                                                                      cross_chain_rhat,
+                                                                      cross_chain_ess,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
@@ -619,6 +686,10 @@ namespace cmdstan {
                                                                       random_seed,
                                                                       id,
                                                                       init_radius,
+                                                                      num_cross_chains,
+                                                                      cross_chain_window,
+                                                                      cross_chain_rhat,
+                                                                      cross_chain_ess,
                                                                       num_warmup,
                                                                       num_samples,
                                                                       num_thin,
