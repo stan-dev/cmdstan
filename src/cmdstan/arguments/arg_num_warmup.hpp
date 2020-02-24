@@ -8,8 +8,13 @@ namespace cmdstan {
   class arg_num_warmup: public int_argument {
   public:
     arg_num_warmup(): int_argument() {
+#ifdef MPI_ADAPTED_WARMUP
+      _name = "max_num_warmup";
+      _description = "Maximum number of warmup iterations";
+#else
       _name = "num_warmup";
       _description = "Number of warmup iterations";
+#endif
       _validity = "0 <= warmup";
       _default = "1000";
       _default_value = 1000;

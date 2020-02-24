@@ -1,0 +1,38 @@
+** Get the repo & depdencies
+#+BEGIN_SRC bash
+git clone --recurse-submodules --single-branch --branch mpi_warmup_framework git@github.com:stan-dev/cmdstan.git
+#+END_SRC
+
+** Edit make/local
+#+BEGIN_SRC bash
+  MPI_ADAPTED_WARMUP = 1
+  CXXFLAGS += -isystem /path/to/mpi/headers
+  TBB_CXX_TYPE=clang              # your cpp compiler
+#+END_SRC
+
+** Compile
+#+BEGIN_SRC bash
+make clean-all;
+make -j4 examples/radon/radon
+#+END_SRC
+
+** Run
+#+BEGIN_SRC bash
+  mpiexec -n 4 -l ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # MPICH
+  mpiexec -n 4 --tag-output ./radon sample adapt num_cross_chains=4 cross_chain_window=100 data file=radon.data.R # OpenMPI
+#+END_SRC
+runs 4 chains with cross-chain warmup, using 4
+processes. Here
+#+BEGIN_SRC bash
+num_cross_chains=
+#+END_SRC
+specifies the number of parallel chains used in cross-chain
+warmup(default 4), and
+#+BEGIN_SRC bash
+cross_chain_window=
+#+END_SRC
+specifies that every =cross_chain_window=
+iterations(default 100) the
+convergence check is performed using data collected from the
+chains. See https://discourse.mc-stan.org/t/new-adaptive-warmup-proposal-looking-for-feedback/12039
+for details.

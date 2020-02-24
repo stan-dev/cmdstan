@@ -1,0 +1,166 @@
+mpiexec -n 5 -l ./radon sample data file=radon.data.R output file=output.csv
+[0] method = sample (Default)
+[0]   sample
+[0]     num_samples = 1000 (Default)
+[0]     num_warmup = 1000 (Default)
+[0]     save_warmup = 0 (Default)
+[0]     thin = 1 (Default)
+[0]     adapt
+[0]       engaged = 1 (Default)
+[0]       gamma = 0.050000000000000003 (Default)
+[0]       delta = 0.80000000000000004 (Default)
+[0]       kappa = 0.75 (Default)
+[0]       t0 = 10 (Default)
+[0]       init_buffer = 75 (Default)
+[0]       term_buffer = 50 (Default)
+[0]       window = 25 (Default)
+[0]     algorithm = hmc (Default)
+[0]       hmc
+[0]         engine = nuts (Default)
+[0]           nuts
+[0]             max_depth = 10 (Default)
+[0]         metric = diag_e (Default)[0] 
+[0]         metric_file =  (Default)
+[0]         stepsize = 1 (Default)
+[0]         stepsize_jitter = 0 (Default)
+[0] id = 0 (Default)
+[0] data
+[0]   file = radon.data.R
+[0] init = 2 (Default)
+[0] random
+[0]   seed = -1 (Default)
+[0] output
+[0]   file = output.csv (Default)
+[0]   diagnostic_file =  (Default)
+[0]   refresh = 100 (Default)
+[0] 
+[0] 
+[0] Gradient evaluation took 0.000725 seconds
+[0] 1000 transitions using 10 leapfrog steps per transition would take 7.25 seconds.
+[0] Adjust your expectations accordingly!
+[0] 
+[0] 
+[3] 
+[3] Gradient evaluation took 0.000732 seconds
+[3] 1000 transitions using 10 leapfrog steps per transition would take 7.32 seconds.
+[3] Adjust your expectations accordingly!
+[3] 
+[3] 
+[4] 
+[4] Gradient evaluation took 0.000717 seconds
+[4] 1000 transitions using 10 leapfrog steps per transition would take 7.17 seconds.
+[4] Adjust your expectations accordingly!
+[4] 
+[4] 
+[1] 
+[1] Gradient evaluation took 0.000936 seconds
+[1] 1000 transitions using 10 leapfrog steps per transition would take 9.36 seconds.
+[1] Adjust your expectations accordingly!
+[1] 
+[1] 
+[2] 
+[2] Gradient evaluation took 0.000954 seconds
+[2] 1000 transitions using 10 leapfrog steps per transition would take 9.54 seconds.
+[2] Adjust your expectations accordingly!
+[2] 
+[2] 
+[3] Iteration:    1 / 2000 [  0%]  (Warmup)
+[0] Iteration:    1 / 2000 [  0%]  (Warmup)
+[4] Iteration:    1 / 2000 [  0%]  (Warmup)
+[1] Iteration:    1 / 2000 [  0%]  (Warmup)
+[2] Iteration:    1 / 2000 [  0%]  (Warmup)
+[4] Iteration:  100 / 2000 [  5%]  (Warmup)
+[3] Iteration:  100 / 2000 [  5%]  (Warmup)
+[2] Iteration:  100 / 2000 [  5%]  (Warmup)
+[0] Iteration:  100 / 2000 [  5%]  (Warmup)
+[1] Iteration:  100 / 2000 [  5%]  (Warmup)
+[2] Iteration:  200 / 2000 [ 10%]  (Warmup)
+[4] Iteration:  200 / 2000 [ 10%]  (Warmup)
+[0] Iteration:  200 / 2000 [ 10%]  (Warmup)
+[3] Iteration:  200 / 2000 [ 10%]  (Warmup)
+[1] Iteration:  200 / 2000 [ 10%]  (Warmup)
+[0] Iteration:  300 / 2000 [ 15%]  (Warmup)
+[4] Iteration:  300 / 2000 [ 15%]  (Warmup)
+[2] Iteration:  300 / 2000 [ 15%]  (Warmup)
+[3] Iteration:  300 / 2000 [ 15%]  (Warmup)
+[3] Iteration: 1001 / 2000 [ 50%]  (Sampling)
+[2] Iteration: 1001 / 2000 [ 50%]  (Sampling)
+[4] Iteration: 1001 / 2000 [ 50%]  (Sampling)
+[0] Iteration: 1001 / 2000 [ 50%]  (Sampling)
+[1] Iteration:  300 / 2000 [ 15%]  (Warmup)
+[1] Iteration: 1001 / 2000 [ 50%]  (Sampling)
+[2] Iteration: 1100 / 2000 [ 55%]  (Sampling)
+[3] Iteration: 1100 / 2000 [ 55%]  (Sampling)
+[4] Iteration: 1100 / 2000 [ 55%]  (Sampling)
+[1] Iteration: 1100 / 2000 [ 55%]  (Sampling)
+[0] Iteration: 1100 / 2000 [ 55%]  (Sampling)
+[4] Iteration: 1200 / 2000 [ 60%]  (Sampling)
+[3] Iteration: 1200 / 2000 [ 60%]  (Sampling)
+[1] Iteration: 1200 / 2000 [ 60%]  (Sampling)
+[2] Iteration: 1200 / 2000 [ 60%]  (Sampling)
+[0] Iteration: 1200 / 2000 [ 60%]  (Sampling)
+[3] Iteration: 1300 / 2000 [ 65%]  (Sampling)
+[4] Iteration: 1300 / 2000 [ 65%]  (Sampling)
+[1] Iteration: 1300 / 2000 [ 65%]  (Sampling)
+[2] Iteration: 1300 / 2000 [ 65%]  (Sampling)
+[0] Iteration: 1300 / 2000 [ 65%]  (Sampling)
+[1] Iteration: 1400 / 2000 [ 70%]  (Sampling)
+[4] Iteration: 1400 / 2000 [ 70%]  (Sampling)
+[3] Iteration: 1400 / 2000 [ 70%]  (Sampling)
+[2] Iteration: 1400 / 2000 [ 70%]  (Sampling)
+[0] Iteration: 1400 / 2000 [ 70%]  (Sampling)
+[1] Iteration: 1500 / 2000 [ 75%]  (Sampling)
+[2] Iteration: 1500 / 2000 [ 75%]  (Sampling)
+[3] Iteration: 1500 / 2000 [ 75%]  (Sampling)
+[4] Iteration: 1500 / 2000 [ 75%]  (Sampling)
+[0] Iteration: 1500 / 2000 [ 75%]  (Sampling)
+[2] Iteration: 1600 / 2000 [ 80%]  (Sampling)
+[4] Iteration: 1600 / 2000 [ 80%]  (Sampling)
+[1] Iteration: 1600 / 2000 [ 80%]  (Sampling)
+[3] Iteration: 1600 / 2000 [ 80%]  (Sampling)
+[0] Iteration: 1600 / 2000 [ 80%]  (Sampling)
+[2] Iteration: 1700 / 2000 [ 85%]  (Sampling)
+[4] Iteration: 1700 / 2000 [ 85%]  (Sampling)
+[1] Iteration: 1700 / 2000 [ 85%]  (Sampling)
+[3] Iteration: 1700 / 2000 [ 85%]  (Sampling)
+[0] Iteration: 1700 / 2000 [ 85%]  (Sampling)
+[2] Iteration: 1800 / 2000 [ 90%]  (Sampling)
+[4] Iteration: 1800 / 2000 [ 90%]  (Sampling)
+[3] Iteration: 1800 / 2000 [ 90%]  (Sampling)
+[1] Iteration: 1800 / 2000 [ 90%]  (Sampling)
+[0] Iteration: 1800 / 2000 [ 90%]  (Sampling)
+[4] Iteration: 1900 / 2000 [ 95%]  (Sampling)
+[2] Iteration: 1900 / 2000 [ 95%]  (Sampling)
+[1] Iteration: 1900 / 2000 [ 95%]  (Sampling)
+[3] Iteration: 1900 / 2000 [ 95%]  (Sampling)
+[0] Iteration: 1900 / 2000 [ 95%]  (Sampling)
+[4] Iteration: 2000 / 2000 [100%]  (Sampling)
+[4] 
+[4]  Elapsed Time: 8.04447 seconds (Warm-up)
+[4]                5.68666 seconds (Sampling)
+[4]                13.7311 seconds (Total)
+[4] 
+[2] Iteration: 2000 / 2000 [100%]  (Sampling)
+[2] 
+[2]  Elapsed Time: 8.04798 seconds (Warm-up)
+[2]                5.70403 seconds (Sampling)
+[2]                13.752 seconds (Total)
+[2] 
+[1] Iteration: 2000 / 2000 [100%]  (Sampling)
+[3] Iteration: 2000 / 2000 [100%]  (Sampling)
+[1] 
+[1]  Elapsed Time: 8.07648 seconds (Warm-up)
+[1]                5.70783 seconds (Sampling)
+[1]                13.7843 seconds (Total)
+[1] 
+[3] 
+[3]  Elapsed Time: 8.05199 seconds (Warm-up)
+[3]                5.7405 seconds (Sampling)
+[3]                13.7925 seconds (Total)
+[3] 
+[0] Iteration: 2000 / 2000 [100%]  (Sampling)
+[0] 
+[0]  Elapsed Time: 8.04967 seconds (Warm-up)
+[0]                5.93972 seconds (Sampling)
+[0]                13.9894 seconds (Total)
+[0] 
