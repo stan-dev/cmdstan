@@ -27,9 +27,27 @@ def deleteDirWin() {
     deleteDir()
 }
 
+def sourceCodePaths(){
+    // These paths will be passed to git diff
+    // If there are changes to them, CI/CD will continue else skip
+    def paths = ['src/cmdstan', 'src/test', 'lib', 'examples', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile']
+    def bashArray = ""
+
+    for(path in paths){
+        bashArray += path + (path != paths[paths.size() - 1] ? " " : "")
+    }
+
+    return bashArray
+}
+
+def skipRemainingStages = true
+
 pipeline {
     agent none
     options { skipDefaultCheckout() }
+    environment {
+        scPaths = sourceCodePaths()
+    }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
@@ -55,13 +73,76 @@ pipeline {
                     utils.checkout_pr("stan", "stan", params.stan_pr)
                     utils.checkout_pr("math", "stan/lib/stan_math", params.math_pr)
                 }
+
                 stash 'CmdStanSetup'
             }
             post { always { deleteDir() }}
         }
-        stage('Parallel tests') {
-            parallel {
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
+                script {         
 
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
+
+                    def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
+                    def changeTarget = ""
+
+                    if (env.CHANGE_TARGET) {
+                        println "This build is a PR, checking out target branch to compare changes."
+                        changeTarget = env.CHANGE_TARGET
+                        sh(script: "git pull && git checkout ${changeTarget}", returnStdout: false)
+                    }
+                    else{
+                        println "This build is not PR, checking out current branch and extract HEAD^1 commit to compare changes or develop when downstream_tests."
+                        if (env.BRANCH_NAME == "downstream_tests"){
+                            sh(script: "git checkout develop && git pull", returnStdout: false)
+                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                            sh(script: "git checkout ${commitHash}", returnStdout: false)
+                        }
+                        else{
+                            sh(script: "git pull && git checkout ${env.BRANCH_NAME}", returnStdout: false)
+                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                        }
+                    }
+
+                    println "Comparing differences between current ${commitHash} and target ${changeTarget}."
+
+                    def bashScript = """
+                        for i in ${env.scPaths};
+                        do
+                            git diff ${commitHash} ${changeTarget} -- \$i
+                        done
+                    """
+
+                    def differences = sh(script: bashScript, returnStdout: true)
+
+                    println differences
+
+                    if (differences?.trim()) {
+                        println "There are differences in the source code, CI/CD will run."
+                        skipRemainingStages = false
+                    }
+                    else{
+                        println "There aren't any differences in the source code, CI/CD will not run."
+                        skipRemainingStages = true
+                    }
+                }
+            }
+            post {
+                always {
+                    deleteDir()
+                }
+            }
+        }
+        stage('Parallel tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
+            parallel {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
@@ -90,7 +171,7 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent {label 'linux && mpi'}
+                    agent { label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
@@ -120,7 +201,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent {label 'osx'}
+                    agent { label 'osx'}
                     steps {
                         setupCXX()
                         sh runTests("./")
@@ -174,12 +255,12 @@ pipeline {
     }
     post {
         success {
-            script {
-                if (env.BRANCH_NAME == "develop") {
-                    build job: "CmdStan Performance Tests/master", wait:false
-                }
-                utils.mailBuildResults("SUCCESSFUL")
-            }
+           script {
+               if (env.BRANCH_NAME == "develop") {
+                   build job: "CmdStan Performance Tests/master", wait:false
+               }
+               utils.mailBuildResults("SUCCESSFUL")
+           }
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
