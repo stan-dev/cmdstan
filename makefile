@@ -46,6 +46,7 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 endif
 
 CMDSTAN_VERSION := 2.22.1
+CMDSTAN_VERSION_DOC := 2.22
 
 .PHONY: help
 help:
@@ -267,7 +268,7 @@ stan-revert:
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 	mkdir -p doc
-	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION).pdf
+	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION_DOC).pdf
 
 %.pdf: %.tex
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
