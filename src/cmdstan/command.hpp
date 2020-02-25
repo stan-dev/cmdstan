@@ -42,7 +42,6 @@
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -124,13 +123,9 @@ namespace cmdstan {
     if (parser.help_printed())
       return err_code;
 
-    int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
-    unsigned int random_seed;
-    if (random_arg->is_default()) {
-      random_seed = (boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds();
-    } else {
-      random_seed = static_cast<unsigned int>(random_arg->value());
-    }
+    arg_seed* random_arg = dynamic_cast<arg_seed*>(parser.arg("random")->arg("seed"));
+    unsigned int random_seed = random_arg->random_value();
+
     parser.print(info);
     write_parallel_info(info);
     write_opencl_device(info);
