@@ -14,7 +14,7 @@ namespace cmdstan {
       _name = "num_cross_chains";
       _description = "Number of chains in cross-chain warmup iterations";
 #ifdef MPI_ADAPTED_WARMUP
-      _validity = "num_cross_chains < number of MPI processes";
+      _validity = "num_cross_chains <= number of MPI processes";
       _default = "number of MPI processes";
       int stan_world_size;
       MPI_Comm_size(MPI_COMM_STAN, &stan_world_size);

@@ -156,16 +156,18 @@ namespace cmdstan {
       cross_chain_rhat = dynamic_cast<real_argument*>(adapt->arg("cross_chain_rhat"))->value();
       cross_chain_ess = dynamic_cast<u_int_argument*>(adapt->arg("cross_chain_ess"))->value();
 
-      int_argument* id_arg = dynamic_cast<int_argument*>(parser.arg("id"));
-      unsigned int id = id_arg->value();
-      stan::services::util::set_cross_chain_id(id, num_cross_chains);
-      id_arg -> set_value(static_cast<int>(id));
+      if (num_cross_chains > 1) {
+        int_argument* id_arg = dynamic_cast<int_argument*>(parser.arg("id"));
+        unsigned int id = id_arg->value();
+        stan::services::util::set_cross_chain_id(id, num_cross_chains);
+        id_arg -> set_value(static_cast<int>(id));
 
-      stan::services::util::set_cross_chain_file(output_file, num_cross_chains);  
-      stan::services::util::set_cross_chain_file(diagnostic_file, num_cross_chains);
+	stan::services::util::set_cross_chain_file(output_file, num_cross_chains);  
+	stan::services::util::set_cross_chain_file(diagnostic_file, num_cross_chains);
 
-      info.set_num_chains(num_cross_chains);
-      err.set_num_chains(num_cross_chains);
+        info.set_num_chains(num_cross_chains);
+        err.set_num_chains(num_cross_chains);
+      }
     }
 #endif
 
@@ -363,7 +365,8 @@ namespace cmdstan {
       }
     } else if (parser.arg("method")->arg("sample")) {
 #ifdef MPI_ADAPTED_WARMUP
-      int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("max_num_warmup"))->value();
+      int num_warmup =
+        dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("max_num_warmup"))->value();
 #else
       int num_warmup = dynamic_cast<int_argument*>(parser.arg("method")->arg("sample")->arg("num_warmup"))->value();
 #endif
