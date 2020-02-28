@@ -1,3 +1,4 @@
+ifeq ($(CMDSTAN_SUBMODULES),1)
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
@@ -9,3 +10,4 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
+endif

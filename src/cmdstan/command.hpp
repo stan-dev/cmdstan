@@ -8,6 +8,8 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
+#include <cmdstan/write_opencl_device.hpp>
+#include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <stan/callbacks/interrupt.hpp>
@@ -42,9 +44,7 @@
 #include <stan/services/util/mpi_cross_chain.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
-#include <stan/math/opencl/opencl_context.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -55,11 +55,10 @@
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 
 #ifdef STAN_MPI
-#include <stan/math/prim/arr/functor/mpi_cluster.hpp>
-#include <stan/math/prim/arr/functor/mpi_command.hpp>
-#include <stan/math/prim/arr/functor/mpi_distributed_apply.hpp>
+#include <stan/math/prim/functor/mpi_cluster.hpp>
+#include <stan/math/prim/functor/mpi_command.hpp>
+#include <stan/math/prim/functor/mpi_distributed_apply.hpp>
 #endif
-
 
 // forward declaration for function defined in another translation unit
 stan::model::model_base& new_model(stan::io::var_context& data_context,
@@ -145,9 +144,10 @@ namespace cmdstan {
     unsigned int cross_chain_window = 0;
     double cross_chain_rhat = 0.0;
     unsigned int cross_chain_ess = 0;
+
     std::string output_file = dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value();
     std::string diagnostic_file = dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value();
-      
+
 #ifdef MPI_ADAPTED_WARMUP
     if (parser.arg("method")->arg("sample")) {
       categorical_argument* adapt = dynamic_cast<categorical_argument*>(parser.arg("method")->arg("sample")->arg("adapt"));
@@ -172,8 +172,10 @@ namespace cmdstan {
 #endif
 
     parser.print(info);
+    write_parallel_info(info);
+    write_opencl_device(info);
     info();
-
+  
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
@@ -203,6 +205,8 @@ namespace cmdstan {
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     parser.print(sample_writer);
+    write_parallel_info(sample_writer);
+    write_opencl_device(sample_writer);
 
     write_stan(diagnostic_writer);
     write_model(diagnostic_writer, model.model_name());

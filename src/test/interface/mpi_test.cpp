@@ -2,7 +2,7 @@
 
 #include <cmdstan/command.hpp>
 #include <gtest/gtest.h>
-#include <stan/math/prim/arr.hpp>
+#include <stan/math/prim.hpp>
 #include <test/test-models/proper.hpp>
 
 TEST(StanUiCommand, mpi_ready) {

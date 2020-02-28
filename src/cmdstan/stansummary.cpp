@@ -1,10 +1,11 @@
 #include <algorithm>
-#include <iostream>
 #include <iomanip>
 #include <ios>
-#include <stan/mcmc/chains.hpp>
-#include <cmdstan/stansummary_helper.hpp>
+#include <iostream>
 #include <fstream>
+#include <vector>
+#include <cmdstan/stansummary_helper.hpp>
+#include <stan/mcmc/chains.hpp>
 
 /**
  * The Stan print function.
@@ -105,7 +106,7 @@ int main(int argc, const char* argv[]) {
 
 
   // Prepare values
-  int n = 9;
+  static const int n = 9;
   
   Eigen::MatrixXd values(chains.num_params(), n);
   values.setZero();
@@ -127,12 +128,10 @@ int main(int argc, const char* argv[]) {
   }
   
   // Prepare header
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> headers(n);
-  headers << 
-    "Mean", "MCSE", "StdDev",
-    "5%", "50%", "95%", 
-    "N_Eff", "N_Eff/s", "R_hat";
-  
+  std::vector<std::string> headers{ "Mean", "MCSE", "StdDev",
+                                    "5%", "50%", "95%",
+                                    "N_Eff", "N_Eff/s", "R_hat" };
+
   // Set sig figs
   Eigen::VectorXi column_sig_figs(n);
   
@@ -219,7 +218,7 @@ int main(int argc, const char* argv[]) {
   // Header output
   std::cout << std::setw(max_name_length + 1) << "";
   for (int i = 0; i < n; i++) {
-    std::cout << std::setw(column_widths(i)) << headers(i);
+    std::cout << std::setw(column_widths(i)) << headers[i];
   }
   std::cout << std::endl;
   
@@ -328,7 +327,7 @@ int main(int argc, const char* argv[]) {
     // Header output
     csv_file << "name";
     for (int i = 0; i < n; i++)
-      csv_file << "," << headers(i);
+      csv_file << "," << headers[i];
     csv_file << std::endl;
 
     // Value output

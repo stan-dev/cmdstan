@@ -32,6 +32,7 @@ O_STANC ?= 0
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
+
 -include $(MATH)make/compiler_flags
 -include $(MATH)make/dependencies
 -include $(MATH)make/libraries
@@ -45,7 +46,8 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.21.0
+CMDSTAN_VERSION := 2.22.1
+CMDSTAN_VERSION_DOC := 2.22
 
 .PHONY: help
 help:
@@ -60,14 +62,14 @@ else
 endif
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Download the Stan compiler bin/stanc$(EXE).'
+	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries and build bin/stanc2$(EXE).'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
-	@echo '    5. Build all dependencies of Stan'
+	@echo '    5. Build all libraries and object files compile and link an executable Stan program'
 	@echo ''
-	@echo '    Note: to build using multiple cores, use the -j option to make. '
-	@echo '    For 4 cores:'
+	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
+	@echo '    for 4 cores:'
 ifeq ($(OS),Windows_NT)
 	@echo '    > mingw32-make build -j4'
 else
@@ -87,7 +89,7 @@ endif
 	@echo '    > make foo/bar$(EXE)'
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Build the Stan compiler and the print utility if not built.'
+	@echo '    1. Install the Stan compiler (bin/stanc or bin/stanc2), as needed.'
 	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
 	@echo ''
@@ -99,6 +101,7 @@ endif
 	@echo '    USER_HEADER: when STANCFLAGS has --allow_undefined, this is the name of the'
 	@echo '      header file that is included. This defaults to "user_header.hpp" in the'
 	@echo '      directory of the Stan program.'
+	@echo '    STANC2: When set, use bin/stanc2 to generate C++ code.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
@@ -148,12 +151,11 @@ help-dev:
 	@echo '                     what is in the repository.'
 	@echo ''
 	@echo 'Model related:'
-	@echo '- bin/stanc$(EXE): Build the Stan compiler.'
+	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary$(EXE): Build the print utility.'
 	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
-	@echo '- bin/libstanc.a : Build the Stan compiler static library (used in linking'
-	@echo '                   bin/stanc$(EXE))'
+	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
 	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
@@ -167,8 +169,9 @@ build-mpi: $(MPI_TARGETS)
 	@echo ''
 	@echo '--- boost mpi bindings built ---'
 
+ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
+build: bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
@@ -179,6 +182,18 @@ ifeq ($(OS),Windows_NT)
 		@echo 'to automatically update your user configuration.'
 endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
+else
+.PHONY: build
+build:
+	@echo 'ERROR: Missing Stan submodules.'
+	@echo 'Please run the following commands to fix:'
+	@echo ''
+	@echo 'git submodule init'
+	@echo 'git submodule update --recursive'
+	@echo ''
+	@echo 'And try building again'
+	@exit 1
+endif
 
 ifeq ($(CXX_TYPE),clang)
 build: $(STAN)src/stan/model/model_header.hpp.gch
@@ -193,12 +208,13 @@ endif
 ##
 # Clean up.
 ##
-.PHONY: clean clean-deps clean-manual clean-all
-
+.PHONY: clean clean-deps clean-manual clean-all clean-program
 
 clean: clean-manual
 	$(RM) -r test
+	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.o,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
 
 clean-deps:
@@ -212,9 +228,20 @@ clean-manual:
 	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
 
 clean-all: clean clean-deps clean-libraries clean-manual
-	$(RM) -r bin
-	$(RM) -r $(CMDSTAN_MAIN_O)
+	$(RM) bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) -r $(CMDSTAN_MAIN_O) bin/cmdstan
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
+	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
+
+
+clean-program:
+ifndef STANPROG
+	$(error STANPROG not set)
+endif
+	$(RM) "$(wildcard $(patsubst %.stan,%.d,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%.hpp,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%.o,$(basename ${STANPROG}).stan))"
+	$(RM) "$(wildcard $(patsubst %.stan,%$(EXE),$(basename ${STANPROG}).stan))"
 
 ##
 # Submodule related tasks
@@ -242,7 +269,7 @@ stan-revert:
 .PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
 manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
 	mkdir -p doc
-	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION).pdf
+	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION_DOC).pdf
 
 %.pdf: %.tex
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)

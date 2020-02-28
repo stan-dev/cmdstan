@@ -35,16 +35,23 @@ instructions of the prerequisites, see
 
 \section{Building \CmdStan}
 
-Building \CmdStan involves building two executable programs:
+Building \CmdStan involves preparing a set of executable programs:
 %
 \begin{itemize}
-\item \code{stanc}: the Stan compiler (translates Stan language to \Cpp)
-\item \code{stansummary}: a basic posterior analysis tool
+\item \code{stanc}: the Stan compiler (translates Stan language to \Cpp).
+\item \code{stansummary}: a basic posterior analysis tool.
+\item \code{diagnose}: a basic sampler diagnostic tool.
 \end{itemize}
 %
-The build process utilizes the \code{make} command-line
-utility and these instructions are applicable for any of our supported
-platforms.
+\CmdStan releases include pre-built binaries of the Stan language compiler
+\url {https://github.com/stan-dev/stanc3}: \code{bin/linux-stanc}, \code{bin/mac-stanc} and \code{bin/windows-stanc}.
+The CmdStan makefile \code{build} task copies the appropriate binary to \code{bin/stanc}.  For CmdStan installations
+which have been cloned of downloaded from the CmdStan GitHub repository, 
+the makefile task will download the appropriate OS-specific binary
+from the stanc3 repository's nightly release.
+%
+The build process utilizes the \code{GNU make} command-line
+utility or the Windows \code{mingw32-make} equivalent.
 
 Steps to build \CmdStan:
 %
@@ -56,20 +63,6 @@ Steps to build \CmdStan:
     \begin{quote}
       \begin{Verbatim}[fontshape=sl]
 > cd <cmdstan-home>
-      \end{Verbatim}
-    \end{quote}
-    %
-    \noindent
-    A listing of the files and directory of this folder should show these files:
-    %
-    \begin{quote}
-      \begin{Verbatim}
-> ls
-LICENSE            makefile
-README.md          runCmdStanTests.py
-doc                src
-examples           stan
-make               test-all.sh
       \end{Verbatim}
     \end{quote}
     %
@@ -119,11 +112,11 @@ report (after other lines of output)
 %
 \begin{quote}
   \begin{Verbatim}
---- CmdStan v2.21.0 built ---
+--- CmdStan v2.22.1 built ---
   \end{Verbatim}
 \end{quote}
 %
-and there will be two executables in the \code{<cmdstan-home>/bin/} folder:
+and there will be the following executables in the \code{<cmdstan-home>/bin/} folder:
 %
 \begin{itemize}
   \item \code{stanc}, the Stan compiler. The Stan compiler
@@ -135,6 +128,10 @@ and there will be two executables in the \code{<cmdstan-home>/bin/} folder:
     Stan program, \code{stansummary} reports the mean, standard deviation,
     quantiles, $\hat{R}$, and other values. See \refchapter{stansummary} for
     details.
+  \item \code{diagnose}, a sampler analysis tool. The \code{diagnose}
+    reads the generated outputs from Stan program runs and checks for
+    indications that the HMC sampler was unable to sample from the full posterior.
+
 \end{itemize}
 
 \section{Compiling and Executing a Stan Program}\label{compiling-model.section}

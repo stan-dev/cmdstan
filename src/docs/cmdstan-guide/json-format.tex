@@ -62,7 +62,7 @@ data {
 \end{Verbatim}
 \end{quote}
 \noindent
-the following JSON input file would be valid
+the following JSON input would be valid
 \begin{quote}
 \begin{Verbatim}
 { "d1" : 2,
@@ -102,6 +102,50 @@ and the right column contains valid JSON data inputs.
 \code{matrix[2,3] a;} & \code{"a" : [ [ 1, 2, 3 ], [ 4, 5, 6] ]} \\
 \end{tabular}
 \end{center}
+
+\subsection{Empty arrays in JSON}
+
+JSON notation is not able to distinguish between multi-dimensional arrays
+where any dimension is 0, e.g., 
+a 2-D array with dimensions (1, 0), i.e., one row, zero columns, has JSON representation \code{ [ ] }.
+
+To see how this works, consider the following Stan program data block:
+\begin{quote}
+\begin{Verbatim}
+data {
+  int d;
+  int ar_1d[d];
+  int ar_2d[d,d];
+  int ar_3d[d,d,d];
+}
+\end{Verbatim}
+\end{quote}
+In the case where variable \code{d} is \code{1},  all arrays will contain 1 value.
+If where variable \code{ar\_d1} contains value \code{7},
+variable \code{ar\_d2} contains value \code{8}, and
+variable \code{ar\_d3} contains value \code{9}, 
+the JSON representation is:
+\begin{quote}
+\begin{Verbatim}
+{ "d" : 1,
+  "ar_d1" : [7],
+  "ar_d2" : [[8]],
+  "ar_d3" : [[[9]]]
+}
+\end{Verbatim}
+\end{quote}
+However, in the case where variable  \code{d} is \code{0},
+all arrays contain 0 values, and the JSON representation is:
+\begin{quote}
+\begin{Verbatim}
+{ "d" : 0,
+  "ar_d1" : [ ],
+  "ar_d2" : [ ],
+  "ar_d3" : [ ]
+}
+\end{Verbatim}
+\end{quote}
+
 %
 
 

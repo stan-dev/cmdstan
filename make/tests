@@ -28,10 +28,7 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
-
-%.d: %.hpp
-
-
+src/test/*.d : src/test/*.hpp
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
@@ -41,11 +38,6 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
-
-TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
-
-.PHONY: test-models-hpp
-test-models-hpp: $(TEST_MODELS_HPP)
 
 ############################################################
 #
@@ -70,6 +62,16 @@ test/dummy.cpp:
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
+
+############################################################
+#
+# Target to generate C++ code for all test-models
+##
+TEST_MODELS := $(wildcard src/test/test-models/*.stan)
+TEST_MODELS_DEPS := $(patsubst %.stan,%.d,$(TEST_MODELS))
+
+.PHONY: test-models-hpp
+test-models-hpp:  $(TEST_MODELS_DEPS)
 
 ##
 # Tests that depend on compiled models
