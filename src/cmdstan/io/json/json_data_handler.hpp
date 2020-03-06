@@ -53,15 +53,15 @@ namespace cmdstan {
     private:
       vars_map_r& vars_r_;
       vars_map_i& vars_i_;
-      std::string key_;
-      std::vector<double> values_r_;
-      std::vector<int> values_i_;
-      std::vector<size_t> dims_;
-      std::vector<size_t> dims_verify_;
-      std::vector<bool> dims_unknown_;
-      size_t dim_idx_;
-      size_t dim_last_;
-      bool is_int_;
+      std::string key_{};
+      std::vector<double> values_r_{};
+      std::vector<int> values_i_{};
+      std::vector<size_t> dims_{};
+      std::vector<size_t> dims_verify_{};
+      std::vector<bool> dims_unknown_{};
+      size_t dim_idx_{0};
+      size_t dim_last_{0};
+      bool is_int_{true};
 
       void reset() {
         key_.clear();
@@ -98,11 +98,7 @@ namespace cmdstan {
        * @param vars_i name-value map for int-valued variables
        */
       json_data_handler(vars_map_r& vars_r, vars_map_i& vars_i)
-        : json_handler(), vars_r_(vars_r), vars_i_(vars_i),
-          key_(), values_r_(), values_i_(),
-          dims_(), dims_verify_(), dims_unknown_(),
-          dim_idx_(0), dim_last_(0), is_int_(true) {
-      }
+        : json_handler(), vars_r_(vars_r), vars_i_(vars_i) {}
 
       void start_text() {
         vars_i_.clear();

@@ -3,5 +3,5 @@ parameters {
 }
 
 model {
-  target += 1 / x;
+  target += 1.0 / x;
 }

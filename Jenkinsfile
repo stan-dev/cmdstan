@@ -81,7 +81,7 @@ pipeline {
         stage('Verify changes') {
             agent { label 'linux' }
             steps {
-                script {         
+                script {
 
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
