@@ -42,11 +42,11 @@ else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
 else ifeq ($(OS_TAG),windows)
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-connrefuse --retry-delay $(STANC_DL_DELAY)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-connrefused --retry-delay $(STANC_DL_DELAY)")
 else
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-connrefuse --retry-delay $(STANC_DL_DELAY)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-connrefused --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
 
