@@ -10,6 +10,8 @@ endef
 # if nothing was set to $(OS) that means that the Stan Math submodule is missing
 OS ?= missing-submodules
 CMDSTAN_SUBMODULES = 1
+STANC_DL_RETRY = 5
+STANC_DL_DELAY = 10
 
 ifeq ($(OS),Windows_NT)
   OS_TAG := windows
@@ -40,11 +42,11 @@ else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
 else ifeq ($(OS_TAG),windows)
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
 else
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
 
