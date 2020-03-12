@@ -31,9 +31,6 @@ def deleteDirWin() {
 pipeline {
     agent none
     options { skipDefaultCheckout() }
-    environment {
-        scPaths = sourceCodePaths()
-    }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
