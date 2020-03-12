@@ -8,6 +8,8 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/write_model.hpp>
+#include <cmdstan/write_opencl_device.hpp>
+#include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <stan/callbacks/interrupt.hpp>
@@ -39,9 +41,7 @@
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
 #include <stan/services/experimental/advi/meanfield.hpp>
-#include <stan/math/opencl/opencl_context.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -123,39 +123,14 @@ namespace cmdstan {
     if (parser.help_printed())
       return err_code;
 
-    int_argument* random_arg = dynamic_cast<int_argument*>(parser.arg("random")->arg("seed"));
-    unsigned int random_seed;
-    if (random_arg->is_default()) {
-      random_seed = (boost::posix_time::microsec_clock::universal_time() - boost::posix_time::ptime(boost::posix_time::min_date_time)).total_milliseconds();
-      random_arg->set_value(random_seed);
-    } else {
-      random_seed = static_cast<unsigned int>(random_arg->value());
-    }
+    arg_seed* random_arg = dynamic_cast<arg_seed*>(parser.arg("random")->arg("seed"));
+    unsigned int random_seed = random_arg->random_value();
+
     parser.print(info);
+    write_parallel_info(info);
+    write_opencl_device(info);
     info();
   
-#ifdef STAN_THREADS
-    std::stringstream msg_threads;
-#ifndef STAN_MPI
-    msg_threads << "Threading is enabled. map_rect will run with at most ";
-#else
-    msg_threads << "MPI and threading is enabled. Nested map_rect will run with at most ";
-#endif
-    msg_threads << stan::math::internal::get_num_threads();
-    msg_threads << " thread(s)." << std::endl;
-    info(msg_threads.str());
-#endif
-
-#ifdef STAN_OPENCL
-    std::stringstream msg_opencl;
-    if((stan::math::opencl_context.platform().size() > 0) && (stan::math::opencl_context.device().size() > 0)) {
-      msg_opencl << "STAN_OPENCL is enabled. OpenCL supported functions will use:" << std::endl;
-      msg_opencl << "Platform: " << stan::math::opencl_context.platform()[0].getInfo<CL_PLATFORM_NAME>() << std::endl;
-      msg_opencl << "Device: " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
-      info(msg_opencl.str());
-    }
-#endif
-
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
@@ -181,6 +156,8 @@ namespace cmdstan {
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     parser.print(sample_writer);
+    write_parallel_info(sample_writer);
+    write_opencl_device(sample_writer);
 
     write_stan(diagnostic_writer);
     write_model(diagnostic_writer, model.model_name());

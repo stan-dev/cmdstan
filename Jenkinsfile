@@ -75,16 +75,44 @@ pipeline {
                 }
 
                 stash 'CmdStanSetup'
-
+            }
+            post { always { deleteDir() }}
+        }
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
                 script {         
 
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
+
                     def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
-                    sh(script: "git pull && git checkout ${CHANGE_TARGET}", returnStdout: false)
+                    def changeTarget = ""
+
+                    if (env.CHANGE_TARGET) {
+                        println "This build is a PR, checking out target branch to compare changes."
+                        changeTarget = env.CHANGE_TARGET
+                        sh(script: "git pull && git checkout ${changeTarget}", returnStdout: false)
+                    }
+                    else{
+                        println "This build is not PR, checking out current branch and extract HEAD^1 commit to compare changes or develop when downstream_tests."
+                        if (env.BRANCH_NAME == "downstream_tests"){
+                            sh(script: "git checkout develop && git pull", returnStdout: false)
+                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                            sh(script: "git checkout ${commitHash}", returnStdout: false)
+                        }
+                        else{
+                            sh(script: "git pull && git checkout ${env.BRANCH_NAME}", returnStdout: false)
+                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
+                        }
+                    }
+
+                    println "Comparing differences between current ${commitHash} and target ${changeTarget}."
 
                     def bashScript = """
-                        for i in ${scPaths};
+                        for i in ${env.scPaths};
                         do
-                            git diff ${commitHash} ${CHANGE_TARGET} -- \$i
+                            git diff ${commitHash} ${changeTarget} -- \$i
                         done
                     """
 
@@ -101,9 +129,12 @@ pipeline {
                         skipRemainingStages = true
                     }
                 }
-
             }
-            post { always { deleteDir() }}
+            post {
+                always {
+                    deleteDir()
+                }
+            }
         }
         stage('Parallel tests') {
             when {
@@ -140,7 +171,7 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent {label 'linux && mpi'}
+                    agent { label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
@@ -170,7 +201,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent {label 'osx'}
+                    agent { label 'osx'}
                     steps {
                         setupCXX()
                         sh runTests("./")
