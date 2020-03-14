@@ -44,7 +44,7 @@ endif
 # Target to verify header files within CmdStan has
 # enough include calls
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/cmdstan -name '*.hpp' -type f))
+HEADER_TESTS := $(addsuffix -test,$(call findfiles,src/cmdstan,*.hpp))
 
 ifeq ($(OS),Windows_NT)
   DEV_NULL = nul

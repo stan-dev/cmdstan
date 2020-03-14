@@ -29,7 +29,7 @@ endif
 ifeq ($(CMDSTAN_SUBMODULES),1)
 
 ifneq ($(STANC3),)
-    bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
+    bin/stanc$(EXE) : $(call findfiles,$(STANC3)/src/,*.ml*) $(STANC#)
 	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
@@ -65,7 +65,7 @@ bin/stanc2$(EXE) : bin/cmdstan/stanc.o
 
 
 # libstanc build rules
-STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
+STANC_TEMPLATE_INSTANTIATION_CPP := $(call findfiles,$(STAN)src/stan/lang,*_inst.cpp) $(call findfiles,$(STAN)src/stan/lang,*_def.cpp)
 STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
 
 bin/cmdstan/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
