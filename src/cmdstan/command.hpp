@@ -250,6 +250,8 @@ namespace cmdstan {
       list_argument* algo = dynamic_cast<list_argument*>(parser.arg("method")->arg("optimize")->arg("algorithm"));
       int num_iterations = dynamic_cast<int_argument*>(parser.arg("method")->arg("optimize")->arg("iter"))->value();
       bool save_iterations = dynamic_cast<bool_argument*>(parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
+      int laplace_draws = dynamic_cast<int_argument*>(parser.arg("method")->arg("optimize")->arg("laplace_draws"))->value();
+      double laplace_diag_shift = dynamic_cast<real_argument*>(parser.arg("method")->arg("optimize")->arg("laplace_diag_shift"))->value();
 
       if (algo->value() == "newton") {
         return_code = stan::services::optimize::newton(model,
@@ -312,6 +314,8 @@ namespace cmdstan {
                                                       tol_param,
                                                       num_iterations,
                                                       save_iterations,
+						      laplace_draws,
+						      laplace_diag_shift,
                                                       refresh,
                                                       interrupt,
                                                       logger,
