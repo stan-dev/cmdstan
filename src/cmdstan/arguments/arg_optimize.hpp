@@ -6,7 +6,7 @@
 #include <cmdstan/arguments/arg_iter.hpp>
 #include <cmdstan/arguments/arg_save_iterations.hpp>
 #include <cmdstan/arguments/arg_laplace_draws.hpp>
-#include <cmdstan/arguments/arg_laplace_diag_shift.hpp>
+#include <cmdstan/arguments/arg_laplace_add_diag.hpp>
 
 namespace cmdstan {
 
@@ -20,7 +20,7 @@ namespace cmdstan {
       _subarguments.push_back(new arg_iter());
       _subarguments.push_back(new arg_save_iterations());
       _subarguments.push_back(new arg_laplace_draws());
-      _subarguments.push_back(new arg_laplace_diag_shift());
+      _subarguments.push_back(new arg_laplace_add_diag());
     }
   };
 

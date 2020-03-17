@@ -1,16 +1,16 @@
-#ifndef CMDSTAN_ARGUMENTS_ARG_LAPLACE_DIAG_SHIFT_HPP
-#define CMDSTAN_ARGUMENTS_ARG_LAPLACE_DIAG_SHIFT_HPP
+#ifndef CMDSTAN_ARGUMENTS_ARG_LAPLACE_ADD_DIAG_HPP
+#define CMDSTAN_ARGUMENTS_ARG_LAPLACE_ADD_DIAG_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 
 namespace cmdstan {
 
-  class arg_laplace_diag_shift : public real_argument {
+  class arg_laplace_add_diag : public real_argument {
   public:
-    arg_laplace_diag_shift(): real_argument() {
-      _name = "laplace_diag_shift";
+    arg_laplace_add_diag(): real_argument() {
+      _name = "laplace_add_diag";
       _description = "Value added to diagonal of Laplace approximation to avoid singularities";
-      _validity = "0 <= laplace_diag_shift";
+      _validity = "0 <= laplace_add_diag";
       _default = "0";
       _default_value = 0.0;
       _constrained = true;

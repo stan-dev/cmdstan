@@ -134,7 +134,6 @@ namespace cmdstan {
     stan::callbacks::writer init_writer;
     stan::callbacks::interrupt interrupt;
 
-
     std::fstream output_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("file"))->value().c_str(),
                                std::fstream::out);
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
@@ -142,7 +141,6 @@ namespace cmdstan {
     std::fstream diagnostic_stream(dynamic_cast<string_argument*>(parser.arg("output")->arg("diagnostic_file"))->value().c_str(),
                                    std::fstream::out);
     stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
-
 
     //////////////////////////////////////////////////
     //                Initialize Model              //
@@ -251,7 +249,7 @@ namespace cmdstan {
       int num_iterations = dynamic_cast<int_argument*>(parser.arg("method")->arg("optimize")->arg("iter"))->value();
       bool save_iterations = dynamic_cast<bool_argument*>(parser.arg("method")->arg("optimize")->arg("save_iterations"))->value();
       int laplace_draws = dynamic_cast<int_argument*>(parser.arg("method")->arg("optimize")->arg("laplace_draws"))->value();
-      double laplace_diag_shift = dynamic_cast<real_argument*>(parser.arg("method")->arg("optimize")->arg("laplace_diag_shift"))->value();
+      double laplace_add_diag = dynamic_cast<real_argument*>(parser.arg("method")->arg("optimize")->arg("laplace_add_diag"))->value();
 
       if (algo->value() == "newton") {
         return_code = stan::services::optimize::newton(model,
@@ -315,7 +313,7 @@ namespace cmdstan {
                                                       num_iterations,
                                                       save_iterations,
 						      laplace_draws,
-						      laplace_diag_shift,
+						      laplace_add_diag,
                                                       refresh,
                                                       interrupt,
                                                       logger,
