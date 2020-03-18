@@ -41,7 +41,7 @@ endif
 %.hpp : %.stan $(BINSTANC)
 	@echo ''
 	@echo '--- Translating Stan model to C++ code ---'
-	$(WINE) $(BINSTANC) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
+	$(WINE) $(BINSTANC) $(STANCFLAGS) --warn-pedantic --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
 .PRECIOUS: %.hpp
 %$(EXE) : %.hpp %.d $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)

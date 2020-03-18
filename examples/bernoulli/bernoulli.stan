@@ -4,6 +4,7 @@ data {
 } 
 parameters {
   real<lower=0,upper=1> theta;
+  real sigma;
 } 
 model {
   theta ~ beta(1,1);  // uniform prior on interval 0,1
