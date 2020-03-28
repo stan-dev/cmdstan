@@ -1,7 +1,7 @@
 ################################################################################
 # stanc build rules
 
-# used to creat breaks in error messages
+# used to create breaks in error messages
 define n
 
 
@@ -10,6 +10,9 @@ endef
 # if nothing was set to $(OS) that means that the Stan Math submodule is missing
 OS ?= missing-submodules
 CMDSTAN_SUBMODULES = 1
+STANC_DL_RETRY = 5
+STANC_DL_DELAY = 10
+STANC3_TEST_BIN_URL ?=
 
 ifeq ($(OS),Windows_NT)
   OS_TAG := windows
@@ -25,51 +28,63 @@ endif
 
 # bin/stanc build rules - requires stan, stan_math submodules in place
 ifeq ($(CMDSTAN_SUBMODULES),1)
-ifneq ($(STANC2),)
-bin/stanc$(EXE) : O = $(O_STANC)
-bin/stanc$(EXE) : CPPFLAGS_MPI =
-bin/stanc$(EXE) : LDFLAGS_MPI =
-bin/stanc$(EXE) : LDLIBS_MPI =
-bin/stanc$(EXE) : bin/cmdstan/libstanc.a
-bin/stanc$(EXE) : bin/cmdstan/stanc.o
-	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
-else ifneq ($(STANC3),)
-bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
+STANC_XATTR =
+ifeq ($(OS_TAG),mac)
+STANC_XATTR = $(shell xattr bin/mac-stanc)
+endif
+
+ifneq ($(STANC3),)
+    bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
 	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
-
-else ifneq (,$(wildcard bin/mac-stanc))
-STANC_XATTR = $(shell xattr bin/mac-stanc)
-ifneq (,$(STANC_XATTR))
-bin/stanc$(EXE) :
-	cp bin/mac-stanc bin/stanc$(EXE)
-	chmod +x bin/stanc
-	xattr -d com.apple.quarantine bin/stanc
+else ifneq ($(STANC3_TEST_BIN_URL),)
+ifeq ($(OS_TAG),windows)
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
 else
-bin/stanc$(EXE) :
-	cp bin/mac-stanc bin/stanc$(EXE)
-	chmod +x bin/stanc
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
 endif
 
-else ifneq (,$(wildcard bin/linux-stanc))
-bin/stanc$(EXE) :
+else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
+ifneq (,$(STANC_XATTR))
+	bin/stanc$(EXE) :
+		cp bin/mac-stanc bin/stanc$(EXE)
+		chmod +x bin/stanc
+		xattr -d com.apple.quarantine bin/stanc
+else
+    bin/stanc$(EXE) :
 	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
-	chmod +x bin/stanc
+	chmod +x bin/stanc$(EXE)
+endif
 
 else ifeq ($(OS_TAG),windows)
-bin/stanc$(EXE) :
+    bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
 else
-bin/stanc$(EXE) :
-	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc
-	chmod +x bin/stanc
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
 endif
 
 
+# bin/stanc2 build rules
+bin/stanc2$(EXE) : $(TBB_TARGETS)
+bin/stanc2$(EXE) : O = $(O_STANC)
+bin/stanc2$(EXE) : CPPFLAGS_MPI =
+bin/stanc2$(EXE) : LDFLAGS_MPI =
+bin/stanc2$(EXE) : LDLIBS_MPI =
+bin/stanc2$(EXE) : bin/cmdstan/libstanc.a
+bin/stanc2$(EXE) : bin/cmdstan/stanc.o
+	@mkdir -p $(dir $@)
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
 
 
@@ -95,4 +110,3 @@ endif
 
 endif
 # end bin/stanc build rules
-
