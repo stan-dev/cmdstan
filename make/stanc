@@ -15,26 +15,28 @@ STANC_DL_DELAY = 10
 STANC3_TEST_BIN_URL ?=
 
 ifeq ($(OS),Windows_NT)
-  OS_TAG := windows
+ OS_TAG := windows
 else ifeq ($(OS),Darwin)
-  OS_TAG := mac
+ OS_TAG := mac
+ STANC_XATTR := $(shell xattr bin/mac-stanc)
 else ifeq ($(OS),Linux)
-  OS_TAG := linux
+ OS_TAG := linux
 else ifeq ($(OS),missing-submodules)
-  CMDSTAN_SUBMODULES = 0
+ CMDSTAN_SUBMODULES = 0
 else
-  $(error $n Can't detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc)
+  $(error  Cannot detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc. $n )
 endif
 
 # bin/stanc build rules - requires stan, stan_math submodules in place
 ifeq ($(CMDSTAN_SUBMODULES),1)
-
 ifneq ($(STANC3),)
+# build stanc3 from local installation
     bin/stanc$(EXE) : $(shell find $(STANC3)/src/ -type f -name '*.ml*') $(STANC#)
 	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
 else ifneq ($(STANC3_TEST_BIN_URL),)
+# download stanc3 build from specific branch
 ifeq ($(OS_TAG),windows)
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
@@ -45,16 +47,28 @@ else
 	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
+
+else ifneq ($(STANC_XATTR),)
+# unquarantine release stanc3 binary (MacOS Catalina)
+    bin/stanc$(EXE) :
+	cp bin/mac-stanc bin/stanc$(EXE)
+	chmod +x bin/stanc
+	xattr -d com.apple.quarantine bin/stanc
+
 else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
+# use release stanc3 binary (Linux & MacOS releases before Catalina)
     bin/stanc$(EXE) :
 	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
 	chmod +x bin/stanc$(EXE)
 
 else ifeq ($(OS_TAG),windows)
+# get latest stanc3 - Windows
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
 	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+
 else
+# get latest stanc3 - Linux & MacOS
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
 	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
