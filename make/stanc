@@ -18,7 +18,7 @@ ifeq ($(OS),Windows_NT)
  OS_TAG := windows
 else ifeq ($(OS),Darwin)
  OS_TAG := mac
- STANC_XATTR := $(shell xattr bin/mac-stanc)
+ STANC_XATTR := $(shell xattr bin/mac-stanc 2>/dev/null)
 else ifeq ($(OS),Linux)
  OS_TAG := linux
 else ifeq ($(OS),missing-submodules)
@@ -56,19 +56,19 @@ else ifneq ($(STANC_XATTR),)
 	xattr -d com.apple.quarantine bin/stanc
 
 else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
-# use release stanc3 binary (linux, MacOS before Catalina)
+# use release stanc3 binary (Linux & MacOS releases before Catalina)
     bin/stanc$(EXE) :
 	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
 	chmod +x bin/stanc$(EXE)
 
 else ifeq ($(OS_TAG),windows)
-# Windows binary not included with 2.22 release - remove for 2.23?
+# get latest stanc3 - Windows
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
 	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
 
 else
-# get latest stanc3
+# get latest stanc3 - Linux & MacOS
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
 	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
