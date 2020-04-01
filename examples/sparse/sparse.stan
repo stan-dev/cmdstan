@@ -12,9 +12,9 @@ data {
 transformed data {
   sparse_matrix[N, M] xx = x * transpose(x);
   // Should be allowed
-  //real data_cool = xx[1, 1];
+  real data_cool = xx[1, 1];
   // Should not be allowed
-  //xx[1, 1] = 5.0;
+  xx[1, 1] = 5.0;
   xx[1:10, 1:10] = x[1:10, 1:10];
 
 }
@@ -27,8 +27,8 @@ parameters {
 transformed parameters {
   sparse_matrix[N, M] ZZ = VV * nz_vals;
   // Cool and fine
-  //real param_cool = ZZ[1, 1];
+  real param_cool = ZZ[1, 1];
   // Neither are cool or fine
-  //ZZ[1, 1] = 10.0;
-  ZZ[1:10, 1:10] = VV[1:10, 1:10];
+  ZZ[1, 1] = 10.0;
+  ZZ[1:10, 1:10] = VV[1:10, 1:10] * 10.0;
 }
