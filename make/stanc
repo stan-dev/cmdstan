@@ -18,7 +18,7 @@ ifeq ($(OS),Windows_NT)
  OS_TAG := windows
 else ifeq ($(OS),Darwin)
  OS_TAG := mac
- STANC_XATTR := $(shell xattr bin/mac-stanc)
+ STANC_XATTR := $(shell xattr bin/mac-stanc 2>/dev/null)
 else ifeq ($(OS),Linux)
  OS_TAG := linux
 else ifeq ($(OS),missing-submodules)
