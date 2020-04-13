@@ -218,9 +218,9 @@ clean: clean-manual
 
 clean-deps:
 	@echo '  removing dependency files'
-	$(shell find src $(STAN)src/stan $(MATH)stan -type f -name '*.d' -exec rm {} +)
-	$(shell find src $(STAN)src/stan $(MATH)stan -type f -name '*.d.*' -exec rm {} +)
-	$(shell find src $(STAN)src/stan $(MATH)stan -type f -name '*.dSYM' -exec rm {} +)
+	$(RM) $(call findfiles,src,*.d) $(call findfiles,src/stan,*.d) $(call findfiles,$(MATH)/stan,*.d)
+	$(RM) $(call findfiles,src,*.d.*) $(call findfiles,src/stan,*.d.*) $(call findfiles,$(MATH)/stan,*.d.*)
+	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
 clean-manual:
 	$(RM) -r doc
