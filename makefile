@@ -18,6 +18,7 @@
 # The default target of this Makefile is...
 help:
 
+
 -include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
 
@@ -30,6 +31,10 @@ endif
 O_STANC ?= 0
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
+
+ifeq ($(origin STAN_THREADS), undefined)
+STAN_THREADS=TRUE
+endif
 
 
 -include $(MATH)make/compiler_flags
