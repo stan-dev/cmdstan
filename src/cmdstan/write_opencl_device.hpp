@@ -16,7 +16,7 @@ namespace cmdstan {
         msg_opencl_platform << "opencl_platform = " << stan::math::opencl_context.platform()[0].getInfo<CL_PLATFORM_NAME>();
         writer(msg_opencl_platform.str());
         std::stringstream msg_opencl_device;
-        msg_opencl_device << "opencl_platform = " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
+        msg_opencl_device << "opencl_device = " << stan::math::opencl_context.device()[0].getInfo<CL_DEVICE_NAME>();
         writer(msg_opencl_device.str());
     }
 #endif
