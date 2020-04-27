@@ -9,6 +9,8 @@ STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(
 ##
 # Precompiled model header
 ##
+$(STAN)src/stan/model/model_header.d : $(STAN)src/stan/model/model_header.hpp
+	$(COMPILE.cpp) $(DEPFLAGS) $<
 $(STAN)src/stan/model/model_header.d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
 $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
