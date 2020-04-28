@@ -105,7 +105,7 @@ pipeline {
                             git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/cmdstan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
-                            echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
+                            echo "Those changes are now found on stan-dev/cmdstan under branch ${branchName()}"
                             echo "Please 'git pull' before continuing to develop."
                             exit 1
                         fi
