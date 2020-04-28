@@ -1,6 +1,7 @@
 #ifndef CMDSTAN_IO_JSON_JSON_DATA_HPP
 #define CMDSTAN_IO_JSON_JSON_DATA_HPP
 
+#include <cmdstan/io/json/json_data_handler.hpp>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/rapidjson_parser.hpp>
 #include <iostream>
