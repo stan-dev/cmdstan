@@ -97,7 +97,7 @@ pipeline {
                             git config --global user.name "Stan Jenkins"
                             git add src
                             git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
-                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/cmdstan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
                             echo "Please 'git pull' before continuing to develop."
