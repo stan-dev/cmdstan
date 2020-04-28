@@ -4,6 +4,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <stdexcept>
+#include <vector>
 
 namespace cmdstan {
 namespace test {
