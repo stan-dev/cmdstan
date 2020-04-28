@@ -1,16 +1,16 @@
 #ifndef CMDSTAN_STANSUMMARY_HELPER_HPP
 #define CMDSTAN_STANSUMMARY_HELPER_HPP
 
-#include <stan/mcmc/chains.hpp>
 #include <algorithm>
-#include <iostream>
 #include <iomanip>
 #include <ios>
+#include <iostream>
+#include <stan/mcmc/chains.hpp>
 #include <string>
 #include <vector>
 
-void compute_width_and_precision(double value, int sig_figs,
-                                 int& width, int& precision) {
+void compute_width_and_precision(double value, int sig_figs, int &width,
+                                 int &precision) {
   double abs_value = std::fabs(value);
 
   if (value == 0) {
@@ -48,10 +48,9 @@ int compute_precision(double value, int sig_figs, bool scientific) {
   }
 }
 
-int calculate_column_width(const Eigen::VectorXd& x,
-                           const std::string& name,
+int calculate_column_width(const Eigen::VectorXd &x, const std::string &name,
                            const int sig_figs,
-                           std::ios_base::fmtflags& format) {
+                           std::ios_base::fmtflags &format) {
   int padding = 2;
 
   // Fixed Precision
@@ -65,17 +64,18 @@ int calculate_column_width(const Eigen::VectorXd& x,
 
   if (max_fixed_width + padding < fixed_threshold) {
     format = std::ios_base::fixed;
-    max_fixed_width
-      = name.length() > max_fixed_width ? name.length() : max_fixed_width;
+    max_fixed_width =
+        name.length() > max_fixed_width ? name.length() : max_fixed_width;
     return max_fixed_width + padding;
   }
 
   // Scientific Notation
-  size_t scientific_width = sig_figs + 1 + 4;  // Decimal place + exponent
-  if (x.minCoeff() < 0) ++scientific_width;
+  size_t scientific_width = sig_figs + 1 + 4; // Decimal place + exponent
+  if (x.minCoeff() < 0)
+    ++scientific_width;
 
-  scientific_width
-    = name.length() > scientific_width ? name.length() : scientific_width;
+  scientific_width =
+      name.length() > scientific_width ? name.length() : scientific_width;
 
   format = std::ios_base::scientific;
   return scientific_width + padding;
@@ -83,46 +83,43 @@ int calculate_column_width(const Eigen::VectorXd& x,
 
 using Eigen::Dynamic;
 
-Eigen::VectorXi
-calculate_column_widths(const Eigen::MatrixXd& values,
-                        const std::vector<std::string>& headers,
-                        const int sig_figs,
-                        Eigen::Matrix<std::ios_base::fmtflags, Dynamic, 1>&
-                        formats) {
+Eigen::VectorXi calculate_column_widths(
+    const Eigen::MatrixXd &values, const std::vector<std::string> &headers,
+    const int sig_figs,
+    Eigen::Matrix<std::ios_base::fmtflags, Dynamic, 1> &formats) {
   int n = values.cols();
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) = calculate_column_width(values.col(i), headers[i],
-                                              sig_figs, formats(i));
+    column_widths(i) =
+        calculate_column_width(values.col(i), headers[i], sig_figs, formats(i));
   }
   return column_widths;
 }
 
-
-bool is_matrix(const std::string& parameter_name) {
+bool is_matrix(const std::string &parameter_name) {
   return (parameter_name.find("[") != std::string::npos);
 }
 
-std::string base_param_name(stan::mcmc::chains<>& chains, const int index) {
+std::string base_param_name(stan::mcmc::chains<> &chains, const int index) {
   std::string name = chains.param_name(index);
   return name.substr(0, name.find("["));
 }
 
-std::string matrix_index(stan::mcmc::chains<>& chains, const int index) {
+std::string matrix_index(stan::mcmc::chains<> &chains, const int index) {
   std::string name = chains.param_name(index);
   return name.substr(name.find("["));
 }
 
-std::vector<int>
-dimensions(stan::mcmc::chains<>& chains, const int start_index) {
+std::vector<int> dimensions(stan::mcmc::chains<> &chains,
+                            const int start_index) {
   std::vector<int> dims;
   int dim;
 
   std::string name = base_param_name(chains, start_index);
   int last_matrix_element = start_index;
-  while (last_matrix_element+1 < chains.num_params()) {
-    if (base_param_name(chains, last_matrix_element+1) == name)
+  while (last_matrix_element + 1 < chains.num_params()) {
+    if (base_param_name(chains, last_matrix_element + 1) == name)
       last_matrix_element++;
     else
       break;
@@ -141,16 +138,16 @@ dimensions(stan::mcmc::chains<>& chains, const int start_index) {
 }
 
 // next 1-based index in row major order
-void next_index(std::vector<int>& index, const std::vector<int>& dims) {
+void next_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
     throw std::domain_error("next_index: size mismatch");
   if (dims.size() == 0)
     return;
-  index[index.size()-1]++;
+  index[index.size() - 1]++;
 
-  for (int i = index.size()-1; i > 0; i--) {
+  for (int i = index.size() - 1; i > 0; i--) {
     if (index[i] > dims[i]) {
-      index[i-1]++;
+      index[i - 1]++;
       index[i] = 1;
     }
   }
@@ -168,7 +165,7 @@ void next_index(std::vector<int>& index, const std::vector<int>& dims) {
 
 // return the flat 0-based index of a column major order matrix based on the
 // 1-based index
-int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
+int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
     throw std::domain_error("next_index: size mismatch");
   if (dims.size() == 0)
@@ -186,30 +183,27 @@ int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
   int offset = 0;
   int prod = 1;
   for (size_t i = 0; i < dims.size(); i++) {
-    offset += (index[i]-1) * prod;
+    offset += (index[i] - 1) * prod;
     prod *= dims[i];
   }
   return offset;
 }
 
 void stansummary_usage() {
-  std::cout << "USAGE:  stansummary <filename 1> [<filename 2> ... <filename N>]"
-            << std::endl
-            << std::endl;
+  std::cout
+      << "USAGE:  stansummary <filename 1> [<filename 2> ... <filename N>]"
+      << std::endl
+      << std::endl;
 
   std::cout << "OPTIONS:" << std::endl << std::endl;
   std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations "
-            << "for the given chain"
-            << std::endl
+            << "for the given chain" << std::endl
             << std::endl;
   std::cout << "  --sig_figs=<int>\tSet significant figures of output "
-            << "(Defaults to 2)"
-            << std::endl
+            << "(Defaults to 2)" << std::endl
             << std::endl;
-  std::cout << "  --csv_file=<filename>\tWrite output as csv file "
-            << std::endl
+  std::cout << "  --csv_file=<filename>\tWrite output as csv file " << std::endl
             << std::endl;
 }
-
 
 #endif

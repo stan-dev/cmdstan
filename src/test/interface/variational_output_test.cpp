@@ -1,14 +1,14 @@
-#include <gtest/gtest.h>
-#include <test/utility.hpp>
-#include <stan/mcmc/chains.hpp>
 #include <fstream>
+#include <gtest/gtest.h>
+#include <stan/mcmc/chains.hpp>
+#include <test/utility.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
 class CmdStan : public testing::Test {
- public:
+public:
   void SetUp() {
     std::vector<std::string> model_path;
     model_path.push_back("src");
@@ -18,8 +18,8 @@ class CmdStan : public testing::Test {
 
     output_file = "test/output.csv";
 
-    base_command = convert_model_path(model_path)
-      + " output file=" + output_file;
+    base_command =
+        convert_model_path(model_path) + " output file=" + output_file;
 
     y11 = "y[1,1]";
     y12 = "y[1,2]";
@@ -31,7 +31,8 @@ class CmdStan : public testing::Test {
     std::ifstream output_stream;
     output_stream.open(output_file.data());
 
-    stan::io::stan_csv parsed_output = stan::io::stan_csv_reader::parse(output_stream, 0);
+    stan::io::stan_csv parsed_output =
+        stan::io::stan_csv_reader::parse(output_stream, 0);
     stan::mcmc::chains<> chains(parsed_output);
     output_stream.close();
     return chains;
@@ -41,7 +42,6 @@ class CmdStan : public testing::Test {
   std::string output_file;
   std::string y11, y12, y21, y22;
 };
-
 
 TEST_F(CmdStan, variational_default) {
   run_command_output out = run_command(base_command + " variational");
@@ -54,7 +54,8 @@ TEST_F(CmdStan, variational_default) {
 }
 
 TEST_F(CmdStan, variational_meanfield) {
-  run_command_output out = run_command(base_command + " variational algorithm=meanfield");
+  run_command_output out =
+      run_command(base_command + " variational algorithm=meanfield");
 
   ASSERT_EQ(0, out.err_code);
 
@@ -64,7 +65,8 @@ TEST_F(CmdStan, variational_meanfield) {
 }
 
 TEST_F(CmdStan, variational_fullrank) {
-  run_command_output out = run_command(base_command + " variational algorithm=fullrank");
+  run_command_output out =
+      run_command(base_command + " variational algorithm=fullrank");
 
   ASSERT_EQ(0, out.err_code);
 

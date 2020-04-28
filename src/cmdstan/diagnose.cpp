@@ -1,10 +1,10 @@
 #include <algorithm>
-#include <iostream>
-#include <iomanip>
-#include <ios>
-#include <stan/mcmc/chains.hpp>
 #include <cmdstan/stansummary_helper.hpp>
 #include <fstream>
+#include <iomanip>
+#include <ios>
+#include <iostream>
+#include <stan/mcmc/chains.hpp>
 
 double RHAT_MAX = 1.05;
 
@@ -23,7 +23,7 @@ void diagnose_usage() {
  * @return 0 for success,
  *         non-zero otherwise
  */
-int main(int argc, const char* argv[]) {
+int main(int argc, const char *argv[]) {
 
   if (argc == 1) {
     diagnose_usage();
@@ -53,23 +53,27 @@ int main(int argc, const char* argv[]) {
   std::cout << "Processing csv files: " << filenames[0];
   ifstream.open(filenames[0].c_str());
 
-  stan::io::stan_csv stan_csv
-    = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  stan::io::stan_csv stan_csv =
+      stan::io::stan_csv_reader::parse(ifstream, &std::cout);
   stan::mcmc::chains<> chains(stan_csv);
   ifstream.close();
 
-  if (filenames.size() > 1) std::cout << ", ";
-  else std::cout << std::endl << std::endl;
+  if (filenames.size() > 1)
+    std::cout << ", ";
+  else
+    std::cout << std::endl << std::endl;
 
-  for (std::vector<std::string>::size_type chain = 1;
-       chain < filenames.size(); ++chain) {
+  for (std::vector<std::string>::size_type chain = 1; chain < filenames.size();
+       ++chain) {
     std::cout << filenames[chain];
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
     chains.add(stan_csv);
     ifstream.close();
-    if (chain < filenames.size()-1) std::cout << ", ";
-    else std::cout << std::endl << std::endl;
+    if (chain < filenames.size() - 1)
+      std::cout << ", ";
+    else
+      std::cout << std::endl << std::endl;
   }
 
   int num_samples = chains.num_samples();
@@ -92,18 +96,19 @@ int main(int argc, const char* argv[]) {
       if (n_max > 0) {
         has_errors = true;
         double pct = 100 * static_cast<double>(n_max) / num_samples;
-        std::cout << n_max << " of " << num_samples
-                  << " (" << std::setprecision(2) << pct << "%)"
+        std::cout << n_max << " of " << num_samples << " ("
+                  << std::setprecision(2) << pct << "%)"
                   << " transitions hit the maximum treedepth limit of "
                   << max_limit << ", or 2^" << max_limit << " leapfrog steps."
                   << std::endl
                   << "Trajectories that are prematurely terminated due to this"
-                  << " limit will result in slow exploration."
-                  << std::endl
+                  << " limit will result in slow exploration." << std::endl
                   << "For optimal performance, increase this limit."
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
       } else {
-        std::cout << "Treedepth satisfactory for all transitions." << std::endl << std::endl;
+        std::cout << "Treedepth satisfactory for all transitions." << std::endl
+                  << std::endl;
       }
     } else if (chains.param_name(i) == std::string("divergent__")) {
       std::cout << "Checking sampler transitions for divergences." << std::endl;
@@ -113,21 +118,22 @@ int main(int argc, const char* argv[]) {
         std::cout << n_divergent << " of " << num_samples << " ("
                   << std::setprecision(2)
                   << 100 * static_cast<double>(n_divergent) / num_samples
-                  << "%) transitions ended with a divergence."
-                  << std::endl
-                  << "These divergent transitions indicate that HMC is not fully able to"
-                  << " explore the posterior distribution."
-                  << std::endl
-                  << "Try increasing adapt delta closer to 1."
-                  << std::endl
+                  << "%) transitions ended with a divergence." << std::endl
+                  << "These divergent transitions indicate that HMC is not "
+                     "fully able to"
+                  << " explore the posterior distribution." << std::endl
+                  << "Try increasing adapt delta closer to 1." << std::endl
                   << "If this doesn't remove all"
                   << " divergences, try to reparameterize the model."
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
       } else {
-        std::cout << "No divergent transitions found." << std::endl << std::endl;
+        std::cout << "No divergent transitions found." << std::endl
+                  << std::endl;
       }
     } else if (chains.param_name(i) == std::string("energy__")) {
-      std::cout << "Checking E-BFMI - sampler transitions HMC potential energy." << std::endl;
+      std::cout << "Checking E-BFMI - sampler transitions HMC potential energy."
+                << std::endl;
       Eigen::VectorXd e_samples = chains.samples(i);
       double delta_e_sq_mean = 0;
       double e_mean = 0;
@@ -152,12 +158,13 @@ int main(int argc, const char* argv[]) {
         std::cout << "The E-BFMI, " << e_bfmi << ", is below the nominal"
                   << " threshold of " << e_bfmi_threshold << " which suggests"
                   << " that HMC may have trouble exploring the target"
-                  << " distribution."
-                  << std::endl
+                  << " distribution." << std::endl
                   << "If possible, try to reparameterize the model."
-                  << std::endl << std::endl;
+                  << std::endl
+                  << std::endl;
       } else {
-        std::cout << "E-BFMI satisfactory for all transitions." << std::endl << std::endl;
+        std::cout << "E-BFMI satisfactory for all transitions." << std::endl
+                  << std::endl;
       }
     } else if (chains.param_name(i).find("__") == std::string::npos) {
       double n_eff = chains.effective_sample_size(i);
@@ -180,11 +187,11 @@ int main(int argc, const char* argv[]) {
 
     std::cout << "Such low values indicate that the effective sample size"
               << " estimators may be biased high and actual performance"
-              << " may be substantially lower than quoted."
-              << std::endl << std::endl;
+              << " may be substantially lower than quoted." << std::endl
+              << std::endl;
   } else {
-    std::cout << "Effective sample size satisfactory."
-              << std::endl << std::endl;
+    std::cout << "Effective sample size satisfactory." << std::endl
+              << std::endl;
   }
 
   if (bad_rhat_names.size() > 0) {
@@ -197,21 +204,19 @@ int main(int argc, const char* argv[]) {
     std::cout << bad_rhat_names.back() << std::endl;
 
     std::cout << "Such high values indicate incomplete mixing and biased"
-              << "estimation."
-              << std::endl
+              << "estimation." << std::endl
               << "You should consider regularizating your model"
               << " with additional prior information or a more"
-              << " effective parameterization."
-              << std::endl << std::endl;
+              << " effective parameterization." << std::endl
+              << std::endl;
   } else {
-    std::cout << "Split R-hat values satisfactory all parameters."
-              << std::endl << std::endl;
+    std::cout << "Split R-hat values satisfactory all parameters." << std::endl
+              << std::endl;
   }
   if (!has_errors)
     std::cout << "Processing complete, no problems detected." << std::endl;
   else
     std::cout << "Processing complete." << std::endl;
-    
-  return 0;
 
+  return 0;
 }

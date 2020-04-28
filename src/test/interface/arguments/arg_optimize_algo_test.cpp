@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <cmdstan/arguments/arg_optimize_algo.hpp>
+#include <gtest/gtest.h>
 
 TEST(CmdStanArguments, arg_optimize_algo) {
   cmdstan::arg_optimize_algo arg;
@@ -12,4 +12,3 @@ TEST(CmdStanArguments, arg_optimize_algo) {
   EXPECT_EQ("lbfgs", arg.values()[1]->name());
   EXPECT_EQ("newton", arg.values()[2]->name());
 }
-
