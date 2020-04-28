@@ -1,17 +1,13 @@
 #ifndef CMDSTAN_IO_JSON_JSON_DATA_HPP
 #define CMDSTAN_IO_JSON_JSON_DATA_HPP
 
-#include <boost/lexical_cast.hpp>
-#include <boost/throw_exception.hpp>
-#include <cctype>
-#include <cmdstan/io/json/json_data_handler.hpp>
+#include <stan/io/var_context.hpp>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/rapidjson_parser.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
-#include <stan/io/var_context.hpp>
 #include <string>
 #include <vector>
 
