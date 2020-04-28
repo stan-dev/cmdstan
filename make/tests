@@ -28,7 +28,7 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
-src/test/*.d : src/test/*.hpp
+src/test/%.d : src/test/%.hpp
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
@@ -68,10 +68,9 @@ test-headers: $(HEADER_TESTS)
 # Target to generate C++ code for all test-models
 ##
 TEST_MODELS := $(wildcard src/test/test-models/*.stan)
-TEST_MODELS_DEPS := $(patsubst %.stan,%.d,$(TEST_MODELS))
 
 .PHONY: test-models-hpp
-test-models-hpp:  $(TEST_MODELS_DEPS)
+test-models-hpp:  $(TEST_MODELS)
 
 ##
 # Tests that depend on compiled models
