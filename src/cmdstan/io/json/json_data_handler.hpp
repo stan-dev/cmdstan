@@ -1,15 +1,15 @@
 #ifndef CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
 #define CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
 
-#include <stan/io/var_context.hpp>
+#include <cctype>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/json_handler.hpp>
 #include <cmdstan/io/json/rapidjson_parser.hpp>
-#include <cctype>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
+#include <stan/io/var_context.hpp>
 #include <string>
 #include <utility>
 #include <vector>

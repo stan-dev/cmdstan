@@ -1,5 +1,5 @@
-#include <stan/services/error_codes.hpp>
 #include <cmdstan/command.hpp>
+#include <stan/services/error_codes.hpp>
 
 int main(int argc, const char *argv[]) {
   try {
