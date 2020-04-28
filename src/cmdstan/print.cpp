@@ -232,7 +232,8 @@ int main(int argc, const char *argv[]) {
       for (int j = 0; j < n; j++) {
         std::cout.setf(formats(j), std::ios::floatfield);
         std::cout << std::setprecision(compute_precision(
-            values(i, j), sig_figs, formats(j) == std::ios_base::scientific))
+                         values(i, j), sig_figs,
+                         formats(j) == std::ios_base::scientific))
                   << std::setw(column_widths(j)) << values(i, j);
       }
       std::cout << std::endl;
@@ -250,9 +251,9 @@ int main(int argc, const char *argv[]) {
         std::cout << std::right;
         for (int j = 0; j < n; j++) {
           std::cout.setf(formats(j), std::ios::floatfield);
-          std::cout << std::setprecision(
-              compute_precision(values(param_index, j), sig_figs,
-                                formats(j) == std::ios_base::scientific))
+          std::cout << std::setprecision(compute_precision(
+                           values(param_index, j), sig_figs,
+                           formats(j) == std::ios_base::scientific))
                     << std::setw(column_widths(j)) << values(param_index, j);
         }
         std::cout << std::endl;
