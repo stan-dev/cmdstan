@@ -1,4 +1,3 @@
-#include <gtest/gtest.h>
 
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/io/json/json_data_handler.hpp>
@@ -9,6 +8,7 @@
 #include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <gtest/gtest.h>
 
 void test_int_var(cmdstan::json::json_data &jdata, const std::string &text,
                   const std::string &name,

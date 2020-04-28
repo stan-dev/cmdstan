@@ -2,11 +2,11 @@
 #define STAN_IO_JSON_RAPIDJSON_PARSER_HPP
 
 #include <cmdstan/io/json/json_error.hpp>
+#include <stan/io/validate_zero_buf.hpp>
 #include <rapidjson/encodings.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/reader.h>
-#include <stan/io/validate_zero_buf.hpp>
 
 #include <cerrno>
 #include <fstream>

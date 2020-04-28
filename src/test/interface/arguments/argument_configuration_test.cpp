@@ -5,10 +5,10 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/argument_probe.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
 
 #include <sstream>
 #include <vector>

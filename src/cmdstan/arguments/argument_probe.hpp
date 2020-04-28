@@ -2,8 +2,8 @@
 #define CMDSTAN_ARGUMENTS_ARGUMENT_PROBE_HPP
 
 #include <cmdstan/arguments/argument.hpp>
-#include <sstream>
 #include <stan/callbacks/writer.hpp>
+#include <sstream>
 #include <string>
 #include <vector>
 

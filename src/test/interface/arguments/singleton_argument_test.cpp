@@ -1,7 +1,7 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <gtest/gtest.h>
 
 template <typename T>
 T argument_value() {

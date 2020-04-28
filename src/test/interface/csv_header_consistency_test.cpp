@@ -1,8 +1,8 @@
-#include <fstream>
-#include <gtest/gtest.h>
 #include <stan/mcmc/chains.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;

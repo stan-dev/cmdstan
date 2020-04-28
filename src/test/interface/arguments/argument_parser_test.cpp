@@ -4,9 +4,9 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/error_codes.hpp>
+#include <gtest/gtest.h>
 
 using cmdstan::arg_data;
 using cmdstan::arg_id;

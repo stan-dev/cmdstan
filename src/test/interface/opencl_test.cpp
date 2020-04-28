@@ -1,7 +1,7 @@
 #ifdef STAN_OPENCL
 
-#include <gtest/gtest.h>
 #include <stan/math/opencl/opencl.hpp>
+#include <gtest/gtest.h>
 
 TEST(StanUiCommand, opencl_ready) {
   // Check if  the OpenCL context has a device ready

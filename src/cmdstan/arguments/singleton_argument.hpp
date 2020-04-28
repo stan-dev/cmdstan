@@ -1,8 +1,8 @@
 #ifndef CMDSTAN_ARGUMENTS_SINGLETON_ARGUMENT_HPP
 #define CMDSTAN_ARGUMENTS_SINGLETON_ARGUMENT_HPP
 
-#include <boost/lexical_cast.hpp>
 #include <cmdstan/arguments/valued_argument.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string>
 #include <vector>

@@ -1,7 +1,7 @@
 #include <cmdstan/arguments/unvalued_argument.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <gtest/gtest.h>
 
 class test_arg_impl : public cmdstan::unvalued_argument {
   std::string print_value() { return ""; }

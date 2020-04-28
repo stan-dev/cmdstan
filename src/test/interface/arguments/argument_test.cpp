@@ -1,6 +1,6 @@
 #include <cmdstan/arguments/argument.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/writer.hpp>
+#include <gtest/gtest.h>
 
 class test_arg_impl : public cmdstan::argument {
   void print(stan::callbacks::writer &w, int depth, const std::string &prefix) {

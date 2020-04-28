@@ -1,9 +1,9 @@
 #ifdef STAN_MPI
 
-#include <cmdstan/command.hpp>
-#include <gtest/gtest.h>
-#include <stan/math/prim.hpp>
 #include <test/test-models/proper.hpp>
+#include <cmdstan/command.hpp>
+#include <stan/math/prim.hpp>
+#include <gtest/gtest.h>
 
 TEST(StanUiCommand, mpi_ready) {
   // The initialization has all worked if we get to here on the rank=0

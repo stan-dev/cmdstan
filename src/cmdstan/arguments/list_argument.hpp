@@ -3,8 +3,8 @@
 
 #include <cmdstan/arguments/arg_fail.hpp>
 #include <cmdstan/arguments/valued_argument.hpp>
-#include <iostream>
 #include <stan/callbacks/writer.hpp>
+#include <iostream>
 #include <string>
 #include <vector>
 

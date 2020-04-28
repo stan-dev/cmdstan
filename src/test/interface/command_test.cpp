@@ -1,13 +1,13 @@
-#include <boost/algorithm/string.hpp>
-#include <boost/math/policies/error_handling.hpp>
 #include <cmdstan/command.hpp>
-#include <gtest/gtest.h>
-#include <stan/callbacks/stream_writer.hpp>
-#include <stan/services/error_codes.hpp>
-#include <stdexcept>
-#include <string>
 #include <test/test-models/proper.hpp>
 #include <test/utility.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/services/error_codes.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/math/policies/error_handling.hpp>
+#include <gtest/gtest.h>
+#include <stdexcept>
+#include <string>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;

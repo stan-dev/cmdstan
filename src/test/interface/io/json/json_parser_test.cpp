@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
 
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/io/json/json_data_handler.hpp>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/json_handler.hpp>
 #include <cmdstan/io/json/rapidjson_parser.hpp>
+#include <gtest/gtest.h>
 
 class recording_handler : public cmdstan::json::json_handler {
  public:

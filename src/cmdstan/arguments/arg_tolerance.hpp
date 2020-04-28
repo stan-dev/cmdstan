@@ -1,8 +1,8 @@
 #ifndef CMDSTAN_ARGUMENTS_ARG_TOLERANCE_HPP
 #define CMDSTAN_ARGUMENTS_ARG_TOLERANCE_HPP
 
-#include <boost/lexical_cast.hpp>
 #include <cmdstan/arguments/singleton_argument.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 
 namespace cmdstan {

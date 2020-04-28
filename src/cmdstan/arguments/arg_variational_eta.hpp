@@ -1,9 +1,9 @@
 #ifndef CMDSTAN_ARGUMENTS_VARIATIONAL_ETA_HPP
 #define CMDSTAN_ARGUMENTS_VARIATIONAL_ETA_HPP
 
-#include <boost/lexical_cast.hpp>
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/services/experimental/advi/defaults.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace cmdstan {
 

@@ -1,9 +1,9 @@
-#include <fstream>
-#include <gtest/gtest.h>
+#include <test/utility.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
-#include <test/utility.hpp>
+#include <gtest/gtest.h>
+#include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;

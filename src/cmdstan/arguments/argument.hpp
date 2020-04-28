@@ -1,9 +1,9 @@
 #ifndef CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 #define CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 
+#include <stan/callbacks/writer.hpp>
 #include <iomanip>
 #include <sstream>
-#include <stan/callbacks/writer.hpp>
 #include <string>
 #include <vector>
 

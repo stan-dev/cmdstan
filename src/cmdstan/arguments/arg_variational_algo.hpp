@@ -2,7 +2,6 @@
 #define CMDSTAN_ARGUMENTS_VARIATIONAL_ALGO_HPP
 
 #include <cmdstan/arguments/list_argument.hpp>
-
 #include <cmdstan/arguments/arg_variational_fullrank.hpp>
 #include <cmdstan/arguments/arg_variational_meanfield.hpp>
 

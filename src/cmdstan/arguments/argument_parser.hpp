@@ -3,8 +3,8 @@
 
 #include <cmdstan/arguments/arg_method.hpp>
 #include <cmdstan/arguments/argument.hpp>
-#include <cstring>
 #include <stan/services/error_codes.hpp>
+#include <cstring>
 #include <string>
 #include <vector>
 

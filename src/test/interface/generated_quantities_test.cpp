@@ -1,8 +1,8 @@
-#include <fstream>
-#include <gtest/gtest.h>
-#include <stdexcept>
-#include <string>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
+#include <fstream>
+#include <string>
+#include <stdexcept>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::multiple_command_separator;

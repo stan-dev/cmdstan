@@ -12,9 +12,6 @@
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_stan.hpp>
-#include <fstream>
-#include <memory>
-#include <sstream>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -45,6 +42,9 @@
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
+#include <fstream>
+#include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>

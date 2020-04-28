@@ -1,8 +1,8 @@
 #ifndef CMDSTAN_ARGUMENTS_VARIATIONAL_EVAL_ELBO_HPP
 #define CMDSTAN_ARGUMENTS_VARIATIONAL_EVAL_ELBO_HPP
 
-#include <boost/lexical_cast.hpp>
 #include <cmdstan/arguments/singleton_argument.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 
 namespace cmdstan {

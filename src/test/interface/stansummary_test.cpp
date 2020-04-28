@@ -1,6 +1,6 @@
 #include <cmdstan/stansummary_helper.hpp>
-#include <gtest/gtest.h>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;

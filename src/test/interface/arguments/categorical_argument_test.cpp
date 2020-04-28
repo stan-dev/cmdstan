@@ -1,8 +1,8 @@
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <cmdstan/arguments/singleton_argument.hpp>
-#include <gtest/gtest.h>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <gtest/gtest.h>
 
 class CmdStanArgumentsCategoricalArgument : public testing::Test {
  public:

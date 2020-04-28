@@ -1,7 +1,7 @@
-#include <fstream>
-#include <gtest/gtest.h>
-#include <streambuf>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
+#include <fstream>
+#include <streambuf>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;

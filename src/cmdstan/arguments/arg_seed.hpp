@@ -1,8 +1,8 @@
 #ifndef CMDSTAN_ARGUMENTS_ARG_SEED_HPP
 #define CMDSTAN_ARGUMENTS_ARG_SEED_HPP
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <cmdstan/arguments/singleton_argument.hpp>
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 
 namespace cmdstan {
 

@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
+#include <stan/services/error_codes.hpp>
+#include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;

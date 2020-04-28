@@ -1,11 +1,11 @@
 #ifndef CMDSTAN_STANSUMMARY_HELPER_HPP
 #define CMDSTAN_STANSUMMARY_HELPER_HPP
 
+#include <stan/mcmc/chains.hpp>
 #include <algorithm>
 #include <iomanip>
 #include <ios>
 #include <iostream>
-#include <stan/mcmc/chains.hpp>
 #include <string>
 #include <vector>
 
