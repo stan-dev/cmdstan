@@ -5,13 +5,13 @@
 
 namespace cmdstan {
 
-  class arg_newton: public categorical_argument {
-  public:
-    arg_newton() {
-      _name = "newton";
-      _description = "Newton's method";
-    }
-  };
+class arg_newton : public categorical_argument {
+ public:
+  arg_newton() {
+    _name = "newton";
+    _description = "Newton's method";
+  }
+};
 
-}
+}  // namespace cmdstan
 #endif

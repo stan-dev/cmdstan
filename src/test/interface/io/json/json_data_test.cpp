@@ -1,4 +1,3 @@
-#include <gtest/gtest.h>
 
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/io/json/json_data_handler.hpp>
@@ -9,6 +8,7 @@
 #include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
+#include <gtest/gtest.h>
 
 void test_int_var(cmdstan::json::json_data &jdata, const std::string &text,
                   const std::string &name,
@@ -61,7 +61,7 @@ void test_exception(const std::string &input,
     EXPECT_EQ(e.what(), exception_text);
     return;
   }
-  FAIL(); // didn't throw an exception as expected.
+  FAIL();  // didn't throw an exception as expected.
 }
 
 TEST(ioJson, jsonData_scalar_int) {
@@ -111,9 +111,10 @@ TEST(ioJson, jsonData_mult_vars2) {
 }
 
 TEST(ioJson, jsonData_mult_vars3) {
-  std::string txt = "{ \"foo\" : \"-Inf\", "
-                    "                  \"bar\" : 0.1 ,"
-                    "                  \"baz\" : [ \"-Inf\", 0.1 , 1 ] }";
+  std::string txt
+      = "{ \"foo\" : \"-Inf\", "
+        "                  \"bar\" : 0.1 ,"
+        "                  \"baz\" : [ \"-Inf\", 0.1 , 1 ] }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals_r;
@@ -180,8 +181,8 @@ TEST(ioJson, jsonData_array_1D_neg_inf) {
 }
 
 TEST(ioJson, jsonData_real_array_2D) {
-  std::string txt =
-      "{ \"foo\" : [ [ 1.1, 1.2 ], [ 2.1, 2.2 ], [ 3.1, 3.2] ]  }";
+  std::string txt
+      = "{ \"foo\" : [ [ 1.1, 1.2 ], [ 2.1, 2.2 ], [ 3.1, 3.2] ]  }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
@@ -198,11 +199,13 @@ TEST(ioJson, jsonData_real_array_2D) {
 }
 
 TEST(ioJson, jsonData_real_array_3D) {
-  std::string txt =
-      "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 ], "
-      "[ 13.1, 13.2, 13.3, 13.4] ],"
-      "                            [ [ 21.1, 21.2, 21.3, 21.4 ], [ 22.1, 22.2, "
-      "22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
+  std::string txt
+      = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 "
+        "], "
+        "[ 13.1, 13.2, 13.3, 13.4] ],"
+        "                            [ [ 21.1, 21.2, 21.3, 21.4 ], [ 22.1, "
+        "22.2, "
+        "22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<double> expected_vals;
@@ -231,17 +234,18 @@ TEST(ioJson, jsonData_real_array_3D) {
   expected_vals.push_back(13.4);
   expected_vals.push_back(23.4);
   std::vector<size_t> expected_dims;
-  expected_dims.push_back(2); // two rows
-  expected_dims.push_back(3); // three cols
-  expected_dims.push_back(4); // four shelves
+  expected_dims.push_back(2);  // two rows
+  expected_dims.push_back(3);  // three cols
+  expected_dims.push_back(4);  // four shelves
   test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_int_array_3D) {
-  std::string txt = "{ \"foo\" : [ [ [ 111, 112, 113, 114 ], [ 121, 122, 123, "
-                    "124 ], [ 131, 132, 133, 134] ],"
-                    "                            [ [ 211, 212, 213, 214 ], [ "
-                    "221, 222, 223, 224 ], [ 231, 232, 233, 234] ] ] }";
+  std::string txt
+      = "{ \"foo\" : [ [ [ 111, 112, 113, 114 ], [ 121, 122, 123, "
+        "124 ], [ 131, 132, 133, 134] ],"
+        "                            [ [ 211, 212, 213, 214 ], [ "
+        "221, 222, 223, 224 ], [ 231, 232, 233, 234] ] ] }";
   std::stringstream in(txt);
   cmdstan::json::json_data jdata(in);
   std::vector<int> expected_vals;
@@ -270,9 +274,9 @@ TEST(ioJson, jsonData_int_array_3D) {
   expected_vals.push_back(134);
   expected_vals.push_back(234);
   std::vector<size_t> expected_dims;
-  expected_dims.push_back(2); // two rows
-  expected_dims.push_back(3); // three cols
-  expected_dims.push_back(4); // four shelves
+  expected_dims.push_back(2);  // two rows
+  expected_dims.push_back(3);  // three cols
+  expected_dims.push_back(4);  // four shelves
   test_int_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
@@ -353,18 +357,20 @@ TEST(ioJson, jsonData_empty_3D_array_2_1_0) {
 }
 
 TEST(ioJson, jsonData_array_err1) {
-  std::string txt = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, "
-                    "12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
-                    "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
-                    "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
+  std::string txt
+      = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, "
+        "12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
+        "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
+        "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
   test_exception(txt, "variable: foo, error: non-rectangular array");
 }
 
 TEST(ioJson, jsonData_array_err2) {
-  std::string txt = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, "
-                    "12.3, 12.4 ] ],"
-                    "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
-                    "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
+  std::string txt
+      = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, "
+        "12.3, 12.4 ] ],"
+        "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
+        "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
   test_exception(txt, "variable: foo, error: non-rectangular array");
 }
 
@@ -384,26 +390,28 @@ TEST(ioJson, jsonData_array_err5) {
 }
 
 TEST(ioJson, jsonData_array_err6) {
-  std::string txt = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, "
-                    "2, 3, 4, [5], 6, 7] }";
+  std::string txt
+      = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, "
+        "2, 3, 4, [5], 6, 7] }";
   test_exception(txt, "variable: foo, error: non-scalar array value");
 }
 
 TEST(ioJson, jsonData_array_err7) {
-  std::string txt =
-      "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
+  std::string txt
+      = "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
   test_exception(txt, "variable: foo, error: non-rectangular array");
 }
 
 TEST(ioJson, jsonData_array_err8) {
-  std::string txt =
-      "{  \"baz\":[1,2,\"-Inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  std::string txt
+      = "{  \"baz\":[1,2,\"-Inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt, "variable: foo, error: non-scalar array value");
 }
 
 TEST(ioJson, jsonData_array_err9) {
-  std::string txt = "{\"a\":1,  \"baz\":[1,2,\"-Inf\"], \"b\":2.0, "
-                    "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
+  std::string txt
+      = "{\"a\":1,  \"baz\":[1,2,\"-Inf\"], \"b\":2.0, "
+        "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
   test_exception(txt, "variable: foo, error: non-scalar array value");
 }
 
@@ -460,8 +468,9 @@ TEST(ioJson, jsonData_err_array_of_obj) {
 
 TEST(ioJson, jsonData_parse_mult_objects_err) {
   std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
-  test_exception(txt, "Error in JSON parsing \nat offset 11: \nThe document "
-                      "root must not be followed by other values.\n");
+  test_exception(txt,
+                 "Error in JSON parsing \nat offset 11: \nThe document "
+                 "root must not be followed by other values.\n");
 }
 
 TEST(ioJson, jsonData_parse_empty_obj) {

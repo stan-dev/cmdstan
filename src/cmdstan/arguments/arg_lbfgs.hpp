@@ -6,15 +6,15 @@
 
 namespace cmdstan {
 
-  class arg_lbfgs: public arg_bfgs {
-  public:
-    arg_lbfgs() {
-      _name = "lbfgs";
-      _description = "LBFGS with linesearch";
+class arg_lbfgs : public arg_bfgs {
+ public:
+  arg_lbfgs() {
+    _name = "lbfgs";
+    _description = "LBFGS with linesearch";
 
-      _subarguments.push_back(new arg_history_size());
-    }
-  };
+    _subarguments.push_back(new arg_history_size());
+  }
+};
 
-}
+}  // namespace cmdstan
 #endif
