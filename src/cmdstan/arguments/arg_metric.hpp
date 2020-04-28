@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class arg_metric : public list_argument {
-public:
+ public:
   arg_metric() {
     _name = "metric";
     _description = "Geometry of base manifold";
@@ -23,5 +23,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

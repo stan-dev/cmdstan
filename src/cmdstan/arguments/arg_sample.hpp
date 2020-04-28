@@ -12,7 +12,7 @@
 namespace cmdstan {
 
 class arg_sample : public categorical_argument {
-public:
+ public:
   arg_sample() {
     _name = "sample";
     _description = "Bayesian inference with Markov Chain Monte Carlo";
@@ -26,5 +26,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

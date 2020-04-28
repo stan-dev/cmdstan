@@ -24,7 +24,6 @@ void diagnose_usage() {
  *         non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
-
   if (argc == 1) {
     diagnose_usage();
     return 0;
@@ -53,8 +52,8 @@ int main(int argc, const char *argv[]) {
   std::cout << "Processing csv files: " << filenames[0];
   ifstream.open(filenames[0].c_str());
 
-  stan::io::stan_csv stan_csv =
-      stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  stan::io::stan_csv stan_csv
+      = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
   stan::mcmc::chains<> chains(stan_csv);
   ifstream.close();
 

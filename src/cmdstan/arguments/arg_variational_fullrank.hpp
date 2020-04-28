@@ -6,11 +6,11 @@
 namespace cmdstan {
 
 class arg_variational_fullrank : public categorical_argument {
-public:
+ public:
   arg_variational_fullrank() {
     _name = "fullrank";
     _description = "full-rank covariance";
   }
 };
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

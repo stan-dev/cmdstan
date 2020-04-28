@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_adapt_delta : public real_argument {
-public:
+ public:
   arg_adapt_delta() : real_argument() {
     _name = "delta";
     _description = "Adaptation target acceptance statistic";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return 0 < value && value < 1; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

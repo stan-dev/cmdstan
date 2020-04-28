@@ -3,22 +3,39 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 
-template <typename T> T argument_value() { return 0; }
+template <typename T>
+T argument_value() {
+  return 0;
+}
 
-template <typename T> std::string argument_string() {
+template <typename T>
+std::string argument_string() {
   return boost::lexical_cast<std::string>(argument_value<T>());
 }
 
-template <> double argument_value<double>() { return 1.234; }
+template <>
+double argument_value<double>() {
+  return 1.234;
+}
 
-template <> int argument_value<int>() { return 567; }
+template <>
+int argument_value<int>() {
+  return 567;
+}
 
-template <> bool argument_value<bool>() { return true; }
+template <>
+bool argument_value<bool>() {
+  return true;
+}
 
-template <> std::string argument_value<std::string>() { return "value"; }
+template <>
+std::string argument_value<std::string>() {
+  return "value";
+}
 
-template <typename T> class CmdStanArgumentsSingleton : public ::testing::Test {
-public:
+template <typename T>
+class CmdStanArgumentsSingleton : public ::testing::Test {
+ public:
   CmdStanArgumentsSingleton()
       : arg(new cmdstan::singleton_argument<T>("argument")) {}
 

@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_static : public categorical_argument {
-public:
+ public:
   arg_static() {
     _name = "static";
     _description = "Static integration time";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -11,8 +11,8 @@ namespace cmdstan {
 
 void write_opencl_device(stan::callbacks::writer &writer) {
 #ifdef STAN_OPENCL
-  if ((stan::math::opencl_context.platform().size() > 0) &&
-      (stan::math::opencl_context.device().size() > 0)) {
+  if ((stan::math::opencl_context.platform().size() > 0)
+      && (stan::math::opencl_context.device().size() > 0)) {
     std::stringstream msg_opencl_platform;
     msg_opencl_platform
         << "opencl_platform = "
@@ -27,5 +27,5 @@ void write_opencl_device(stan::callbacks::writer &writer) {
 #endif
 }
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

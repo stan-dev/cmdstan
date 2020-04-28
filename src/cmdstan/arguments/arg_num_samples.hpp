@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_num_samples : public int_argument {
-public:
+ public:
   arg_num_samples() : int_argument() {
     _name = "num_samples";
     _description = "Number of sampling iterations";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value >= 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

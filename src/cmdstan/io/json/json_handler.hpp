@@ -13,7 +13,7 @@ namespace json {
  * is available for convenience.
  */
 class json_handler {
-public:
+ public:
   json_handler() {}
 
   ~json_handler() {}
@@ -99,7 +99,7 @@ public:
   virtual void key(const std::string &s) {}
 };
 
-} // namespace json
-} // namespace cmdstan
+}  // namespace json
+}  // namespace cmdstan
 
 #endif

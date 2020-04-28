@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class categorical_argument : public argument {
-public:
+ public:
   virtual ~categorical_argument() {
     for (std::vector<argument *>::iterator it = _subarguments.begin();
          it != _subarguments.end(); ++it) {
@@ -138,9 +138,9 @@ public:
     return 0;
   }
 
-protected:
+ protected:
   std::vector<argument *> _subarguments;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

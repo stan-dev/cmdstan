@@ -17,7 +17,6 @@
  *         non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
-
   if (argc == 1) {
     stansummary_usage();
     return 0;
@@ -28,7 +27,6 @@ int main(int argc, const char *argv[]) {
   std::vector<std::string> filenames;
   bool write_csv = false;
   for (int i = 1; i < argc; i++) {
-
     if (std::string(argv[i]).find("--autocorr=") != std::string::npos)
       continue;
 
@@ -68,8 +66,8 @@ int main(int argc, const char *argv[]) {
 
   ifstream.open(filenames[0].c_str());
 
-  stan::io::stan_csv stan_csv =
-      stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+  stan::io::stan_csv stan_csv
+      = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
 
@@ -282,9 +280,7 @@ int main(int argc, const char *argv[]) {
 
   // Print autocorrelation, if desired
   for (int k = 1; k < argc; k++) {
-
     if (std::string(argv[k]).find("--autocorr=") != std::string::npos) {
-
       const int c = atoi(std::string(argv[k]).substr(11).c_str());
 
       if (c < 0 || c >= chains.num_chains()) {
@@ -464,7 +460,6 @@ int main(int argc, const char *argv[]) {
 
     // Print autocorrelation, if desired
     for (int k = 1; k < argc; k++) {
-
       if (std::string(argv[k]).find("--autocorr=") != std::string::npos) {
         const int c = atoi(std::string(argv[k]).substr(11).c_str());
 

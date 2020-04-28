@@ -11,7 +11,7 @@
 namespace cmdstan {
 
 class list_argument : public valued_argument {
-public:
+ public:
   list_argument() { _value_type = "list element"; }
 
   ~list_argument() {
@@ -70,8 +70,8 @@ public:
           continue;
 
         _cursor = i;
-        valid_arg &=
-            _values.at(_cursor)->parse_args(args, info, err, help_flag);
+        valid_arg
+            &= _values.at(_cursor)->parse_args(args, info, err, help_flag);
         good_arg = true;
         break;
       }
@@ -158,12 +158,12 @@ public:
 
   bool is_default() { return _cursor == _default_cursor; }
 
-protected:
+ protected:
   int _cursor;
   int _default_cursor;
 
   std::vector<argument *> _values;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

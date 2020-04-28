@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_diag_e : public unvalued_argument {
-public:
+ public:
   arg_diag_e() {
     _name = "diag_e";
     _description = "Euclidean manifold with diag metric";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

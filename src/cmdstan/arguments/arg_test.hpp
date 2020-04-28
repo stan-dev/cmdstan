@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_test : public list_argument {
-public:
+ public:
   arg_test() {
     _name = "test";
     _description = "Diagnostic test";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

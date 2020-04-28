@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_stepsize : public real_argument {
-public:
+ public:
   arg_stepsize() : real_argument() {
     _name = "stepsize";
     _description = "Step size for discrete evolution";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

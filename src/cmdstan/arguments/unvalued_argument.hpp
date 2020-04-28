@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class unvalued_argument : public argument {
-public:
+ public:
   unvalued_argument() : _is_present(false) {}
 
   void print(stan::callbacks::writer &w, const int depth,
@@ -43,9 +43,9 @@ public:
 
   bool is_present() { return _is_present; }
 
-protected:
+ protected:
   bool _is_present;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

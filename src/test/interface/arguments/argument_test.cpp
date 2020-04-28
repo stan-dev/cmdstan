@@ -9,7 +9,7 @@ class test_arg_impl : public cmdstan::argument {
 };
 
 class CmdStanArgumentsArgument : public testing::Test {
-public:
+ public:
   void SetUp() { arg = new test_arg_impl; }
   void TearDown() { delete (arg); }
 

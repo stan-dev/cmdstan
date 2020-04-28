@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_thin : public int_argument {
-public:
+ public:
   arg_thin() : int_argument() {
     _name = "thin";
     _description = "Period between saved samples";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

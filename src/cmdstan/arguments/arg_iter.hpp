@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_iter : public int_argument {
-public:
+ public:
   arg_iter() : int_argument() {
     _name = "iter";
     _description = "Total number of iterations";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

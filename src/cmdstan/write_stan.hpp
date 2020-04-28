@@ -13,5 +13,5 @@ void write_stan(stan::callbacks::writer &writer) {
   writer("stan_version_patch = " + stan::PATCH_VERSION);
 }
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

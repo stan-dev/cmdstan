@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_random : public categorical_argument {
-public:
+ public:
   arg_random() {
     _name = "random";
     _description = "Random number configuration";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

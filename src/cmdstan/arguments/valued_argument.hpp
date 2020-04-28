@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class valued_argument : public argument {
-public:
+ public:
   virtual void print(stan::callbacks::writer &w, const int depth,
                      const std::string &prefix) {
     std::string indent(compute_indent(depth), ' ');
@@ -35,10 +35,10 @@ public:
   virtual std::string print_valid() = 0;
   virtual bool is_default() = 0;
 
-protected:
+ protected:
   std::string _default;
   std::string _value_type;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

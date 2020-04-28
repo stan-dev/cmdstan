@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_nuts : public categorical_argument {
-public:
+ public:
   arg_nuts() {
     _name = "nuts";
     _description = "The No-U-Turn Sampler";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

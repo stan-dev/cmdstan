@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_adapt_t0 : public real_argument {
-public:
+ public:
   arg_adapt_t0() : real_argument() {
     _name = "t0";
     _description = "Adaptation iteration offset";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

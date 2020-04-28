@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class arg_variational_algo : public list_argument {
-public:
+ public:
   arg_variational_algo() {
     _name = "algorithm";
     _description = "Variational inference algorithm";
@@ -21,5 +21,5 @@ public:
     _cursor = _default_cursor;
   }
 };
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

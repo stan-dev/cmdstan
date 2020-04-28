@@ -74,25 +74,25 @@ TEST(StanUiCommand, printReallyPrints) {
   // static HMC
   // + adapt
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=unit_e adapt engaged=0");
+      path
+      + " sample algorithm=hmc engine=static metric=unit_e adapt engaged=0");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=diag_e adapt engaged=0");
+      path
+      + " sample algorithm=hmc engine=static metric=diag_e adapt engaged=0");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=dense_e adapt engaged=0");
+      path
+      + " sample algorithm=hmc engine=static metric=dense_e adapt engaged=0");
 
   // - adapt
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=unit_e adapt engaged=1");
+      path
+      + " sample algorithm=hmc engine=static metric=unit_e adapt engaged=1");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=diag_e adapt engaged=1");
+      path
+      + " sample algorithm=hmc engine=static metric=diag_e adapt engaged=1");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=static metric=dense_e adapt engaged=1");
+      path
+      + " sample algorithm=hmc engine=static metric=dense_e adapt engaged=1");
 
   // NUTS
   // + adapt
@@ -101,8 +101,8 @@ TEST(StanUiCommand, printReallyPrints) {
   test_sample_prints(
       path + " sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=0");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=0");
+      path
+      + " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=0");
 
   // - adapt
   test_sample_prints(
@@ -110,8 +110,8 @@ TEST(StanUiCommand, printReallyPrints) {
   test_sample_prints(
       path + " sample algorithm=hmc engine=nuts metric=diag_e adapt engaged=1");
   test_sample_prints(
-      path +
-      " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=1");
+      path
+      + " sample algorithm=hmc engine=nuts metric=dense_e adapt engaged=1");
 
   // OPTIMIZATION
   test_optimize_prints(path + " optimize algorithm=newton");
@@ -157,8 +157,8 @@ TEST(StanUiCommand, zero_init_value_fail) {
   model_path.push_back("test-models");
   model_path.push_back("value_fail");
 
-  std::string command = convert_model_path(model_path) +
-                        " sample init=0 output file=test/output.csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample init=0 output file=test/output.csv";
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 
@@ -178,8 +178,8 @@ TEST(StanUiCommand, zero_init_domain_fail) {
   model_path.push_back("test-models");
   model_path.push_back("domain_fail");
 
-  std::string command = convert_model_path(model_path) +
-                        " sample init=0 output file=test/output.csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample init=0 output file=test/output.csv";
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
@@ -206,9 +206,9 @@ TEST(StanUiCommand, user_init_value_fail) {
   init_path.push_back("test-models");
   init_path.push_back("value_fail.init.R");
 
-  std::string command = convert_model_path(model_path) +
-                        " sample init=" + convert_model_path(init_path) +
-                        " output file=test/output.csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample init=" + convert_model_path(init_path)
+                        + " output file=test/output.csv";
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
@@ -235,9 +235,9 @@ TEST(StanUiCommand, user_init_domain_fail) {
   init_path.push_back("test-models");
   init_path.push_back("domain_fail.init.R");
 
-  std::string command = convert_model_path(model_path) +
-                        " sample init=" + convert_model_path(init_path) +
-                        " output file=test/output.csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample init=" + convert_model_path(init_path)
+                        + " output file=test/output.csv";
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
@@ -254,7 +254,7 @@ TEST(StanUiCommand, CheckCommand_default) {
   model_path.push_back("src");
   model_path.push_back("test");
   model_path.push_back("test-models");
-  model_path.push_back("domain_fail"); // can use any model here
+  model_path.push_back("domain_fail");  // can use any model here
 
   std::string command = convert_model_path(model_path);
   run_command_output out = run_command(command);
@@ -266,7 +266,7 @@ TEST(StanUiCommand, CheckCommand_help) {
   model_path.push_back("src");
   model_path.push_back("test");
   model_path.push_back("test-models");
-  model_path.push_back("domain_fail"); // can use any model here
+  model_path.push_back("domain_fail");  // can use any model here
 
   std::string command = convert_model_path(model_path) + " help";
 
@@ -279,7 +279,7 @@ TEST(StanUiCommand, CheckCommand_unrecognized_argument) {
   model_path.push_back("src");
   model_path.push_back("test");
   model_path.push_back("test-models");
-  model_path.push_back("domain_fail"); // can use any model here
+  model_path.push_back("domain_fail");  // can use any model here
 
   std::string command = convert_model_path(model_path) + " foo";
 
@@ -344,11 +344,11 @@ TEST(StanUiCommand, random_seed_default) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
@@ -386,11 +386,11 @@ TEST(StanUiCommand, random_seed_specified_same) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " + " random seed=12345 " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 " + " random seed=12345 "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
@@ -428,11 +428,11 @@ TEST(StanUiCommand, random_seed_specified_different) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " + " random seed=12345 " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 " + " random seed=12345 "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
@@ -447,11 +447,11 @@ TEST(StanUiCommand, random_seed_specified_different) {
       break;
     }
   }
-  command = convert_model_path(model_path) +
-            " sample num_samples=10 num_warmup=10 init=0 " +
-            " random seed=45678 " +
-            " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-            " output refresh=0 file=test/output.csv";
+  command = convert_model_path(model_path)
+            + " sample num_samples=10 num_warmup=10 init=0 "
+            + " random seed=45678 "
+            + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+            + " output refresh=0 file=test/output.csv";
   cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   split(lines, cmd_output, boost::is_any_of("\n"));
@@ -477,11 +477,11 @@ TEST(StanUiCommand, random_seed_fail_1) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " + " random seed=0 " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 " + " random seed=0 "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body));
@@ -496,11 +496,11 @@ TEST(StanUiCommand, random_seed_fail_2) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " + " random seed=-2 " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 " + " random seed=-2 "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body));
@@ -517,12 +517,12 @@ TEST(StanUiCommand, random_seed_fail_3) {
 
   int max = std::numeric_limits<int>::max();
   unsigned int maxplus = max + 100;
-  std::string command =
-      convert_model_path(model_path) +
-      " sample num_samples=10 num_warmup=10 init=0 " +
-      " random seed=" + std::to_string(maxplus) + " " +
-      " data file=src/test/test-models/transformed_data_rng_test.init.R" +
-      " output refresh=0 file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path)
+        + " sample num_samples=10 num_warmup=10 init=0 "
+        + " random seed=" + std::to_string(maxplus) + " "
+        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body));
@@ -535,11 +535,11 @@ TEST(StanUiCommand, json_input) {
   model_path.push_back("test-models");
   model_path.push_back("ndim_array");
 
-  std::string command = convert_model_path(model_path) +
-                        " sample algorithm=fixed_param" +
-                        " random seed=12345 " +
-                        " data file=src/test/test-models/ndim_array.data.json" +
-                        " output refresh=0 file=test/output.csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample algorithm=fixed_param"
+                        + " random seed=12345 "
+                        + " data file=src/test/test-models/ndim_array.data.json"
+                        + " output refresh=0 file=test/output.csv";
   std::string cmd_output = run_command(command).output;
 
   EXPECT_EQ(
@@ -562,7 +562,8 @@ struct dummy_z {
   Eigen::VectorXd q;
 };
 
-template <class ExceptionType> struct sampler {
+template <class ExceptionType>
+struct sampler {
   dummy_stepsize_adaptation _stepsize_adaptation;
   dummy_z _z;
 

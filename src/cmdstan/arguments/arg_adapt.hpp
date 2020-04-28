@@ -13,7 +13,7 @@
 
 namespace cmdstan {
 class arg_adapt : public categorical_argument {
-public:
+ public:
   arg_adapt() {
     _name = "adapt";
     _description = "Warmup Adaptation";
@@ -29,5 +29,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_softabs_alpha : public real_argument {
-public:
+ public:
   arg_softabs_alpha() : real_argument() {
     _name = "alpha";
     _description = "Softabs regularization parameter";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return 0 < value; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

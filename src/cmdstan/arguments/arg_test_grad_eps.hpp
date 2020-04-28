@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_test_grad_eps : public real_argument {
-public:
+ public:
   arg_test_grad_eps() : real_argument() {
     _name = "epsilon";
     _description = "Finite difference step size";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

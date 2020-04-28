@@ -10,7 +10,7 @@ namespace cmdstan {
 using stan::services::experimental::advi::eta;
 
 class arg_variational_eta : public real_argument {
-public:
+ public:
   arg_variational_eta() : real_argument() {
     _name = "eta";
     _description = eta::description();
@@ -24,5 +24,5 @@ public:
   }
   bool is_valid(double value) { return value > 0; }
 };
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

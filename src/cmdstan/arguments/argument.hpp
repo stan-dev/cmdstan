@@ -10,7 +10,7 @@
 namespace cmdstan {
 
 class argument {
-public:
+ public:
   argument() : indent_width(2), help_width(20) {}
 
   explicit argument(const std::string &name)
@@ -23,10 +23,12 @@ public:
   std::string description() const { return _description; }
 
   virtual void print(stan::callbacks::writer &w, const int depth,
-                     const std::string &prefix) = 0;
+                     const std::string &prefix)
+      = 0;
 
   virtual void print_help(stan::callbacks::writer &w, const int depth,
-                          const bool recurse) = 0;
+                          const bool recurse)
+      = 0;
 
   virtual bool parse_args(std::vector<std::string> &args,
                           stan::callbacks::writer &info,
@@ -60,7 +62,7 @@ public:
 
   int compute_indent(const int depth) { return indent_width * depth; }
 
-protected:
+ protected:
   std::string _name;
   std::string _description;
 
@@ -68,5 +70,5 @@ protected:
   int help_width;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

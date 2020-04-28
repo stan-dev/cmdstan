@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class arg_output : public categorical_argument {
-public:
+ public:
   arg_output() {
     _name = "output";
     _description = "File output options";
@@ -20,5 +20,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

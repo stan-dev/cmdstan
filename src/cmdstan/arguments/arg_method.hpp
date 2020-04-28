@@ -11,7 +11,7 @@
 namespace cmdstan {
 
 class arg_method : public list_argument {
-public:
+ public:
   arg_method() {
     _name = "method";
     _description = "Analysis method (Note that method= is optional)";
@@ -27,5 +27,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

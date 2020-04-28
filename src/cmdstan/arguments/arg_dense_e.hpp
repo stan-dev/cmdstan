@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_dense_e : public unvalued_argument {
-public:
+ public:
   arg_dense_e() {
     _name = "dense_e";
     _description = "Euclidean manifold with dense metric";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

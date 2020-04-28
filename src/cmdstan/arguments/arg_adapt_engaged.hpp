@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_adapt_engaged : public bool_argument {
-public:
+ public:
   arg_adapt_engaged() : bool_argument() {
     _name = "engaged";
     _description = "Adaptation engaged?";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

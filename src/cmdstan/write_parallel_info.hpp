@@ -20,5 +20,5 @@ void write_parallel_info(stan::callbacks::writer &writer) {
 #endif
 }
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_adapt_kappa : public real_argument {
-public:
+ public:
   arg_adapt_kappa() : real_argument() {
     _name = "kappa";
     _description = "Adaptation relaxation exponent";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

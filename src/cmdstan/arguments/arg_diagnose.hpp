@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_diagnose : public categorical_argument {
-public:
+ public:
   arg_diagnose() {
     _name = "diagnose";
     _description = "Model diagnostics";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

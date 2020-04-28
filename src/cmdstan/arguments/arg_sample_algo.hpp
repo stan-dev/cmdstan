@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_sample_algo : public list_argument {
-public:
+ public:
   arg_sample_algo() {
     _name = "algorithm";
     _description = "Sampling algorithm";
@@ -21,5 +21,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

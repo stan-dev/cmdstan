@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_history_size : public int_argument {
-public:
+ public:
   arg_history_size() : int_argument() {
     _name = "history_size";
     _description = "Amount of history to keep for L-BFGS";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

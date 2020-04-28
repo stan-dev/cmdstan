@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_adapt_gamma : public real_argument {
-public:
+ public:
   arg_adapt_gamma() : real_argument() {
     _name = "gamma";
     _description = "Adaptation regularization scale";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_adapt_term_buffer : public u_int_argument {
-public:
+ public:
   arg_adapt_term_buffer() : u_int_argument() {
     _name = "term_buffer";
     _description = std::string("Width of final fast adaptation interval");
@@ -17,5 +17,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

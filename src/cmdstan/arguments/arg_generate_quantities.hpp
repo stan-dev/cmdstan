@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_generate_quantities : public categorical_argument {
-public:
+ public:
   arg_generate_quantities() {
     _name = "generate_quantities";
     _description = "Generate quantities of interest";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

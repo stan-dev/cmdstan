@@ -39,7 +39,7 @@ namespace json {
  * to read a single JSON text from an input stream.
  */
 class json_data : public stan::io::var_context {
-private:
+ private:
   vars_map_r vars_r_;
   vars_map_i vars_i_;
 
@@ -60,7 +60,7 @@ private:
     return vars_r_.find(name) != vars_r_.end();
   }
 
-public:
+ public:
   /**
    * Construct a json_data object from the specified input stream.
    *
@@ -258,7 +258,7 @@ public:
   }
 };
 
-} // namespace json
+}  // namespace json
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

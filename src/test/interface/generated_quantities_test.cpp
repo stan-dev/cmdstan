@@ -10,16 +10,16 @@ using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
 class CmdStan : public testing::Test {
-public:
+ public:
   void SetUp() {
     model_path = {"src", "test", "test-models", "gq_model"};
     data_file_path = {"src", "test", "test-models", "gq_model.data.json"};
     model_path_2 = {"src", "test", "test-models", "test_model"};
     output_file_path = {"/dev", "null"};
-    fitted_params_file_path = {"src", "test", "test-models",
-                               "gq_model_output.csv"};
-    fitted_params_file_path_2 = {"src", "test", "test-models",
-                                 "test_model_output.csv"};
+    fitted_params_file_path
+        = {"src", "test", "test-models", "gq_model_output.csv"};
+    fitted_params_file_path_2
+        = {"src", "test", "test-models", "test_model_output.csv"};
     fitted_params_file_path_empty = {"src", "test", "test-models", "empty.csv"};
   }
 

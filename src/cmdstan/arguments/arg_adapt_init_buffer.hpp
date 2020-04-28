@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_adapt_init_buffer : public u_int_argument {
-public:
+ public:
   arg_adapt_init_buffer() : u_int_argument() {
     _name = "init_buffer";
     _description = std::string("Width of initial fast adaptation interval");
@@ -17,5 +17,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_variational_adapt : public categorical_argument {
-public:
+ public:
   arg_variational_adapt() {
     _name = "adapt";
     _description = "Eta Adaptation for Variational Inference";
@@ -18,5 +18,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

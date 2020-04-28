@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_diagnostic_file : public string_argument {
-public:
+ public:
   arg_diagnostic_file() : string_argument() {
     _name = "diagnostic_file";
     _description = "Auxiliary output file for diagnostic information";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

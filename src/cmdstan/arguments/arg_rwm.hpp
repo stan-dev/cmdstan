@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_rwm : public categorical_argument {
-public:
+ public:
   arg_rwm() {
     _name = "rwm";
     _description = "Random Walk Metropolis Monte Carlo";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

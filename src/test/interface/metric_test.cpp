@@ -56,13 +56,13 @@ TEST(StanUiCommand, metric_file_test) {
               }
               metric_file = convert_model_path(metric_file_path);
 
-              std::string command =
-                  convert_model_path(model_path) +
-                  " method=sample num_samples=100 num_warmup=" + num_warmup +
-                  " adapt engaged=" + adapt +
-                  " algorithm=hmc engine=" + engine + " metric=" + metric +
-                  " metric_file=" + convert_model_path(metric_file_path) +
-                  " stepsize=" + stepsize + " output file=test/output.csv";
+              std::string command
+                  = convert_model_path(model_path)
+                    + " method=sample num_samples=100 num_warmup=" + num_warmup
+                    + " adapt engaged=" + adapt
+                    + " algorithm=hmc engine=" + engine + " metric=" + metric
+                    + " metric_file=" + convert_model_path(metric_file_path)
+                    + " stepsize=" + stepsize + " output file=test/output.csv";
 
               run_command_output out = run_command(command);
               if (adapt == "1" && num_warmup == "0") {

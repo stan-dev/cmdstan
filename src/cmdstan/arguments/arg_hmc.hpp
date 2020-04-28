@@ -11,7 +11,7 @@
 namespace cmdstan {
 
 class arg_hmc : public categorical_argument {
-public:
+ public:
   arg_hmc() {
     _name = "hmc";
     _description = "Hamiltonian Monte Carlo";
@@ -24,5 +24,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

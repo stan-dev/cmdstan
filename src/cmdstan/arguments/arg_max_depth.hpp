@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_max_depth : public int_argument {
-public:
+ public:
   arg_max_depth() : int_argument() {
     _name = "max_depth";
     _description = "Maximum tree depth";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

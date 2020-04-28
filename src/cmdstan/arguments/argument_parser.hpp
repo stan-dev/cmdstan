@@ -11,7 +11,7 @@
 namespace cmdstan {
 
 class argument_parser {
-public:
+ public:
   explicit argument_parser(std::vector<argument *> &valid_args)
       : _arguments(valid_args), _help_flag(false), _method_flag(false) {
     _arguments.insert(_arguments.begin(), new arg_method());
@@ -45,8 +45,8 @@ public:
 
       // Check for method arguments entered without the method= prefix
       if (!_method_flag) {
-        list_argument *method =
-            dynamic_cast<list_argument *>(_arguments.front());
+        list_argument *method
+            = dynamic_cast<list_argument *>(_arguments.front());
 
         if (method->valid_value(cat_name)) {
           cat_name = "method=" + cat_name;
@@ -138,9 +138,9 @@ public:
     std::string indent(2, ' ');
     int width = 12;
 
-    w(std::string("Usage: ") + executable +
-      " <arg1> <subarg1_1> ... <subarg1_m>" +
-      " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
+    w(std::string("Usage: ") + executable
+      + " <arg1> <subarg1_1> ... <subarg1_m>"
+      + " ... <arg_n> <subarg_n_1> ... <subarg_n_m>");
     w();
 
     w("Begin by selecting amongst the following inference methods"
@@ -181,8 +181,8 @@ public:
     }
 
     w();
-    w(std::string("See ") + executable + " <arg1> [ help | help-all ] " +
-      "for details on individual arguments.");
+    w(std::string("See ") + executable + " <arg1> [ help | help-all ] "
+      + "for details on individual arguments.");
     w();
   }
 
@@ -196,7 +196,7 @@ public:
 
   bool help_printed() { return _help_flag; }
 
-protected:
+ protected:
   std::vector<argument *> &_arguments;
 
   // We can also check for, and warn the user of, deprecated arguments
@@ -208,5 +208,5 @@ protected:
   bool _method_flag;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

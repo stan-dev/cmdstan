@@ -11,9 +11,9 @@ using cmdstan::test::run_command_output;
 TEST(CommandElapsedTime, PrintToScreen) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "src" + path_separator + "test" + path_separator +
-                        "test-models" + path_separator + "test_model" +
-                        " sample output file=test/output.csv";
+  std::string command = "src" + path_separator + "test" + path_separator
+                        + "test-models" + path_separator + "test_model"
+                        + " sample output file=test/output.csv";
 
   run_command_output out = run_command(command);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
@@ -26,9 +26,9 @@ TEST(CommandElapsedTime, PrintToScreen) {
 TEST(CommandElapsedTime, PrintToFile) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "src" + path_separator + "test" + path_separator +
-                        "test-models" + path_separator + "test_model" +
-                        " sample output file=test/output2.csv";
+  std::string command = "src" + path_separator + "test" + path_separator
+                        + "test-models" + path_separator + "test_model"
+                        + " sample output file=test/output2.csv";
 
   run_command_output out = run_command(command);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";

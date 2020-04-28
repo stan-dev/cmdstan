@@ -10,7 +10,7 @@
 namespace cmdstan {
 
 class arg_engine : public list_argument {
-public:
+ public:
   arg_engine() {
     _name = "engine";
     _description = "Engine for Hamiltonian Monte Carlo";
@@ -24,5 +24,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -10,7 +10,7 @@ class test_arg_impl : public cmdstan::valued_argument {
 };
 
 class CmdStanArgumentsValuedArgument : public testing::Test {
-public:
+ public:
   void SetUp() { arg = new test_arg_impl; }
   void TearDown() { delete (arg); }
 

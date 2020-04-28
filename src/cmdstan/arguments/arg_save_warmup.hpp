@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_save_warmup : public bool_argument {
-public:
+ public:
   arg_save_warmup() : bool_argument() {
     _name = "save_warmup";
     _description = "Stream warmup samples to output?";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

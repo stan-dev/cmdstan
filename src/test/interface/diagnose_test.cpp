@@ -12,9 +12,9 @@ TEST(CommandDiagnose, corr_gauss) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "diagnose";
-  std::string csv_file = "src" + path_separator + "test" + path_separator +
-                         "interface" + path_separator + "example_output" +
-                         path_separator + "corr_gauss_output.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "corr_gauss_output.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
@@ -30,9 +30,9 @@ TEST(CommandDiagnose, corr_gauss_depth8) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "diagnose";
-  std::string csv_file = "src" + path_separator + "test" + path_separator +
-                         "interface" + path_separator + "example_output" +
-                         path_separator + "corr_gauss_output_depth8.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "corr_gauss_output_depth8.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
@@ -48,9 +48,9 @@ TEST(CommandDiagnose, corr_gauss_depth15) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "diagnose";
-  std::string csv_file = "src" + path_separator + "test" + path_separator +
-                         "interface" + path_separator + "example_output" +
-                         path_separator + "corr_gauss_output_depth15.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "corr_gauss_output_depth15.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
@@ -66,9 +66,9 @@ TEST(CommandDiagnose, eight_schools) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "diagnose";
-  std::string csv_file = "src" + path_separator + "test" + path_separator +
-                         "interface" + path_separator + "example_output" +
-                         path_separator + "eight_schools_output.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "eight_schools_output.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
@@ -84,9 +84,9 @@ TEST(CommandDiagnose, mix) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "diagnose";
-  std::string csv_file = "src" + path_separator + "test" + path_separator +
-                         "interface" + path_separator + "example_output" +
-                         path_separator + "mix_output.*";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "mix_output.*";
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";

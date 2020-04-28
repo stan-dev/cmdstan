@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_softabs : public categorical_argument {
-public:
+ public:
   arg_softabs() {
     _name = "softabs";
     _description = "Riemannian manifold with SoftAbs metric";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

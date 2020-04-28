@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_save_iterations : public bool_argument {
-public:
+ public:
   arg_save_iterations() : bool_argument() {
     _name = "save_iterations";
     _description = "Stream optimization progress to output?";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

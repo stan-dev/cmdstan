@@ -64,18 +64,18 @@ int calculate_column_width(const Eigen::VectorXd &x, const std::string &name,
 
   if (max_fixed_width + padding < fixed_threshold) {
     format = std::ios_base::fixed;
-    max_fixed_width =
-        name.length() > max_fixed_width ? name.length() : max_fixed_width;
+    max_fixed_width
+        = name.length() > max_fixed_width ? name.length() : max_fixed_width;
     return max_fixed_width + padding;
   }
 
   // Scientific Notation
-  size_t scientific_width = sig_figs + 1 + 4; // Decimal place + exponent
+  size_t scientific_width = sig_figs + 1 + 4;  // Decimal place + exponent
   if (x.minCoeff() < 0)
     ++scientific_width;
 
-  scientific_width =
-      name.length() > scientific_width ? name.length() : scientific_width;
+  scientific_width
+      = name.length() > scientific_width ? name.length() : scientific_width;
 
   format = std::ios_base::scientific;
   return scientific_width + padding;
@@ -91,8 +91,8 @@ Eigen::VectorXi calculate_column_widths(
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) =
-        calculate_column_width(values.col(i), headers[i], sig_figs, formats(i));
+    column_widths(i) = calculate_column_width(values.col(i), headers[i],
+                                              sig_figs, formats(i));
   }
   return column_widths;
 }

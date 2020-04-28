@@ -9,33 +9,40 @@
 
 namespace cmdstan {
 
-template <typename T> struct type_name {
+template <typename T>
+struct type_name {
   static std::string name() { return typeid(T).name(); }
 };
 
 // Specialize to something more readable
-template <> struct type_name<int> {
+template <>
+struct type_name<int> {
   static std::string name() { return "int"; }
 };
 
-template <> struct type_name<unsigned int> {
+template <>
+struct type_name<unsigned int> {
   static std::string name() { return "unsigned int"; }
 };
 
-template <> struct type_name<double> {
+template <>
+struct type_name<double> {
   static std::string name() { return "double"; }
 };
 
-template <> struct type_name<bool> {
+template <>
+struct type_name<bool> {
   static std::string name() { return "boolean"; }
 };
 
-template <> struct type_name<std::string> {
+template <>
+struct type_name<std::string> {
   static std::string name() { return "string"; }
 };
 
-template <typename T> class singleton_argument : public valued_argument {
-public:
+template <typename T>
+class singleton_argument : public valued_argument {
+ public:
   singleton_argument() : _validity("All") {
     _constrained = false;
     _name = "";
@@ -124,7 +131,7 @@ public:
 
   bool is_default() { return _value == _default_value; }
 
-protected:
+ protected:
   std::string _validity;
   virtual bool is_valid(T value) { return true; }
 
@@ -142,5 +149,5 @@ typedef singleton_argument<int> int_argument;
 typedef singleton_argument<unsigned int> u_int_argument;
 typedef singleton_argument<bool> bool_argument;
 typedef singleton_argument<std::string> string_argument;
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

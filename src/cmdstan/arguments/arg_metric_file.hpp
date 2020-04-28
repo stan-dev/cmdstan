@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_metric_file : public string_argument {
-public:
+ public:
   arg_metric_file() : string_argument() {
     _name = "metric_file";
     _description = "Input file with precomputed Euclidean metric";
@@ -19,6 +19,6 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 
 #endif

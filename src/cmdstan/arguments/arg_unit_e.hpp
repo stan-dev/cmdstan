@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_unit_e : public unvalued_argument {
-public:
+ public:
   arg_unit_e() {
     _name = "unit_e";
     _description = "Euclidean manifold with unit metric";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

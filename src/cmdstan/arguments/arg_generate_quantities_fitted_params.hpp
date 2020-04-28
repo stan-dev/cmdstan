@@ -6,11 +6,12 @@
 namespace cmdstan {
 
 class arg_generate_quantities_fitted_params : public string_argument {
-public:
+ public:
   arg_generate_quantities_fitted_params() : string_argument() {
     _name = "fitted_params";
-    _description = "Input file of sample of fitted parameter values for model "
-                   "conditioned on data";
+    _description
+        = "Input file of sample of fitted parameter values for model "
+          "conditioned on data";
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";
@@ -20,6 +21,6 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 
 #endif

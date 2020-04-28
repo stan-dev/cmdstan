@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_lbfgs : public arg_bfgs {
-public:
+ public:
   arg_lbfgs() {
     _name = "lbfgs";
     _description = "LBFGS with linesearch";
@@ -16,5 +16,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

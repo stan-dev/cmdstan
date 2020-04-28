@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_tolerance : public real_argument {
-public:
+ public:
   arg_tolerance(const char *name, const char *desc, double def)
       : real_argument() {
     _name = name;
@@ -25,5 +25,5 @@ public:
   bool is_valid(double value) { return value >= 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

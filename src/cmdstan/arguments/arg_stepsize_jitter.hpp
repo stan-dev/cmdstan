@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_stepsize_jitter : public real_argument {
-public:
+ public:
   arg_stepsize_jitter() : real_argument() {
     _name = "stepsize_jitter";
     _description = "Uniformly random jitter of the stepsize, in percent";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return 0 <= value && value <= 1; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_num_warmup : public int_argument {
-public:
+ public:
   arg_num_warmup() : int_argument() {
     _name = "num_warmup";
     _description = "Number of warmup iterations";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value >= 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

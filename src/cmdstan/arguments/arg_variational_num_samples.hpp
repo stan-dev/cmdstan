@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_variational_num_samples : public int_argument {
-public:
+ public:
   arg_variational_num_samples(const char *name, const char *desc, double def)
       : int_argument() {
     _name = name;
@@ -23,5 +23,5 @@ public:
   }
   bool is_valid(int value) { return value > 0; }
 };
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

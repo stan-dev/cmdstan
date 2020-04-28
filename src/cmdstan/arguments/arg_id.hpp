@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_id : public int_argument {
-public:
+ public:
   arg_id() : int_argument() {
     _name = "id";
     _description = "Unique process identifier";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value >= 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

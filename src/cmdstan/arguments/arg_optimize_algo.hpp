@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class arg_optimize_algo : public list_argument {
-public:
+ public:
   arg_optimize_algo() {
     _name = "algorithm";
     _description = "Optimization algorithm";
@@ -23,5 +23,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_init_alpha : public real_argument {
-public:
+ public:
   arg_init_alpha() : real_argument() {
     _name = "init_alpha";
     _description = "Line search step size for first iteration";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

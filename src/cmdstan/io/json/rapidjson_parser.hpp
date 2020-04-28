@@ -21,7 +21,8 @@ namespace cmdstan {
 namespace json {
 enum class ParsingState { Idle, Started, End };
 
-template <typename Handler> struct RapidJSONHandler {
+template <typename Handler>
+struct RapidJSONHandler {
   explicit RapidJSONHandler(Handler &h) : h_(h), state_(ParsingState::Idle) {}
   bool check_start() {
     if (state_ == ParsingState::Idle) {
@@ -112,9 +113,9 @@ void rapidjson_parse(std::istream &in, Handler &handler) {
   RapidJSONHandler<Handler> filter(handler);
   rapidjson::IStreamWrapper isw(in);
   handler.start_text();
-  if (!reader.Parse<rapidjson::kParseNanAndInfFlag |
-                    rapidjson::kParseValidateEncodingFlag |
-                    rapidjson::kParseFullPrecisionFlag>(isw, filter)) {
+  if (!reader.Parse<rapidjson::kParseNanAndInfFlag
+                    | rapidjson::kParseValidateEncodingFlag
+                    | rapidjson::kParseFullPrecisionFlag>(isw, filter)) {
     rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
     std::stringstream ss;
     ss << "Error in JSON parsing " << std::endl
@@ -128,6 +129,6 @@ void rapidjson_parse(std::istream &in, Handler &handler) {
   }
   handler.end_text();
 }
-} // namespace json
-} // namespace cmdstan
+}  // namespace json
+}  // namespace cmdstan
 #endif

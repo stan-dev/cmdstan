@@ -9,5 +9,5 @@ void write_model(stan::callbacks::writer &writer,
                  const std::string model_name) {
   writer("model = " + model_name);
 }
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

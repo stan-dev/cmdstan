@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_bfgs : public categorical_argument {
-public:
+ public:
   arg_bfgs() {
     _name = "bfgs";
     _description = "BFGS with linesearch";
@@ -39,5 +39,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_fixed_param : public unvalued_argument {
-public:
+ public:
   arg_fixed_param() {
     _name = "fixed_param";
     _description = "Fixed Parameter Sampler";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

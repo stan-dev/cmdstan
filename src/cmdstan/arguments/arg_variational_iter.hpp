@@ -10,13 +10,13 @@ namespace cmdstan {
 using stan::services::experimental::advi::max_iterations;
 
 class arg_variational_iter : public int_argument {
-public:
+ public:
   arg_variational_iter() : int_argument() {
     _name = "iter";
     _description = max_iterations::description();
     _validity = "0 < iter";
-    _default =
-        boost::lexical_cast<std::string>(max_iterations::default_value());
+    _default
+        = boost::lexical_cast<std::string>(max_iterations::default_value());
     _default_value = max_iterations::default_value();
     _constrained = true;
     _good_value = max_iterations::default_value();
@@ -27,5 +27,5 @@ public:
   bool is_valid(int value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

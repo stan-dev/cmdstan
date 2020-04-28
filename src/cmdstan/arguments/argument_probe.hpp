@@ -10,7 +10,7 @@
 namespace cmdstan {
 
 class argument_probe {
-public:
+ public:
   explicit argument_probe(std::vector<argument *> &valid_args)
       : _arguments(valid_args) {}
 
@@ -20,9 +20,9 @@ public:
       (*arg_it)->probe_args(*arg_it, w);
   }
 
-protected:
+ protected:
   std::vector<argument *> &_arguments;
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -20,7 +20,7 @@ using stan::services::experimental::advi::output_draws;
 using stan::services::experimental::advi::tol_rel_obj;
 
 class arg_variational : public categorical_argument {
-public:
+ public:
   arg_variational() {
     _name = "variational";
     _description = "Variational inference";
@@ -47,5 +47,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

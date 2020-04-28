@@ -18,7 +18,7 @@ using cmdstan::argument_parser;
 using stan::services::error_codes;
 
 class CmdStanArgumentsArgumentParser : public testing::Test {
-public:
+ public:
   void SetUp() {
     // copied setup from src/stan/common/command.hpp
     // FIXME: move to factory?

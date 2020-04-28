@@ -19,6 +19,6 @@ struct json_error : public std::logic_error {
   explicit json_error(const std::string &what) : logic_error(what) {}
 };
 
-} // namespace json
-} // namespace cmdstan
+}  // namespace json
+}  // namespace cmdstan
 #endif

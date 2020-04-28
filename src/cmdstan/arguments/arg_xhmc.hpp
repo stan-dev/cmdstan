@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_xhmc : public categorical_argument {
-public:
+ public:
   arg_xhmc() {
     _name = "xhmc";
     _description = "Exhaustive Hamiltonian Monte Carlo";
@@ -18,5 +18,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

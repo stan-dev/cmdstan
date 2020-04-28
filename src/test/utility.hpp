@@ -13,7 +13,7 @@ namespace test {
 // empty target returns -1
 int count_matches(const std::string &target, const std::string &s) {
   if (target.size() == 0)
-    return -1; // error
+    return -1;  // error
   int count = 0;
   for (size_t pos = 0; (pos = s.find(target, pos)) != std::string::npos;
        pos += target.size())
@@ -27,8 +27,8 @@ int count_matches(const std::string &target, const std::string &s) {
  * @return '\' for Windows, '/' otherwise.
  */
 char get_path_separator() {
-#if defined(WIN32) || defined(_WIN32) ||                                       \
-    defined(__WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) \
+    || defined(__WIN32) && !defined(__CYGWIN__)
   static char path_separator = '\\';
 #else
   static char path_separator = '/';
@@ -80,8 +80,13 @@ struct run_command_output {
 
   run_command_output(const std::string command, const std::string output,
                      const long time, const int err_code)
-      : command(command), output(output), time(time), err_code(err_code),
-        hasError(err_code != 0), header(), body() {
+      : command(command),
+        output(output),
+        time(time),
+        err_code(err_code),
+        hasError(err_code != 0),
+        header(),
+        body() {
     size_t end_of_header = output.find("\n\n");
     if (end_of_header == std::string::npos)
       end_of_header = 0;
@@ -92,7 +97,12 @@ struct run_command_output {
   }
 
   run_command_output()
-      : command(), output(), time(0), err_code(0), hasError(false), header(),
+      : command(),
+        output(),
+        time(0),
+        err_code(0),
+        hasError(false),
+        header(),
         body() {}
 };
 
@@ -133,10 +143,10 @@ run_command_output run_command(std::string command) {
   std::string output;
   char buf[1024];
   size_t count;
-  ptime time_start(microsec_clock::universal_time()); // start timer
+  ptime time_start(microsec_clock::universal_time());  // start timer
   while ((count = fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
-  ptime time_end(microsec_clock::universal_time()); // end timer
+  ptime time_end(microsec_clock::universal_time());  // end timer
 
   // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
   int err_code = pclose(in);
@@ -179,8 +189,8 @@ std::vector<std::string> parse_help_options(const std::string &help_output) {
  *
  * @return Option, value pairs as indicated by the Stan model.
  */
-std::vector<std::pair<std::string, std::string>>
-parse_command_output(const std::string &command_output) {
+std::vector<std::pair<std::string, std::string>> parse_command_output(
+    const std::string &command_output) {
   using std::pair;
   using std::string;
   using std::vector;
@@ -207,6 +217,6 @@ parse_command_output(const std::string &command_output) {
   return output;
 }
 
-} // namespace test
-} // namespace cmdstan
+}  // namespace test
+}  // namespace cmdstan
 #endif

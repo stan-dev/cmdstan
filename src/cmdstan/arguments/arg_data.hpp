@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_data : public categorical_argument {
-public:
+ public:
   arg_data() : categorical_argument() {
     _name = "data";
     _description = "Input data options";
@@ -17,5 +17,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

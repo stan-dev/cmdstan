@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_refresh : public int_argument {
-public:
+ public:
   arg_refresh() : int_argument() {
     _name = "refresh";
     _description = "Number of interations between screen updates";
@@ -22,5 +22,5 @@ public:
   bool is_valid(int value) { return value >= 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

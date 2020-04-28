@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_test_grad_err : public real_argument {
-public:
+ public:
   arg_test_grad_err() : real_argument() {
     _name = "error";
     _description = "Error threshold";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

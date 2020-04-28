@@ -7,7 +7,7 @@
 namespace cmdstan {
 
 class arg_seed : public int_argument {
-public:
+ public:
   unsigned int _random_value;
   arg_seed() : int_argument() {
     _name = "seed";
@@ -19,9 +19,10 @@ public:
     _good_value = 18383;
     _bad_value = -2;
     _value = _default_value;
-    _random_value = (boost::posix_time::microsec_clock::universal_time() -
-                     boost::posix_time::ptime(boost::posix_time::min_date_time))
-                        .total_milliseconds();
+    _random_value
+        = (boost::posix_time::microsec_clock::universal_time()
+           - boost::posix_time::ptime(boost::posix_time::min_date_time))
+              .total_milliseconds();
   }
 
   bool is_valid(int value) { return value > 0 || value == _default_value; }
@@ -43,5 +44,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

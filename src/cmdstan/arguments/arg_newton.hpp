@@ -6,12 +6,12 @@
 namespace cmdstan {
 
 class arg_newton : public categorical_argument {
-public:
+ public:
   arg_newton() {
     _name = "newton";
     _description = "Newton's method";
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

@@ -9,7 +9,7 @@
 namespace cmdstan {
 
 class arg_optimize : public categorical_argument {
-public:
+ public:
   arg_optimize() {
     _name = "optimize";
     _description = "Point estimation";
@@ -20,5 +20,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

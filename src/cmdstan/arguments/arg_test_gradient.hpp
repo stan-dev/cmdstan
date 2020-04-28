@@ -8,7 +8,7 @@
 namespace cmdstan {
 
 class arg_test_gradient : public categorical_argument {
-public:
+ public:
   arg_test_gradient() {
     _name = "gradient";
     _description = "Check model gradient against finite differences";
@@ -18,5 +18,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

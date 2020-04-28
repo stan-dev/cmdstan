@@ -39,7 +39,7 @@ void remove_duplicates(std::string &argument) {
 }
 
 class StanGmArgumentsConfiguration : public testing::Test {
-public:
+ public:
   static void SetUpTestCase() {
     std::vector<std::string> model_path;
     model_path.push_back("..");
@@ -169,7 +169,6 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
-
   // Prepare arguments
   std::stringstream method_output;
   stan::callbacks::stream_writer method_writer(method_output);
@@ -221,7 +220,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -248,7 +246,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
       expected_output.str(method_output.str() + expected_output.str());
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -289,7 +286,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
-
   // Prepare arguments
   std::stringstream s;
   stan::callbacks::stream_writer w(s);
@@ -319,7 +315,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -345,7 +340,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
       expected_output.seekg(std::ios_base::beg);
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -389,7 +383,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
-
   // Prepare arguments
   std::stringstream method_output;
   stan::callbacks::stream_writer method_writer(method_output);
@@ -470,7 +463,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
       expected_output.str(method_output.str() + expected_output.str());
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -514,7 +506,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
-
   // Prepare arguments
   std::stringstream s;
   stan::callbacks::stream_writer w(s);
@@ -544,7 +535,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -570,7 +560,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
       expected_output.seekg(std::ios_base::beg);
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -614,7 +603,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
-
   // Prepare arguments
   std::stringstream method_output;
   stan::callbacks::stream_writer method_writer(method_output);
@@ -665,7 +653,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -692,7 +679,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
       expected_output.str(method_output.str() + expected_output.str());
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -729,7 +715,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
-
   // Prepare arguments
   std::stringstream s;
   stan::callbacks::stream_writer w(s);
@@ -759,7 +744,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -785,7 +769,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
       expected_output.seekg(std::ios_base::beg);
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -825,7 +808,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
-
   // Prepare arguments
   std::stringstream method_output;
   stan::callbacks::stream_writer method_writer(method_output);
@@ -877,7 +859,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -904,7 +885,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
       expected_output.str(method_output.str() + expected_output.str());
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -941,7 +921,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
-
   // Prepare arguments
   std::stringstream s;
   stan::callbacks::stream_writer w(s);
@@ -971,7 +950,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -997,7 +975,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
       expected_output.seekg(std::ios_base::beg);
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -1041,7 +1018,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
-
   // Prepare arguments
   std::stringstream method_output;
   stan::callbacks::stream_writer method_writer(method_output);
@@ -1093,7 +1069,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -1120,7 +1095,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
       expected_output.str(method_output.str() + expected_output.str());
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");
@@ -1161,7 +1135,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
 }
 
 TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
-
   // Prepare arguments
   std::stringstream s;
   stan::callbacks::stream_writer w(s);
@@ -1191,7 +1164,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
     else if (l1 != "")
       expected_output << l1 << std::endl;
     else {
-
       int n_output = 0;
 
       std::string l2;
@@ -1217,7 +1189,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
       expected_output.seekg(std::ios_base::beg);
 
       if (expected_success == false) {
-
         unsigned int c1 = out.output.find("is not");
         out.output.erase(0, c1);
         unsigned int c2 = out.output.find(" \"");

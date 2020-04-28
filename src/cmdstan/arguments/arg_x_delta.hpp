@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_x_delta : public real_argument {
-public:
+ public:
   arg_x_delta() : real_argument() {
     _name = "x_delta";
     _description = "Exhaustion tolerance";
@@ -22,5 +22,5 @@ public:
   bool is_valid(double value) { return value > 0; }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

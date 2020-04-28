@@ -10,7 +10,7 @@ namespace cmdstan {
 using stan::services::experimental::advi::adapt_engaged;
 
 class arg_variational_adapt_engaged : public bool_argument {
-public:
+ public:
   arg_variational_adapt_engaged() : bool_argument() {
     _name = "engaged";
     _description = adapt_engaged::description();
@@ -23,5 +23,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

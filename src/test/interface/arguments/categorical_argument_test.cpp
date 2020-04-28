@@ -5,7 +5,7 @@
 #include <stan/callbacks/writer.hpp>
 
 class CmdStanArgumentsCategoricalArgument : public testing::Test {
-public:
+ public:
   void SetUp() { arg = new cmdstan::categorical_argument; }
   void TearDown() { delete (arg); }
 

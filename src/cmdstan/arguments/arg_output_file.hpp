@@ -6,7 +6,7 @@
 namespace cmdstan {
 
 class arg_output_file : public string_argument {
-public:
+ public:
   arg_output_file() : string_argument() {
     _name = "file";
     _description = "Output file";
@@ -19,5 +19,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

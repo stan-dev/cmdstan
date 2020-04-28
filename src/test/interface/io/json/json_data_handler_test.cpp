@@ -27,7 +27,7 @@ void test_exception(size_t idx_rtl, const std::string &exception_text,
     EXPECT_EQ(e.what(), exception_text);
     return;
   }
-  FAIL(); // didn't throw an exception as expected.
+  FAIL();  // didn't throw an exception as expected.
 }
 
 TEST(ioJson, rtl_2_ltr_1) {

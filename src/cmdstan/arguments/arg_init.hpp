@@ -7,13 +7,13 @@
 namespace cmdstan {
 
 class arg_init : public string_argument {
-public:
+ public:
   arg_init() : string_argument() {
     _name = "init";
-    _description = std::string("Initialization method: ") +
-                   std::string("\"x\" initializes randomly between [-x, x], ") +
-                   std::string("\"0\" initializes to 0, ") +
-                   std::string("anything else identifies a file of values");
+    _description = std::string("Initialization method: ")
+                   + std::string("\"x\" initializes randomly between [-x, x], ")
+                   + std::string("\"0\" initializes to 0, ")
+                   + std::string("anything else identifies a file of values");
     _default = "\"2\"";
     _default_value = "2";
     _constrained = false;
@@ -22,5 +22,5 @@ public:
   }
 };
 
-} // namespace cmdstan
+}  // namespace cmdstan
 #endif

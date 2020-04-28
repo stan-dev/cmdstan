@@ -43,7 +43,7 @@ typedef std::map<std::string, std::pair<std::vector<int>, std::vector<size_t>>>
  * Bare versions of Infinity, -Infinity, and NaN are also allowed.
  */
 class json_data_handler : public cmdstan::json::json_handler {
-private:
+ private:
   vars_map_r &vars_r_;
   vars_map_i &vars_i_;
   std::string key_;
@@ -69,13 +69,13 @@ private:
   }
 
   bool is_init() {
-    return (key_.size() == 0 && values_r_.size() == 0 &&
-            values_i_.size() == 0 && dims_.size() == 0 &&
-            dims_verify_.size() == 0 && dims_unknown_.size() == 0 &&
-            dim_idx_ == 0 && dim_last_ == 0 && is_int_);
+    return (key_.size() == 0 && values_r_.size() == 0 && values_i_.size() == 0
+            && dims_.size() == 0 && dims_verify_.size() == 0
+            && dims_unknown_.size() == 0 && dim_idx_ == 0 && dim_last_ == 0
+            && is_int_);
   }
 
-public:
+ public:
   /**
    * Construct a json_data_handler object.
    *
@@ -85,9 +85,18 @@ public:
    * @param vars_i name-value map for int-valued variables
    */
   json_data_handler(vars_map_r &vars_r, vars_map_i &vars_i)
-      : json_handler(), vars_r_(vars_r), vars_i_(vars_i), key_(), values_r_(),
-        values_i_(), dims_(), dims_verify_(), dims_unknown_(), dim_idx_(0),
-        dim_last_(0), is_int_(true) {}
+      : json_handler(),
+        vars_r_(vars_r),
+        vars_i_(vars_i),
+        key_(),
+        values_r_(),
+        values_i_(),
+        dims_(),
+        dims_verify_(),
+        dims_unknown_(),
+        dim_idx_(0),
+        dim_last_(0),
+        is_int_(true) {}
 
   void start_text() {
     vars_i_.clear();
@@ -125,8 +134,8 @@ public:
       errorMsg << "variable: " << key_ << ", error: non-rectangular array";
       throw json_error(errorMsg.str());
     }
-    if (0 == dim_last_ &&
-        ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0)))
+    if (0 == dim_last_
+        && ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0)))
       dim_last_ = dim_idx_;
     dim_idx_--;
   }
@@ -228,8 +237,8 @@ public:
       return;
 
     // redefinition or variables not allowed
-    if (vars_r_.find(key_) != vars_r_.end() ||
-        vars_i_.find(key_) != vars_i_.end()) {
+    if (vars_r_.find(key_) != vars_r_.end()
+        || vars_i_.find(key_) != vars_i_.end()) {
       std::stringstream errorMsg;
       errorMsg << "attempt to redefine variable: " << key_;
       throw json_error(errorMsg.str());
@@ -314,14 +323,14 @@ public:
       rtl_dsize = rtl_dsize / dims[i + 1];
       ltr_dsize *= dims[i];
     }
-    ltr_offset += rem * ltr_dsize; // for loop stops 1 early
+    ltr_offset += rem * ltr_dsize;  // for loop stops 1 early
 
     return ltr_offset;
   }
 };
 
-} // namespace json
+}  // namespace json
 
-} // namespace cmdstan
+}  // namespace cmdstan
 
 #endif
