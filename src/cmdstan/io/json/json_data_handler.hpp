@@ -1,8 +1,6 @@
 #ifndef CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
 #define CMDSTAN_IO_JSON_JSON_DATA_HANDLER_HPP
 
-#include <boost/lexical_cast.hpp>
-#include <boost/throw_exception.hpp>
 #include <cctype>
 #include <cmdstan/io/json/json_error.hpp>
 #include <cmdstan/io/json/json_handler.hpp>
