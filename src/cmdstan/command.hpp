@@ -46,6 +46,7 @@
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -114,8 +115,8 @@ static int hmc_fixed_cols = 7; // hmc sampler outputs columns __lp + 6
 
 int command(int argc, const char *argv[]) {
   using internal::get_arg_val;
-  stan::callbacks::stream_writer info(std::cout);
-  stan::callbacks::stream_writer err(std::cout);
+  stan::callbacks::stream_writer info(std::make_unique<std::fstream>(std::fstream("blah.txt", std::fstream::out)));
+  stan::callbacks::stream_writer err(std::make_unique<std::fstream>(std::fstream("blah2.txt", std::fstream::out)));
   stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                         std::cerr, std::cerr);
 
@@ -161,28 +162,26 @@ int command(int argc, const char *argv[]) {
   stan::callbacks::interrupt interrupt;
   std::string output_file =
       get_arg_val(string_argument(), parser, "output", "file");
-  std::fstream output_stream(output_file.c_str(), std::fstream::out);
-  std::vector<std::fstream> output_streamers;
+  std::vector<std::unique_ptr<std::fstream>> output_streamers;
   std::vector<stan::callbacks::stream_writer> sample_writers;
-  std::vector<std::fstream> diagnostic_streamers;
+  std::vector<std::unique_ptr<std::fstream>> diagnostic_streamers;
   std::vector<stan::callbacks::stream_writer> diagnostic_writers;
   for (int i = 0; i < n_chains; i++) {
-    output_streamers.push_back(
-        std::fstream(std::string("output") + std::to_string(i + 1) + ".csv",
-                     std::fstream::out));
-    sample_writers.push_back(
+    output_streamers.emplace_back(
+        std::make_unique<std::fstream>(std::fstream(std::string("output") + std::to_string(i + 1) + ".csv",
+                     std::fstream::out)));
+    sample_writers.emplace_back(
         stan::callbacks::stream_writer(output_streamers[i], "# "));
-    diagnostic_streamers.push_back(
-        std::fstream(std::string("diagnostic_file") + std::to_string(i + 1) + ".csv"));
-    diagnostic_writers.push_back(
+    diagnostic_streamers.emplace_back(
+        std::make_unique<std::fstream>(std::fstream(std::string("diagnostic_file") + std::to_string(i + 1) + ".csv")));
+    diagnostic_writers.emplace_back(
         stan::callbacks::stream_writer(diagnostic_streamers[i], "# "));
   }
-  stan::callbacks::stream_writer sample_writer(output_stream, "# ");
+  stan::callbacks::stream_writer sample_writer(std::make_unique<std::fstream>(std::fstream(output_file.c_str(), std::fstream::out)), "# ");
   std::string output_diagnostic_file =
       get_arg_val(string_argument(), parser, "output", "diagnostic_file");
-  std::fstream diagnostic_stream(output_diagnostic_file.c_str(),
-                                 std::fstream::out);
-  stan::callbacks::stream_writer diagnostic_writer(diagnostic_stream, "# ");
+  stan::callbacks::stream_writer diagnostic_writer(std::make_unique<std::fstream>(std::fstream(output_diagnostic_file.c_str(),
+                                 std::fstream::out)), "# ");
 
   //////////////////////////////////////////////////
   //                Initialize Model              //
@@ -831,8 +830,6 @@ int command(int argc, const char *argv[]) {
     }
   }
 
-  output_stream.close();
-  diagnostic_stream.close();
   for (size_t i = 0; i < valid_arguments.size(); ++i)
     delete valid_arguments.at(i);
 #ifdef STAN_MPI

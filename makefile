@@ -39,7 +39,7 @@ include make/stanc
 include make/program
 include make/tests
 include make/command
-CXXFLAGS+= -g -O0
+CXXFLAGS+= -mtune=native -march=native
 ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-update stan-pr/%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 -include src/cmdstan/stanc.d
