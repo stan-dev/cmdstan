@@ -7,11 +7,11 @@
 
 namespace cmdstan {
 
-  void write_stan(stan::callbacks::writer& writer) {
-    writer("stan_version_major = " + stan::MAJOR_VERSION);
-    writer("stan_version_minor = " + stan::MINOR_VERSION);
-    writer("stan_version_patch = " + stan::PATCH_VERSION);
-  }
-
+void write_stan(stan::callbacks::writer &writer) {
+  writer("stan_version_major = " + stan::MAJOR_VERSION);
+  writer("stan_version_minor = " + stan::MINOR_VERSION);
+  writer("stan_version_patch = " + stan::PATCH_VERSION);
 }
+
+}  // namespace cmdstan
 #endif

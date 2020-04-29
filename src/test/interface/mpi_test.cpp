@@ -1,13 +1,13 @@
 #ifdef STAN_MPI
 
-#include <cmdstan/command.hpp>
-#include <gtest/gtest.h>
-#include <stan/math/prim.hpp>
 #include <test/test-models/proper.hpp>
+#include <cmdstan/command.hpp>
+#include <stan/math/prim.hpp>
+#include <gtest/gtest.h>
 
 TEST(StanUiCommand, mpi_ready) {
   // The initialization has all worked if we get to here on the rank=0
-  // process. 
+  // process.
   EXPECT_TRUE(stan::math::mpi_cluster::listening_status());
 }
 
@@ -18,11 +18,10 @@ struct mpi_hello {
   }
 };
 
-
 // register worker command
 STAN_REGISTER_MPI_DISTRIBUTED_APPLY(mpi_hello)
 
-TEST(StanUiCommand, mpi_comm) {  
+TEST(StanUiCommand, mpi_comm) {
   // perform simple check if a very basic mpi gather works over the
   // stan math mpi building blocks
   std::unique_lock<std::mutex> cluster_lock;
@@ -32,7 +31,7 @@ TEST(StanUiCommand, mpi_comm) {
   EXPECT_TRUE(cluster_lock.owns_lock());
 
   boost::mpi::communicator world;
-  
+
   std::vector<int> world_ranks(world.size(), -1);
   boost::mpi::gather(world, world.rank(), world_ranks, 0);
 
