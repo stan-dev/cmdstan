@@ -70,7 +70,8 @@ test-headers: $(HEADER_TESTS)
 TEST_MODELS := $(wildcard src/test/test-models/*.stan)
 
 .PHONY: test-models-hpp
-test-models-hpp:  $(TEST_MODELS)
+test-models-hpp: 
+	$(MAKE) $(patsubst %.stan,%$(EXE),$(TEST_MODELS)) 
 
 ##
 # Tests that depend on compiled models
