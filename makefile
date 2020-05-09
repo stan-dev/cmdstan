@@ -45,8 +45,8 @@ ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-
 -include src/cmdstan/stanc.d
 endif
 
-CMDSTAN_VERSION := 2.22.1
-CMDSTAN_VERSION_DOC := 2.22
+CMDSTAN_VERSION := 2.23.0
+CMDSTAN_VERSION_DOC := 2.23
 
 .PHONY: help
 help:
@@ -61,7 +61,7 @@ else
 endif
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries and build bin/stanc2$(EXE).'
+	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries.'
 	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
 	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
 	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
@@ -170,7 +170,7 @@ build-mpi: $(MPI_TARGETS)
 
 ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
-build: bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'

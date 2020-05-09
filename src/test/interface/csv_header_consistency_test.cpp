@@ -1,14 +1,14 @@
-#include <gtest/gtest.h>
+#include <stan/mcmc/chains.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
-#include <stan/mcmc/chains.hpp>
+#include <gtest/gtest.h>
 #include <fstream>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
-TEST(interface,csv_header_consistency) {
+TEST(interface, csv_header_consistency) {
   // from stan-dev/stan issue #109
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -20,9 +20,7 @@ TEST(interface,csv_header_consistency) {
   std::string samples = path + ".csv";
 
   std::string command
-    = path
-    + " sample num_warmup=1 num_samples=1"
-    + " output file=" + samples;
+      = path + " sample num_warmup=1 num_samples=1" + " output file=" + samples;
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -30,9 +28,10 @@ TEST(interface,csv_header_consistency) {
 
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
-  stan::mcmc::chains<> chains(stan::io::stan_csv_reader::parse(ifstream, &std::cout));
+  stan::mcmc::chains<> chains(
+      stan::io::stan_csv_reader::parse(ifstream, &std::cout));
   ifstream.close();
-  
+
   EXPECT_EQ(1, chains.num_samples());
   EXPECT_FLOAT_EQ(1, chains.samples("z[1,1]")(0));
   EXPECT_FLOAT_EQ(2, chains.samples("z[1,2]")(0));

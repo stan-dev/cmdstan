@@ -7,15 +7,15 @@
 
 namespace cmdstan {
 
-  class arg_data: public categorical_argument {
-  public:
-    arg_data(): categorical_argument() {
-      _name = "data";
-      _description = "Input data options";
+class arg_data : public categorical_argument {
+ public:
+  arg_data() : categorical_argument() {
+    _name = "data";
+    _description = "Input data options";
 
-      _subarguments.push_back(new arg_data_file());
-    }
-  };
+    _subarguments.push_back(new arg_data_file());
+  }
+};
 
-}
+}  // namespace cmdstan
 #endif
