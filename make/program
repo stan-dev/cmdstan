@@ -17,11 +17,6 @@ $(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.
 	@echo '--- Compiling pre-compiled header ---	'
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
-ifeq ($(CXX_TYPE),clang)
-CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header.hpp.gch
-$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header.hpp.gch
-endif
-
 ifneq ($(findstring allow_undefined,$(STANCFLAGS)),)
 $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
 endif
@@ -48,7 +43,7 @@ endif
 %.d: %.hpp
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(STAN)src/stan/model/model_header.hpp.gch
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
