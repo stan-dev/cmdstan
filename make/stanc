@@ -56,17 +56,17 @@ else ifneq ($(STANC_XATTR),)
 	xattr -d com.apple.quarantine bin/stanc
 
 else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
-# use release stanc3 binary (Linux & MacOS releases before Catalina)
+# use release stanc3 binary (Windows, Linux & MacOS releases before Catalina)
     bin/stanc$(EXE) :
 	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
+ifneq ($(OS_TAG),windows)
 	chmod +x bin/stanc$(EXE)
-
+endif
 else ifeq ($(OS_TAG),windows)
 # get latest stanc3 - Windows
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
 	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
-
 else
 # get latest stanc3 - Linux & MacOS
     bin/stanc$(EXE) :
