@@ -44,10 +44,22 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) $(BINSTANC) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
+ifeq ($(OS),Windows_NT)
+PRECOMPILED_HEADERS ?= false
+else
+PRECOMPILED_HEADERS ?= true
+endif
+
+ifeq ($(PRECOMPILED_HEADERS),true)
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch
+else
+PRECOMPILED_MODEL_HEADER=
+endif
+
 %.d: %.hpp
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(STAN)src/stan/model/model_header.hpp.gch
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(PRECOMPILED_MODEL_HEADER)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
