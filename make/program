@@ -52,12 +52,11 @@ endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
 PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch
-CXX
-else
-PRECOMPILED_MODEL_HEADER=
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
 endif
+else
+PRECOMPILED_MODEL_HEADER=
 endif
 
 %.d: %.hpp
