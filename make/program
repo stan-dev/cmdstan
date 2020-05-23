@@ -44,21 +44,6 @@ endif
 	@echo '--- Translating Stan model to C++ code ---'
 	$(WINE) $(BINSTANC) $(STANCFLAGS) --o=$(subst  \,/,$@) $(subst  \,/,$<)
 
-ifeq ($(OS),Windows_NT)
-PRECOMPILED_HEADERS ?= false
-else
-PRECOMPILED_HEADERS ?= true
-endif
-
-ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch
-ifeq ($(CXX_TYPE),gcc)
-CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
-endif
-else
-PRECOMPILED_MODEL_HEADER=
-endif
-
 %.d: %.hpp
 
 .PRECIOUS: %.hpp
@@ -79,19 +64,5 @@ ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	else \
 		echo 'Using existing $(@D)/tbb.dll'; \
 	fi
-endif
-endif
-
-##
-# Dependencies file
-##
-ifneq (,$(STAN_TARGETS))
-$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
--include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
--include src/cmdstan/stanc.d
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
--include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
-ifeq ($(CXX_TYPE),clang)
--include $(STAN)src/stan/model/model_header.d
 endif
 endif

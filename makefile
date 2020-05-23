@@ -40,9 +40,19 @@ include make/program
 include make/tests
 include make/command
 
-ifneq ($(filter-out clean clean-% print-% help help-% manual stan-update/% stan-update stan-pr/%,$(MAKECMDGOALS)),)
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
--include src/cmdstan/stanc.d
+ifeq ($(OS),Windows_NT)
+PRECOMPILED_HEADERS ?= false
+else
+PRECOMPILED_HEADERS ?= true
+endif
+
+ifeq ($(PRECOMPILED_HEADERS),true)
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch
+ifeq ($(CXX_TYPE),gcc)
+CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
+endif
+else
+PRECOMPILED_MODEL_HEADER=
 endif
 
 CMDSTAN_VERSION := 2.23.0
@@ -170,7 +180,7 @@ build-mpi: $(MPI_TARGETS)
 
 ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O)
+build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
@@ -192,10 +202,6 @@ build:
 	@echo ''
 	@echo 'And try building again'
 	@exit 1
-endif
-
-ifeq ($(CXX_TYPE),clang)
-build: $(STAN)src/stan/model/model_header.hpp.gch
 endif
 
 .PHONY: install-tbb
@@ -232,7 +238,6 @@ clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
 
-
 clean-program:
 ifndef STANPROG
 	$(error STANPROG not set)
@@ -259,7 +264,6 @@ stan-pr/%: stan-update
 .PHONY: stan-revert
 stan-revert:
 	git submodule update --init --recursive
-
 
 ##
 # Manual related
