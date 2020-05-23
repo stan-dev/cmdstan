@@ -10,8 +10,6 @@
 # - CXX: The compiler to use. Expecting g++ or clang++.
 # - O: Optimization level. Valid values are {s, 0, 1, 2, 3}.
 #      Default is 3.
-# - O_STANC: Optimization level for compiling stanc.
-#      Valid values are {s, 0, 1, 2, 3}. Default is 0
 # - STANCFLAGS: Extra options for calling stanc
 ##
 
@@ -31,15 +29,6 @@ O_STANC ?= 0
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
-
--include $(MATH)make/compiler_flags
--include $(MATH)make/dependencies
--include $(MATH)make/libraries
-include make/stanc
-include make/program
-include make/tests
-include make/command
-
 ifeq ($(OS),Windows_NT)
 PRECOMPILED_HEADERS ?= false
 else
@@ -54,6 +43,14 @@ endif
 else
 PRECOMPILED_MODEL_HEADER=
 endif
+
+-include $(MATH)make/compiler_flags
+-include $(MATH)make/dependencies
+-include $(MATH)make/libraries
+include make/stanc
+include make/program
+include make/tests
+include make/command
 
 CMDSTAN_VERSION := 2.23.0
 CMDSTAN_VERSION_DOC := 2.23
