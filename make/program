@@ -66,3 +66,19 @@ ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	fi
 endif
 endif
+
+##
+# Dependencies file
+##
+ifneq (,$(STAN_TARGETS))
+$(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
+-include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
+-include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
+ifeq ($(PRECOMPILED_HEADERS),true)
+-include $(STAN)src/stan/model/model_header.d
+endif
+ifneq ($(STANC2),)
+-include src/cmdstan/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
+endif
