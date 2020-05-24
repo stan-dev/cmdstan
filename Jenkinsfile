@@ -144,7 +144,6 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat "mingw32-make -f stan/lib/stan_math/make/standalone math-libs"
                         runWinTests()
                     }
                     post {
