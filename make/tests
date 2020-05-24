@@ -9,10 +9,6 @@ else
 LIB_DIRS_TBB=
 endif
 
-test/%/tbb.dll : $(TBB_TARGETS)
-	@mkdir -p test/$*
-	cp -v $(TBB_TARGETS) test/$*
-
 .PRECIOUS: $(LIB_DIRS_TBB)
 
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
