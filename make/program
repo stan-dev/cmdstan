@@ -58,7 +58,7 @@ ifeq ($(OS),Windows_NT)
 ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	@echo 'Intel TBB is not in PATH.'
 	@echo 'Consider calling '
-	@echo 'make install-tbb'
+	@echo '$(HELP_MAKE) install-tbb'
 	@echo 'to avoid copying Intel TBB library files.'
 	@if ! [[ -f "$(@D)/tbb.dll" ]]; then \
 		cp -v $(TBB_TARGETS) $(@D); \
@@ -74,10 +74,12 @@ endif
 ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
+-include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
+ifeq ($(PRECOMPILED_HEADERS),true)
+-include $(STAN)src/stan/model/model_header.d
+endif
+ifneq ($(STANC2),)
 -include src/cmdstan/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
--include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
-ifeq ($(CXX_TYPE),clang)
--include $(STAN)src/stan/model/model_header.d
 endif
 endif
