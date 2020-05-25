@@ -75,7 +75,6 @@ else
 	chmod +x bin/stanc$(EXE)
 endif
 
-
 # bin/stanc2 build rules
 bin/stanc2$(EXE) : $(TBB_TARGETS)
 bin/stanc2$(EXE) : O = $(O_STANC)
@@ -86,8 +85,6 @@ bin/stanc2$(EXE) : bin/cmdstan/libstanc.a
 bin/stanc2$(EXE) : bin/cmdstan/stanc.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
-
-
 
 # libstanc build rules
 STANC_TEMPLATE_INSTANTIATION_CPP := $(call findfiles,$(STAN)src/stan/lang,*_inst.cpp) $(call findfiles,$(STAN)src/stan/lang,*_def.cpp)
@@ -104,7 +101,7 @@ $(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
 
 $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@
 
-ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
+ifneq ($(filter bin/stanc2$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 # end libstanc build rules

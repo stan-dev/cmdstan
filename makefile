@@ -22,10 +22,6 @@ help:
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
 RAPIDJSON ?= lib/rapidjson_1.1.0/
-ifeq ($(OS),Windows_NT)
-  O_STANC ?= 3
-endif
-O_STANC ?= 0
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
@@ -55,17 +51,20 @@ include make/command
 CMDSTAN_VERSION := 2.23.0
 CMDSTAN_VERSION_DOC := 2.23
 
+ifeq ($(OS),Windows_NT)
+HELP_MAKE=mingw32-make
+else
+HELP_MAKE=make
+endif
+
+
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan v$(CMDSTAN_VERSION) help'
 	@echo ''
 	@echo '  Build CmdStan utilities:'
-ifeq ($(OS),Windows_NT)
-	@echo '    > mingw32-make build'
-else
-	@echo '    > make build'
-endif
+	@echo '    > $(HELP_MAKE) build'
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries.'
@@ -76,11 +75,7 @@ endif
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
 	@echo '    for 4 cores:'
-ifeq ($(OS),Windows_NT)
-	@echo '    > mingw32-make build -j4'
-else
-	@echo '    > make build -j4'
-endif
+	@echo '    > $(HELP_MAKE) build -j4'
 	@echo ''
 ifeq ($(OS),Windows_NT)
 	@echo '    On Windows it is recommended to include with the PATH environment'
@@ -113,19 +108,11 @@ endif
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
 	@echo ''
 	@echo '    1. Build the model:'
-	@echo '       > make examples/bernoulli/bernoulli$(EXE)'
+	@echo '       > $(HELP_MAKE) examples/bernoulli/bernoulli$(EXE)'
 	@echo '    2. Run the model:'
-ifeq ($(OS),Windows_NT)
-	@echo '       > examples\bernoulli\bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
-else
 	@echo '       > examples/bernoulli/bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
-endif
 	@echo '    3. Look at the samples:'
-ifeq ($(OS),Windows_NT)
-	@echo '       > bin\stansummary$(EXE) output.csv'
-else
 	@echo '       > bin/stansummary$(EXE) output.csv'
-endif
 	@echo ''
 	@echo ''
 	@echo '  Clean CmdStan:'
@@ -140,7 +127,6 @@ help-dev:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan help for developers:'
 	@$(MAKE) print-compiler-flags
-	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
 	@echo ''
 	@echo '  If this copy of CmdStan has been cloned using git,'
 	@echo '  before building CmdStan utilities the first time you need'
@@ -183,7 +169,7 @@ ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
 		@echo 'You may call'
 		@echo ''
-		@echo 'mingw32-make install-tbb'
+		@echo '$(HELP_MAKE) install-tbb'
 		@echo ''
 		@echo 'to automatically update your user configuration.'
 endif

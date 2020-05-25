@@ -58,7 +58,7 @@ ifeq ($(OS),Windows_NT)
 ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	@echo 'Intel TBB is not in PATH.'
 	@echo 'Consider calling '
-	@echo 'make install-tbb'
+	@echo '$(HELP_MAKE) install-tbb'
 	@echo 'to avoid copying Intel TBB library files.'
 	@if ! [[ -f "$(@D)/tbb.dll" ]]; then \
 		cp -v $(TBB_TARGETS) $(@D); \
