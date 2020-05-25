@@ -79,9 +79,10 @@ TEST(StanUiCommand, metric_file_test) {
 
                 EXPECT_EQ(
                     1, count_matches(expected_output[model][metric], output));
-                if (adapt == "0")
+                if (adapt == "0") {
                   EXPECT_EQ(1,
                             count_matches("# Step size = " + stepsize, output));
+                }
               }
             }
           }
