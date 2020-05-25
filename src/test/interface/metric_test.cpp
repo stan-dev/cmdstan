@@ -82,7 +82,7 @@ TEST(StanUiCommand, metric_file_test) {
                 if (adapt == "0") {
                   EXPECT_EQ(1,
                             count_matches("# Step size = " + stepsize, output));
-                }                  
+                }
               }
             }
           }
