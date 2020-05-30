@@ -9,7 +9,6 @@ CMDSTAN_MAIN_O = $(patsubst %.cpp,%$(STAN_FLAGS).o,$(CMDSTAN_MAIN))
 
 $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 	@echo ''
-ifeq ($(STAN_FLAGS),)
 	@echo '--- Compiling the main object file. This might take up to a minute. ---'
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
