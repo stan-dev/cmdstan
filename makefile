@@ -25,6 +25,18 @@ RAPIDJSON ?= lib/rapidjson_1.1.0/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
+ifdef STAN_THREADS
+STAN_FLAG_THREADS=_threads
+endif
+ifdef STAN_MPI
+STAN_FLAG_MPI=_mpi
+endif
+ifdef STAN_OPENCL
+STAN_FLAG_OPENCL=_opencl
+endif
+
+STAN_FLAGS=$(STAN_FLAG_THREADS)$(STAN_FLAG_MPI)$(STAN_FLAG_OPENCL)
+
 ifeq ($(OS),Windows_NT)
 PRECOMPILED_HEADERS ?= false
 else
@@ -32,7 +44,7 @@ PRECOMPILED_HEADERS ?= true
 endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
 endif
@@ -217,8 +229,8 @@ clean-manual:
 
 clean-all: clean clean-deps clean-libraries clean-manual
 	$(RM) bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
-	$(RM) -r $(CMDSTAN_MAIN_O) bin/cmdstan
-	$(RM) $(wildcard $(STAN)src/stan/model/model_header.hpp.gch)
+	$(RM) -r src/cmdstan/main*.o bin/cmdstan
+	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
 
 clean-program:
