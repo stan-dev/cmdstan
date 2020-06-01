@@ -1,0 +1,26 @@
+name: cmdstan manual
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install tex environment
+      run: sudo apt-get install latexmk texlive-fonts-recommended texlive-latex-recommended texlive-latex-extra
+
+    - name: Build manual
+      run: make manual
+    
+    - name: Upload build result
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: manual_PDF
+        path: 'doc/cmdstan-guide-2.23.pdf'
