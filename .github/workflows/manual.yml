@@ -23,4 +23,4 @@ jobs:
       if: success()
       with:
         name: manual_PDF
-        path: 'doc/cmdstan-guide-2.23.pdf'
+        path: 'doc/cmdstan-guide-*.pdf'
