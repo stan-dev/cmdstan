@@ -818,7 +818,7 @@ int command(int argc, const char *argv[]) {
           init_writer, sample_writer, diagnostic_writer);
     }
   }
-
+  model.print_profiler();
   output_stream.close();
   diagnostic_stream.close();
   for (size_t i = 0; i < valid_arguments.size(); ++i)
