@@ -17,7 +17,7 @@ jobs:
 
     - name: Build manual
       run: make manual
-    
+
     - name: Upload build result
       uses: actions/upload-artifact@v2
       if: success()
