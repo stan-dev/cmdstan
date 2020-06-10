@@ -11,6 +11,7 @@
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
+#include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -818,7 +819,13 @@ int command(int argc, const char *argv[]) {
           init_writer, sample_writer, diagnostic_writer);
     }
   }
-  model.print_profiler();
+
+// add if profiling
+  info("Profiling:");
+  stan::math::profilers p;
+  model.get_profilers(p);
+  write_profiling(info, p);
+// -----------
   output_stream.close();
   diagnostic_stream.close();
   for (size_t i = 0; i < valid_arguments.size(); ++i)
