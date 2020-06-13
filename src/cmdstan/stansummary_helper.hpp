@@ -8,6 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 
 void compute_width_and_precision(double value, int sig_figs, int &width,
                                  int &precision) {
@@ -189,21 +190,34 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
   return offset;
 }
 
-void stansummary_usage() {
-  std::cout
-      << "USAGE:  stansummary <filename 1> [<filename 2> ... <filename N>]"
-      << std::endl
-      << std::endl;
-
-  std::cout << "OPTIONS:" << std::endl << std::endl;
-  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations "
-            << "for the given chain" << std::endl
-            << std::endl;
-  std::cout << "  --sig_figs=<int>\tSet significant figures of output "
-            << "(Defaults to 2)" << std::endl
-            << std::endl;
-  std::cout << "  --csv_file=<filename>\tWrite output as csv file " << std::endl
-            << std::endl;
+Eigen::VectorXd parse_probs(const std::string &percentiles_spec) {
+  std::vector<std::string> percentiles;
+  boost::algorithm::split(percentiles, percentiles_spec,
+                          boost::is_any_of(", "),
+                          boost::token_compress_on);
+  Eigen::VectorXd probs(percentiles.size());
+  int cur_pct = 0;
+  int pct = 0;
+  uint i = 0;
+  for (std::vector<std::string>::iterator it=percentiles.begin();
+       it != percentiles.end(); it++, ++i) {
+    try {
+      pct = std::stoi(*it);
+      if (pct < 0 || pct > 100 || pct < cur_pct)
+        throw std::exception();
+      cur_pct = pct;
+    } catch (const std::exception& e) {
+        std::stringstream message_stream("");
+        message_stream << "invalid config: percentiles must be "
+                       << "integers between 0 and 100, increasing, found: "
+                       << percentiles_spec
+                       << ".";
+        throw std::domain_error(message_stream.str());
+    }
+    probs[i] = pct * 1.0 / 100.0;
+  }
+  return probs;
 }
+
 
 #endif
