@@ -192,32 +192,29 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
 
 Eigen::VectorXd parse_probs(const std::string &percentiles_spec) {
   std::vector<std::string> percentiles;
-  boost::algorithm::split(percentiles, percentiles_spec,
-                          boost::is_any_of(", "),
+  boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
   int pct = 0;
   uint i = 0;
-  for (std::vector<std::string>::iterator it=percentiles.begin();
+  for (std::vector<std::string>::iterator it = percentiles.begin();
        it != percentiles.end(); it++, ++i) {
     try {
       pct = std::stoi(*it);
       if (pct < 0 || pct > 100 || pct < cur_pct)
         throw std::exception();
       cur_pct = pct;
-    } catch (const std::exception& e) {
-        std::stringstream message_stream("");
-        message_stream << "invalid config: percentiles must be "
-                       << "integers between 0 and 100, increasing, found: "
-                       << percentiles_spec
-                       << ".";
-        throw std::domain_error(message_stream.str());
+    } catch (const std::exception &e) {
+      std::stringstream message_stream("");
+      message_stream << "invalid config: percentiles must be "
+                     << "integers between 0 and 100, increasing, found: "
+                     << percentiles_spec << ".";
+      throw std::domain_error(message_stream.str());
     }
     probs[i] = pct * 1.0 / 100.0;
   }
   return probs;
 }
-
 
 #endif

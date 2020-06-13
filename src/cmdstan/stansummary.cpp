@@ -27,25 +27,25 @@ int main(int argc, const char *argv[]) {
   std::string percentiles_spec;
   std::vector<std::string> filenames;
   po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help", "produce help message")
-    ("sig_figs", po::value<int>(&sig_figs)->default_value(2),
-     "set significant figures of output, default 2")
-    ("autocorr", po::value<int>(&autocorr_idx),
-     "display autocorrelations for specified chain")
-    ("csv_filename", po::value<std::string>(&csv_filename),
-     "write summary to csv file (also print summary to console)")
-    ("percentiles",
-     po::value<std::string>(&percentiles_spec)->default_value("5, 50, 95"),
-     "percentiles")
-    ("input_files", po::value<std::vector<std::string> >(&filenames), "sampler csv files")
-    ;
+  desc.add_options()("help", "produce help message")(
+      "sig_figs", po::value<int>(&sig_figs)->default_value(2),
+      "set significant figures of output, default 2")(
+      "autocorr", po::value<int>(&autocorr_idx),
+      "display autocorrelations for specified chain")(
+      "csv_filename", po::value<std::string>(&csv_filename),
+      "write summary to csv file (also print summary to console)")(
+      "percentiles",
+      po::value<std::string>(&percentiles_spec)->default_value("5, 50, 95"),
+      "percentiles")("input_files",
+                     po::value<std::vector<std::string> >(&filenames),
+                     "sampler csv files");
   po::positional_options_description p;
   p.add("input_files", -1);
 
   po::variables_map vm;
-  po::store(po::command_line_parser(argc, argv).
-            options(desc).positional(p).run(), vm);
+  po::store(
+      po::command_line_parser(argc, argv).options(desc).positional(p).run(),
+      vm);
   po::notify(vm);
 
   if (vm.count("help")) {
@@ -53,7 +53,6 @@ int main(int argc, const char *argv[]) {
     return 0;
   }
 
-  
   if (vm.count("sig_figs")) {
     std::cout << "sig_figs " << vm["sig_figs"].as<int>();
     if (vm["sig_figs"].defaulted())
@@ -76,16 +75,17 @@ int main(int argc, const char *argv[]) {
     else
       std::cout << "input_files ";
     uint i = 0;
-    for (std::vector<std::string>::iterator it=filenames.begin();
+    for (std::vector<std::string>::iterator it = filenames.begin();
          it != filenames.end(); it++, ++i) {
       std::cout << (*it);
-      if (i < filenames.size()-1) std::cout << ", ";
+      if (i < filenames.size() - 1)
+        std::cout << ", ";
     }
     std::cout << std::endl;
   }
 
   parse_probs(percentiles_spec);
-  
+
   // Parse specified files
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
@@ -96,7 +96,7 @@ int main(int argc, const char *argv[]) {
   ifstream.open(filenames[0].c_str());
 
   stan::io::stan_csv stan_csv
-    = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
+      = stan::io::stan_csv_reader::parse(ifstream, &std::cout);
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
 
@@ -131,7 +131,6 @@ int main(int argc, const char *argv[]) {
     if (chains.param_name(i).length() > max_name_length)
       max_name_length = chains.param_name(i).length();
 
-
   // Specify percentiles
   Eigen::VectorXd probs = parse_probs(percentiles_spec);
 
@@ -142,11 +141,10 @@ int main(int argc, const char *argv[]) {
   headers.at(1) = "MCSE";
   headers.at(2) = "StdDev";
   std::vector<std::string> percentiles;
-  boost::algorithm::split(percentiles, percentiles_spec,
-                          boost::is_any_of(", "),
+  boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   uint idx = 3;
-  for (std::vector<std::string>::iterator it=percentiles.begin();
+  for (std::vector<std::string>::iterator it = percentiles.begin();
        it != percentiles.end(); it++, idx++) {
     headers.at(idx) = (*it) + '%';
   }
@@ -213,17 +211,17 @@ int main(int argc, const char *argv[]) {
 
   std::cout << "Warmup took (" << std::fixed
             << std::setprecision(
-                                 compute_precision(warmup_times(0), sig_figs, false))
+                   compute_precision(warmup_times(0), sig_figs, false))
             << warmup_times(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << ", " << std::fixed
               << std::setprecision(
-                                   compute_precision(warmup_times(chain), sig_figs, false))
+                     compute_precision(warmup_times(chain), sig_figs, false))
               << warmup_times(chain);
   std::cout << ") seconds, ";
   std::cout << std::fixed
             << std::setprecision(
-                                 compute_precision(total_warmup_time, sig_figs, false))
+                   compute_precision(total_warmup_time, sig_figs, false))
             << total_warmup_time << " " << warmup_unit << " total" << std::endl;
 
   std::string sampling_unit = "seconds";
@@ -238,17 +236,17 @@ int main(int argc, const char *argv[]) {
 
   std::cout << "Sampling took (" << std::fixed
             << std::setprecision(
-                                 compute_precision(sampling_times(0), sig_figs, false))
+                   compute_precision(sampling_times(0), sig_figs, false))
             << sampling_times(0);
   for (int chain = 1; chain < chains.num_chains(); chain++)
     std::cout << ", " << std::fixed
               << std::setprecision(
-                                   compute_precision(sampling_times(chain), sig_figs, false))
+                     compute_precision(sampling_times(chain), sig_figs, false))
               << sampling_times(chain);
   std::cout << ") seconds, ";
   std::cout << std::fixed
             << std::setprecision(
-                                 compute_precision(total_sampling_time, sig_figs, false))
+                   compute_precision(total_sampling_time, sig_figs, false))
             << total_sampling_time << " " << sampling_unit << " total"
             << std::endl;
   std::cout << std::endl;
@@ -269,8 +267,8 @@ int main(int argc, const char *argv[]) {
       for (int j = 0; j < num_cols; j++) {
         std::cout.setf(formats(j), std::ios::floatfield);
         std::cout << std::setprecision(compute_precision(
-                                                         values(i, j), sig_figs,
-                                                         formats(j) == std::ios_base::scientific))
+                         values(i, j), sig_figs,
+                         formats(j) == std::ios_base::scientific))
                   << std::setw(column_widths(j)) << values(i, j);
       }
       std::cout << std::endl;
@@ -289,8 +287,8 @@ int main(int argc, const char *argv[]) {
         for (int j = 0; j < num_cols; j++) {
           std::cout.setf(formats(j), std::ios::floatfield);
           std::cout << std::setprecision(compute_precision(
-                                                           values(param_index, j), sig_figs,
-                                                           formats(j) == std::ios_base::scientific))
+                           values(param_index, j), sig_figs,
+                           formats(j) == std::ios_base::scientific))
                     << std::setw(column_widths(j)) << values(param_index, j);
         }
         std::cout << std::endl;
@@ -306,10 +304,10 @@ int main(int argc, const char *argv[]) {
   std::cout << "Samples were drawn using " << stan_csv.metadata.algorithm
             << " with " << stan_csv.metadata.engine << "." << std::endl
             << "For each parameter, N_Eff is a crude measure of effective "
-    "sample size,"
+               "sample size,"
             << std::endl
             << "and R_hat is the potential scale reduction factor on split "
-    "chains (at "
+               "chains (at "
             << std::endl
             << "convergence, R_hat=1)." << std::endl
             << std::endl;
@@ -321,7 +319,6 @@ int main(int argc, const char *argv[]) {
       std::cout << "Bad chain index " << c
                 << ", aborting autocorrelation display." << std::endl;
     } else {
-
       Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
 
       for (int i = 0; i < chains.num_params(); i++) {
@@ -435,17 +432,17 @@ int main(int argc, const char *argv[]) {
 
     csv_file << "# Warmup took (" << std::fixed
              << std::setprecision(
-                                  compute_precision(warmup_times(0), sig_figs, false))
+                    compute_precision(warmup_times(0), sig_figs, false))
              << warmup_times(0);
     for (int chain = 1; chain < chains.num_chains(); chain++)
       csv_file << ", " << std::fixed
                << std::setprecision(
-                                    compute_precision(warmup_times(chain), sig_figs, false))
+                      compute_precision(warmup_times(chain), sig_figs, false))
                << warmup_times(chain);
     csv_file << ") seconds, ";
     csv_file << std::fixed
              << std::setprecision(
-                                  compute_precision(total_warmup_time, sig_figs, false))
+                    compute_precision(total_warmup_time, sig_figs, false))
              << total_warmup_time << " " << warmup_unit << " total"
              << std::endl;
 
@@ -461,17 +458,17 @@ int main(int argc, const char *argv[]) {
 
     csv_file << "# Sampling took (" << std::fixed
              << std::setprecision(
-                                  compute_precision(sampling_times(0), sig_figs, false))
+                    compute_precision(sampling_times(0), sig_figs, false))
              << sampling_times(0);
     for (int chain = 1; chain < chains.num_chains(); chain++)
       csv_file << ", " << std::fixed
                << std::setprecision(
-                                    compute_precision(sampling_times(chain), sig_figs, false))
+                      compute_precision(sampling_times(chain), sig_figs, false))
                << sampling_times(chain);
     csv_file << ") seconds, ";
     csv_file << std::fixed
              << std::setprecision(
-                                  compute_precision(total_sampling_time, sig_figs, false))
+                    compute_precision(total_sampling_time, sig_figs, false))
              << total_sampling_time << " " << sampling_unit << " total"
              << std::endl;
     csv_file << "#" << std::endl;
@@ -480,10 +477,10 @@ int main(int argc, const char *argv[]) {
     csv_file << "# Samples were drawn using " << stan_csv.metadata.algorithm
              << " with " << stan_csv.metadata.engine << "." << std::endl
              << "# For each parameter, N_Eff is a crude measure of effective "
-      "sample size,"
+                "sample size,"
              << std::endl
              << "# and R_hat is the potential scale reduction factor on split "
-      "chains (at "
+                "chains (at "
              << std::endl
              << "# convergence, R_hat=1)." << std::endl;
 
