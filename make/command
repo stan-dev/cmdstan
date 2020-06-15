@@ -7,26 +7,15 @@ bin/cmdstan/%.o : src/cmdstan/%.cpp
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o $(BOOST)/stage/lib/libboost_program_options.a
 	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ -lboost_program_options $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $^ $(BOOST)/stage/lib/libboost_program_options.a $(LDLIBS) $(OUTPUT_OPTION)
 
 # BOOST program_options build rules:
 
-ifdef STAN_MPI
-
-$(BOOST)/stage/lib/program_options.a:
+$(BOOST)/stage/lib/libboost_program_options.a:
 	@mkdir -p $(dir $@)
 	cd $(BOOST); ./bootstrap.sh
-	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --with-mpi
-
-else
-
-$(BOOST)/stage/lib/program_options.a:
-	@mkdir -p $(dir $@)
-	cd $(BOOST); ./bootstrap.sh
-	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --without-mpi
-
-endif
+	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static
 
 endif
