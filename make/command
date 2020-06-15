@@ -18,14 +18,14 @@ ifdef STAN_MPI
 $(BOOST)/stage/lib/program_options.a:
 	@mkdir -p $(dir $@)
 	cd $(BOOST); ./bootstrap.sh
-	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --without-mpi
+	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --with-mpi
 
 else
 
 $(BOOST)/stage/lib/program_options.a:
 	@mkdir -p $(dir $@)
 	cd $(BOOST); ./bootstrap.sh
-	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --with-mpi
+	cd $(BOOST); ./b2 --with-program_options cxxstd=11 variant=release link=static threading=multi runtime-link=shared --without-mpi
 
 endif
 
