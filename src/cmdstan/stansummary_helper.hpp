@@ -202,7 +202,7 @@ Eigen::VectorXd parse_probs(const std::string &percentiles_spec) {
        it != percentiles.end(); it++, ++i) {
     try {
       pct = std::stoi(*it);
-      if (pct < 0 || pct > 100 || pct < cur_pct)
+      if (pct < 1 || pct > 99 || pct < cur_pct)
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
