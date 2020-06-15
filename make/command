@@ -10,5 +10,11 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) -lboost_program_options $^ $(LDLIBS) $(OUTPUT_OPTION)
-endif
 
+# BOOST program_options build rules:
+$(BOOST)/stage/lib/program_options.a:
+	@mkdir -p $(dir $@)
+	cd $(BOOST); ./bootstrap.sh
+	cd $(BOOST); ./b2 --with-program_options cxxstd=11
+
+endif
