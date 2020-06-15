@@ -74,7 +74,7 @@ int main(int argc, const char *argv[]) {
       std::cout << "input_file ";
     else
       std::cout << "input_files ";
-    uint i = 0;
+    size_t i = 0;
     for (std::vector<std::string>::iterator it = filenames.begin();
          it != filenames.end(); it++, ++i) {
       std::cout << (*it);
@@ -143,7 +143,7 @@ int main(int argc, const char *argv[]) {
   std::vector<std::string> percentiles;
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
-  uint idx = 3;
+  size_t idx = 3;
   for (std::vector<std::string>::iterator it = percentiles.begin();
        it != percentiles.end(); it++, idx++) {
     headers.at(idx) = (*it) + '%';

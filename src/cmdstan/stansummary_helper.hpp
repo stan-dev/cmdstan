@@ -197,7 +197,7 @@ Eigen::VectorXd parse_probs(const std::string &percentiles_spec) {
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
   int pct = 0;
-  uint i = 0;
+  int i = 0;
   for (std::vector<std::string>::iterator it = percentiles.begin();
        it != percentiles.end(); it++, ++i) {
     try {
