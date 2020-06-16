@@ -1,7 +1,8 @@
 ifeq ($(CMDSTAN_SUBMODULES),1)
+CXXFLAGS_BIN_O=-fvisibility=hidden
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+	$(COMPILE.cpp) $(CXXFLAGS_BIN_O) $(OUTPUT_OPTION) $<
 
 ifeq ($(OS),Windows_NT)
 # bitness check to decide which program_options .a file to select
@@ -35,6 +36,6 @@ ifeq ($(OS),Windows_NT)
 else
 	cd $(BOOST); sh bootstrap.sh
 endif
-	cd $(BOOST); ./b2 --toolset=$(CXX_TYPE) $(BOOST_ADDRESS_MODEL) --with-program_options cxxstd=11 variant=release link=static
+	cd $(BOOST); ./b2 --toolset=$(CXX_TYPE) $(BOOST_ADDRESS_MODEL) --visibility=hidden --with-program_options cxxstd=11 variant=release link=static
 
 endif
