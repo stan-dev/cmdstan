@@ -241,7 +241,7 @@ pipeline {
                                     string(name: 'stan_pr', value: params.stan_pr),
                                     string(name: 'math_pr', value: params.math_pr)
                                 ],
-                                wait:false
+                                wait:true
                             )
                         }
                     }
