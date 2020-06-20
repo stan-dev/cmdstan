@@ -18,7 +18,7 @@ def runTests(String prefix = "") {
 def runWinTests(String prefix = "") {
     withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
        bat "echo %PATH%"
-       bat "cd stan/lib/stan_math/lib/boost_1.72.0; bash.exe ./bootstrap.sh"
+       bat "cd stan/lib/stan_math/lib/boost_1.72.0 | bash.exe ./bootstrap.sh"
        bat "mingw32-make -j1 build"
        bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
     }
