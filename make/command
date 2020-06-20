@@ -30,7 +30,7 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmd
 # BOOST program_options build rules:
 $(BOOST_PROGRAM_OPTIONS_LIB):
 	@mkdir -p $(dir $@)
-	cd $(BOOST); ./bootstrap.sh
+	cd $(BOOST); sh ./bootstrap.sh
 	cd $(BOOST); ./b2  $(BOOST_BUILD_OPTS) --visibility=hidden --with-program_options cxxstd=11 variant=release link=static
 
 endif
