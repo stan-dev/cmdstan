@@ -7,11 +7,11 @@
 #include <vector>
 
 namespace cmdstan {
-void write_compile_info(stan::callbacks::writer &writer,
-                 std::vector<std::string>& compile_info) {
-    for (int i = 0; i < compile_info.size(); i++) {
-       writer(compile_info[i]);
-    }
+void write_compile_info(stan::callbacks::writer& writer,
+                        std::vector<std::string>& compile_info) {
+  for (int i = 0; i < compile_info.size(); i++) {
+    writer(compile_info[i]);
+  }
 }
 }  // namespace cmdstan
 #endif
