@@ -11,7 +11,7 @@
 /test/
 
 # main intermediate
-src/cmdstan/main.o
+src/cmdstan/main*.o
 
 # test models
 /src/test/test-models/*

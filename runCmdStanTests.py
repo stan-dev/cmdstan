@@ -85,6 +85,13 @@ def makeTestModels(j):
         command = 'make -j%d test-models-hpp' % j
     doCommand(command)
 
+def makeMathLibs(j):
+    if j == None:
+        command = 'make -f stan/lib/stan_math/make/standalone math-libs'
+    else:
+        command = 'make -j%d -f stan/lib/stan_math/make/standalone math-libs' % j
+    doCommand(command)
+
 def makeTests(dirname, filenames, j):
     targets = list()
     for name in filenames:
@@ -162,6 +169,8 @@ def main():
 
     # pass 0:  make build, compile all test models
     makeBuild(j)
+    if (isWin()):
+        makeMathLibs(j)
     makeTestModels(j)
 
     # pass 1:  call make to compile test targets

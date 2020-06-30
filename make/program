@@ -1,25 +1,32 @@
 ##
 # Models (to be passed through stanc)
 ##
-CMDSTAN_MAIN ?= src/cmdstan/main.cpp
-CMDSTAN_MAIN_O = $(patsubst %.cpp,%.o,$(CMDSTAN_MAIN))
 
 STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(MAKECMDGOALS))))
+
+CMDSTAN_MAIN ?= src/cmdstan/main.cpp
+CMDSTAN_MAIN_O = $(patsubst %.cpp,%$(STAN_FLAGS).o,$(CMDSTAN_MAIN))
+
+$(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
+	@echo ''
+	@echo '--- Compiling the main object file. This might take up to a minute. ---'
+	@mkdir -p $(dir $@)
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
 ##
 # Precompiled model header
 ##
-$(STAN)src/stan/model/model_header.d : $(STAN)src/stan/model/model_header.hpp
+$(STAN)src/stan/model/model_header$(STAN_FLAGS).d : $(STAN)src/stan/model/model_header.hpp
 	$(COMPILE.cpp) $(DEPFLAGS) $<
-$(STAN)src/stan/model/model_header.d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
-$(STAN)src/stan/model/model_header.hpp.gch : $(STAN)src/stan/model/model_header.hpp
+$(STAN)src/stan/model/model_header$(STAN_FLAGS).d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
+$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
-	@echo '--- Compiling pre-compiled header ---	'
+	@echo '--- Compiling pre-compiled header. This might take a few seconds. ---'
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
 ifeq ($(CXX_TYPE),clang)
-CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header.hpp.gch
-$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header.hpp.gch
+CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
+$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
 endif
 
 ifneq ($(findstring allow_undefined,$(STANCFLAGS)),)
@@ -48,7 +55,7 @@ endif
 %.d: %.hpp
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(PRECOMPILED_MODEL_HEADER)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
@@ -58,7 +65,7 @@ ifeq ($(OS),Windows_NT)
 ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	@echo 'Intel TBB is not in PATH.'
 	@echo 'Consider calling '
-	@echo 'make install-tbb'
+	@echo '$(HELP_MAKE) install-tbb'
 	@echo 'to avoid copying Intel TBB library files.'
 	@if ! [[ -f "$(@D)/tbb.dll" ]]; then \
 		cp -v $(TBB_TARGETS) $(@D); \
@@ -74,10 +81,12 @@ endif
 ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
+-include $(patsubst %.cpp,%$(STAN_FLAGS).d,$(CMDSTAN_MAIN))
+ifeq ($(PRECOMPILED_HEADERS),true)
+-include $(STAN)src/stan/model/model_header$(STAN_FLAGS).d
+endif
+ifneq ($(STANC2),)
 -include src/cmdstan/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
--include $(patsubst %.cpp,%.d,$(CMDSTAN_MAIN))
-ifeq ($(CXX_TYPE),clang)
--include $(STAN)src/stan/model/model_header.d
 endif
 endif
