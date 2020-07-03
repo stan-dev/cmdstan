@@ -190,7 +190,7 @@ else
 .PHONY: build
 build:
 	@echo 'ERROR: Missing Stan submodules.'
-	@echo 'Please run the following commands to fix:'
+	@echo 'Please run the following to fix:'
 	@echo ''
 	@echo 'git submodule update --init --recursive'
 	@echo ''
