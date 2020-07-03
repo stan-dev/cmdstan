@@ -192,8 +192,7 @@ build:
 	@echo 'ERROR: Missing Stan submodules.'
 	@echo 'Please run the following commands to fix:'
 	@echo ''
-	@echo 'git submodule init'
-	@echo 'git submodule update --recursive'
+	@echo 'git submodule update --init --recursive'
 	@echo ''
 	@echo 'And try building again'
 	@exit 1
