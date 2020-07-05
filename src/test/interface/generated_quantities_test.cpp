@@ -22,7 +22,8 @@ class CmdStan : public testing::Test {
     fitted_params_file_path_2
         = {"src", "test", "test-models", "test_model_output.csv"};
     fitted_params_file_path_empty = {"src", "test", "test-models", "empty.csv"};
-    fitted_params_non_scalar_gq = {"src", "test", "test-models", "gq_non_scalar.csv"};
+    fitted_params_non_scalar_gq
+        = {"src", "test", "test-models", "gq_non_scalar.csv"};
   }
 
   std::vector<std::string> model_path;
