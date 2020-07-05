@@ -221,9 +221,6 @@ int command(int argc, const char *argv[]) {
           "the sample.");
       return_code = stan::services::error_codes::CONFIG;
     }
-    std::string output_fname
-        = dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
-              ->value();
     std::string fname(fitted_params_file->value());
     std::ifstream stream(fname.c_str());
     if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
