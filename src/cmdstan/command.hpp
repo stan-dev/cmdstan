@@ -214,7 +214,7 @@ int command(int argc, const char *argv[]) {
     stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
                                              &msg);
     if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
-                                                &msg)) {
+                                                &msg, false)) {
       msg << "Error reading fitted param names from sample csv file \"" << fname
           << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
@@ -231,7 +231,6 @@ int command(int argc, const char *argv[]) {
     model.constrained_param_names(param_names, false, false);
     size_t num_cols = param_names.size();
     size_t num_rows = fitted_params.metadata.num_samples;
-
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
       std::stringstream msg;
@@ -242,6 +241,7 @@ int command(int argc, const char *argv[]) {
     for (size_t i = 0; i < num_cols; ++i) {
       if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols])
           != 0) {
+
         std::stringstream msg;
         msg << "Mismatch between model and fitted_parameters csv file \""
             << fname << "\"" << std::endl;
