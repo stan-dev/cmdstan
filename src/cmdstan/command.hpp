@@ -241,7 +241,6 @@ int command(int argc, const char *argv[]) {
     for (size_t i = 0; i < num_cols; ++i) {
       if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols])
           != 0) {
-
         std::stringstream msg;
         msg << "Mismatch between model and fitted_parameters csv file \""
             << fname << "\"" << std::endl;
