@@ -115,7 +115,7 @@ TEST_F(CmdStan, generate_quantities_csv_conflict) {
      << " data file=" << convert_model_path(data_file_path)
      << " output file=" << convert_model_path(default_file_path)
      << " method=generate_quantities fitted_params="
-     << convert_model_path(default_file_path); // << " 2>&1";
+     << convert_model_path(default_file_path);  // << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
