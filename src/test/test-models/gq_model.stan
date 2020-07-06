@@ -7,8 +7,7 @@ parameters {
 } 
 model {
   theta ~ beta(1,1);
-  for (n in 1:N) 
-    y[n] ~ bernoulli(theta);
+  y ~ bernoulli(theta);
 }
 generated quantities {
   real mu = theta;

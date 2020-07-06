@@ -133,6 +133,24 @@ int command(int argc, const char *argv[]) {
   write_opencl_device(info);
   info();
 
+  // Cross-check arguments
+  if (parser.arg("method")->arg("generate_quantities")) {
+    std::string fitted_sample_fname
+        = dynamic_cast<string_argument *>(parser.arg("method")
+                                              ->arg("generate_quantities")
+                                              ->arg("fitted_params"))
+              ->value();
+    std::string output_fname
+        = dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
+              ->value();
+    if (fitted_sample_fname.compare(output_fname) == 0) {
+      std::stringstream msg;
+      msg << "Filename conflict, fitted_params file " << output_fname
+          << " and output file have same name, must be different." << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+  }
+
   stan::callbacks::writer init_writer;
   stan::callbacks::interrupt interrupt;
 
@@ -198,7 +216,8 @@ int command(int argc, const char *argv[]) {
         parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
     if (fitted_params_file->is_default()) {
       info(
-          "Must specify argument fitted_params which is a csv file containing "
+          "Must specify argument fitted_params which is a csv file "
+          "containing "
           "the sample.");
       return_code = stan::services::error_codes::CONFIG;
     }
