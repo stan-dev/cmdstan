@@ -1,4 +1,3 @@
-
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <algorithm>

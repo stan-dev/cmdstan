@@ -10,6 +10,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
+
 void compute_width_and_precision(double value, int sig_figs, int &width,
                                  int &precision) {
   double abs_value = std::fabs(value);
@@ -216,5 +217,6 @@ Eigen::VectorXd parse_probs(const std::string &percentiles_spec) {
   }
   return probs;
 }
+
 
 #endif
