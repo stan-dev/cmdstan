@@ -225,7 +225,7 @@ int main(int argc, const char *argv[]) {
 
   // Value output
   for (int i = skip; i < chains.num_params(); i++) {
-    if (!is_matrix(chains.param_name(i))) {
+    if (!is_container(chains.param_name(i))) {
       std::cout << std::setw(max_name_length + 1) << std::left
                 << chains.param_name(i);
       std::cout << std::right;
