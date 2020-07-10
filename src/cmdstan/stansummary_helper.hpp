@@ -276,7 +276,7 @@ std::vector<std::string> get_model_params_header(
 
 void sampler_params_stats(const stan::mcmc::chains<> &chains,
                           const Eigen::VectorXd &probs,
-                          int &sampler_params_start_col,
+                          int sampler_params_start_col,
                           Eigen::MatrixXd &sampler_params) {
   sampler_params.setZero();
   for (int i = 0; i < sampler_params.rows(); ++i) {
@@ -293,7 +293,7 @@ void model_params_stats(const stan::mcmc::chains<> &chains,
                         const Eigen::VectorXd &warmup_times,
                         const Eigen::VectorXd &sampling_times,
                         const Eigen::VectorXd &probs,
-                        int &model_params_start_col,
+                        int model_params_start_col,
                         Eigen::MatrixXd &model_params) {
   model_params.setZero();
   double total_warmup_time = warmup_times.sum();
@@ -446,8 +446,8 @@ void timing_summary(const stan::mcmc::chains<> &chains,
                     const stan::io::stan_csv_metadata &metadata,
                     const Eigen::VectorXd &warmup_times,
                     const Eigen::VectorXd &sampling_times,
-                    const Eigen::VectorXi &thin,
-                    const std::string &prefix, std::ostream *out) {
+                    const Eigen::VectorXi &thin, const std::string &prefix,
+                    std::ostream *out) {
   *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
        << prefix << chains.num_chains() << " chains: each with iter=("
        << chains.num_kept_samples(0);
@@ -553,8 +553,7 @@ void sampler_summary(const stan::io::stan_csv_metadata &metadata,
 // autocorrelation report prints to std::out
 void autocorrelation(const stan::mcmc::chains<> &chains,
                      const stan::io::stan_csv_metadata &metadata,
-                     int autocorr_idx,
-                     int max_name_length) {
+                     int autocorr_idx, int max_name_length) {
   int c = autocorr_idx;
   if (c < 0 || c >= chains.num_chains()) {
     std::cout << "Bad chain index " << c
