@@ -414,8 +414,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
 
   // Individual model parameters
   int num_sampler_params = model_params_start_col - 1;
-  for (int i = 0; i < model_params.rows() - 1; ++i) {
-    int i_offset = i + model_params_start_col;
+  for (int i = 1; i < model_params.rows(); ++i) {
+    int i_offset = i + model_params_start_col - 1;
     if (!is_container(chains.param_name(i_offset))) {
       if (as_csv) {
         *out << "\"" << chains.param_name(i_offset) << "\"";
