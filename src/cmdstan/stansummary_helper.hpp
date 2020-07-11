@@ -357,8 +357,8 @@ void sampler_params_summary(
     for (int j = 0; j < sampler_params.cols(); j++) {
       std::cout.setf(sampler_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-          sampler_params(i, j), sig_figs,
-          sampler_params_formats(j) == std::ios_base::scientific))
+                  sampler_params(i, j), sig_figs,
+                  sampler_params_formats(j) == std::ios_base::scientific))
            << std::setw(sampler_params_column_widths(j))
            << sampler_params(i, j);
     }
@@ -405,8 +405,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
     for (int j = 0; j < model_params.cols(); j++) {
       std::cout.setf(model_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-          model_params(0, j), sig_figs,
-          model_params_formats(j) == std::ios_base::scientific))
+                  model_params(0, j), sig_figs,
+                  model_params_formats(j) == std::ios_base::scientific))
            << std::setw(model_params_column_widths(j)) << model_params(0, j);
     }
   }
@@ -429,8 +429,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
         for (int j = 0; j < model_params.cols(); j++) {
           std::cout.setf(model_params_formats(j), std::ios::floatfield);
           *out << std::setprecision(compute_precision(
-              model_params(i, j), sig_figs,
-              model_params_formats(j) == std::ios_base::scientific))
+                      model_params(i, j), sig_figs,
+                      model_params_formats(j) == std::ios_base::scientific))
                << std::setw(model_params_column_widths(j))
                << model_params(i, j);
         }
@@ -462,8 +462,9 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
           for (int j = 0; j < model_params_header.size(); j++) {
             std::cout.setf(model_params_formats(j), std::ios::floatfield);
             *out << std::setprecision(compute_precision(
-                model_params(row_maj_index - num_sampler_params, j), sig_figs,
-                model_params_formats(j) == std::ios_base::scientific))
+                        model_params(row_maj_index - num_sampler_params, j),
+                        sig_figs,
+                        model_params_formats(j) == std::ios_base::scientific))
                  << std::setw(model_params_column_widths(j))
                  << model_params(row_maj_index - num_sampler_params, j);
           }
