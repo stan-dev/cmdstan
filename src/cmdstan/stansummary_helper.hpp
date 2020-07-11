@@ -370,7 +370,7 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
                           const Eigen::MatrixXd &model_params,
                           const std::vector<std::string> &model_params_header,
                           int model_params_start_col, int max_name_length,
-                          int sig_figs, std::ostream *out) {
+                          int sig_figs, bool as_csv, std::ostream *out) {
   Eigen::VectorXi model_params_column_sig_figs(model_params_header.size());
   Eigen::VectorXi model_params_column_widths(model_params_header.size());
   Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>
@@ -378,21 +378,37 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
   model_params_column_widths = calculate_column_widths(
       model_params, model_params_header, sig_figs, model_params_formats);
 
-  *out << std::setw(max_name_length + 1) << "";
-  for (int i = 0; i < model_params_header.size(); ++i) {
-    *out << std::setw(model_params_column_widths(i)) << model_params_header[i];
+  // Column headers
+  if (as_csv) {
+    *out << "name";
+    for (int i = 0; i < model_params_header.size(); ++i) {
+      *out << "," << model_params_header[i];
+    }
+  } else {
+    *out << std::setw(max_name_length + 1) << "";
+    for (int i = 0; i < model_params_header.size(); ++i) {
+      *out << std::setw(model_params_column_widths(i))
+           << model_params_header[i];
+    }
   }
   *out << std::endl;
 
   // Joint log prob lp__
-  *out << std::setw(max_name_length + 1) << std::left << chains.param_name(0);
-  *out << std::right;
-  for (int j = 0; j < model_params.cols(); j++) {
-    std::cout.setf(model_params_formats(j), std::ios::floatfield);
-    *out << std::setprecision(
-        compute_precision(model_params(0, j), sig_figs,
-                          model_params_formats(j) == std::ios_base::scientific))
-         << std::setw(model_params_column_widths(j)) << model_params(0, j);
+  if (as_csv) {
+    *out << "\"lp__\"";
+    for (int j = 0; j < model_params.cols(); j++) {
+      *out << "," << model_params(0, j);
+    }
+  } else {
+    *out << std::setw(max_name_length + 1) << std::left << chains.param_name(0);
+    *out << std::right;
+    for (int j = 0; j < model_params.cols(); j++) {
+      std::cout.setf(model_params_formats(j), std::ios::floatfield);
+      *out << std::setprecision(compute_precision(
+          model_params(0, j), sig_figs,
+          model_params_formats(j) == std::ios_base::scientific))
+           << std::setw(model_params_column_widths(j)) << model_params(0, j);
+    }
   }
   *out << std::endl;
 
@@ -401,15 +417,23 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
   for (int i = 0; i < model_params.rows() - 1; ++i) {
     int i_offset = i + model_params_start_col;
     if (!is_container(chains.param_name(i_offset))) {
-      *out << std::setw(max_name_length + 1) << std::left
-           << chains.param_name(i_offset);
-      *out << std::right;
-      for (int j = 0; j < model_params.cols(); j++) {
-        std::cout.setf(model_params_formats(j), std::ios::floatfield);
-        *out << std::setprecision(compute_precision(
-            model_params(i, j), sig_figs,
-            model_params_formats(j) == std::ios_base::scientific))
-             << std::setw(model_params_column_widths(j)) << model_params(i, j);
+      if (as_csv) {
+        *out << "\"" << chains.param_name(i_offset) << "\"";
+        for (int j = 0; j < model_params.cols(); j++) {
+          *out << "," << model_params(i_offset, j);
+        }
+      } else {
+        *out << std::setw(max_name_length + 1) << std::left
+             << chains.param_name(i_offset);
+        *out << std::right;
+        for (int j = 0; j < model_params.cols(); j++) {
+          std::cout.setf(model_params_formats(j), std::ios::floatfield);
+          *out << std::setprecision(compute_precision(
+              model_params(i, j), sig_figs,
+              model_params_formats(j) == std::ios_base::scientific))
+               << std::setw(model_params_column_widths(j))
+               << model_params(i, j);
+        }
       }
       *out << std::endl;
     } else {
@@ -422,16 +446,27 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
         max *= dims[j];
       for (int k = 0; k < max; k++) {
         int row_maj_index = i_offset + matrix_index(index, dims);
-        *out << std::setw(max_name_length + 1) << std::left
-             << chains.param_name(row_maj_index);
-        *out << std::right;
-        for (int j = 0; j < model_params_header.size(); j++) {
-          std::cout.setf(model_params_formats(j), std::ios::floatfield);
-          *out << std::setprecision(compute_precision(
-              model_params(row_maj_index - num_sampler_params, j), sig_figs,
-              model_params_formats(j) == std::ios_base::scientific))
-               << std::setw(model_params_column_widths(j))
-               << model_params(row_maj_index - num_sampler_params, j);
+        if (as_csv) {
+          *out << "\"" << chains.param_name(row_maj_index) << "\"";
+          for (int j = 0; j < model_params.cols(); j++) {
+            *out << "," << std::fixed
+                 << std::setprecision(compute_precision(
+                        model_params(row_maj_index - num_sampler_params, j),
+                        sig_figs, false))
+                 << model_params(row_maj_index - num_sampler_params, j);
+          }
+        } else {
+          *out << std::setw(max_name_length + 1) << std::left
+               << chains.param_name(row_maj_index);
+          *out << std::right;
+          for (int j = 0; j < model_params_header.size(); j++) {
+            std::cout.setf(model_params_formats(j), std::ios::floatfield);
+            *out << std::setprecision(compute_precision(
+                model_params(row_maj_index - num_sampler_params, j), sig_figs,
+                model_params_formats(j) == std::ios_base::scientific))
+                 << std::setw(model_params_column_widths(j))
+                 << model_params(row_maj_index - num_sampler_params, j);
+          }
         }
         *out << std::endl;
         if (k < max - 1)
@@ -529,7 +564,6 @@ void timing_summary(const stan::mcmc::chains<> &chains,
          << total_sampling_time << " " << sampling_unit << " total"
          << std::endl;
   }
-  *out << prefix << std::endl;
 }
 
 void sampler_summary(const stan::io::stan_csv_metadata &metadata,
@@ -547,7 +581,6 @@ void sampler_summary(const stan::io::stan_csv_metadata &metadata,
           "chains (at "
        << std::endl;
   *out << prefix << "convergence, R_hat=1)." << std::endl;
-  *out << prefix << std::endl;
 }
 
 // autocorrelation report prints to std::out

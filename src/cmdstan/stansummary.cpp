@@ -127,7 +127,7 @@ int main(int argc, const char *argv[]) {
   std::cout << std::endl;
 
   model_params_summary(chains, model_params, model_params_hdr,
-                       model_params_start_col, max_name_length, sig_figs,
+                       model_params_start_col, max_name_length, sig_figs, 0,
                        &std::cout);
   std::cout << std::endl;
 
@@ -142,7 +142,7 @@ int main(int argc, const char *argv[]) {
   if (vm.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
     model_params_summary(chains, model_params, model_params_hdr,
-                         model_params_start_col, max_name_length, sig_figs,
+                         model_params_start_col, max_name_length, sig_figs, 1,
                          &csv_file);
     timing_summary(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
