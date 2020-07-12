@@ -34,7 +34,8 @@ int main(int argc, const char *argv[]) {
       "autocorr", po::value<int>(&autocorr_idx),
       "display autocorrelations for specified chain")(
       "csv_filename", po::value<std::string>(&csv_filename),
-      "write summary to csv file (also print summary to console)")(
+      "write summary to csv file (as well as to console),"
+      " overwrites existing summary csv file")(
       "percentiles",
       po::value<std::string>(&percentiles_spec)->default_value("5, 50, 95"),
       "percentiles")("input_files",
@@ -59,24 +60,43 @@ int main(int argc, const char *argv[]) {
   }
   if (vm.count("autocorr"))
     std::cout << autocorr_idx << std::endl;
-  if (vm.count("csv_filename"))
+  if (vm.count("csv_filename")) {
+    if (FILE *file = fopen(csv_filename.c_str(), "w")) {
+        fclose(file);
+    } else {
+      std::cout << "Invalid output csv file: " << csv_filename << ", exiting." << std::endl;
+      return -1;
+    }
     std::cout << "csv_filename " << csv_filename << std::endl;
+  }
   if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
     std::cout << "percentiles " << percentiles_spec << std::endl;
   }
   if (vm.count("input_files")) {
+    // validate filepaths
+    for (size_t i = 0; i < filenames.size(); ++i) {
+      if (FILE *file = fopen(filenames[i].c_str(), "r")) {
+        fclose(file);
+      } else {
+        std::cout << "Invalid input file: " << filenames[i] << ", exiting." << std::endl;
+        return -1;
+      }   
+    }
     if (filenames.size() == 1)
       std::cout << "Input file: ";
     else
       std::cout << "Input files: ";
     size_t i = 0;
-    for (std::vector<std::string>::iterator it = filenames.begin();
-         it != filenames.end(); it++, ++i) {
-      std::cout << (*it);
+    for (size_t i = 0; i < filenames.size(); ++i) {
+      std::cout << filenames[i];
       if (i < filenames.size() - 1)
         std::cout << ", ";
     }
     std::cout << std::endl;
+  } else {
+    std::cout << "No Stan csv file(s) specified, expecting one or more filenames." << std::endl;
+    std::cout << desc << std::endl;
+    return -1;
   }
 
   std::vector<std::string> percentiles;
@@ -120,6 +140,7 @@ int main(int argc, const char *argv[]) {
   // Print to console
   timing_summary(chains, metadata, warmup_times, sampling_times, thin, "",
                  &std::cout);
+  std::cout << std::endl;
 
   sampler_params_summary(chains, sampler_params, sampler_params_hdr,
                          sampler_params_start_col, max_name_length, sig_figs,
@@ -129,10 +150,9 @@ int main(int argc, const char *argv[]) {
   model_params_summary(chains, model_params, model_params_hdr,
                        model_params_start_col, max_name_length, sig_figs, 0,
                        &std::cout);
-  std::cout << std::endl;
+  //  std::cout << std::endl;
 
   sampler_summary(metadata, "", &std::cout);
-  std::cout << std::endl;
 
   if (vm.count("autocorr")) {
     autocorrelation(chains, metadata, autocorr_idx, max_name_length);
