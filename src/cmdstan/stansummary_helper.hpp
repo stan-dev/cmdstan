@@ -570,7 +570,6 @@ void timing_summary(const stan::mcmc::chains<> &chains,
 void sampler_summary(const stan::io::stan_csv_metadata &metadata,
                      const std::string &prefix, std::ostream *out) {
   /// Footer output
-  *out << prefix << std::endl;
   *out << prefix << "Samples were drawn using " << metadata.algorithm
        << " with " << metadata.engine << "." << std::endl;
   *out << prefix

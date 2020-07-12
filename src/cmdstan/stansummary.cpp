@@ -183,7 +183,7 @@ int main(int argc, const char *argv[]) {
   model_params_summary(chains, model_params, model_params_hdr,
                        model_params_start_col, max_name_length, sig_figs, 0,
                        &std::cout);
-  //  std::cout << std::endl;
+  std::cout << std::endl;
 
   sampler_summary(metadata, "", &std::cout);
 
