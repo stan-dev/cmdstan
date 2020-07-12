@@ -61,7 +61,6 @@ include make/tests
 include make/command
 
 CMDSTAN_VERSION := 2.23.0
-CMDSTAN_VERSION_DOC := 2.23
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -163,9 +162,6 @@ help-dev:
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
 	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
-	@echo ''
-	@echo 'Documentation:'
-	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build-mpi
@@ -222,11 +218,7 @@ clean-deps:
 	$(RM) $(call findfiles,src,*.d.*) $(call findfiles,src/stan,*.d.*) $(call findfiles,$(MATH)/stan,*.d.*)
 	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
-clean-manual:
-	$(RM) -r doc
-	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
-
-clean-all: clean clean-deps clean-libraries clean-manual
+clean-all: clean clean-deps clean-libraries
 	$(RM) bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	$(RM) -r src/cmdstan/main*.o bin/cmdstan
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
@@ -261,17 +253,8 @@ stan-revert:
 	git submodule update --init --recursive
 
 ##
-# Manual related
+# Debug target that prints compile command for CmdStan executable
 ##
-
-.PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
-manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
-	mkdir -p doc
-	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION_DOC).pdf
-
-%.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
-
 
 .PHONY: compile_info
 compile_info:
