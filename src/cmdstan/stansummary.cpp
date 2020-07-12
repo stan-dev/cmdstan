@@ -30,7 +30,8 @@ int main(int argc, const char *argv[]) {
   po::options_description desc("Allowed options");
   desc.add_options()("help", "produce help message")(
       "sig_figs", po::value<int>(&sig_figs)->default_value(2),
-      "set significant figures of output, default 2")(
+      "set significant figures of output, default 2,"
+      " must be in range (0, 100)")(
       "autocorr", po::value<int>(&autocorr_idx),
       "display autocorrelations for specified chain")(
       "csv_filename", po::value<std::string>(&csv_filename),
@@ -55,23 +56,6 @@ int main(int argc, const char *argv[]) {
     return 0;
   }
 
-  if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-    std::cout << "sig_figs " << vm["sig_figs"].as<int>() << std::endl;
-  }
-  if (vm.count("autocorr"))
-    std::cout << autocorr_idx << std::endl;
-  if (vm.count("csv_filename")) {
-    if (FILE *file = fopen(csv_filename.c_str(), "w")) {
-        fclose(file);
-    } else {
-      std::cout << "Invalid output csv file: " << csv_filename << ", exiting." << std::endl;
-      return -1;
-    }
-    std::cout << "csv_filename " << csv_filename << std::endl;
-  }
-  if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
-    std::cout << "percentiles " << percentiles_spec << std::endl;
-  }
   if (vm.count("input_files")) {
     // validate filepaths
     for (size_t i = 0; i < filenames.size(); ++i) {
@@ -98,6 +82,34 @@ int main(int argc, const char *argv[]) {
     std::cout << desc << std::endl;
     return -1;
   }
+  if (vm.count("csv_filename")) {
+    if (FILE *file = fopen(csv_filename.c_str(), "w")) {
+        fclose(file);
+    } else {
+      std::cout << "Invalid output csv file: " << csv_filename << ", exiting." << std::endl;
+      return -1;
+    }
+    std::cout << "csv_filename " << csv_filename << std::endl;
+  }
+  if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
+    if (sig_figs < 0 || sig_figs > 100) {
+      std::cout << "Invalid --sig_figs option: " << vm["sig_figs"].as<int>()
+                << ", exiting." << std::endl;
+      return -1;
+    }
+    std::cout << "sig_figs " << vm["sig_figs"].as<int>() << std::endl;
+  }
+  if (vm.count("autocorr")) {
+    if (autocorr_idx < 1 || autocorr_idx > filenames.size()) {
+      std::cout << "Invalid --autocorr option: " << autocorr_idx
+                << ", exiting." << std::endl;
+      return -1;
+    }
+    std::cout << autocorr_idx << std::endl;
+  }
+  if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
+    std::cout << "percentiles " << percentiles_spec << std::endl;
+  }
 
   std::vector<std::string> percentiles;
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
@@ -111,6 +123,7 @@ int main(int argc, const char *argv[]) {
   Eigen::VectorXi thin(filenames.size());
   stan::mcmc::chains<> chains = parse_csv_files(
       filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+
 
   size_t max_name_length = 0;
   size_t num_sampler_params = -1;  // don't count name 'lp__'

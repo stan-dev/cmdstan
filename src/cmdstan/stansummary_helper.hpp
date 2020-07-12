@@ -357,8 +357,8 @@ void sampler_params_summary(
     for (int j = 0; j < sampler_params.cols(); j++) {
       std::cout.setf(sampler_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-                  sampler_params(i, j), sig_figs,
-                  sampler_params_formats(j) == std::ios_base::scientific))
+          sampler_params(i, j), sig_figs,
+          sampler_params_formats(j) == std::ios_base::scientific))
            << std::setw(sampler_params_column_widths(j))
            << sampler_params(i, j);
     }
@@ -405,8 +405,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
     for (int j = 0; j < model_params.cols(); j++) {
       std::cout.setf(model_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-                  model_params(0, j), sig_figs,
-                  model_params_formats(j) == std::ios_base::scientific))
+          model_params(0, j), sig_figs,
+          model_params_formats(j) == std::ios_base::scientific))
            << std::setw(model_params_column_widths(j)) << model_params(0, j);
     }
   }
@@ -416,7 +416,6 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
   int num_sampler_params = model_params_start_col - 1;
   for (int i = 1; i < model_params.rows(); ++i) {
     int i_offset = i + model_params_start_col - 1;
-    std::cout << "i: " << i << " i_offset: " << i_offset << std::endl;
     if (!is_container(chains.param_name(i_offset))) {
       if (as_csv) {
         *out << "\"" << chains.param_name(i_offset) << "\"";
@@ -430,8 +429,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
         for (int j = 0; j < model_params.cols(); j++) {
           std::cout.setf(model_params_formats(j), std::ios::floatfield);
           *out << std::setprecision(compute_precision(
-                      model_params(i, j), sig_figs,
-                      model_params_formats(j) == std::ios_base::scientific))
+              model_params(i, j), sig_figs,
+              model_params_formats(j) == std::ios_base::scientific))
                << std::setw(model_params_column_widths(j))
                << model_params(i, j);
         }
@@ -463,9 +462,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
           for (int j = 0; j < model_params_header.size(); j++) {
             std::cout.setf(model_params_formats(j), std::ios::floatfield);
             *out << std::setprecision(compute_precision(
-                        model_params(row_maj_index - num_sampler_params, j),
-                        sig_figs,
-                        model_params_formats(j) == std::ios_base::scientific))
+                model_params(row_maj_index - num_sampler_params, j), sig_figs,
+                model_params_formats(j) == std::ios_base::scientific))
                  << std::setw(model_params_column_widths(j))
                  << model_params(row_maj_index - num_sampler_params, j);
           }
@@ -589,42 +587,37 @@ void sampler_summary(const stan::io::stan_csv_metadata &metadata,
 void autocorrelation(const stan::mcmc::chains<> &chains,
                      const stan::io::stan_csv_metadata &metadata,
                      int autocorr_idx, int max_name_length) {
-  int c = autocorr_idx;
-  if (c < 0 || c >= chains.num_chains()) {
-    std::cout << "Bad chain index " << c
-              << ", aborting autocorrelation display." << std::endl;
-  } else {
-    Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
-    for (int i = 0; i < chains.num_params(); ++i) {
-      autocorr.row(i) = chains.autocorrelation(c, i);
-    }
-    std::cout << "Displaying the autocorrelations for chain " << c << ":"
-              << std::endl
-              << std::endl;
+  int c = autocorr_idx - 1;
+  Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
+  for (int i = 0; i < chains.num_params(); ++i) {
+    autocorr.row(i) = chains.autocorrelation(c, i);
+  }
+  std::cout << "Displaying the autocorrelations for chain " << autocorr_idx << ":"
+            << std::endl
+            << std::endl;
 
-    int n_autocorr = autocorr.row(0).size();
-    int lag_width = 1;
-    int number = n_autocorr;
-    while (number != 0) {
-      number /= 10;
-      lag_width++;
-    }
+  int n_autocorr = autocorr.row(0).size();
+  int lag_width = 1;
+  int number = n_autocorr;
+  while (number != 0) {
+    number /= 10;
+    lag_width++;
+  }
 
-    std::cout << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
+  std::cout << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
+  for (int i = 0; i < chains.num_params(); ++i) {
+    std::cout << std::setw(max_name_length + 1) << std::right
+              << chains.param_name(i);
+  }
+  std::cout << std::endl;
+
+  for (int n = 0; n < n_autocorr; ++n) {
+    std::cout << std::setw(lag_width) << std::right << n;
     for (int i = 0; i < chains.num_params(); ++i) {
       std::cout << std::setw(max_name_length + 1) << std::right
-                << chains.param_name(i);
+                << autocorr(i, n);
     }
     std::cout << std::endl;
-
-    for (int n = 0; n < n_autocorr; ++n) {
-      std::cout << std::setw(lag_width) << std::right << n;
-      for (int i = 0; i < chains.num_params(); ++i) {
-        std::cout << std::setw(max_name_length + 1) << std::right
-                  << autocorr(i, n);
-      }
-      std::cout << std::endl;
-    }
   }
 }
 #endif
