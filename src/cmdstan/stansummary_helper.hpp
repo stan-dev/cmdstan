@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
 
 void compute_width_and_precision(double value, int sig_figs, int &width,
                                  int &precision) {
@@ -203,10 +204,10 @@ Eigen::VectorXd percentiles_to_probs(
       cur_pct = pct;
     } catch (const std::exception &e) {
       std::stringstream message_stream("");
-      message_stream << "invalid config: percentiles must be "
-                     << "integers between 0 and 100, increasing, found: "
-                     << percentiles[i] << ".";
-      throw std::domain_error(message_stream.str());
+      message_stream << "value(s) for option --percentiles must be "
+                     << "integers between 0 and 100, strictly increasing."
+                     << std::endl;
+      throw boost::program_options::error(message_stream.str());
     }
     probs[i] = pct * 1.0 / 100.0;
   }

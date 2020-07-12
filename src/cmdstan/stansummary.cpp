@@ -28,30 +28,40 @@ int main(int argc, const char *argv[]) {
   std::string csv_filename;
   std::string percentiles_spec;
   std::vector<std::string> filenames;
-  po::options_description desc("Allowed options");
+  boost::program_options::options_description desc("Allowed options");
   desc.add_options()("help", "produce help message")(
-      "sig_figs", po::value<int>(&sig_figs)->default_value(2),
+      "sig_figs",
+      boost::program_options::value<int>(&sig_figs)->default_value(2),
       "set significant figures of output, default 2,"
       " must be in range (0, 100)")(
-      "autocorr", po::value<int>(&autocorr_idx),
+      "autocorr", boost::program_options::value<int>(&autocorr_idx),
       "display autocorrelations for specified chain")(
-      "csv_filename", po::value<std::string>(&csv_filename),
+      "csv_filename", boost::program_options::value<std::string>(&csv_filename),
       "write summary to csv file (as well as to console),"
       " overwrites existing summary csv file")(
       "percentiles",
-      po::value<std::string>(&percentiles_spec)->default_value("5, 50, 95"),
-      "percentiles")("input_files",
-                     po::value<std::vector<std::string> >(&filenames),
-                     "sampler csv files");
-  po::positional_options_description p;
+      boost::program_options::value<std::string>(&percentiles_spec)
+          ->default_value("5, 50, 95"),
+      "percentiles")(
+      "input_files",
+      boost::program_options::value<std::vector<std::string> >(&filenames),
+      "sampler csv files");
+  boost::program_options::positional_options_description p;
   p.add("input_files", -1);
 
-  po::variables_map vm;
-  po::store(
-      po::command_line_parser(argc, argv).options(desc).positional(p).run(),
-      vm);
-  po::notify(vm);
-
+  boost::program_options::variables_map vm;
+  try {
+    boost::program_options::store(
+        boost::program_options::command_line_parser(argc, argv)
+            .options(desc)
+            .positional(p)
+            .run(),
+        vm);
+    boost::program_options::notify(vm);
+  } catch (const boost::program_options::error &e) {
+    std::cout << "Invalid argument: " << e.what();
+    return -1;
+  }
   if (vm.count("help")) {
     std::cout << desc << std::endl;
     return 0;
@@ -63,9 +73,10 @@ int main(int argc, const char *argv[]) {
       if (FILE *file = fopen(filenames[i].c_str(), "r")) {
         fclose(file);
       } else {
-        std::cout << "Invalid input file: " << filenames[i] << ", exiting." << std::endl;
+        std::cout << "Invalid input file: " << filenames[i] << ", exiting."
+                  << std::endl;
         return -1;
-      }   
+      }
     }
     if (filenames.size() == 1)
       std::cout << "Input file: ";
@@ -79,31 +90,36 @@ int main(int argc, const char *argv[]) {
     }
     std::cout << std::endl;
   } else {
-    std::cout << "No Stan csv file(s) specified, expecting one or more filenames." << std::endl;
+    std::cout
+        << "No Stan csv file(s) specified, expecting one or more filenames."
+        << std::endl;
     std::cout << desc << std::endl;
     return -1;
   }
   if (vm.count("csv_filename")) {
     if (FILE *file = fopen(csv_filename.c_str(), "w")) {
-        fclose(file);
+      fclose(file);
     } else {
-      std::cout << "Invalid output csv file: " << csv_filename << ", exiting." << std::endl;
+      std::cout << "Invalid output csv file: " << csv_filename << ", exiting."
+                << std::endl;
       return -1;
     }
     std::cout << "csv_filename " << csv_filename << std::endl;
   }
   if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
     if (sig_figs < 0 || sig_figs > 100) {
-      std::cout << "Invalid --sig_figs option: " << vm["sig_figs"].as<int>()
-                << ", exiting." << std::endl;
+      std::cout << "Bad value for option --sig_figs: "
+                << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
+      std::cout << desc << std::endl;
       return -1;
     }
     std::cout << "sig_figs " << vm["sig_figs"].as<int>() << std::endl;
   }
   if (vm.count("autocorr")) {
     if (autocorr_idx < 1 || autocorr_idx > filenames.size()) {
-      std::cout << "Invalid --autocorr option: " << autocorr_idx
+      std::cout << "Bad value for option --autocorr: " << autocorr_idx
                 << ", exiting." << std::endl;
+      std::cout << desc << std::endl;
       return -1;
     }
     std::cout << autocorr_idx << std::endl;
@@ -114,7 +130,13 @@ int main(int argc, const char *argv[]) {
   std::vector<std::string> percentiles;
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
-  Eigen::VectorXd probs = percentiles_to_probs(percentiles);
+  Eigen::VectorXd probs(percentiles.size());
+  try {
+    probs = percentiles_to_probs(percentiles);
+  } catch (const boost::program_options::error &e) {
+    std::cout << "Invalid argument: " << e.what();
+    return -1;
+  }
 
   // Parse csv files into sample, metadata
   stan::io::stan_csv_metadata metadata;

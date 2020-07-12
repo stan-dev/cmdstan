@@ -1,5 +1,6 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <test/utility.hpp>
+#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 
 using cmdstan::test::count_matches;
@@ -138,4 +139,133 @@ TEST(CommandStansummary, functional_test__issue_342) {
 
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+}
+
+TEST(CommandStansummary, missing_input_files) {
+  std::string expected_message = "No Stan csv file(s) specified";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  run_command_output out = run_command(command);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+}
+
+TEST(CommandStansummary, bad_input_files) {
+  std::string expected_message = "Invalid input file";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "no_such_file";
+
+  run_command_output out = run_command(command + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+}
+
+TEST(CommandStansummary, bad_csv_file_arg) {
+  std::string expected_message = "Invalid output csv file";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::string arg_csv_file
+      = "--csv_file=" + path_separator + "bin" + path_separator + "hi_mom.csv";
+
+  run_command_output out
+      = run_command(command + " " + arg_csv_file + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+}
+
+TEST(CommandStansummary, bad_sig_figs_arg) {
+  std::string expected_message = "Bad value for option --sig_figs";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::string arg_sig_figs = "--sig_figs=-1";
+
+  run_command_output out
+      = run_command(command + " " + arg_sig_figs + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_sig_figs = "--sig_figs=101";
+  out = run_command(command + " " + arg_sig_figs + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+}
+
+TEST(CommandStansummary, bad_autocorr_arg) {
+  std::string expected_message = "Bad value for option --autocorr";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::string arg_autocorr = "--autocorr=-1";
+
+  run_command_output out
+      = run_command(command + " " + arg_autocorr + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_autocorr = "--autocorr=0";
+  out = run_command(command + " " + arg_autocorr + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_autocorr = "--autocorr=2";
+  out = run_command(command + " " + arg_autocorr + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+}
+
+TEST(CommandStansummary, bad_percentiles_arg) {
+  std::string expected_message = "option --percentiles";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::string arg_percentiles = "--percentiles=-1";
+
+  run_command_output out
+      = run_command(command + " " + arg_percentiles + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_percentiles = "--percentiles=\"0,100\"";
+  out = run_command(command + " " + arg_percentiles + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_percentiles = "--percentiles=\"2,30,5\"";
+  out = run_command(command + " " + arg_percentiles + " " + csv_file);
+  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  ASSERT_TRUE(out.hasError)
+      << "\"" << out.command << "\" failed to quit with an error";
+
+  arg_percentiles = "--percentiles=\"2,50,95\"";
+  out = run_command(command + " " + arg_percentiles + " " + csv_file);
+  ASSERT_FALSE(out.hasError)
+      << "\"" << out.command << "\" quit with an error";
 }
