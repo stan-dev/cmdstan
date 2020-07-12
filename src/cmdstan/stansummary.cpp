@@ -7,9 +7,7 @@
 #include <ios>
 #include <iostream>
 #include <vector>
-
 #include <boost/program_options.hpp>
-namespace po = boost::program_options;
 
 /**
  * Compute summary statistics over HMC sampler output
