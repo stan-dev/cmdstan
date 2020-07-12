@@ -12,8 +12,9 @@
 namespace po = boost::program_options;
 
 /**
- * Compute summary statistics over NUTS-HMC sampler output
+ * Compute summary statistics over HMC sampler output
  * read in from stan_csv files.
+ * Command line options handled by boost::program_options.
  *
  * @param argc Number of arguments
  * @param argv Arguments
@@ -56,8 +57,8 @@ int main(int argc, const char *argv[]) {
     return 0;
   }
 
+  // Validate command line args
   if (vm.count("input_files")) {
-    // validate filepaths
     for (size_t i = 0; i < filenames.size(); ++i) {
       if (FILE *file = fopen(filenames[i].c_str(), "r")) {
         fclose(file);
@@ -110,13 +111,12 @@ int main(int argc, const char *argv[]) {
   if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
     std::cout << "percentiles " << percentiles_spec << std::endl;
   }
-
   std::vector<std::string> percentiles;
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   Eigen::VectorXd probs = percentiles_to_probs(percentiles);
 
-  // parse csv files into sample, metadata
+  // Parse csv files into sample, metadata
   stan::io::stan_csv_metadata metadata;
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
@@ -124,7 +124,7 @@ int main(int argc, const char *argv[]) {
   stan::mcmc::chains<> chains = parse_csv_files(
       filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
 
-
+  // Get column headers for sampler, model params
   size_t max_name_length = 0;
   size_t num_sampler_params = -1;  // don't count name 'lp__'
   for (int i = 0; i < chains.num_params(); ++i) {
@@ -172,6 +172,7 @@ int main(int argc, const char *argv[]) {
     std::cout << std::endl;
   }
 
+  // Optional: print to output csv file
   if (vm.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
     model_params_summary(chains, model_params, model_params_hdr,
