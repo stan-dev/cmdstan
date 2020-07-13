@@ -51,7 +51,7 @@ int compute_precision(double value, int sig_figs, bool scientific) {
   }
 }
 
-int calculate_column_width(const Eigen::VectorXd &x, const std::string &name,
+int column_width(const Eigen::VectorXd &x, const std::string &name,
                            int sig_figs, std::ios_base::fmtflags &format) {
   int padding = 2;
 
@@ -92,8 +92,8 @@ Eigen::VectorXi calculate_column_widths(
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) = calculate_column_width(values.col(i), headers[i],
-                                              sig_figs, formats(i));
+    column_widths(i) = column_width(values.col(i), headers[i],
+                                    sig_figs, formats(i));
   }
   return column_widths;
 }
@@ -250,9 +250,8 @@ std::vector<std::string> get_sampler_params_header(
   std::vector<std::string> sampler_params_header(percentiles.size() + 2);
   sampler_params_header.at(0) = "Mean";
   sampler_params_header.at(1) = "StdDev";
-  size_t offset = 2;
   for (size_t i = 0; i < percentiles.size(); ++i) {
-    sampler_params_header[i + offset] = percentiles[i] + '%';
+    sampler_params_header[i + 2] = percentiles[i] + '%';
   }
   return sampler_params_header;
 }
@@ -264,11 +263,10 @@ std::vector<std::string> get_model_params_header(
   model_params_header.at(0) = "Mean";
   model_params_header.at(1) = "MCSE";
   model_params_header.at(2) = "StdDev";
-  size_t offset = 3;
   for (size_t i = 0; i < percentiles.size(); ++i) {
-    model_params_header[i + offset] = percentiles[i] + '%';
+    model_params_header[i + 3] = percentiles[i] + '%';
   }
-  offset += percentiles.size();
+  size_t offset = 3 + percentiles.size();
   model_params_header.at(offset) = "N_Eff";
   model_params_header.at(offset + 1) = "N_Eff/s";
   model_params_header.at(offset + 2) = "R_hat";
@@ -285,7 +283,7 @@ void sampler_params_stats(const stan::mcmc::chains<> &chains,
     sampler_params(i, 0) = chains.mean(i_offset);
     sampler_params(i, 1) = chains.sd(i_offset);
     Eigen::VectorXd quantiles = chains.quantiles(i_offset, probs);
-    for (int j = 0; j < probs.size(); j++)
+    for (int j = 0; j < quantiles.cols(); j++)
       sampler_params(i, 2 + j) = quantiles(j);
   }
 }
@@ -307,26 +305,27 @@ void model_params_stats(const stan::mcmc::chains<> &chains,
   model_params(0, 1) = lp_sd / sqrt(lp_n_eff);
   model_params(0, 2) = lp_sd;
   Eigen::VectorXd quantiles = chains.quantiles(0, probs);
-  for (int j = 0; j < probs.size(); j++)
+  for (int j = 0; j < quantiles.cols(); j++)
     model_params(0, 3 + j) = quantiles(j);
-  model_params(0, probs.size() + 3) = lp_n_eff;
-  model_params(0, probs.size() + 4) = lp_n_eff / total_sampling_time;
-  model_params(0, probs.size() + 5) = chains.split_potential_scale_reduction(0);
+  int offset = quantiles.cols() + 3;
+  model_params(0, offset) = lp_n_eff;
+  model_params(0, offset + 1) = lp_n_eff / total_sampling_time;
+  model_params(0, offset + 2) = chains.split_potential_scale_reduction(0);
 
   // Model parameters
-  for (int i = model_params_start_col; i < chains.num_params(); ++i) {
-    int row_offset = i - model_params_start_col + 1;
+  for (int i = model_params_start_col, i_offset = 1; i < chains.num_params();
+       ++i, ++i_offset) {
     double sd = chains.sd(i);
     double n_eff = chains.effective_sample_size(i);
-    model_params(row_offset, 0) = chains.mean(i);
-    model_params(row_offset, 1) = sd / sqrt(n_eff);
-    model_params(row_offset, 2) = sd;
+    model_params(i_offset, 0) = chains.mean(i);
+    model_params(i_offset, 1) = sd / sqrt(n_eff);
+    model_params(i_offset, 2) = sd;
     Eigen::VectorXd quantiles = chains.quantiles(i, probs);
-    for (int j = 0; j < probs.size(); j++)
-      model_params(row_offset, 3 + j) = quantiles(j);
-    model_params(row_offset, probs.size() + 3) = n_eff;
-    model_params(row_offset, probs.size() + 4) = n_eff / total_sampling_time;
-    model_params(row_offset, probs.size() + 5)
+    for (int j = 0; j < quantiles.cols(); j++)
+      model_params(i_offset, 3 + j) = quantiles(j);
+    model_params(i_offset, quantiles.cols() + 3) = n_eff;
+    model_params(i_offset, quantiles.cols() + 4) = n_eff / total_sampling_time;
+    model_params(i_offset, quantiles.cols() + 5)
         = chains.split_potential_scale_reduction(i);
   }
 }
@@ -358,8 +357,8 @@ void sampler_params_summary(
     for (int j = 0; j < sampler_params.cols(); j++) {
       std::cout.setf(sampler_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-                  sampler_params(i, j), sig_figs,
-                  sampler_params_formats(j) == std::ios_base::scientific))
+          sampler_params(i, j), sig_figs,
+          sampler_params_formats(j) == std::ios_base::scientific))
            << std::setw(sampler_params_column_widths(j))
            << sampler_params(i, j);
     }
@@ -406,8 +405,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
     for (int j = 0; j < model_params.cols(); j++) {
       std::cout.setf(model_params_formats(j), std::ios::floatfield);
       *out << std::setprecision(compute_precision(
-                  model_params(0, j), sig_figs,
-                  model_params_formats(j) == std::ios_base::scientific))
+          model_params(0, j), sig_figs,
+          model_params_formats(j) == std::ios_base::scientific))
            << std::setw(model_params_column_widths(j)) << model_params(0, j);
     }
   }
@@ -430,8 +429,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
         for (int j = 0; j < model_params.cols(); j++) {
           std::cout.setf(model_params_formats(j), std::ios::floatfield);
           *out << std::setprecision(compute_precision(
-                      model_params(i, j), sig_figs,
-                      model_params_formats(j) == std::ios_base::scientific))
+              model_params(i, j), sig_figs,
+              model_params_formats(j) == std::ios_base::scientific))
                << std::setw(model_params_column_widths(j))
                << model_params(i, j);
         }
@@ -463,9 +462,8 @@ void model_params_summary(const stan::mcmc::chains<> &chains,
           for (int j = 0; j < model_params_header.size(); j++) {
             std::cout.setf(model_params_formats(j), std::ios::floatfield);
             *out << std::setprecision(compute_precision(
-                        model_params(row_maj_index - num_sampler_params, j),
-                        sig_figs,
-                        model_params_formats(j) == std::ios_base::scientific))
+                model_params(row_maj_index - num_sampler_params, j), sig_figs,
+                model_params_formats(j) == std::ios_base::scientific))
                  << std::setw(model_params_column_widths(j))
                  << model_params(row_maj_index - num_sampler_params, j);
           }

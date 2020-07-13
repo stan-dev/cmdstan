@@ -31,7 +31,7 @@ int main(int argc, const char *argv[]) {
       "sig_figs",
       boost::program_options::value<int>(&sig_figs)->default_value(2),
       "set significant figures of output, default 2,"
-      " must be in range (0, 100)")(
+      " must be in range (0, 10), inclusive")(
       "autocorr", boost::program_options::value<int>(&autocorr_idx),
       "display autocorrelations for specified chain")(
       "csv_filename", boost::program_options::value<std::string>(&csv_filename),
@@ -80,7 +80,6 @@ int main(int argc, const char *argv[]) {
       std::cout << "Input file: ";
     else
       std::cout << "Input files: ";
-    size_t i = 0;
     for (size_t i = 0; i < filenames.size(); ++i) {
       std::cout << filenames[i];
       if (i < filenames.size() - 1)
@@ -105,7 +104,7 @@ int main(int argc, const char *argv[]) {
     std::cout << "csv_filename " << csv_filename << std::endl;
   }
   if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-    if (sig_figs < 0 || sig_figs > 100) {
+    if (sig_figs < 0 || sig_figs > 10) {
       std::cout << "Bad value for option --sig_figs: "
                 << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
       std::cout << desc << std::endl;
