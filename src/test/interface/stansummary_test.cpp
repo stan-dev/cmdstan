@@ -271,11 +271,15 @@ TEST(CommandStansummary, bad_percentiles_arg) {
 }
 
 TEST(CommandStansummary, check_console_output) {
-  std::string lp = "lp__            -7.3  3.7e-02    0.77   -9.1  -7.0  -6.8    443    19275    1.0";
-  std::string theta = "theta           0.26  6.1e-03    0.12  0.079  0.25  0.47    384    16683   1.00";
+  std::string lp
+      = "lp__            -7.3  3.7e-02    0.77   -9.1  -7.0  -6.8    443    "
+        "19275    1.0";
+  std::string theta
+      = "theta           0.26  6.1e-03    0.12  0.079  0.25  0.47    384    "
+        "16683   1.00";
   std::string accept_stat = "accept_stat__   0.90  1.5e-01  0.57  0.96  1.0";
   std::string energy = "energy__         7.8  1.0e+00   6.8   7.5  9.9";
-  
+
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
@@ -288,15 +292,19 @@ TEST(CommandStansummary, check_console_output) {
   EXPECT_TRUE(boost::algorithm::contains(out.output, theta));
   EXPECT_TRUE(boost::algorithm::contains(out.output, accept_stat));
   EXPECT_TRUE(boost::algorithm::contains(out.output, energy));
-  ASSERT_FALSE(out.hasError)
-      << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
 
 TEST(CommandStansummary, check_csv_output) {
-  std::string csv_header = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
-  std::string lp = "\"lp__\",-7.2719,0.0365168,0.768874,-9.05757,-6.96978,-6.75008,443.328,19275.1,1.00037";
-  std::string theta = "\"theta\",0.256552,0.00610844,0.119654,0.0786292,0.24996,0.470263,383.704,16682.8,0.999309";
-  
+  std::string csv_header
+      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
+  std::string lp
+      = "\"lp__\",-7.2719,0.0365168,0.768874,-9.05757,-6.96978,-6.75008,443."
+        "328,19275.1,1.00037";
+  std::string theta
+      = "\"theta\",0.256552,0.00610844,0.119654,0.0786292,0.24996,0.470263,383."
+        "704,16682.8,0.999309";
+
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
@@ -305,14 +313,14 @@ TEST(CommandStansummary, check_csv_output) {
                          + path_separator + "bernoulli_chain_1.csv";
 
   std::string target_csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "tmp_test_target_csv_file.csv";
+                                + "interface" + path_separator
+                                + "example_output" + path_separator
+                                + "tmp_test_target_csv_file.csv";
   std::string arg_csv_file = "--csv_file=" + target_csv_file;
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
-  ASSERT_FALSE(out.hasError)
-      << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   std::ifstream target_stream(target_csv_file.c_str());
   if (!target_stream.is_open())
