@@ -52,7 +52,7 @@ int compute_precision(double value, int sig_figs, bool scientific) {
 }
 
 int column_width(const Eigen::VectorXd &x, const std::string &name,
-                           int sig_figs, std::ios_base::fmtflags &format) {
+                 int sig_figs, std::ios_base::fmtflags &format) {
   int padding = 2;
 
   // Fixed Precision
@@ -92,8 +92,8 @@ Eigen::VectorXi calculate_column_widths(
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) = column_width(values.col(i), headers[i],
-                                    sig_figs, formats(i));
+    column_widths(i)
+        = column_width(values.col(i), headers[i], sig_figs, formats(i));
   }
   return column_widths;
 }
