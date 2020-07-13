@@ -266,6 +266,5 @@ TEST(CommandStansummary, bad_percentiles_arg) {
 
   arg_percentiles = "--percentiles=\"2,50,95\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
-  ASSERT_FALSE(out.hasError)
-      << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
