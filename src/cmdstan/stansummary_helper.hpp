@@ -283,7 +283,8 @@ void sampler_params_stats(const stan::mcmc::chains<> &chains,
     sampler_params(i, 0) = chains.mean(i_offset);
     sampler_params(i, 1) = chains.sd(i_offset);
     Eigen::VectorXd quantiles = chains.quantiles(i_offset, probs);
-    for (int j = 0; j < quantiles.cols(); j++)
+    std::cout << quantiles.size() << std::endl;
+    for (int j = 0; j < quantiles.size(); ++j)
       sampler_params(i, 2 + j) = quantiles(j);
   }
 }
@@ -305,9 +306,9 @@ void model_params_stats(const stan::mcmc::chains<> &chains,
   model_params(0, 1) = lp_sd / sqrt(lp_n_eff);
   model_params(0, 2) = lp_sd;
   Eigen::VectorXd quantiles = chains.quantiles(0, probs);
-  for (int j = 0; j < quantiles.cols(); j++)
+  for (int j = 0; j < quantiles.size(); j++)
     model_params(0, 3 + j) = quantiles(j);
-  int offset = quantiles.cols() + 3;
+  int offset = quantiles.size() + 3;
   model_params(0, offset) = lp_n_eff;
   model_params(0, offset + 1) = lp_n_eff / total_sampling_time;
   model_params(0, offset + 2) = chains.split_potential_scale_reduction(0);
@@ -321,11 +322,11 @@ void model_params_stats(const stan::mcmc::chains<> &chains,
     model_params(i_offset, 1) = sd / sqrt(n_eff);
     model_params(i_offset, 2) = sd;
     Eigen::VectorXd quantiles = chains.quantiles(i, probs);
-    for (int j = 0; j < quantiles.cols(); j++)
+    for (int j = 0; j < quantiles.size(); j++)
       model_params(i_offset, 3 + j) = quantiles(j);
-    model_params(i_offset, quantiles.cols() + 3) = n_eff;
-    model_params(i_offset, quantiles.cols() + 4) = n_eff / total_sampling_time;
-    model_params(i_offset, quantiles.cols() + 5)
+    model_params(i_offset, quantiles.size() + 3) = n_eff;
+    model_params(i_offset, quantiles.size() + 4) = n_eff / total_sampling_time;
+    model_params(i_offset, quantiles.size() + 5)
         = chains.split_potential_scale_reduction(i);
   }
 }
