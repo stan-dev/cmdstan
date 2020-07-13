@@ -283,7 +283,6 @@ void sampler_params_stats(const stan::mcmc::chains<> &chains,
     sampler_params(i, 0) = chains.mean(i_offset);
     sampler_params(i, 1) = chains.sd(i_offset);
     Eigen::VectorXd quantiles = chains.quantiles(i_offset, probs);
-    std::cout << quantiles.size() << std::endl;
     for (int j = 0; j < quantiles.size(); ++j)
       sampler_params(i, 2 + j) = quantiles(j);
   }
