@@ -337,3 +337,101 @@ TEST(CommandStansummary, check_csv_output) {
   if (return_code != 0)
     FAIL();
 }
+
+TEST(CommandStansummary, sampler_params) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+
+  std::vector<std::string> pcts;
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  Eigen::VectorXd probs = percentiles_to_probs(pcts);
+  EXPECT_FLOAT_EQ(probs[0], 0.1);
+  EXPECT_FLOAT_EQ(probs[1], 0.5);
+  EXPECT_FLOAT_EQ(probs[2], 0.9);
+
+  std::vector<std::string> header = get_sampler_params_header(pcts);
+  EXPECT_EQ(header.size(), pcts.size() + 2);
+  EXPECT_EQ(header[0], "Mean");
+  EXPECT_EQ(header[2], "10%");
+
+  // bernoulli model:  6 sampler params, ("lp__", is model param)
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::vector<std::string> filenames;
+  filenames.push_back(csv_file);
+  stan::io::stan_csv_metadata metadata;
+  Eigen::VectorXd warmup_times(filenames.size());
+  Eigen::VectorXd sampling_times(filenames.size());
+  Eigen::VectorXi thin(filenames.size());
+  stan::mcmc::chains<> chains = parse_csv_files(
+      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  EXPECT_EQ(chains.num_chains(), 1);
+  EXPECT_EQ(chains.num_params(), 8);
+
+  int sampler_params_start_col = 1;
+  Eigen::MatrixXd sampler_params(6, header.size());
+  sampler_params_stats(chains, probs, sampler_params_start_col, sampler_params);
+  std::stringstream ss;
+  sampler_params_summary(chains, sampler_params, header,
+                         sampler_params_start_col, 13, 2, &ss);
+  std::string accept_stat = "accept_stat__    0.9      0.1  0.69  0.96    1";
+  std::string energy = "energy__           8        1     7     7    9";
+  EXPECT_TRUE(boost::algorithm::contains(ss.str(), accept_stat));
+  EXPECT_TRUE(boost::algorithm::contains(ss.str(), energy));
+}
+
+TEST(CommandStansummary, model_params) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+
+  std::vector<std::string> pcts;
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  Eigen::VectorXd probs = percentiles_to_probs(pcts);
+  EXPECT_FLOAT_EQ(probs[0], 0.1);
+  EXPECT_FLOAT_EQ(probs[1], 0.5);
+  EXPECT_FLOAT_EQ(probs[2], 0.9);
+
+  std::vector<std::string> header = get_model_params_header(pcts);
+  EXPECT_EQ(header.size(), pcts.size() + 6);
+  EXPECT_EQ(header[0], "Mean");
+  EXPECT_EQ(header[2], "StdDev");
+  EXPECT_EQ(header[4], "50%");
+  EXPECT_EQ(header[6], "N_Eff");
+  EXPECT_EQ(header[8], "R_hat");
+
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::vector<std::string> filenames;
+  filenames.push_back(csv_file);
+  stan::io::stan_csv_metadata metadata;
+  Eigen::VectorXd warmup_times(filenames.size());
+  Eigen::VectorXd sampling_times(filenames.size());
+  Eigen::VectorXi thin(filenames.size());
+  stan::mcmc::chains<> chains = parse_csv_files(
+      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  EXPECT_EQ(chains.num_chains(), 1);
+  EXPECT_EQ(chains.num_params(), 8);
+
+  // bernoulli model:  2 model params: "lp__", "theta"
+  int model_params_start_col = 7;
+  Eigen::MatrixXd model_params(2, header.size());
+  model_params_stats(chains, warmup_times, sampling_times, probs,
+                     model_params_start_col, model_params);
+  std::stringstream ss;
+  model_params_summary(chains, model_params, header, model_params_start_col, 13,
+                       2, 0, &ss);
+  std::string lp
+      = "lp__              -7     0.04    0.77    -8    -7    -7  4e+02    "
+        "2e+04      1";
+  std::string theta
+      = "theta           0.26    0.006    0.12  0.11  0.25  0.42  4e+02    "
+        "2e+04      1";
+  EXPECT_TRUE(boost::algorithm::contains(ss.str(), lp));
+  EXPECT_TRUE(boost::algorithm::contains(ss.str(), theta));
+}

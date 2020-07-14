@@ -7,6 +7,7 @@
 #include <ios>
 #include <iostream>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
 /**
@@ -27,23 +28,27 @@ int main(int argc, const char *argv[]) {
   std::string percentiles_spec;
   std::vector<std::string> filenames;
   boost::program_options::options_description desc("Allowed options");
-  desc.add_options()("help", "produce help message")(
-      "sig_figs",
+  desc.add_options()("help,h", "Produce help message")(
+      "sig_figs,s",
       boost::program_options::value<int>(&sig_figs)->default_value(2),
-      "set significant figures of output, default 2,"
-      " must be in range (0, 10), inclusive")(
-      "autocorr", boost::program_options::value<int>(&autocorr_idx),
-      "display autocorrelations for specified chain")(
-      "csv_filename", boost::program_options::value<std::string>(&csv_filename),
-      "write summary to csv file (as well as to console),"
-      " overwrites existing summary csv file")(
-      "percentiles",
+      "Significant figures reported, (default 2). "
+      "Must be in the range (1, 10), inclusive.")(
+      "autocorr,a", boost::program_options::value<int>(&autocorr_idx),
+      "Display the chain autocorrelation for the n-th input file, "
+      "(default none).")(
+      "csv_filename,c", boost::program_options::value<std::string>(&csv_filename),
+      "Write model parameter summaries to a csv file as well as to console."
+      " Will overwrite an existing file.")(
+      "percentiles,p",
       boost::program_options::value<std::string>(&percentiles_spec)
-          ->default_value("5, 50, 95"),
-      "percentiles")(
-      "input_files",
+      ->default_value("5,50,95"),
+      "Percentiles to report, in increasing order. "
+      "Must be integers in the range (1,99), inclusive.")(
+      "input_files,i",
       boost::program_options::value<std::vector<std::string> >(&filenames),
-      "sampler csv files");
+      "Sampler csv files. "
+      "Flag \"-i\" is optional, instead list input files at end, "
+      "e.g.:  stansummary chain_1.csv chain_2.csv");
   boost::program_options::positional_options_description p;
   p.add("input_files", -1);
 
@@ -57,7 +62,7 @@ int main(int argc, const char *argv[]) {
         vm);
     boost::program_options::notify(vm);
   } catch (const boost::program_options::error &e) {
-    std::cout << "Invalid argument: " << e.what();
+    std::cout << "Invalid argument: " << e.what() << std::endl;
     return -1;
   }
   if (vm.count("help")) {
@@ -104,7 +109,7 @@ int main(int argc, const char *argv[]) {
     std::cout << "csv_filename " << csv_filename << std::endl;
   }
   if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-    if (sig_figs < 0 || sig_figs > 10) {
+    if (sig_figs < 1 || sig_figs > 10) {
       std::cout << "Bad value for option --sig_figs: "
                 << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
       std::cout << desc << std::endl;
@@ -125,13 +130,14 @@ int main(int argc, const char *argv[]) {
     std::cout << "percentiles " << percentiles_spec << std::endl;
   }
   std::vector<std::string> percentiles;
+  boost::algorithm::trim(percentiles_spec); // split treats leading space as token
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
-  Eigen::VectorXd probs(percentiles.size());
+  Eigen::VectorXd probs;
   try {
     probs = percentiles_to_probs(percentiles);
   } catch (const boost::program_options::error &e) {
-    std::cout << "Invalid argument: " << e.what();
+    std::cout << "Invalid argument: " << e.what() << std::endl;
     return -1;
   }
 

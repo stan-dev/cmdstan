@@ -279,17 +279,16 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
 }
 
 /**
- * Convert percentiles - int values in range (0,100)
+ * Convert percentiles - int values in range (1,99)
  * to probabilities - double values in range (0, 1).
  *
  * <p>Input values must be in strictly increasing order.
  *
- * @param in vector of percentile values as strings
+ * @param vector of strings
  * @return vector of doubles
  * @throws boost::program_options::error if input is ill-formed.
  */
-Eigen::VectorXd percentiles_to_probs(
-    const std::vector<std::string> &percentiles) {
+Eigen::VectorXd percentiles_to_probs(const std::vector<std::string> percentiles) {
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
   int pct = 0;
@@ -303,8 +302,7 @@ Eigen::VectorXd percentiles_to_probs(
     } catch (const std::exception &e) {
       std::stringstream message_stream("");
       message_stream << "value(s) for option --percentiles must be "
-                     << "integers between 0 and 100, strictly increasing."
-                     << std::endl;
+                     << "integers between 0 and 100, strictly increasing.";
       throw boost::program_options::error(message_stream.str());
     }
     probs[i] = pct * 1.0 / 100.0;
