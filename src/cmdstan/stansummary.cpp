@@ -36,12 +36,13 @@ int main(int argc, const char *argv[]) {
       "autocorr,a", boost::program_options::value<int>(&autocorr_idx),
       "Display the chain autocorrelation for the n-th input file, "
       "(default none).")(
-      "csv_filename,c", boost::program_options::value<std::string>(&csv_filename),
+      "csv_filename,c",
+      boost::program_options::value<std::string>(&csv_filename),
       "Write model parameter summaries to a csv file as well as to console."
       " Will overwrite an existing file.")(
       "percentiles,p",
       boost::program_options::value<std::string>(&percentiles_spec)
-      ->default_value("5,50,95"),
+          ->default_value("5,50,95"),
       "Percentiles to report, in increasing order. "
       "Must be integers in the range (1,99), inclusive.")(
       "input_files,i",
@@ -130,7 +131,8 @@ int main(int argc, const char *argv[]) {
     std::cout << "percentiles " << percentiles_spec << std::endl;
   }
   std::vector<std::string> percentiles;
-  boost::algorithm::trim(percentiles_spec); // split treats leading space as token
+  boost::algorithm::trim(
+      percentiles_spec);  // split treats leading space as token
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   Eigen::VectorXd probs;
