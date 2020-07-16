@@ -667,27 +667,26 @@ void write_params(const stan::mcmc::chains<> &chains,
       for (size_t j = 0; j < dims.size(); j++)
         max *= dims[j];
       for (int k = 0; k < max; k++) {
-        int row_maj_index = i_chains + matrix_index(index, dims);
+        int row_maj_index = i + matrix_index(index, dims);
         if (as_csv) {
-          *out << "\"" << chains.param_name(row_maj_index) << "\"";
+          *out << "\"" << chains.param_name(row_maj_index + params_start_col)
+               << "\"";
           for (int j = 0; j < params.cols(); j++) {
             *out << "," << std::fixed
                  << std::setprecision(compute_precision(
-                        params(row_maj_index, j), sig_figs,
-                        false))
+                        params(row_maj_index, j), sig_figs, false))
                  << params(row_maj_index, j);
           }
         } else {
           *out << std::setw(max_name_length + 1) << std::left
-               << chains.param_name(row_maj_index);
+               << chains.param_name(row_maj_index + params_start_col);
           *out << std::right;
           for (int j = 0; j < params.cols(); j++) {
             std::cout.setf(col_formats(j), std::ios::floatfield);
-            *out << std::setprecision(compute_precision(
-                params(row_maj_index - params_start_col, j), sig_figs,
-                col_formats(j) == std::ios_base::scientific))
-                 << std::setw(col_widths(j))
-                 << params(row_maj_index - params_start_col, j);
+            *out << std::setprecision(
+                compute_precision(params(row_maj_index, j), sig_figs,
+                                  col_formats(j) == std::ios_base::scientific))
+                 << std::setw(col_widths(j)) << params(row_maj_index, j);
           }
         }
         *out << std::endl;
