@@ -668,8 +668,9 @@ void write_params(const stan::mcmc::chains<> &chains,
         max *= dims[j];
       for (int k = 0; k < max; k++) {
         int row_maj_index = i + matrix_index(index, dims);
+        int row_maj_index_chains = i_chains + matrix_index(index, dims);
         if (as_csv) {
-          *out << "\"" << chains.param_name(row_maj_index + params_start_col)
+          *out << "\"" << chains.param_name(row_maj_index_chains)
                << "\"";
           for (int j = 0; j < params.cols(); j++) {
             *out << "," << std::fixed
@@ -679,7 +680,7 @@ void write_params(const stan::mcmc::chains<> &chains,
           }
         } else {
           *out << std::setw(max_name_length + 1) << std::left
-               << chains.param_name(row_maj_index + params_start_col);
+               << chains.param_name(row_maj_index_chains);
           *out << std::right;
           for (int j = 0; j < params.cols(); j++) {
             std::cout.setf(col_formats(j), std::ios::floatfield);
@@ -694,6 +695,7 @@ void write_params(const stan::mcmc::chains<> &chains,
           next_index(index, dims);
       }
       i += max - 1;
+      i_chains += max - 1;
     }
   }
 }
