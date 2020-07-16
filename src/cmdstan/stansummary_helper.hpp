@@ -353,179 +353,6 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
 }
 
 /**
- * Output timing statistics for all chains
- *
- * @param in set of samples from one or more chains
- * @param in metatdata
- * @param in warmup times for each chain
- * @param in sampling times for each chain
- * @param in thinning for each chain
- * @param in prefix string - used to output as comments in csv file
- * @param out output stream
- */
-void timing_summary(const stan::mcmc::chains<> &chains,
-                    const stan::io::stan_csv_metadata &metadata,
-                    const Eigen::VectorXd &warmup_times,
-                    const Eigen::VectorXd &sampling_times,
-                    const Eigen::VectorXi &thin, const std::string &prefix,
-                    std::ostream *out) {
-  *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
-       << prefix << chains.num_chains() << " chains: each with iter=("
-       << chains.num_kept_samples(0);
-  for (int chain = 1; chain < chains.num_chains(); chain++)
-    *out << "," << chains.num_kept_samples(chain);
-  *out << ")";
-  *out << "; warmup=(" << chains.warmup(0);
-  for (int chain = 1; chain < chains.num_chains(); chain++)
-    *out << "," << chains.warmup(chain);
-  *out << ")";
-  *out << "; thin=(" << thin(0);
-  for (int chain = 1; chain < chains.num_chains(); chain++)
-    *out << "," << thin(chain);
-  *out << ")";
-  *out << "; " << chains.num_samples() << " iterations saved." << std::endl
-       << prefix << std::endl;
-
-  int sig_figs = 2;
-  double total_warmup_time = warmup_times.sum();
-  double total_sampling_time = sampling_times.sum();
-
-  std::string warmup_unit = "seconds";
-  if (total_warmup_time / 3600 > 1) {
-    total_warmup_time /= 3600;
-    warmup_unit = "hours";
-  } else if (total_warmup_time / 60 > 1) {
-    total_warmup_time /= 60;
-    warmup_unit = "minutes";
-  }
-  if (chains.num_chains() == 1) {
-    *out << prefix << "Warmup took " << std::fixed
-         << std::setprecision(
-                compute_precision(total_warmup_time, sig_figs, false))
-         << total_warmup_time << " " << warmup_unit << std::endl;
-  } else {
-    *out << prefix << "Warmup took (" << std::fixed
-         << std::setprecision(
-                compute_precision(warmup_times(0), sig_figs, false))
-         << warmup_times(0);
-    for (int chain = 1; chain < chains.num_chains(); chain++)
-      *out << ", " << std::fixed
-           << std::setprecision(
-                  compute_precision(warmup_times(chain), sig_figs, false))
-           << warmup_times(chain);
-    *out << ") seconds, ";
-    *out << std::fixed
-         << std::setprecision(
-                compute_precision(total_warmup_time, sig_figs, false))
-         << total_warmup_time << " " << warmup_unit << " total" << std::endl;
-  }
-
-  std::string sampling_unit = "seconds";
-  if (total_sampling_time / 3600 > 1) {
-    total_sampling_time /= 3600;
-    sampling_unit = "hours";
-  } else if (total_sampling_time / 60 > 1) {
-    total_sampling_time /= 60;
-    sampling_unit = "minutes";
-  }
-  if (chains.num_chains() == 1) {
-    *out << prefix << "Sampling took " << std::fixed
-         << std::setprecision(
-                compute_precision(total_sampling_time, sig_figs, false))
-         << total_sampling_time << " " << sampling_unit << std::endl;
-  } else {
-    *out << prefix << "Sampling took (" << std::fixed
-         << std::setprecision(
-                compute_precision(sampling_times(0), sig_figs, false))
-         << sampling_times(0);
-    for (int chain = 1; chain < chains.num_chains(); chain++)
-      *out << ", " << std::fixed
-           << std::setprecision(
-                  compute_precision(sampling_times(chain), sig_figs, false))
-           << sampling_times(chain);
-    *out << ") seconds, ";
-    *out << std::fixed
-         << std::setprecision(
-                compute_precision(total_sampling_time, sig_figs, false))
-         << total_sampling_time << " " << sampling_unit << " total"
-         << std::endl;
-  }
-}
-
-/**
- * Output sampler information
- *
- * @param in metatdata
- * @param in prefix string - used to output as comments in csv file
- * @param out output stream
- */
-void sampler_summary(const stan::io::stan_csv_metadata &metadata,
-                     const std::string &prefix, std::ostream *out) {
-  /// Footer output
-  *out << prefix << "Samples were drawn using " << metadata.algorithm
-       << " with " << metadata.engine << "." << std::endl;
-  *out << prefix
-       << "For each parameter, N_Eff is a crude measure of effective "
-          "sample size,"
-       << std::endl;
-  *out << prefix
-       << "and R_hat is the potential scale reduction factor on split "
-          "chains (at "
-       << std::endl;
-  *out << prefix << "convergence, R_hat=1)." << std::endl;
-}
-
-/**
- * Compute and autocorrelation of a specified chain
- * and print to console.
- *
- * <p>Lag is computed based on number of samples:
- * size < 100, lag 1, size < 1000, lag 2, size < 10000 lag 3, etc.
-
- * @param in set of samples from one or more chains
- * @param in metatdata
- * @param in 1-based index of stan csv input file
- * @param in size of longest sampler param name
- */
-// autocorrelation report prints to std::out
-void autocorrelation(const stan::mcmc::chains<> &chains,
-                     const stan::io::stan_csv_metadata &metadata,
-                     int autocorr_idx, int max_name_length) {
-  int c = autocorr_idx - 1;
-  Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
-  for (int i = 0; i < chains.num_params(); ++i) {
-    autocorr.row(i) = chains.autocorrelation(c, i);
-  }
-  std::cout << "Displaying the autocorrelations for chain " << autocorr_idx
-            << ":" << std::endl
-            << std::endl;
-
-  int n_autocorr = autocorr.row(0).size();
-  int lag_width = 1;
-  int number = n_autocorr;
-  while (number != 0) {
-    number /= 10;
-    lag_width++;
-  }
-
-  std::cout << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
-  for (int i = 0; i < chains.num_params(); ++i) {
-    std::cout << std::setw(max_name_length + 1) << std::right
-              << chains.param_name(i);
-  }
-  std::cout << std::endl;
-
-  for (int n = 0; n < n_autocorr; ++n) {
-    std::cout << std::setw(lag_width) << std::right << n;
-    for (int i = 0; i < chains.num_params(); ++i) {
-      std::cout << std::setw(max_name_length + 1) << std::right
-                << autocorr(i, n);
-    }
-    std::cout << std::endl;
-  }
-}
-
-/**
  * Assemble vector of output column labels as follows:
  * Mean, MCSE, StdDev, specified quantile labels, N_eff, N_eff/S, R-hat
  *
@@ -699,5 +526,179 @@ void write_params(const stan::mcmc::chains<> &chains,
     }
   }
 }
+
+/**
+ * Output timing statistics for all chains
+ *
+ * @param in set of samples from one or more chains
+ * @param in metatdata
+ * @param in warmup times for each chain
+ * @param in sampling times for each chain
+ * @param in thinning for each chain
+ * @param in prefix string - used to output as comments in csv file
+ * @param out output stream
+ */
+void write_timing(const stan::mcmc::chains<> &chains,
+                    const stan::io::stan_csv_metadata &metadata,
+                    const Eigen::VectorXd &warmup_times,
+                    const Eigen::VectorXd &sampling_times,
+                    const Eigen::VectorXi &thin, const std::string &prefix,
+                    std::ostream *out) {
+  *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
+       << prefix << chains.num_chains() << " chains: each with iter=("
+       << chains.num_kept_samples(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << chains.num_kept_samples(chain);
+  *out << ")";
+  *out << "; warmup=(" << chains.warmup(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << chains.warmup(chain);
+  *out << ")";
+  *out << "; thin=(" << thin(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << thin(chain);
+  *out << ")";
+  *out << "; " << chains.num_samples() << " iterations saved." << std::endl
+       << prefix << std::endl;
+
+  int sig_figs = 2;
+  double total_warmup_time = warmup_times.sum();
+  double total_sampling_time = sampling_times.sum();
+
+  std::string warmup_unit = "seconds";
+  if (total_warmup_time / 3600 > 1) {
+    total_warmup_time /= 3600;
+    warmup_unit = "hours";
+  } else if (total_warmup_time / 60 > 1) {
+    total_warmup_time /= 60;
+    warmup_unit = "minutes";
+  }
+  if (chains.num_chains() == 1) {
+    *out << prefix << "Warmup took " << std::fixed
+         << std::setprecision(
+                compute_precision(total_warmup_time, sig_figs, false))
+         << total_warmup_time << " " << warmup_unit << std::endl;
+  } else {
+    *out << prefix << "Warmup took (" << std::fixed
+         << std::setprecision(
+                compute_precision(warmup_times(0), sig_figs, false))
+         << warmup_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      *out << ", " << std::fixed
+           << std::setprecision(
+                  compute_precision(warmup_times(chain), sig_figs, false))
+           << warmup_times(chain);
+    *out << ") seconds, ";
+    *out << std::fixed
+         << std::setprecision(
+                compute_precision(total_warmup_time, sig_figs, false))
+         << total_warmup_time << " " << warmup_unit << " total" << std::endl;
+  }
+
+  std::string sampling_unit = "seconds";
+  if (total_sampling_time / 3600 > 1) {
+    total_sampling_time /= 3600;
+    sampling_unit = "hours";
+  } else if (total_sampling_time / 60 > 1) {
+    total_sampling_time /= 60;
+    sampling_unit = "minutes";
+  }
+  if (chains.num_chains() == 1) {
+    *out << prefix << "Sampling took " << std::fixed
+         << std::setprecision(
+                compute_precision(total_sampling_time, sig_figs, false))
+         << total_sampling_time << " " << sampling_unit << std::endl;
+  } else {
+    *out << prefix << "Sampling took (" << std::fixed
+         << std::setprecision(
+                compute_precision(sampling_times(0), sig_figs, false))
+         << sampling_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      *out << ", " << std::fixed
+           << std::setprecision(
+                  compute_precision(sampling_times(chain), sig_figs, false))
+           << sampling_times(chain);
+    *out << ") seconds, ";
+    *out << std::fixed
+         << std::setprecision(
+                compute_precision(total_sampling_time, sig_figs, false))
+         << total_sampling_time << " " << sampling_unit << " total"
+         << std::endl;
+  }
+}
+
+/**
+ * Output sampler information
+ *
+ * @param in metatdata
+ * @param in prefix string - used to output as comments in csv file
+ * @param out output stream
+ */
+void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
+                     const std::string &prefix, std::ostream *out) {
+  /// Footer output
+  *out << prefix << "Samples were drawn using " << metadata.algorithm
+       << " with " << metadata.engine << "." << std::endl;
+  *out << prefix
+       << "For each parameter, N_Eff is a crude measure of effective "
+          "sample size,"
+       << std::endl;
+  *out << prefix
+       << "and R_hat is the potential scale reduction factor on split "
+          "chains (at "
+       << std::endl;
+  *out << prefix << "convergence, R_hat=1)." << std::endl;
+}
+
+/**
+ * Compute and autocorrelation of a specified chain
+ * and print to console.
+ *
+ * <p>Lag is computed based on number of samples:
+ * size < 100, lag 1, size < 1000, lag 2, size < 10000 lag 3, etc.
+
+ * @param in set of samples from one or more chains
+ * @param in metatdata
+ * @param in 1-based index of stan csv input file
+ * @param in size of longest sampler param name
+ */
+// autocorrelation report prints to std::out
+void autocorrelation(const stan::mcmc::chains<> &chains,
+                     const stan::io::stan_csv_metadata &metadata,
+                     int autocorr_idx, int max_name_length) {
+  int c = autocorr_idx - 1;
+  Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
+  for (int i = 0; i < chains.num_params(); ++i) {
+    autocorr.row(i) = chains.autocorrelation(c, i);
+  }
+  std::cout << "Displaying the autocorrelations for chain " << autocorr_idx
+            << ":" << std::endl
+            << std::endl;
+
+  int n_autocorr = autocorr.row(0).size();
+  int lag_width = 1;
+  int number = n_autocorr;
+  while (number != 0) {
+    number /= 10;
+    lag_width++;
+  }
+
+  std::cout << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
+  for (int i = 0; i < chains.num_params(); ++i) {
+    std::cout << std::setw(max_name_length + 1) << std::right
+              << chains.param_name(i);
+  }
+  std::cout << std::endl;
+
+  for (int n = 0; n < n_autocorr; ++n) {
+    std::cout << std::setw(lag_width) << std::right << n;
+    for (int i = 0; i < chains.num_params(); ++i) {
+      std::cout << std::setw(max_name_length + 1) << std::right
+                << autocorr(i, n);
+    }
+    std::cout << std::endl;
+  }
+}
+
 
 #endif

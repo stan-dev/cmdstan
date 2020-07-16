@@ -10,6 +10,8 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
+void usage() { std::cout << "Usage" << std::endl; }
+
 /**
  * Compute summary statistics over HMC sampler output
  * read in from stan_csv files.
@@ -22,6 +24,25 @@
  *         non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
+  std::string usage = R"(Usage: stansummary [OPTIONS] stan_csv_file(s)
+Report statistics for one or more Stan csv files from HMC sampler run.
+Example:  stansummary model_1.csv model_2.csv
+Options:
+  -a, --autocorr [n]          Display the chain autocorrelation for the n-th
+                              input file, in addition to statistics.
+  -c, --csv_filename [file]   Write statistics to a csv file.
+  -h, --help                  Produce help message, then exit.
+  -p, --percentiles [values]  Percentiles to report as ordered set of
+                              comma-separated integers from (1,99), inclusive.
+                              Default is 5,50,95.
+  -s, --sig_figs [n]          Significant figures reported. Default is 2.
+                              Must be an integer from (1, 10), inclusive.
+)";
+  if (argc < 2) {  // pre-empt boost::program_options
+    std::cout << usage << std::endl;
+    return -1;
+  }
+
   int sig_figs;
   int autocorr_idx;
   std::string csv_filename;
@@ -31,25 +52,19 @@ int main(int argc, const char *argv[]) {
   desc.add_options()("help,h", "Produce help message")(
       "sig_figs,s",
       boost::program_options::value<int>(&sig_figs)->default_value(2),
-      "Significant figures reported, (default 2). "
-      "Must be in the range (1, 10), inclusive.")(
+      "Significant figures, default 2.")(
       "autocorr,a", boost::program_options::value<int>(&autocorr_idx),
-      "Display the chain autocorrelation for the n-th input file, "
-      "(default none).")(
+      "Display the chain autocorrelation.")(
       "csv_filename,c",
       boost::program_options::value<std::string>(&csv_filename),
-      "Write model parameter summaries to a csv file as well as to console."
-      " Will overwrite an existing file.")(
+      "Write statistics to a csv.")(
       "percentiles,p",
       boost::program_options::value<std::string>(&percentiles_spec)
           ->default_value("5,50,95"),
-      "Percentiles to report, in increasing order. "
-      "Must be integers in the range (1,99), inclusive.")(
+      "Percentiles to report.")(
       "input_files,i",
       boost::program_options::value<std::vector<std::string> >(&filenames),
-      "Sampler csv files. "
-      "Flag \"-i\" is optional, instead list input files at end, "
-      "e.g.:  stansummary chain_1.csv chain_2.csv");
+      "Sampler csv files. ");
   boost::program_options::positional_options_description p;
   p.add("input_files", -1);
 
@@ -64,14 +79,15 @@ int main(int argc, const char *argv[]) {
     boost::program_options::notify(vm);
   } catch (const boost::program_options::error &e) {
     std::cout << "Invalid argument: " << e.what() << std::endl;
+    std::cout << std::endl << usage << std::endl;
     return -1;
   }
   if (vm.count("help")) {
-    std::cout << desc << std::endl;
+    std::cout << std::endl << usage << std::endl;
     return 0;
   }
 
-  // Validate command line args
+  // Validate command line options
   if (vm.count("input_files")) {
     for (size_t i = 0; i < filenames.size(); ++i) {
       if (FILE *file = fopen(filenames[i].c_str(), "r")) {
@@ -79,6 +95,7 @@ int main(int argc, const char *argv[]) {
       } else {
         std::cout << "Invalid input file: " << filenames[i] << ", exiting."
                   << std::endl;
+        std::cout << std::endl << usage << std::endl;
         return -1;
       }
     }
@@ -96,7 +113,7 @@ int main(int argc, const char *argv[]) {
     std::cout
         << "No Stan csv file(s) specified, expecting one or more filenames."
         << std::endl;
-    std::cout << desc << std::endl;
+    std::cout << std::endl << usage << std::endl;
     return -1;
   }
   if (vm.count("csv_filename")) {
@@ -105,30 +122,31 @@ int main(int argc, const char *argv[]) {
     } else {
       std::cout << "Invalid output csv file: " << csv_filename << ", exiting."
                 << std::endl;
+      std::cout << std::endl << usage << std::endl;
       return -1;
     }
-    std::cout << "csv_filename " << csv_filename << std::endl;
+    std::cout << "Ouput csv_file: " << csv_filename << std::endl;
   }
   if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
     if (sig_figs < 1 || sig_figs > 10) {
       std::cout << "Bad value for option --sig_figs: "
                 << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
-      std::cout << desc << std::endl;
+      std::cout << std::endl << usage << std::endl;
       return -1;
     }
-    std::cout << "sig_figs " << vm["sig_figs"].as<int>() << std::endl;
+    std::cout << "Significant digits: " << vm["sig_figs"].as<int>() << std::endl;
   }
   if (vm.count("autocorr")) {
     if (autocorr_idx < 1 || autocorr_idx > filenames.size()) {
       std::cout << "Bad value for option --autocorr: " << autocorr_idx
                 << ", exiting." << std::endl;
-      std::cout << desc << std::endl;
+      std::cout << std::endl << usage << std::endl;
       return -1;
     }
-    std::cout << autocorr_idx << std::endl;
+    std::cout << "Autocorrelation for chain: " << autocorr_idx << std::endl;
   }
   if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
-    std::cout << "percentiles " << percentiles_spec << std::endl;
+    std::cout << "Percentiles: " << percentiles_spec << std::endl;
   }
   std::vector<std::string> percentiles;
   boost::algorithm::trim(
@@ -139,7 +157,8 @@ int main(int argc, const char *argv[]) {
   try {
     probs = percentiles_to_probs(percentiles);
   } catch (const boost::program_options::error &e) {
-    std::cout << "Invalid argument: " << e.what() << std::endl;
+    std::cout << "Bad value for option percentiles: " << e.what() << std::endl;
+    std::cout << std::endl << usage << std::endl;
     return -1;
   }
 
@@ -195,7 +214,7 @@ int main(int argc, const char *argv[]) {
                                                            : model_widths[i];
 
   // Print to console
-  timing_summary(chains, metadata, warmup_times, sampling_times, thin, "",
+  write_timing(chains, metadata, warmup_times, sampling_times, thin, "",
                  &std::cout);
   std::cout << std::endl;
 
@@ -210,7 +229,7 @@ int main(int argc, const char *argv[]) {
                max_name_length, sig_figs, model_params_offset, false,
                &std::cout);
   std::cout << std::endl;
-  sampler_summary(metadata, "", &std::cout);
+  write_sampler_info(metadata, "", &std::cout);
 
   if (vm.count("autocorr")) {
     autocorrelation(chains, metadata, autocorr_idx, max_name_length);
@@ -229,9 +248,9 @@ int main(int argc, const char *argv[]) {
                  max_name_length, sig_figs, model_params_offset, true,
                  &csv_file);
 
-    timing_summary(chains, metadata, warmup_times, sampling_times, thin, "# ",
+    write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
-    sampler_summary(metadata, "# ", &csv_file);
+    write_sampler_info(metadata, "# ", &csv_file);
     csv_file.close();
   }
 
