@@ -160,38 +160,56 @@ int main(int argc, const char *argv[]) {
     if (stan::io::ends_with("__", chains.param_name(i)))
       num_sampler_params++;
   }
-  size_t num_model_params = chains.num_params() - num_sampler_params;
+  size_t model_params_offset = num_sampler_params + 1;
+  size_t num_model_params = chains.num_params() - model_params_offset;
 
-  std::vector<std::string> sampler_params_hdr
-      = get_sampler_params_header(percentiles);
-  std::vector<std::string> model_params_hdr
-      = get_model_params_header(percentiles);
+  std::vector<std::string> header = get_header(percentiles);
 
   // Compute statistics for sampler and model params
-  int sampler_params_start_col = 1;  // col 0 is `lp__`
-  Eigen::MatrixXd sampler_params(num_sampler_params, sampler_params_hdr.size());
-  sampler_params_stats(chains, probs, sampler_params_start_col, sampler_params);
+  Eigen::MatrixXd lp_param(1, header.size());
+  Eigen::MatrixXd sampler_params(num_sampler_params, header.size());
+  Eigen::MatrixXd model_params(num_model_params, header.size());
 
-  int model_params_start_col = num_sampler_params + sampler_params_start_col;
-  Eigen::MatrixXd model_params(num_model_params, model_params_hdr.size());
-  model_params_stats(chains, warmup_times, sampling_times, probs,
-                     model_params_start_col, model_params);
+  get_stats(chains, warmup_times, sampling_times, probs, 0, lp_param);
+  get_stats(chains, warmup_times, sampling_times, probs, 1, sampler_params);
+  get_stats(chains, warmup_times, sampling_times, probs, model_params_offset,
+            model_params);
+
+  // Console output formatting
+  Eigen::VectorXi column_sig_figs(header.size());
+  Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> sampler_formats(
+      header.size());
+  Eigen::VectorXi sampler_widths(header.size());
+  sampler_widths = calculate_column_widths(sampler_params, header, sig_figs,
+                                           sampler_formats);
+
+  Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> model_formats(
+      header.size());
+  Eigen::VectorXi model_widths(header.size());
+  model_widths
+      = calculate_column_widths(model_params, header, sig_figs, model_formats);
+
+  Eigen::VectorXi column_widths(header.size());
+  for (size_t i = 0; i < header.size(); ++i)
+    column_widths[i] = sampler_widths[i] > model_widths[i] ? sampler_widths[i]
+                                                           : model_widths[i];
 
   // Print to console
   timing_summary(chains, metadata, warmup_times, sampling_times, thin, "",
                  &std::cout);
   std::cout << std::endl;
 
-  sampler_params_summary(chains, sampler_params, sampler_params_hdr,
-                         sampler_params_start_col, max_name_length, sig_figs,
-                         &std::cout);
+  write_header(header, column_widths, max_name_length, false, &std::cout);
   std::cout << std::endl;
-
-  model_params_summary(chains, model_params, model_params_hdr,
-                       model_params_start_col, max_name_length, sig_figs, 0,
-                       &std::cout);
+  write_params(chains, lp_param, column_widths, model_formats, max_name_length,
+               sig_figs, 0, false, &std::cout);
+  write_params(chains, sampler_params, column_widths, sampler_formats,
+               max_name_length, sig_figs, 1, false, &std::cout);
   std::cout << std::endl;
-
+  write_params(chains, model_params, column_widths, model_formats,
+               max_name_length, sig_figs, model_params_offset, false,
+               &std::cout);
+  std::cout << std::endl;
   sampler_summary(metadata, "", &std::cout);
 
   if (vm.count("autocorr")) {
@@ -199,12 +217,18 @@ int main(int argc, const char *argv[]) {
     std::cout << std::endl;
   }
 
-  // Optional: print to output csv file
+  // Write to csv file (optional)
   if (vm.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
-    model_params_summary(chains, model_params, model_params_hdr,
-                         model_params_start_col, max_name_length, sig_figs, 1,
-                         &csv_file);
+    write_header(header, column_widths, max_name_length, true, &csv_file);
+    write_params(chains, lp_param, column_widths, model_formats,
+                 max_name_length, sig_figs, 0, true, &csv_file);
+    write_params(chains, sampler_params, column_widths, sampler_formats,
+                 max_name_length, sig_figs, 1, true, &csv_file);
+    write_params(chains, model_params, column_widths, model_formats,
+                 max_name_length, sig_figs, model_params_offset, true,
+                 &csv_file);
+
     timing_summary(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
     sampler_summary(metadata, "# ", &csv_file);
