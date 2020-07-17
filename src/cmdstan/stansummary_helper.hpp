@@ -497,8 +497,7 @@ void write_params(const stan::mcmc::chains<> &chains,
         int row_maj_index = i + matrix_index(index, dims);
         int row_maj_index_chains = i_chains + matrix_index(index, dims);
         if (as_csv) {
-          *out << "\"" << chains.param_name(row_maj_index_chains)
-               << "\"";
+          *out << "\"" << chains.param_name(row_maj_index_chains) << "\"";
           for (int j = 0; j < params.cols(); j++) {
             *out << "," << std::fixed
                  << std::setprecision(compute_precision(
@@ -539,11 +538,11 @@ void write_params(const stan::mcmc::chains<> &chains,
  * @param out output stream
  */
 void write_timing(const stan::mcmc::chains<> &chains,
-                    const stan::io::stan_csv_metadata &metadata,
-                    const Eigen::VectorXd &warmup_times,
-                    const Eigen::VectorXd &sampling_times,
-                    const Eigen::VectorXi &thin, const std::string &prefix,
-                    std::ostream *out) {
+                  const stan::io::stan_csv_metadata &metadata,
+                  const Eigen::VectorXd &warmup_times,
+                  const Eigen::VectorXd &sampling_times,
+                  const Eigen::VectorXi &thin, const std::string &prefix,
+                  std::ostream *out) {
   *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
        << prefix << chains.num_chains() << " chains: each with iter=("
        << chains.num_kept_samples(0);
@@ -635,7 +634,7 @@ void write_timing(const stan::mcmc::chains<> &chains,
  * @param out output stream
  */
 void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
-                     const std::string &prefix, std::ostream *out) {
+                        const std::string &prefix, std::ostream *out) {
   /// Footer output
   *out << prefix << "Samples were drawn using " << metadata.algorithm
        << " with " << metadata.engine << "." << std::endl;
@@ -699,6 +698,5 @@ void autocorrelation(const stan::mcmc::chains<> &chains,
     std::cout << std::endl;
   }
 }
-
 
 #endif

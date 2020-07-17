@@ -10,8 +10,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
-void usage() { std::cout << "Usage" << std::endl; }
-
 /**
  * Compute summary statistics over HMC sampler output
  * read in from stan_csv files.
@@ -25,8 +23,8 @@ void usage() { std::cout << "Usage" << std::endl; }
  */
 int main(int argc, const char *argv[]) {
   std::string usage = R"(Usage: stansummary [OPTIONS] stan_csv_file(s)
-Report statistics for one or more Stan csv files from HMC sampler run.
-Example:  stansummary model_1.csv model_2.csv
+Report statistics for one or more Stan csv files from a HMC sampler run.
+Example:  stansummary model_chain_1.csv model_chain_2.csv
 Options:
   -a, --autocorr [n]          Display the chain autocorrelation for the n-th
                               input file, in addition to statistics.
@@ -43,6 +41,7 @@ Options:
     return -1;
   }
 
+  // Command-line arguments
   int sig_figs;
   int autocorr_idx;
   std::string csv_filename;
@@ -68,6 +67,7 @@ Options:
   boost::program_options::positional_options_description p;
   p.add("input_files", -1);
 
+  // Parse, validate command-line
   boost::program_options::variables_map vm;
   try {
     boost::program_options::store(
@@ -86,8 +86,6 @@ Options:
     std::cout << std::endl << usage << std::endl;
     return 0;
   }
-
-  // Validate command line options
   if (vm.count("input_files")) {
     for (size_t i = 0; i < filenames.size(); ++i) {
       if (FILE *file = fopen(filenames[i].c_str(), "r")) {
@@ -134,7 +132,8 @@ Options:
       std::cout << std::endl << usage << std::endl;
       return -1;
     }
-    std::cout << "Significant digits: " << vm["sig_figs"].as<int>() << std::endl;
+    std::cout << "Significant digits: " << vm["sig_figs"].as<int>()
+              << std::endl;
   }
   if (vm.count("autocorr")) {
     if (autocorr_idx < 1 || autocorr_idx > filenames.size()) {
@@ -215,7 +214,7 @@ Options:
 
   // Print to console
   write_timing(chains, metadata, warmup_times, sampling_times, thin, "",
-                 &std::cout);
+               &std::cout);
   std::cout << std::endl;
 
   write_header(header, column_widths, max_name_length, false, &std::cout);
@@ -249,7 +248,7 @@ Options:
                  &csv_file);
 
     write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
-                   &csv_file);
+                 &csv_file);
     write_sampler_info(metadata, "# ", &csv_file);
     csv_file.close();
   }

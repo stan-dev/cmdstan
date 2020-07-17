@@ -1,5 +1,6 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <test/utility.hpp>
+#include <stan/io/ends_with.hpp>
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
@@ -129,6 +130,92 @@ TEST(CommandStansummary, matrix_index_2d) {
   index[0] = 1;
   index[1] = 4;
   EXPECT_THROW(matrix_index(index, dims), std::domain_error);
+}
+
+TEST(CommandStansummary, header_tests) {
+  std::string expect
+      = "      Mean  MCSE StdDev     10%      50%       90%      N_Eff     "
+        "N_Eff/s        R_hat\n";
+  std::string expect_csv
+      = "name,Mean,MCSE,StdDev,10%,50%,90%,N_Eff,N_Eff/s,R_hat\n";
+  std::vector<std::string> pcts;
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  Eigen::VectorXd probs = percentiles_to_probs(pcts);
+  EXPECT_FLOAT_EQ(probs[0], 0.1);
+  EXPECT_FLOAT_EQ(probs[1], 0.5);
+  EXPECT_FLOAT_EQ(probs[2], 0.9);
+
+  std::vector<std::string> header = get_header(pcts);
+  EXPECT_EQ(header.size(), pcts.size() + 6);
+  EXPECT_EQ(header[0], "Mean");
+  EXPECT_EQ(header[2], "StdDev");
+  EXPECT_EQ(header[4], "50%");
+  EXPECT_EQ(header[6], "N_Eff");
+  EXPECT_EQ(header[8], "R_hat");
+
+  Eigen::VectorXi column_widths(header.size());
+  for (size_t i = 0, w = 5; i < header.size(); ++i, ++w) {
+    column_widths[i] = w;
+  }
+  std::stringstream ss;
+  write_header(header, column_widths, 4, false, &ss);
+  EXPECT_EQ(expect, ss.str());
+  ss.str(std::string());
+  write_header(header, column_widths, 24, true, &ss);
+  EXPECT_EQ(expect_csv, ss.str());
+}
+
+TEST(CommandStansummary, param_tests) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+
+  std::vector<std::string> pcts;
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  Eigen::VectorXd probs = percentiles_to_probs(pcts);
+
+  // bernoulli model:  6 sampler params, ("lp__", is model param)
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+  std::vector<std::string> filenames;
+  filenames.push_back(csv_file);
+  stan::io::stan_csv_metadata metadata;
+  Eigen::VectorXd warmup_times(filenames.size());
+  Eigen::VectorXd sampling_times(filenames.size());
+  Eigen::VectorXi thin(filenames.size());
+  stan::mcmc::chains<> chains = parse_csv_files(
+      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  EXPECT_EQ(chains.num_chains(), 1);
+  EXPECT_EQ(chains.num_params(), 8);
+
+  size_t max_name_length = 0;
+  size_t num_sampler_params = -1;  // don't count name 'lp__'
+  for (int i = 0; i < chains.num_params(); ++i) {
+    if (chains.param_name(i).length() > max_name_length)
+      max_name_length = chains.param_name(i).length();
+    if (stan::io::ends_with("__", chains.param_name(i)))
+      num_sampler_params++;
+  }
+  EXPECT_EQ(num_sampler_params, 6);
+
+  size_t model_params_offset = num_sampler_params + 1;
+  size_t num_model_params = chains.num_params() - model_params_offset;
+  EXPECT_EQ(num_model_params, 1);
+
+  Eigen::MatrixXd model_params(num_model_params, 9);
+  get_stats(chains, warmup_times, sampling_times, probs, model_params_offset,
+            model_params);
+
+  double mean_theta = model_params(0, 0);
+  EXPECT_TRUE(mean_theta > 0.25);
+  EXPECT_TRUE(mean_theta < 0.27);
+  double rhat_theta = model_params(0, 8);
+  EXPECT_TRUE(rhat_theta > 0.999);
+  EXPECT_TRUE(rhat_theta < 1.01);
 }
 
 TEST(CommandStansummary, functional_test__issue_342) {
