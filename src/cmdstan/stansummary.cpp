@@ -156,7 +156,7 @@ Options:
   try {
     probs = percentiles_to_probs(percentiles);
   } catch (const boost::program_options::error &e) {
-    std::cout << "Bad value for option percentiles: " << e.what() << std::endl;
+    std::cout << "Bad value for option --percentiles: " << e.what() << std::endl;
     std::cout << std::endl << usage << std::endl;
     return -1;
   }

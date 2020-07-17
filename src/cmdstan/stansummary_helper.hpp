@@ -302,8 +302,9 @@ Eigen::VectorXd percentiles_to_probs(
       cur_pct = pct;
     } catch (const std::exception &e) {
       std::stringstream message_stream("");
-      message_stream << "value(s) for option --percentiles must be "
-                     << "integers between 0 and 100, strictly increasing.";
+      message_stream << "position " << i << ", value " << percentiles[i] << ". "
+                     << "Values must be in range (1,99), inclusive, "
+                     << "and strictly increasing.";
       throw boost::program_options::error(message_stream.str());
     }
     probs[i] = pct * 1.0 / 100.0;
@@ -478,9 +479,9 @@ void write_params(const stan::mcmc::chains<> &chains,
         *out << std::right;
         for (int j = 0; j < params.cols(); j++) {
           std::cout.setf(col_formats(j), std::ios::floatfield);
-          *out << std::setprecision(compute_precision(
-                      params(i, j), sig_figs,
-                      col_formats(j) == std::ios_base::scientific))
+          *out << std::setprecision(
+              compute_precision(params(i, j), sig_figs,
+                                col_formats(j) == std::ios_base::scientific))
                << std::setw(col_widths(j)) << params(i, j);
         }
       }
@@ -510,9 +511,9 @@ void write_params(const stan::mcmc::chains<> &chains,
           *out << std::right;
           for (int j = 0; j < params.cols(); j++) {
             std::cout.setf(col_formats(j), std::ios::floatfield);
-            *out << std::setprecision(compute_precision(
-                        params(row_maj_index, j), sig_figs,
-                        col_formats(j) == std::ios_base::scientific))
+            *out << std::setprecision(
+                compute_precision(params(row_maj_index, j), sig_figs,
+                                  col_formats(j) == std::ios_base::scientific))
                  << std::setw(col_widths(j)) << params(row_maj_index, j);
           }
         }
