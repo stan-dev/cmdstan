@@ -1,7 +1,8 @@
 ifeq ($(CMDSTAN_SUBMODULES),1)
+bin/cmdstan/stansummary.o : src/cmdstan/stansummary_helper.hpp
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+	$(COMPILE.cpp) -fvisibility=hidden $(OUTPUT_OPTION) $<
 
 ifeq ($(OS),Windows_NT)
 # bitness check to decide which program_options .a file to select
