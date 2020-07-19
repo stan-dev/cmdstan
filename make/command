@@ -1,10 +1,8 @@
 ifeq ($(CMDSTAN_SUBMODULES),1)
-
-src/cmdstan/stansummary.cpp : src/cmdstan/stansummary_helper.hpp
-
+bin/cmdstan/stansummary.o : src/cmdstan/stansummary_helper.hpp
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+	$(COMPILE.cpp) -fvisibility=hidden $(OUTPUT_OPTION) $<
 
 
 ifeq ($(OS),Windows_NT)
@@ -22,9 +20,6 @@ else
 BOOST_PROGRAM_OPTIONS_LIB=$(BOOST)/stage/lib/libboost_program_options.a
 BOOST_BUILD_OPTS=
 endif
-#ifeq ($(OS),Darwin)
-#CXXFLAGS_BOOST+=-fvisibility=hidden -fvisibility-inlines-hidden
-#endif
 
 .PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
@@ -32,7 +27,7 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o $(BOOST_PROGRAM_OPTIONS_LIB)
 	@mkdir -p $(dir $@)
-	$(LINK.cpp) -fvisibility=hidden -fvisibility-inlines-hidden $^ $(BOOST_PROGRAM_OPTIONS_LIB) $(LDLIBS) $(OUTPUT_OPTION)
+	$(LINK.cpp) $^ $(BOOST_PROGRAM_OPTIONS_LIB) $(LDLIBS) $(OUTPUT_OPTION)
 
 # BOOST program_options build rules:
 $(BOOST_PROGRAM_OPTIONS_LIB):
@@ -42,6 +37,6 @@ ifeq ($(OS),Windows_NT)
 else
 	cd $(BOOST); ./bootstrap.sh
 endif
-	cd $(BOOST); ./b2  $(BOOST_BUILD_OPTS) --visibility=hidden --visibility-inline-hidden --with-program_options cxxstd=11 variant=release link=static
+	cd $(BOOST); ./b2  $(BOOST_BUILD_OPTS) --visibility=hidden --with-program_options cxxstd=11 variant=release link=static
 
 endif
