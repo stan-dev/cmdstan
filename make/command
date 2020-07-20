@@ -4,6 +4,7 @@ bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) -fvisibility=hidden $(OUTPUT_OPTION) $<
 
+
 ifeq ($(OS),Windows_NT)
 # bitness check to decide which program_options .a file to select
 # logic based on: https://docs.microsoft.com/en-us/archive/blogs/david.wang/howto-detect-process-bitness
