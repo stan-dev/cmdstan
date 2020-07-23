@@ -18,7 +18,9 @@ def runTests(String prefix = "") {
 def runWinTests(String prefix = "") {
     withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
        bat "echo %PATH%"
-       bat "mingw32-make -j${env.PARALLEL} build"
+       try { bat "mingw32-make -j${env.PARALLEL} build" }
+       finally { junit 'stan/lib/stan_math/lib/boost_1.72.0/bootstrap.log' }
+       
        bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
     }
 }
@@ -150,7 +152,7 @@ pipeline {
                     }
                     post {
                         always {
-
+                            
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
                             enabledForFailure: true,
