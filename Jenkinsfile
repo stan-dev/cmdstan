@@ -144,7 +144,9 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        runWinTests()
+                        bat "g++ --version"
+                        bat "mingw32-make --version"
+                        runWinTests()                        
                     }
                     post {
                         always {
