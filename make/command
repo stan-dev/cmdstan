@@ -33,7 +33,7 @@ bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmd
 $(BOOST_PROGRAM_OPTIONS_LIB):
 	@mkdir -p $(dir $@)
 ifeq ($(OS),Windows_NT)
-	cd $(BOOST); ./bootstrap.bat
+	cd $(BOOST); ./bootstrap.bat --with-toolset=$(CXX_TYPE)
 else
 	cd $(BOOST); ./bootstrap.sh
 endif
