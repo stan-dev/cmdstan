@@ -144,10 +144,11 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        runWinTests()                        
+                        runWinTests()
                     }
                     post {
                         always {
+
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
                             enabledForFailure: true,
