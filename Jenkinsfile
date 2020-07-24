@@ -19,7 +19,6 @@ def runWinTests(String prefix = "") {
     withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
        bat "echo %PATH%"
        bat "mingw32-make -j${env.PARALLEL} build"
-       
        bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
     }
 }
@@ -145,13 +144,10 @@ pipeline {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat "g++ --version"
-                        bat "mingw32-make --version"
                         runWinTests()                        
                     }
                     post {
                         always {
-                            
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
                             enabledForFailure: true,
