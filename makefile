@@ -114,6 +114,8 @@ endif
 	@echo '      header file that is included. This defaults to "user_header.hpp" in the'
 	@echo '      directory of the Stan program.'
 	@echo '    STANC2: When set, use bin/stanc2 to generate C++ code.'
+	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
+	@echo '      the nightly version.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'

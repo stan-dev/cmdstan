@@ -13,6 +13,7 @@ CMDSTAN_SUBMODULES = 1
 STANC_DL_RETRY = 5
 STANC_DL_DELAY = 10
 STANC3_TEST_BIN_URL ?=
+STANC3_VERSION ?= nightly
 
 ifeq ($(OS),Windows_NT)
  OS_TAG := windows
@@ -66,12 +67,12 @@ else ifeq ($(OS_TAG),windows)
 # get latest stanc3 - Windows
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
 else
 # get latest stanc3 - Linux & MacOS
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
 
