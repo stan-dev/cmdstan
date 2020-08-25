@@ -19,7 +19,9 @@ class CmdStan : public testing::Test {
     output_file = "test/output.csv";
 
     base_command
-        = convert_model_path(model_path) + " output file=" + output_file;
+      = convert_model_path(model_path);
+
+    output_command = " --output_file " + output_file;
 
     y11 = "y[1,1]";
     y12 = "y[1,2]";
@@ -40,12 +42,13 @@ class CmdStan : public testing::Test {
 
   std::string base_command;
   std::string output_file;
+  std::string output_command;
   std::string y11, y12, y21, y22;
 };
 
 TEST_F(CmdStan, optimize_default) {
-  run_command_output out = run_command(base_command + " optimize");
-
+  run_command_output out = run_command(base_command + " optimize" + output_command);
+  
   ASSERT_EQ(0, out.err_code);
 
   stan::mcmc::chains<> chains = parse_output_file();
@@ -60,7 +63,7 @@ TEST_F(CmdStan, optimize_default) {
 
 TEST_F(CmdStan, optimize_bfgs) {
   run_command_output out
-      = run_command(base_command + " optimize algorithm=bfgs");
+      = run_command(base_command + " optimize --bfgs" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 
@@ -76,7 +79,7 @@ TEST_F(CmdStan, optimize_bfgs) {
 
 TEST_F(CmdStan, optimize_lbfgs) {
   run_command_output out
-      = run_command(base_command + " optimize algorithm=lbfgs");
+      = run_command(base_command + " optimize --lbfgs" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 
@@ -92,7 +95,7 @@ TEST_F(CmdStan, optimize_lbfgs) {
 
 TEST_F(CmdStan, optimize_newton) {
   run_command_output out
-      = run_command(base_command + " optimize algorithm=newton");
+      = run_command(base_command + " optimize --newton" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 

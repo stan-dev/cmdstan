@@ -1,7 +1,6 @@
 #ifdef STAN_MPI
 
 #include <test/test-models/proper.hpp>
-#include <cmdstan/command.hpp>
 #include <stan/math/prim.hpp>
 #include <gtest/gtest.h>
 

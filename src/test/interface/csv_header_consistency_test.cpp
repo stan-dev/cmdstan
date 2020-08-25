@@ -20,7 +20,7 @@ TEST(interface, csv_header_consistency) {
   std::string samples = path + ".csv";
 
   std::string command
-      = path + " sample num_warmup=1 num_samples=1" + " output file=" + samples;
+      = path + " sample --num_warmup=1 --num_samples=1 --output_file=" + samples;
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);

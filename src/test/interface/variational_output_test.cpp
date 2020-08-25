@@ -19,7 +19,9 @@ class CmdStan : public testing::Test {
     output_file = "test/output.csv";
 
     base_command
-        = convert_model_path(model_path) + " output file=" + output_file;
+      = convert_model_path(model_path);
+
+    output_command = " --output_file " + output_file;
 
     y11 = "y[1,1]";
     y12 = "y[1,2]";
@@ -40,11 +42,12 @@ class CmdStan : public testing::Test {
 
   std::string base_command;
   std::string output_file;
+  std::string output_command;
   std::string y11, y12, y21, y22;
 };
 
 TEST_F(CmdStan, variational_default) {
-  run_command_output out = run_command(base_command + " variational");
+  run_command_output out = run_command(base_command + " variational" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 
@@ -55,7 +58,7 @@ TEST_F(CmdStan, variational_default) {
 
 TEST_F(CmdStan, variational_meanfield) {
   run_command_output out
-      = run_command(base_command + " variational algorithm=meanfield");
+      = run_command(base_command + " variational --meanfield" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 
@@ -66,7 +69,7 @@ TEST_F(CmdStan, variational_meanfield) {
 
 TEST_F(CmdStan, variational_fullrank) {
   run_command_output out
-      = run_command(base_command + " variational algorithm=fullrank");
+      = run_command(base_command + " variational --fullrank" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 

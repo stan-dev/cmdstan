@@ -1,4 +1,3 @@
-#include <cmdstan/command.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/test-models/proper.hpp>
@@ -16,19 +15,19 @@ using cmdstan::test::run_command_output;
 
 TEST(StanUiCommand, metric_file_test) {
   std::vector<std::string> models = {"proper", "test_model"};
-  std::vector<std::string> engines = {"static", "nuts"};
-  std::vector<std::string> metrics = {"diag_e", "dense_e"};
-  std::vector<std::string> adapts = {"0", "1"};
+  std::vector<std::string> engines = {"hmc", "nuts"};
+  std::vector<std::string> metrics = {"diag", "dense"};
+  std::vector<bool> adapts = {false, true};
   std::vector<std::string> stepsizes = {"0.1", "0.5", "1.25"};
   std::vector<std::string> num_warmups = {"0", "1", "100"};
 
   std::map<std::string, std::map<std::string, std::string>> expected_output = {
       {"proper",
-       {{"diag_e", "# Diagonal elements of inverse mass matrix:\n# 1.5"},
-        {"dense_e", "# Elements of inverse mass matrix:\n# 1.5"}}},
+       {{"diag", "# Diagonal elements of inverse mass matrix:\n# 1.5"},
+        {"dense", "# Elements of inverse mass matrix:\n# 1.5"}}},
       {"test_model",
-       {{"diag_e", "# Diagonal elements of inverse mass matrix:\n# 1.5, 1.8"},
-        {"dense_e",
+       {{"diag", "# Diagonal elements of inverse mass matrix:\n# 1.5, 1.8"},
+        {"dense",
          "# Elements of inverse mass matrix:\n# 1.5, 1\n# 1, 1.5"}}}};
 
   for (auto model : models) {
@@ -47,25 +46,25 @@ TEST(StanUiCommand, metric_file_test) {
               metric_file_path.push_back("src");
               metric_file_path.push_back("test");
               metric_file_path.push_back("test-models");
-              metric_file_path.push_back(model + "." + metric + "_metric.json");
+              metric_file_path.push_back(model + "." + metric + "_e_metric.json");
 
               std::string metric_file(convert_model_path(metric_file_path));
               std::ifstream fs(metric_file.c_str());
               if (fs.fail()) {
-                metric_file_path[3] = model + "." + metric + "_metric.dat.R";
+                metric_file_path[3] = model + "." + metric + "_e_metric.dat.R";
               }
               metric_file = convert_model_path(metric_file_path);
 
               std::string command
-                  = convert_model_path(model_path)
-                    + " method=sample num_samples=100 num_warmup=" + num_warmup
-                    + " adapt engaged=" + adapt
-                    + " algorithm=hmc engine=" + engine + " metric=" + metric
-                    + " metric_file=" + convert_model_path(metric_file_path)
-                    + " stepsize=" + stepsize + " output file=test/output.csv";
+		= convert_model_path(model_path)
+		+ " sample --num_samples=100 --num_warmup=" + num_warmup
+		+ (adapt ? "": " --adapt_off")
+		+ " --" + engine + " --metric=" + metric
+		+ " --metric_file=" + convert_model_path(metric_file_path)
+		+ " --stepsize=" + stepsize + " --output_file=test/output.csv";
 
               run_command_output out = run_command(command);
-              if (adapt == "1" && num_warmup == "0") {
+              if (adapt && num_warmup == "0") {
                 EXPECT_EQ(int(stan::services::error_codes::CONFIG),
                           out.err_code);
               } else {
@@ -79,7 +78,7 @@ TEST(StanUiCommand, metric_file_test) {
 
                 EXPECT_EQ(
                     1, count_matches(expected_output[model][metric], output));
-                if (adapt == "0") {
+                if (!adapt) {
                   EXPECT_EQ(1,
                             count_matches("# Step size = " + stepsize, output));
                 }
