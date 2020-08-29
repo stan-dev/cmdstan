@@ -1,4 +1,3 @@
-#include <cmdstan/command.hpp>
 #include <test/test-models/proper.hpp>
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 #include <tbb/task_scheduler_init.h>

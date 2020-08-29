@@ -131,7 +131,8 @@ run_command_output run_command(std::string command) {
   using boost::posix_time::microsec_clock;
   using boost::posix_time::ptime;
   FILE *in;
-  in = popen(command.c_str(), "r");
+  std::string redirected_command = command + " 2>&1";
+  in = popen(redirected_command.c_str(), "r");
 
   if (!in) {
     std::string err_msg;
