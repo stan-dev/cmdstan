@@ -25,6 +25,65 @@ RAPIDJSON ?= lib/rapidjson_1.1.0/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
+## Set default compiler
+ifeq (default,$(origin CXX))
+  ifeq ($(OS),Darwin)  ## Darwin is Mac OS X
+    CXX := clang++
+  endif
+  ifeq ($(OS),Linux)
+    CXX := g++
+  endif
+  ifeq ($(OS),Windows_NT)
+    CXX := g++
+  endif
+endif
+
+# Detect compiler type
+# - CXX_TYPE: {gcc, clang, mingw32-gcc, other}
+# - CXX_MAJOR: major version of CXX
+# - CXX_MINOR: minor version of CXX
+ifneq (,$(findstring clang,$(CXX)))
+  CXX_TYPE ?= clang
+endif
+ifneq (,$(findstring mingw32-g,$(CXX)))
+  CXX_TYPE ?= mingw32-gcc
+endif
+ifneq (,$(findstring gcc,$(CXX)))
+  CXX_TYPE ?= gcc
+endif
+ifneq (,$(findstring g++,$(CXX)))
+  CXX_TYPE ?= gcc
+endif
+CXX_TYPE ?= other
+CXX_MAJOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f1)
+CXX_MINOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f2)
+
+ifeq (clang,$(CXX_TYPE))
+	CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -ftrigraphs -fvisibility=hidden -fvisibility-inlines-hidden
+	ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
+		CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
+	endif
+endif
+ifeq (mingw32-g,$(CXX_TYPE))
+else ifeq (gcc,$(CXX_TYPE))
+	CXXFLAGS_OPTIM_SUNDIALS ?= -fweb -fivopts -ftree-loop-linear
+	CPPFLAGS_OPTIM_SUNDIALS ?= $(CXXFLAGS_OPTIM_SUNDIALS)
+	# temp to contro for compiler versions while letting user override
+	# CXXFLAGS_OPTIM
+	CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -funroll-loops -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvect-cost-model='unlimited' -fivopts -fvisibility=hidden -fvisibility-inlines-hidden
+	ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
+	  CXXFLAGS_VERSION_OPTIM += -floop-unroll-and-jam
+  endif
+	ifeq ($(shell expr $(CXX_MAJOR) \>= 7), 1)
+	  CXXFLAGS_VERSION_OPTIM += -fsplit-loops
+  endif
+  ifeq ($(shell expr $(CXX_MAJOR) \>= 7), 1)
+    CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
+  endif
+	CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM)
+endif
+
+
 ifdef STAN_THREADS
 STAN_FLAG_THREADS=_threads
 endif
@@ -46,7 +105,7 @@ endif
 ifeq ($(PRECOMPILED_HEADERS),true)
 PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
-CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
+CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
 else
 PRECOMPILED_MODEL_HEADER=
