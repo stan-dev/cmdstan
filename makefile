@@ -70,7 +70,7 @@ else ifeq (gcc,$(CXX_TYPE))
 	CPPFLAGS_OPTIM_SUNDIALS ?= $(CXXFLAGS_OPTIM_SUNDIALS)
 	# temp to contro for compiler versions while letting user override
 	# CXXFLAGS_OPTIM
-	CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvect-cost-model='unlimited'
+	CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvect-cost-model='unlimited' -fvisibility=hidden -fvisibility-inlines-hidden
 	ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
 	  CXXFLAGS_VERSION_OPTIM += -floop-unroll-and-jam
   endif
@@ -79,6 +79,11 @@ else ifeq (gcc,$(CXX_TYPE))
 		CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
   endif
 	CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM)
+	CPPFLAGS_OPTIM ?= $(CXXFLAGS_OPTIM)
+	LDFLAGS_OPTIM ?= $(CXXFLAGS_OPTIM)
+	CPPFLAGS_FLTO ?= $(CXXFLAGS_FLTO)
+	LDFLAGS_FLTO ?= $(CXXFLAGS_FLTO)
+	LDFLAGS_MPI_FLTO ?= $(CXXFLAGS_FLTO)
 endif
 
 
