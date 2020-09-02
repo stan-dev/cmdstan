@@ -77,7 +77,7 @@ ifndef STAN_NO_COMPILER_OPTIMS
 	  endif
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 7), 1)
 		  CXXFLAGS_VERSION_OPTIM += -fsplit-loops
-			ifeq ($(OS),Windows_NT)
+			ifneq ($(OS),Windows_NT)
 				CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
       endif
 	  endif
