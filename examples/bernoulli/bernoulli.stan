@@ -1,15 +1,11 @@
 data {
-  int N;
-  int M;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N];
 }
 parameters {
-  matrix[N, M] A_param;
-}
-transformed parameters {
-  vector[10] B_transform_param = A_param[1:10, 1];
+  real<lower=0,upper=1> theta;
 }
 model {
-  for (i in 1:10) {
-    B_transform_param[i] ~ normal(0, 1);
-  }
+  theta ~ beta(1,1);  // uniform prior on interval 0,1
+  y ~ bernoulli(theta);
 }
