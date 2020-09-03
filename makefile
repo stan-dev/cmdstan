@@ -71,7 +71,7 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		CPPFLAGS_OPTIM_SUNDIALS ?= $(CXXFLAGS_OPTIM_SUNDIALS)
 		# temp to contro for compiler versions while letting user override
 		# CXXFLAGS_OPTIM
-		CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvect-cost-model='unlimited' -fvisibility=hidden -fvisibility-inlines-hidden
+		CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvisibility=hidden -fvisibility-inlines-hidden
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
 		  CXXFLAGS_VERSION_OPTIM += -floop-unroll-and-jam
 	  endif
