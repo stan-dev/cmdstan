@@ -61,20 +61,9 @@ CXX_MINOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f2)
 ifndef STAN_NO_COMPILER_OPTIMS
 	ifeq (clang,$(CXX_TYPE))
 		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops
-		CXXFLAGS_OPTIM_SUNDIALS ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden
+		#CXXFLAGS_OPTIM_SUNDIALS ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
-		ifdef LLVM_AR
-      AR = LLVM_AR
-		else
-		ifeq (, $(shell which llvm-ar))
-			$(warning "llvm-ar was not detected in your path or set via the LLVM_AR flag, to enable lto optimization please add llvm-ar to your environment PATH or add LLVM_AR to your make/local")
-		else
-		  AR = llvm-ar
 			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
-			CXXFLAGS_FLTO_SUNDIALS ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
-			CXXFLAGS_OPTIM_SUNDIALS += $(CXXFLAGS_FLTO_SUNDIALS)
-		endif
-		endif
 		endif
 	endif
 	ifeq (mingw32-g,$(CXX_TYPE))
@@ -91,7 +80,6 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		  CXXFLAGS_VERSION_OPTIM += -fsplit-loops
 			ifneq ($(OS),Windows_NT)
 				CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
-				CXXFLAGS_OPTIM_SUNDIALS += -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
       endif
 	  endif
 		CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM)
