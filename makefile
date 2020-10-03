@@ -63,6 +63,7 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -ftrigraphs -fvisibility=hidden -fvisibility-inlines-hidden
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
 			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
+			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
 		endif
 	endif
 	ifeq (mingw32-g,$(CXX_TYPE))
@@ -79,6 +80,7 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		  CXXFLAGS_VERSION_OPTIM += -fsplit-loops
 			ifneq ($(OS),Windows_NT)
 				CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
+				CXXFLAGS_FLTO_SUNDIALS ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
       endif
 	  endif
 		CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM)
