@@ -63,13 +63,17 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops
 		CXXFLAGS_OPTIM_SUNDIALS ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
+		ifdef LLVM_AR
+      AR = LLVM_AR
+		else
 		ifeq (, $(shell which llvm-ar))
-			$(warning "llvm-ar was not detected in your path, to enable lto optimization please add llvm-ar to your environment PATH")
+			$(warning "llvm-ar was not detected in your path or set via the LLVM_AR flag, to enable lto optimization please add llvm-ar to your environment PATH or add LLVM_AR to your make/local")
 		else
 		  AR = llvm-ar
 			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
 			CXXFLAGS_FLTO_SUNDIALS ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
 			CXXFLAGS_OPTIM_SUNDIALS += $(CXXFLAGS_FLTO_SUNDIALS)
+		endif
 		endif
 		endif
 	endif
