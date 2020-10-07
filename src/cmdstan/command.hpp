@@ -6,6 +6,7 @@
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
+#include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_model.hpp>
@@ -115,6 +116,7 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
+  valid_arguments.push_back(new arg_opencl());
   argument_parser parser(valid_arguments);
   int err_code = parser.parse_args(argc, argv, info, err);
   if (err_code != 0) {
@@ -127,6 +129,23 @@ int command(int argc, const char *argv[]) {
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
+
+  int_argument* opencl_device_id = dynamic_cast<int_argument *>(parser.arg("opencl").arg("device"));
+  int_argument* opencl_platform_id = dynamic_cast<int_argument *>(parser.arg("opencl").arg("platform"));
+
+  // Either both device and platform are set or neither in which case we default to compile-time constants
+  if (opencl_device_id->is_default() ^ opencl_platform_id->is_default()) {
+    std::cerr << "Please set both device and platform IDs." << std::endl;
+    return err_code;
+  } else if (!opencl_device_id->is_default() && !opencl_platform_id->is_default()) {
+#ifdef STAN_OPENCL
+    stan::math::opencl_context.select_device(opencl_platform_id->value(), opencl_device_id->value());
+#else
+    std::cerr << "OpenCL device/platorm IDs are set but the model was not compiled with STAN_OPENCL enabled." << std::endl;
+    std::cerr << "Write STAN_OPENCL=true to the make/local file and recompile." << std::endl;
+    return err_code;
+#endif
+  }
 
   parser.print(info);
   write_parallel_info(info);
