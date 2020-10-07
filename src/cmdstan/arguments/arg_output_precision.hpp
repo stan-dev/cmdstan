@@ -20,7 +20,6 @@ class arg_output_precision : public int_argument {
   }
 
   bool is_valid(int value) { return value >= 0 || value == _default_value; }
-
 };
 
 }  // namespace cmdstan

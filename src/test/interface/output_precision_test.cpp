@@ -13,8 +13,9 @@ TEST(interface, output_precision_1) {
   model_path.push_back("proper_precision");
 
   std::string command
-      = cmdstan::test::convert_model_path(model_path) + " sample num_warmup=200 num_samples=1"
-        + " output file=" + cmdstan::test::convert_model_path(model_path) + ".csv precision=1";
+      = cmdstan::test::convert_model_path(model_path)
+        + " sample num_warmup=200 num_samples=1" + " output file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv precision=1";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -29,7 +30,7 @@ TEST(interface, output_precision_1) {
   Eigen::VectorXi thin(filenames.size());
   stan::mcmc::chains<> chains = parse_csv_files(
       filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-  EXPECT_NEAR(chains.samples(8)(0,0), 0.1, 1E-16);
+  EXPECT_NEAR(chains.samples(8)(0, 0), 0.1, 1E-16);
 }
 
 TEST(interface, output_precision_2) {
@@ -40,8 +41,9 @@ TEST(interface, output_precision_2) {
   model_path.push_back("proper_precision");
 
   std::string command
-      = cmdstan::test::convert_model_path(model_path) + " sample num_warmup=200 num_samples=1"
-        + " output file=" + cmdstan::test::convert_model_path(model_path) + ".csv precision=2";
+      = cmdstan::test::convert_model_path(model_path)
+        + " sample num_warmup=200 num_samples=1" + " output file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv precision=2";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -56,7 +58,7 @@ TEST(interface, output_precision_2) {
   Eigen::VectorXi thin(filenames.size());
   stan::mcmc::chains<> chains = parse_csv_files(
       filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-  EXPECT_NEAR(chains.samples(8)(0,0), 0.12, 1E-16);
+  EXPECT_NEAR(chains.samples(8)(0, 0), 0.12, 1E-16);
 }
 
 TEST(interface, output_precision_9) {
@@ -67,8 +69,9 @@ TEST(interface, output_precision_9) {
   model_path.push_back("proper_precision");
 
   std::string command
-      = cmdstan::test::convert_model_path(model_path) + " sample num_warmup=200 num_samples=1"
-        + " output file=" + cmdstan::test::convert_model_path(model_path) + ".csv precision=9";
+      = cmdstan::test::convert_model_path(model_path)
+        + " sample num_warmup=200 num_samples=1" + " output file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv precision=9";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -83,5 +86,5 @@ TEST(interface, output_precision_9) {
   Eigen::VectorXi thin(filenames.size());
   stan::mcmc::chains<> chains = parse_csv_files(
       filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-  EXPECT_NEAR(chains.samples(8)(0,0), 0.123456789, 1E-16);
+  EXPECT_NEAR(chains.samples(8)(0, 0), 0.123456789, 1E-16);
 }
