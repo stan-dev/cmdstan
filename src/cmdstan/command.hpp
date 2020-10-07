@@ -159,6 +159,11 @@ int command(int argc, const char *argv[]) {
           ->value()
           .c_str(),
       std::fstream::out);
+  
+  int precision = dynamic_cast<int_argument *>(parser.arg("output")->arg("precision"))->value();
+  if (precision != -1) {
+      output_stream << std::setprecision(precision);
+  }
   stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
   std::fstream diagnostic_stream(
