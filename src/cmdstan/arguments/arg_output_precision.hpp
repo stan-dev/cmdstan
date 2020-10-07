@@ -9,8 +9,8 @@ class arg_output_precision : public int_argument {
  public:
   arg_output_precision() : int_argument() {
     _name = "precision";
-    _description = "The precision used for the output CSV files.";
-    _validity = "integer > 0 or -1 to use the defautl precision";
+    _description = "The decimal precision used for the output CSV files.";
+    _validity = "integer >= 0 or -1 to use the default precision";
     _default = "-1";
     _default_value = -1;
     _constrained = true;
@@ -19,7 +19,7 @@ class arg_output_precision : public int_argument {
     _value = _default_value;
   }
 
-  bool is_valid(int value) { return value > 0 || value == _default_value; }
+  bool is_valid(int value) { return value >= 0 || value == _default_value; }
 
 };
 
