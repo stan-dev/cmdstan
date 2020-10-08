@@ -160,12 +160,9 @@ int command(int argc, const char *argv[]) {
           .c_str(),
       std::fstream::out);
 
-  int sig_figs
-      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"))
-            ->value();
-  std::cout << sig_figs;
-  if (sig_figs != -1) {
-    output_stream << std::setprecision(sig_figs);
+  int_argument * sig_figs_arg = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
+  if (!sig_figs_arg->is_default()) {
+    output_stream << std::setprecision(sig_figs_arg->value());
   }
   stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
