@@ -22,7 +22,7 @@ class arg_output_sig_figs : public int_argument {
     _value = _default_value;
   }
 
-  bool is_valid(int value) { return value >= 0 || value == _default_value; }
+  bool is_valid(int value) { return (value >= 0 && value <= 18) || value == _default_value; }
 };
 
 }  // namespace cmdstan
