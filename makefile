@@ -58,7 +58,7 @@ CXX_TYPE ?= other
 CXX_MAJOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f1)
 CXX_MINOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f2)
 
-ifndef STAN_COMPILER_OPTIMS
+ifdef STAN_COMPILER_OPTIMS
 	ifeq (clang,$(CXX_TYPE))
 		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -funroll-loops
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
@@ -180,6 +180,7 @@ endif
 	@echo '    STANC2: When set, use bin/stanc2 to generate C++ code.'
 	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
 	@echo '      the nightly version.'
+	@echo '    STAN_COMPILER_OPTIMS: Turns on additonal compiler flags for performance           '
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
