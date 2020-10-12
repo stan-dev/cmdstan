@@ -58,10 +58,9 @@ CXX_TYPE ?= other
 CXX_MAJOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f1)
 CXX_MINOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f2)
 
-ifndef STAN_NO_COMPILER_OPTIMS
+ifndef STAN_COMPILER_OPTIMS
 	ifeq (clang,$(CXX_TYPE))
-		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops
-		#CXXFLAGS_OPTIM_SUNDIALS ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -fvisibility=hidden -fvisibility-inlines-hidden
+		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -funroll-loops
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
 			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
 		endif
@@ -72,7 +71,7 @@ ifndef STAN_NO_COMPILER_OPTIMS
 		CPPFLAGS_OPTIM_SUNDIALS ?= $(CXXFLAGS_OPTIM_SUNDIALS)
 		# temp to contro for compiler versions while letting user override
 		# CXXFLAGS_OPTIM
-		CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -fvisibility=hidden -fvisibility-inlines-hidden -funroll-loops
+		CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -funroll-loops
 		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
 		  CXXFLAGS_VERSION_OPTIM += -floop-unroll-and-jam
 	  endif
@@ -82,7 +81,10 @@ ifndef STAN_NO_COMPILER_OPTIMS
 				CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
       endif
 	  endif
-		CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM)
+		ifndef STAN_MPI
+		  CXXFLAGS_VISIBILITY ?= -fvisibility=hidden -fvisibility-inlines-hidden
+		endif
+		CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM) $(CXXFLAGS_VISIBILITY)
 		LDFLAGS_FLTO ?=  $(CXXFLAGS_FLTO)
 	endif
 endif
