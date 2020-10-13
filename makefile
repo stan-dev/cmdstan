@@ -25,6 +25,11 @@ RAPIDJSON ?= lib/rapidjson_1.1.0/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
+## Detect operating system
+ifneq ($(OS),Windows_NT)
+  OS := $(shell uname -s)
+endif
+
 ## Set default compiler
 ifeq (default,$(origin CXX))
   ifeq ($(OS),Darwin)  ## Darwin is Mac OS X
