@@ -239,6 +239,9 @@ Options:
   // Write to csv file (optional)
   if (vm.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
+    if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
+      csv_file << std::setprecision(vm["sig_figs"].as<int>());
+    }
     write_header(header, column_widths, max_name_length, true, &csv_file);
     write_params(chains, lp_param, column_widths, model_formats,
                  max_name_length, sig_figs, 0, true, &csv_file);
