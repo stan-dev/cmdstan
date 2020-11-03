@@ -4,8 +4,8 @@
 
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
-test/%$(EXE) : INC += $(INC_GTEST)
-test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS)
+test/%$(EXE) : INC += $(INC_GTEST) -I $(RAPIDJSON)
+test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	$(LINK.cpp) $(filter-out src/test/test-models/% src/%.csv bin/% test/%.hpp %.hpp-test,$^) $(LDLIBS) $(OUTPUT_OPTION)
 
 test/%.o : src/test/%.cpp
@@ -15,31 +15,23 @@ test/%.o : src/test/%.cpp
 ##
 # Customization for generating dependencies
 ##
-
-%.d: %.hpp
-
-
+src/test/%.d : src/test/%.hpp
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
-src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
+src/test/%.d : test/%.o
 
 ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-TEST_MODELS_HPP := $(patsubst %.stan,%.hpp,$(wildcard src/test/test-models/*.stan))
-
-.PHONY: test-models-hpp
-test-models-hpp: $(TEST_MODELS_HPP)
-
 ############################################################
 #
 # Target to verify header files within CmdStan has
 # enough include calls
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/cmdstan -name '*.hpp' -type f))
+HEADER_TESTS := $(addsuffix -test,$(call findfiles,src/cmdstan,*.hpp))
 
 ifeq ($(OS),Windows_NT)
   DEV_NULL = nul
@@ -57,6 +49,16 @@ test/dummy.cpp:
 
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
+
+############################################################
+#
+# Target to generate C++ code for all test-models
+##
+TEST_MODELS := $(wildcard src/test/test-models/*.stan)
+
+.PHONY: test-models-hpp
+test-models-hpp: 
+	$(MAKE) $(patsubst %.stan,%$(EXE),$(TEST_MODELS)) 
 
 ##
 # Tests that depend on compiled models

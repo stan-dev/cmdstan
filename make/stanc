@@ -1,7 +1,94 @@
 ################################################################################
-# libstanc build rules
+# stanc build rules
 
-STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
+# used to create breaks in error messages
+define n
+
+
+endef
+
+# if nothing was set to $(OS) that means that the Stan Math submodule is missing
+OS ?= missing-submodules
+CMDSTAN_SUBMODULES = 1
+STANC_DL_RETRY = 5
+STANC_DL_DELAY = 10
+STANC3_TEST_BIN_URL ?=
+STANC3_VERSION ?= nightly
+
+ifeq ($(OS),Windows_NT)
+ OS_TAG := windows
+else ifeq ($(OS),Darwin)
+ OS_TAG := mac
+ STANC_XATTR := $(shell xattr bin/mac-stanc 2>/dev/null)
+else ifeq ($(OS),Linux)
+ OS_TAG := linux
+else ifeq ($(OS),missing-submodules)
+ CMDSTAN_SUBMODULES = 0
+else
+  $(error  Cannot detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc. $n )
+endif
+
+# bin/stanc build rules - requires stan, stan_math submodules in place
+ifeq ($(CMDSTAN_SUBMODULES),1)
+ifneq ($(STANC3),)
+  # build stanc3 from local installation
+  bin/stanc$(EXE) : $(call findfiles,$(STANC3)/src/,*.ml*) $(STANC#)
+	@mkdir -p $(dir $@)
+	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
+	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
+else ifneq ($(STANC3_TEST_BIN_URL),)
+# download stanc3 build from specific branch
+ifeq ($(OS_TAG),windows)
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+else
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
+endif
+
+else ifneq ($(STANC_XATTR),)
+# unquarantine release stanc3 binary (MacOS Catalina)
+    bin/stanc$(EXE) :
+	cp bin/mac-stanc bin/stanc$(EXE)
+	chmod +x bin/stanc
+	xattr -d com.apple.quarantine bin/stanc
+
+else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
+# use release stanc3 binary (Windows, Linux & MacOS releases before Catalina)
+    bin/stanc$(EXE) :
+	cp bin/$(OS_TAG)-stanc bin/stanc$(EXE)
+ifneq ($(OS_TAG),windows)
+	chmod +x bin/stanc$(EXE)
+endif
+else ifeq ($(OS_TAG),windows)
+# get latest stanc3 - Windows
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+else
+# get latest stanc3 - Linux & MacOS
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
+endif
+
+# bin/stanc2 build rules
+bin/stanc2$(EXE) : $(TBB_TARGETS)
+bin/stanc2$(EXE) : O = $(O_STANC)
+bin/stanc2$(EXE) : CPPFLAGS_MPI =
+bin/stanc2$(EXE) : LDFLAGS_MPI =
+bin/stanc2$(EXE) : LDLIBS_MPI =
+bin/stanc2$(EXE) : bin/cmdstan/libstanc.a
+bin/stanc2$(EXE) : bin/cmdstan/stanc.o
+	@mkdir -p $(dir $@)
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
+
+# libstanc build rules
+STANC_TEMPLATE_INSTANTIATION_CPP := $(call findfiles,$(STAN)src/stan/lang,*_inst.cpp) $(call findfiles,$(STAN)src/stan/lang,*_def.cpp)
 STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
 
 bin/cmdstan/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
@@ -13,17 +100,12 @@ $(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
-bin/stanc$(EXE) : O = $(O_STANC)
-bin/stanc$(EXE) : CPPFLAGS_MPI =
-bin/stanc$(EXE) : LDFLAGS_MPI =
-bin/stanc$(EXE) : LDLIBS_MPI =
-bin/stanc$(EXE) : bin/cmdstan/libstanc.a
-bin/stanc$(EXE) : bin/cmdstan/stanc.o
-	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
-
 $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@
 
-ifneq ($(filter bin/stanc$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
+ifneq ($(filter bin/stanc2$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
+# end libstanc build rules
+
+endif
+# end bin/stanc build rules

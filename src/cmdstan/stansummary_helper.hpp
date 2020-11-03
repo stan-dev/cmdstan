@@ -3,14 +3,26 @@
 
 #include <stan/mcmc/chains.hpp>
 #include <algorithm>
-#include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <ios>
+#include <iostream>
 #include <string>
 #include <vector>
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
 
-void compute_width_and_precision(double value, int sig_figs,
-                                 int& width, int& precision) {
+/**
+ * Determine size, and number of decimals required
+ * to display a value to a given level of significance.
+ *
+ * @param in value to be displayed
+ * @param in significant digits required
+ * @param out column width
+ * @param out number of decimal places
+ */
+void compute_width_and_precision(double value, int sig_figs, int &width,
+                                 int &precision) {
   double abs_value = std::fabs(value);
 
   if (value == 0) {
@@ -30,6 +42,14 @@ void compute_width_and_precision(double value, int sig_figs,
     ++width;
 }
 
+/**
+ * Return size of output slot required
+ * to display a value to a given level of significance.
+ *
+ * @param in value to be displayed
+ * @param in significant digits required
+ * @return display width
+ */
 int compute_width(double value, int sig_figs) {
   int width;
   int precision;
@@ -37,6 +57,14 @@ int compute_width(double value, int sig_figs) {
   return width;
 }
 
+/**
+ * Return number of decimal places required
+ * to display a value to a given level of significance.
+ *
+ * @param in value to be displayed
+ * @param in significant digits required
+ * @return number of decimal places
+ */
 int compute_precision(double value, int sig_figs, bool scientific) {
   if (scientific) {
     return sig_figs - 1;
@@ -48,10 +76,18 @@ int compute_precision(double value, int sig_figs, bool scientific) {
   }
 }
 
-int calculate_column_width(const Eigen::VectorXd& x,
-                           const std::string& name,
-                           const int sig_figs,
-                           std::ios_base::fmtflags& format) {
+/**
+ * Return column width required to display all values in that column
+ * to a given level of significance.
+ *
+ * @param in vector of values to be displayed
+ * @param in column label
+ * @param in significant digits required
+ * @param out format flags
+ * @return column width
+ */
+int column_width(const Eigen::VectorXd &x, const std::string &name,
+                 int sig_figs, std::ios_base::fmtflags &format) {
   int padding = 2;
 
   // Fixed Precision
@@ -66,16 +102,17 @@ int calculate_column_width(const Eigen::VectorXd& x,
   if (max_fixed_width + padding < fixed_threshold) {
     format = std::ios_base::fixed;
     max_fixed_width
-      = name.length() > max_fixed_width ? name.length() : max_fixed_width;
+        = name.length() > max_fixed_width ? name.length() : max_fixed_width;
     return max_fixed_width + padding;
   }
 
   // Scientific Notation
   size_t scientific_width = sig_figs + 1 + 4;  // Decimal place + exponent
-  if (x.minCoeff() < 0) ++scientific_width;
+  if (x.minCoeff() < 0)
+    ++scientific_width;
 
   scientific_width
-    = name.length() > scientific_width ? name.length() : scientific_width;
+      = name.length() > scientific_width ? name.length() : scientific_width;
 
   format = std::ios_base::scientific;
   return scientific_width + padding;
@@ -83,46 +120,80 @@ int calculate_column_width(const Eigen::VectorXd& x,
 
 using Eigen::Dynamic;
 
-Eigen::VectorXi
-calculate_column_widths(const Eigen::MatrixXd& values,
-                        const Eigen::Matrix<std::string, Dynamic, 1>& headers,
-                        const int sig_figs,
-                        Eigen::Matrix<std::ios_base::fmtflags, Dynamic, 1>&
-                        formats) {
+/**
+ * Determine column widths and format flags required to display all values
+ * across all columns of a data matrix, given the data, a vector of labels,
+ * and the desired level of significance.
+ *
+ * @param in matrix of data values to be displayed
+ * @param in vector of column labels
+ * @param in significant digits required
+ * @param out vector of format flags
+ * @return vector of column widths
+ */
+Eigen::VectorXi calculate_column_widths(
+    const Eigen::MatrixXd &values, const std::vector<std::string> &headers,
+    int sig_figs, Eigen::Matrix<std::ios_base::fmtflags, Dynamic, 1> &formats) {
   int n = values.cols();
   Eigen::VectorXi column_widths(n);
   formats.resize(n);
   for (int i = 0; i < n; i++) {
-    column_widths(i) = calculate_column_width(values.col(i), headers(i),
-                                              sig_figs, formats(i));
+    column_widths(i)
+        = column_width(values.col(i), headers[i], sig_figs, formats(i));
   }
   return column_widths;
 }
 
-
-bool is_matrix(const std::string& parameter_name) {
+/**
+ * Given a column label, determine whether or not the parameter
+ * is a scalar variable or a container variable.
+ *
+ * @param in column label
+ * @return boolean
+ */
+bool is_container(const std::string &parameter_name) {
   return (parameter_name.find("[") != std::string::npos);
 }
 
-std::string base_param_name(stan::mcmc::chains<>& chains, const int index) {
+/**
+ * Return parameter name corresponding to column label.
+ *
+ * @param in column index
+ * @return variable name
+ */
+std::string base_param_name(const stan::mcmc::chains<> &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(0, name.find("["));
 }
 
-std::string matrix_index(stan::mcmc::chains<>& chains, const int index) {
+/**
+ * Return parameter name corresponding to column label.
+ *
+ * @param in set of samples from one or more chains
+ * @param in column index
+ * @return parameter name
+ */
+std::string matrix_index(const stan::mcmc::chains<> &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(name.find("["));
 }
 
-std::vector<int>
-dimensions(stan::mcmc::chains<>& chains, const int start_index) {
+/**
+ * Return vector of dimensions for container variable.
+ *
+ * @param in set of samples from one or more chains
+ * @param in column index of first container element
+ * @return vector of dimensions
+ */
+std::vector<int> dimensions(const stan::mcmc::chains<> &chains,
+                            int start_index) {
   std::vector<int> dims;
   int dim;
 
   std::string name = base_param_name(chains, start_index);
   int last_matrix_element = start_index;
-  while (last_matrix_element+1 < chains.num_params()) {
-    if (base_param_name(chains, last_matrix_element+1) == name)
+  while (last_matrix_element + 1 < chains.num_params()) {
+    if (base_param_name(chains, last_matrix_element + 1) == name)
       last_matrix_element++;
     else
       break;
@@ -140,17 +211,26 @@ dimensions(stan::mcmc::chains<>& chains, const int start_index) {
   return dims;
 }
 
-// next 1-based index in row major order
-void next_index(std::vector<int>& index, const std::vector<int>& dims) {
+/**
+ * Compute index for next container element,
+ * for row-major order traversal.
+ *
+ * <p>Stan program stores/output container elements in column-major order.
+ * Legacy code to manipulate indices accordingly.
+ *
+ * @param in out container element indices
+ * @param in vector of array dimensions
+ */
+void next_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
     throw std::domain_error("next_index: size mismatch");
   if (dims.size() == 0)
     return;
-  index[index.size()-1]++;
+  index[index.size() - 1]++;
 
-  for (int i = index.size()-1; i > 0; i--) {
+  for (int i = index.size() - 1; i > 0; i--) {
     if (index[i] > dims[i]) {
-      index[i-1]++;
+      index[i - 1]++;
       index[i] = 1;
     }
   }
@@ -166,9 +246,15 @@ void next_index(std::vector<int>& index, const std::vector<int>& dims) {
   }
 }
 
-// return the flat 0-based index of a column major order matrix based on the
-// 1-based index
-int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
+/**
+ * Return the flat 0-based index of a column major order matrix based on the
+ * 1-based index
+ *
+ * @param in out container element indices
+ * @param in vector of array dimensions
+ * @return offset from first container element.
+ */
+int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
     throw std::domain_error("next_index: size mismatch");
   if (dims.size() == 0)
@@ -186,30 +272,432 @@ int matrix_index(std::vector<int>& index, const std::vector<int>& dims) {
   int offset = 0;
   int prod = 1;
   for (size_t i = 0; i < dims.size(); i++) {
-    offset += (index[i]-1) * prod;
+    offset += (index[i] - 1) * prod;
     prod *= dims[i];
   }
   return offset;
 }
 
-void stansummary_usage() {
-  std::cout << "USAGE:  stansummary <filename 1> [<filename 2> ... <filename N>]"
-            << std::endl
-            << std::endl;
-
-  std::cout << "OPTIONS:" << std::endl << std::endl;
-  std::cout << "  --autocorr=<chain_index>\tAppend the autocorrelations "
-            << "for the given chain"
-            << std::endl
-            << std::endl;
-  std::cout << "  --sig_figs=<int>\tSet significant figures of output "
-            << "(Defaults to 2)"
-            << std::endl
-            << std::endl;
-  std::cout << "  --csv_file=<filename>\tWrite output as csv file "
-            << std::endl
-            << std::endl;
+/**
+ * Convert percentiles - int values in range (1,99)
+ * to probabilities - double values in range (0, 1).
+ *
+ * <p>Input values must be in strictly increasing order.
+ *
+ * @param vector of strings
+ * @return vector of doubles
+ * @throws boost::program_options::error if input is ill-formed.
+ */
+Eigen::VectorXd percentiles_to_probs(
+    const std::vector<std::string> percentiles) {
+  Eigen::VectorXd probs(percentiles.size());
+  int cur_pct = 0;
+  int pct = 0;
+  int i = 0;
+  for (size_t i = 0; i < percentiles.size(); ++i) {
+    try {
+      pct = std::stoi(percentiles[i]);
+      if (pct < 1 || pct > 99 || pct < cur_pct)
+        throw std::exception();
+      cur_pct = pct;
+    } catch (const std::exception &e) {
+      std::stringstream message_stream("");
+      message_stream << "position " << i << ", value " << percentiles[i] << ". "
+                     << "Values must be in range (1,99), inclusive, "
+                     << "and strictly increasing.";
+      throw boost::program_options::error(message_stream.str());
+    }
+    probs[i] = pct * 1.0 / 100.0;
+  }
+  return probs;
 }
 
+/**
+ * Assemble set of Stan csv files into a stan::mcmc::chains object
+ *
+ * @param in vector of filenames of stan csv files
+ * @param in out  metatdata
+ * @param in out  warmup times for each chain
+ * @param in out  sampling times for each chain
+ * @param in out  thinning for each chain
+ * @param out output stream
+ * @return stan::mcmc::chains object
+ */
+stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
+                                     stan::io::stan_csv_metadata &metadata,
+                                     Eigen::VectorXd &warmup_times,
+                                     Eigen::VectorXd &sampling_times,
+                                     Eigen::VectorXi &thin, std::ostream *out) {
+  // instantiate stan::mcmc::chains object by parsing first file
+  std::ifstream ifstream;
+  ifstream.open(filenames[0].c_str());
+  stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
+  warmup_times(0) = stan_csv.timing.warmup;
+  sampling_times(0) = stan_csv.timing.sampling;
+  stan::mcmc::chains<> chains(stan_csv);
+  ifstream.close();
+  thin(0) = stan_csv.metadata.thin;
+  metadata = stan_csv.metadata;
+
+  // parse rest of input files, add to chains
+  for (std::vector<std::string>::size_type chain = 1; chain < filenames.size();
+       chain++) {
+    ifstream.open(filenames[chain].c_str());
+    stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
+    chains.add(stan_csv);
+    ifstream.close();
+    thin(chain) = stan_csv.metadata.thin;
+    warmup_times(chain) = stan_csv.timing.warmup;
+    sampling_times(chain) = stan_csv.timing.sampling;
+  }
+  return chains;
+}
+
+/**
+ * Assemble vector of output column labels as follows:
+ * Mean, MCSE, StdDev, specified quantile labels, N_eff, N_eff/S, R-hat
+ *
+ * @param in vector of percentile values as strings
+ * @return vector column labels
+ */
+std::vector<std::string> get_header(
+    const std::vector<std::string> &percentiles) {
+  // Mean, MCSE,  StdDev, ... percentiles ..., N_eff, N_eff/s, R_hat
+  std::vector<std::string> header(percentiles.size() + 6);
+  header.at(0) = "Mean";
+  header.at(1) = "MCSE";
+  header.at(2) = "StdDev";
+  for (size_t i = 0; i < percentiles.size(); ++i) {
+    header[i + 3] = percentiles[i] + '%';
+  }
+  size_t offset = 3 + percentiles.size();
+  header.at(offset) = "N_Eff";
+  header.at(offset + 1) = "N_Eff/s";
+  header.at(offset + 2) = "R_hat";
+  return header;
+}
+
+/**
+ * Compute statistics for span of output columns
+ * Mean, MCSE, StdDev, specified quantile, N_eff, N_eff/S, R-hat
+ *
+ * @param in set of samples from one or more chains
+ * @param in vector of warmup times  (required for N_eff/S)
+ * @param in vector of sampling times (required for N_eff/S)
+ * @param in vector of probabilities
+ * @param in index of first model param column in chains object
+ * @param in span length
+ * @param in out matrix of model param statistics
+ */
+void get_stats(const stan::mcmc::chains<> &chains,
+               const Eigen::VectorXd &warmup_times,
+               const Eigen::VectorXd &sampling_times,
+               const Eigen::VectorXd &probs, int params_start_col,
+               Eigen::MatrixXd &params) {
+  params.setZero();
+  double total_warmup_time = warmup_times.sum();
+  double total_sampling_time = sampling_times.sum();
+
+  // Model parameters
+  for (int i = 0, i_chains = params_start_col; i < params.rows();
+       ++i, ++i_chains) {
+    double sd = chains.sd(i_chains);
+    double n_eff = chains.effective_sample_size(i_chains);
+    params(i, 0) = chains.mean(i_chains);
+    params(i, 1) = sd / sqrt(n_eff);
+    params(i, 2) = sd;
+    Eigen::VectorXd quantiles = chains.quantiles(i_chains, probs);
+    for (int j = 0; j < quantiles.size(); j++)
+      params(i, 3 + j) = quantiles(j);
+    params(i, quantiles.size() + 3) = n_eff;
+    params(i, quantiles.size() + 4) = n_eff / total_sampling_time;
+    params(i, quantiles.size() + 5)
+        = chains.split_potential_scale_reduction(i_chains);
+  }
+}
+
+/**
+ * Output summary header either as fixed-width text columns or in csv format.
+ * Indent header by length of longest parameter name.
+ *
+ * @param in vector of output column labels
+ * @param in vector of output column widths
+ * @param in length of longest param name
+ * @param in output format flag:  true for csv; false for plain text
+ * @param in output stream
+ */
+void write_header(const std::vector<std::string> &header,
+                  const Eigen::VectorXi &col_widths, int max_name_length,
+                  bool as_csv, std::ostream *out) {
+  if (as_csv) {
+    *out << "name";
+    for (int i = 0; i < header.size(); ++i) {
+      *out << "," << header[i];
+    }
+  } else {
+    *out << std::setw(max_name_length + 1) << "";
+    for (int i = 0; i < header.size(); ++i) {
+      *out << std::setw(col_widths(i)) << header[i];
+    }
+  }
+  *out << std::endl;
+}
+
+/**
+ * Output statistics for a set of parameters
+ * either as fixed-width text columns or in csv format.
+ *
+ * @param in set of samples from one or more chains
+ * @param in matrix of statistics
+ * @param in vector of output column widths
+ * @param in vector of output column formats
+ * @param in size of longest parameter name - (width of 1st output column)
+ * @param in significant digits required
+ * @param in index of first column in chains object
+ * @param in output format flag:  true for csv; false for plain text
+ * @param in output stream
+ */
+void write_params(const stan::mcmc::chains<> &chains,
+                  const Eigen::MatrixXd &params,
+                  const Eigen::VectorXi &col_widths,
+                  const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic,
+                                      1> &col_formats,
+                  int max_name_length, int sig_figs, int params_start_col,
+                  bool as_csv, std::ostream *out) {
+  int num_sampler_params = params.rows();
+  for (int i = 0, i_chains = params_start_col; i < params.rows();
+       ++i, ++i_chains) {
+    if (!is_container(chains.param_name(i_chains))) {
+      if (as_csv) {
+        *out << "\"" << chains.param_name(i_chains) << "\"";
+        for (int j = 0; j < params.cols(); j++) {
+          *out << "," << params(i, j);
+        }
+      } else {
+        *out << std::setw(max_name_length + 1) << std::left
+             << chains.param_name(i_chains);
+        *out << std::right;
+        for (int j = 0; j < params.cols(); j++) {
+          std::cout.setf(col_formats(j), std::ios::floatfield);
+          *out << std::setprecision(compute_precision(
+                      params(i, j), sig_figs,
+                      col_formats(j) == std::ios_base::scientific))
+               << std::setw(col_widths(j)) << params(i, j);
+        }
+      }
+      *out << std::endl;
+    } else {
+      // container object columns in csv are last-index-major order
+      // output as first-index-major order
+      std::vector<int> dims = dimensions(chains, i_chains);
+      std::vector<int> index(dims.size(), 1);
+      int max = 1;
+      for (size_t j = 0; j < dims.size(); j++)
+        max *= dims[j];
+      for (int k = 0; k < max; k++) {
+        int row_maj_index = i + matrix_index(index, dims);
+        int row_maj_index_chains = i_chains + matrix_index(index, dims);
+        if (as_csv) {
+          *out << "\"" << chains.param_name(row_maj_index_chains) << "\"";
+          for (int j = 0; j < params.cols(); j++) {
+            *out << "," << std::fixed
+                 << std::setprecision(compute_precision(
+                        params(row_maj_index, j), sig_figs, false))
+                 << params(row_maj_index, j);
+          }
+        } else {
+          *out << std::setw(max_name_length + 1) << std::left
+               << chains.param_name(row_maj_index_chains);
+          *out << std::right;
+          for (int j = 0; j < params.cols(); j++) {
+            std::cout.setf(col_formats(j), std::ios::floatfield);
+            *out << std::setprecision(compute_precision(
+                        params(row_maj_index, j), sig_figs,
+                        col_formats(j) == std::ios_base::scientific))
+                 << std::setw(col_widths(j)) << params(row_maj_index, j);
+          }
+        }
+        *out << std::endl;
+        if (k < max - 1)
+          next_index(index, dims);
+      }
+      i += max - 1;
+      i_chains += max - 1;
+    }
+  }
+}
+
+/**
+ * Output timing statistics for all chains
+ *
+ * @param in set of samples from one or more chains
+ * @param in metatdata
+ * @param in warmup times for each chain
+ * @param in sampling times for each chain
+ * @param in thinning for each chain
+ * @param in prefix string - used to output as comments in csv file
+ * @param out output stream
+ */
+void write_timing(const stan::mcmc::chains<> &chains,
+                  const stan::io::stan_csv_metadata &metadata,
+                  const Eigen::VectorXd &warmup_times,
+                  const Eigen::VectorXd &sampling_times,
+                  const Eigen::VectorXi &thin, const std::string &prefix,
+                  std::ostream *out) {
+  *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
+       << prefix << chains.num_chains() << " chains: each with iter=("
+       << chains.num_kept_samples(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << chains.num_kept_samples(chain);
+  *out << ")";
+  *out << "; warmup=(" << chains.warmup(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << chains.warmup(chain);
+  *out << ")";
+  *out << "; thin=(" << thin(0);
+  for (int chain = 1; chain < chains.num_chains(); chain++)
+    *out << "," << thin(chain);
+  *out << ")";
+  *out << "; " << chains.num_samples() << " iterations saved." << std::endl
+       << prefix << std::endl;
+
+  int sig_figs = 2;
+  double total_warmup_time = warmup_times.sum();
+  double total_sampling_time = sampling_times.sum();
+
+  std::string warmup_unit = "seconds";
+  if (total_warmup_time / 3600 > 1) {
+    total_warmup_time /= 3600;
+    warmup_unit = "hours";
+  } else if (total_warmup_time / 60 > 1) {
+    total_warmup_time /= 60;
+    warmup_unit = "minutes";
+  }
+  if (chains.num_chains() == 1) {
+    *out << prefix << "Warmup took " << std::fixed
+         << std::setprecision(
+                compute_precision(total_warmup_time, sig_figs, false))
+         << total_warmup_time << " " << warmup_unit << std::endl;
+  } else {
+    *out << prefix << "Warmup took (" << std::fixed
+         << std::setprecision(
+                compute_precision(warmup_times(0), sig_figs, false))
+         << warmup_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      *out << ", " << std::fixed
+           << std::setprecision(
+                  compute_precision(warmup_times(chain), sig_figs, false))
+           << warmup_times(chain);
+    *out << ") seconds, ";
+    *out << std::fixed
+         << std::setprecision(
+                compute_precision(total_warmup_time, sig_figs, false))
+         << total_warmup_time << " " << warmup_unit << " total" << std::endl;
+  }
+
+  std::string sampling_unit = "seconds";
+  if (total_sampling_time / 3600 > 1) {
+    total_sampling_time /= 3600;
+    sampling_unit = "hours";
+  } else if (total_sampling_time / 60 > 1) {
+    total_sampling_time /= 60;
+    sampling_unit = "minutes";
+  }
+  if (chains.num_chains() == 1) {
+    *out << prefix << "Sampling took " << std::fixed
+         << std::setprecision(
+                compute_precision(total_sampling_time, sig_figs, false))
+         << total_sampling_time << " " << sampling_unit << std::endl;
+  } else {
+    *out << prefix << "Sampling took (" << std::fixed
+         << std::setprecision(
+                compute_precision(sampling_times(0), sig_figs, false))
+         << sampling_times(0);
+    for (int chain = 1; chain < chains.num_chains(); chain++)
+      *out << ", " << std::fixed
+           << std::setprecision(
+                  compute_precision(sampling_times(chain), sig_figs, false))
+           << sampling_times(chain);
+    *out << ") seconds, ";
+    *out << std::fixed
+         << std::setprecision(
+                compute_precision(total_sampling_time, sig_figs, false))
+         << total_sampling_time << " " << sampling_unit << " total"
+         << std::endl;
+  }
+}
+
+/**
+ * Output sampler information
+ *
+ * @param in metatdata
+ * @param in prefix string - used to output as comments in csv file
+ * @param out output stream
+ */
+void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
+                        const std::string &prefix, std::ostream *out) {
+  /// Footer output
+  *out << prefix << "Samples were drawn using " << metadata.algorithm
+       << " with " << metadata.engine << "." << std::endl;
+  *out << prefix
+       << "For each parameter, N_Eff is a crude measure of effective "
+          "sample size,"
+       << std::endl;
+  *out << prefix
+       << "and R_hat is the potential scale reduction factor on split "
+          "chains (at "
+       << std::endl;
+  *out << prefix << "convergence, R_hat=1)." << std::endl;
+}
+
+/**
+ * Compute and autocorrelation of a specified chain
+ * and print to console.
+ *
+ * <p>Lag is computed based on number of samples:
+ * size < 100, lag 1, size < 1000, lag 2, size < 10000 lag 3, etc.
+
+ * @param in set of samples from one or more chains
+ * @param in metatdata
+ * @param in 1-based index of stan csv input file
+ * @param in size of longest sampler param name
+ */
+// autocorrelation report prints to std::out
+void autocorrelation(const stan::mcmc::chains<> &chains,
+                     const stan::io::stan_csv_metadata &metadata,
+                     int autocorr_idx, int max_name_length) {
+  int c = autocorr_idx - 1;
+  Eigen::MatrixXd autocorr(chains.num_params(), chains.num_samples(c));
+  for (int i = 0; i < chains.num_params(); ++i) {
+    autocorr.row(i) = chains.autocorrelation(c, i);
+  }
+  std::cout << "Displaying the autocorrelations for chain " << autocorr_idx
+            << ":" << std::endl
+            << std::endl;
+
+  int n_autocorr = autocorr.row(0).size();
+  int lag_width = 1;
+  int number = n_autocorr;
+  while (number != 0) {
+    number /= 10;
+    lag_width++;
+  }
+
+  std::cout << std::setw(lag_width > 4 ? lag_width : 4) << "Lag";
+  for (int i = 0; i < chains.num_params(); ++i) {
+    std::cout << std::setw(max_name_length + 1) << std::right
+              << chains.param_name(i);
+  }
+  std::cout << std::endl;
+
+  for (int n = 0; n < n_autocorr; ++n) {
+    std::cout << std::setw(lag_width) << std::right << n;
+    for (int i = 0; i < chains.num_params(); ++i) {
+      std::cout << std::setw(max_name_length + 1) << std::right
+                << autocorr(i, n);
+    }
+    std::cout << std::endl;
+  }
+}
 
 #endif

@@ -2,6 +2,7 @@
 import org.stan.Utils
 
 def utils = new org.stan.Utils()
+def skipRemainingStages = false
 
 def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
@@ -14,10 +15,24 @@ def runTests(String prefix = "") {
     """
 }
 
+def runWinTests(String prefix = "") {
+    withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
+       bat "echo %PATH%"
+       bat "mingw32-make -j${env.PARALLEL} build"
+       bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
+    }
+}
+
 def deleteDirWin() {
     bat "attrib -r -s /s /d"
     deleteDir()
 }
+
+def isBranch(String b) { env.BRANCH_NAME == b }
+Boolean isPR() { env.CHANGE_URL != null }
+String fork() { env.CHANGE_FORK ?: "stan-dev" }
+String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
+
 
 pipeline {
     agent none
@@ -47,18 +62,89 @@ pipeline {
                     utils.checkout_pr("stan", "stan", params.stan_pr)
                     utils.checkout_pr("math", "stan/lib/stan_math", params.math_pr)
                 }
+
                 stash 'CmdStanSetup'
             }
             post { always { deleteDir() }}
         }
-        stage('Parallel tests') {
-            parallel {
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
+                script {
 
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
+
+                    def paths = ['src/cmdstan', 'src/test', 'lib', 'examples', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile'].join(" ")
+                    skipRemainingStages = utils.verifyChanges(paths)
+                }
+            }
+            post {
+                always {
+                    deleteDir()
+                }
+            }
+        }
+        stage("Clang-format") {
+            agent any
+            steps {
+                sh "printenv"
+                deleteDir()
+                retry(3) { checkout scm }
+                withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                    usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh """#!/bin/bash
+                        set -x
+                        git checkout -b ${branchName()}
+                        clang-format --version
+                        find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${env.PARALLEL} clang-format -i
+                        if [[ `git diff` != "" ]]; then
+                            git config --global user.email "mc.stanislaw@gmail.com"
+                            git config --global user.name "Stan Jenkins"
+                            git add src
+                            git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/cmdstan.git ${branchName()}
+                            echo "Exiting build because clang-format found changes."
+                            echo "Those changes are now found on stan-dev/cmdstan under branch ${branchName()}"
+                            echo "Please 'git pull' before continuing to develop."
+                            exit 1
+                        fi
+                    """
+                }
+            }
+            post {
+                always { deleteDir() }
+                failure {
+                    script {
+                        emailext (
+                            subject: "[StanJenkins] Autoformattted: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                            body: "Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' " +
+                                "has been autoformatted and the changes committed " +
+                                "to your branch, if permissions allowed." +
+                                "Please pull these changes before continuing." +
+                                "\n\n" +
+                                "See https://github.com/stan-dev/stan/wiki/Coding-Style-and-Idioms" +
+                                " for setting up the autoformatter locally.\n"+
+                            "(Check console output at ${env.BUILD_URL})",
+                            recipientProviders: [[$class: 'RequesterRecipientProvider']],
+                            to: "${env.CHANGE_AUTHOR_EMAIL}"
+                        )
+                    }
+                }
+            }
+        }
+        stage('Parallel tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
+            parallel {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
                         setupCXX()
-                        bat runTests()
+                        runWinTests()
                     }
                     post {
                         always {
@@ -82,10 +168,11 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent {label 'linux && mpi'}
+                    agent { label 'linux && mpi'}
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
+                        sh "echo CXX_TYPE=gcc >> make/local"
                         sh "make build-mpi > build-mpi.log 2>&1"
                         sh runTests("./")
                     }
@@ -111,7 +198,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent {label 'osx'}
+                    agent { label 'osx'}
                     steps {
                         setupCXX()
                         sh runTests("./")
@@ -154,7 +241,7 @@ pipeline {
                                     string(name: 'stan_pr', value: params.stan_pr),
                                     string(name: 'math_pr', value: params.math_pr)
                                 ],
-                                wait:false
+                                wait:true
                             )
                         }
                     }
@@ -165,12 +252,12 @@ pipeline {
     }
     post {
         success {
-            script {
-                if (env.BRANCH_NAME == "develop") {
-                    build job: "CmdStan Performance Tests/master", wait:false
-                }
-                utils.mailBuildResults("SUCCESSFUL")
-            }
+           script {
+               if (env.BRANCH_NAME == "develop") {
+                   build job: "CmdStan Performance Tests/master", wait:false
+               }
+               utils.mailBuildResults("SUCCESSFUL")
+           }
         }
         unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
         failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }

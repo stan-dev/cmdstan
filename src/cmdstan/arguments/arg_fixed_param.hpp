@@ -5,13 +5,13 @@
 
 namespace cmdstan {
 
-  class arg_fixed_param: public unvalued_argument {
-  public:
-    arg_fixed_param() {
-      _name = "fixed_param";
-      _description = "Fixed Parameter Sampler";
-    }
-  };
+class arg_fixed_param : public unvalued_argument {
+ public:
+  arg_fixed_param() {
+    _name = "fixed_param";
+    _description = "Fixed Parameter Sampler";
+  }
+};
 
-}
+}  // namespace cmdstan
 #endif

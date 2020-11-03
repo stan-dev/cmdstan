@@ -5,12 +5,12 @@
 
 namespace cmdstan {
 
-  class arg_variational_meanfield: public categorical_argument {
-  public:
-    arg_variational_meanfield() {
-      _name = "meanfield";
-      _description = "mean-field approximation";
-    }
-  };
-}
+class arg_variational_meanfield : public categorical_argument {
+ public:
+  arg_variational_meanfield() {
+    _name = "meanfield";
+    _description = "mean-field approximation";
+  }
+};
+}  // namespace cmdstan
 #endif

@@ -5,13 +5,13 @@
 
 namespace cmdstan {
 
-  class arg_fail: public unvalued_argument {
-  public:
-    arg_fail() {
-      _name = "fail";
-      _description = "Dummy argument to induce failures for testing";
-    }
-  };
+class arg_fail : public unvalued_argument {
+ public:
+  arg_fail() {
+    _name = "fail";
+    _description = "Dummy argument to induce failures for testing";
+  }
+};
 
-}
+}  // namespace cmdstan
 #endif
