@@ -133,6 +133,24 @@ int command(int argc, const char *argv[]) {
   write_opencl_device(info);
   info();
 
+  // Cross-check arguments
+  if (parser.arg("method")->arg("generate_quantities")) {
+    std::string fitted_sample_fname
+        = dynamic_cast<string_argument *>(parser.arg("method")
+                                              ->arg("generate_quantities")
+                                              ->arg("fitted_params"))
+              ->value();
+    std::string output_fname
+        = dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
+              ->value();
+    if (fitted_sample_fname.compare(output_fname) == 0) {
+      std::stringstream msg;
+      msg << "Filename conflict, fitted_params file " << output_fname
+          << " and output file have same name, must be different." << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+  }
+
   stan::callbacks::writer init_writer;
   stan::callbacks::interrupt interrupt;
 
@@ -141,6 +159,12 @@ int command(int argc, const char *argv[]) {
           ->value()
           .c_str(),
       std::fstream::out);
+
+  int_argument *sig_figs_arg
+      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
+  if (!sig_figs_arg->is_default()) {
+    output_stream << std::setprecision(sig_figs_arg->value());
+  }
   stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
   std::fstream diagnostic_stream(
@@ -198,7 +222,8 @@ int command(int argc, const char *argv[]) {
         parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
     if (fitted_params_file->is_default()) {
       info(
-          "Must specify argument fitted_params which is a csv file containing "
+          "Must specify argument fitted_params which is a csv file "
+          "containing "
           "the sample.");
       return_code = stan::services::error_codes::CONFIG;
     }
@@ -214,7 +239,7 @@ int command(int argc, const char *argv[]) {
     stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
                                              &msg);
     if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
-                                                &msg)) {
+                                                &msg, false)) {
       msg << "Error reading fitted param names from sample csv file \"" << fname
           << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
@@ -231,7 +256,6 @@ int command(int argc, const char *argv[]) {
     model.constrained_param_names(param_names, false, false);
     size_t num_cols = param_names.size();
     size_t num_rows = fitted_params.metadata.num_samples;
-
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
       std::stringstream msg;

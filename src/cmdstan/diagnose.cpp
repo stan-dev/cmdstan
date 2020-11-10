@@ -1,4 +1,3 @@
-
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <algorithm>
@@ -16,7 +15,7 @@ void diagnose_usage() {
 }
 
 /**
- * The Stan print function.
+ * Diagnostic checks for NUTS-HMC sampler parameters.
  *
  * @param argc Number of arguments
  * @param argv Arguments

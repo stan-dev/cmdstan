@@ -45,7 +45,7 @@ class CmdStanArgumentsSingleton : public ::testing::Test {
   std::stringstream ss;
 };
 
-TYPED_TEST_CASE_P(CmdStanArgumentsSingleton);
+TYPED_TEST_SUITE_P(CmdStanArgumentsSingleton);
 
 TYPED_TEST_P(CmdStanArgumentsSingleton, constructor) {
   // test fixture would have created the argument
@@ -140,11 +140,11 @@ TYPED_TEST_P(CmdStanArgumentsSingleton, argument_lookup) {
   // EXPECT_EQ(0, this->arg->arg("foo"));
 }
 
-REGISTER_TYPED_TEST_CASE_P(CmdStanArgumentsSingleton, constructor, name,
-                           description, print, print_help, parse_args,
-                           parse_args_unexpected, argument_lookup);
+REGISTER_TYPED_TEST_SUITE_P(CmdStanArgumentsSingleton, constructor, name,
+                            description, print, print_help, parse_args,
+                            parse_args_unexpected, argument_lookup);
 
-INSTANTIATE_TYPED_TEST_CASE_P(real, CmdStanArgumentsSingleton, double);
-INSTANTIATE_TYPED_TEST_CASE_P(int, CmdStanArgumentsSingleton, int);
-INSTANTIATE_TYPED_TEST_CASE_P(bool, CmdStanArgumentsSingleton, bool);
-INSTANTIATE_TYPED_TEST_CASE_P(string, CmdStanArgumentsSingleton, std::string);
+INSTANTIATE_TYPED_TEST_SUITE_P(real, CmdStanArgumentsSingleton, double);
+INSTANTIATE_TYPED_TEST_SUITE_P(int, CmdStanArgumentsSingleton, int);
+INSTANTIATE_TYPED_TEST_SUITE_P(bool, CmdStanArgumentsSingleton, bool);
+INSTANTIATE_TYPED_TEST_SUITE_P(string, CmdStanArgumentsSingleton, std::string);

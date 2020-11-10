@@ -25,6 +25,75 @@ RAPIDJSON ?= lib/rapidjson_1.1.0/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON)
 USER_HEADER ?= $(dir $<)user_header.hpp
 
+## Detect operating system
+ifneq ($(OS),Windows_NT)
+  OS := $(shell uname -s)
+endif
+
+## Set default compiler
+ifeq (default,$(origin CXX))
+  ifeq ($(OS),Darwin)  ## Darwin is Mac OS X
+    CXX := clang++
+  endif
+  ifeq ($(OS),Linux)
+    CXX := g++
+  endif
+  ifeq ($(OS),Windows_NT)
+    CXX := g++
+  endif
+endif
+
+# Detect compiler type
+# - CXX_TYPE: {gcc, clang, mingw32-gcc, other}
+# - CXX_MAJOR: major version of CXX
+# - CXX_MINOR: minor version of CXX
+ifneq (,$(findstring clang,$(CXX)))
+  CXX_TYPE ?= clang
+endif
+ifneq (,$(findstring mingw32-g,$(CXX)))
+  CXX_TYPE ?= mingw32-gcc
+endif
+ifneq (,$(findstring gcc,$(CXX)))
+  CXX_TYPE ?= gcc
+endif
+ifneq (,$(findstring g++,$(CXX)))
+  CXX_TYPE ?= gcc
+endif
+CXX_TYPE ?= other
+CXX_MAJOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f1)
+CXX_MINOR := $(shell $(CXX) -dumpversion 2>&1 | cut -d'.' -f2)
+
+ifdef STAN_CPP_OPTIMS
+	ifeq (clang,$(CXX_TYPE))
+		CXXFLAGS_OPTIM ?= -fvectorize -ftree-vectorize -fslp-vectorize -ftree-slp-vectorize -fno-standalone-debug -fstrict-return -funroll-loops
+		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
+			CXXFLAGS_FLTO ?= -flto=full -fwhole-program-vtables -fstrict-vtable-pointers -fforce-emit-vtables
+		endif
+	endif
+	ifeq (mingw32-g,$(CXX_TYPE))
+	else ifeq (gcc,$(CXX_TYPE))
+		CXXFLAGS_OPTIM_SUNDIALS ?= -fweb -fivopts -ftree-loop-linear
+		CPPFLAGS_OPTIM_SUNDIALS ?= $(CXXFLAGS_OPTIM_SUNDIALS)
+		# temp to contro for compiler versions while letting user override
+		# CXXFLAGS_OPTIM
+		CXXFLAGS_VERSION_OPTIM ?= -fweb -fivopts -ftree-loop-linear -floop-strip-mine -floop-block -floop-nest-optimize -ftree-vectorize -ftree-loop-distribution -funroll-loops
+		ifeq ($(shell expr $(CXX_MAJOR) \>= 5), 1)
+		  CXXFLAGS_VERSION_OPTIM += -floop-unroll-and-jam
+	  endif
+		ifeq ($(shell expr $(CXX_MAJOR) \>= 7), 1)
+		  CXXFLAGS_VERSION_OPTIM += -fsplit-loops
+			ifneq ($(OS),Windows_NT)
+				CXXFLAGS_FLTO ?= -flto -fuse-linker-plugin -fdevirtualize-at-ltrans
+      endif
+	  endif
+		ifndef STAN_MPI
+		  CXXFLAGS_VISIBILITY ?= -fvisibility=hidden -fvisibility-inlines-hidden
+		endif
+		CXXFLAGS_OPTIM ?= $(CXXFLAGS_VERSION_OPTIM) $(CXXFLAGS_VISIBILITY)
+		LDFLAGS_FLTO ?=  $(CXXFLAGS_FLTO)
+	endif
+endif
+
 ifdef STAN_THREADS
 STAN_FLAG_THREADS=_threads
 endif
@@ -46,7 +115,7 @@ endif
 ifeq ($(PRECOMPILED_HEADERS),true)
 PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
-CXXFLAGS_PROGRAM+= -Wno-ignored-attributes
+CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
 else
 PRECOMPILED_MODEL_HEADER=
@@ -60,8 +129,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.23.0
-CMDSTAN_VERSION_DOC := 2.23
+CMDSTAN_VERSION := 2.25.0
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -115,6 +183,9 @@ endif
 	@echo '      header file that is included. This defaults to "user_header.hpp" in the'
 	@echo '      directory of the Stan program.'
 	@echo '    STANC2: When set, use bin/stanc2 to generate C++ code.'
+	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
+	@echo '      the nightly version.'
+	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance           '
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
@@ -163,9 +234,6 @@ help-dev:
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
 	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
-	@echo ''
-	@echo 'Documentation:'
-	@echo ' - manual:          Build the Stan manual and the CmdStan user guide.'
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build-mpi
@@ -190,10 +258,9 @@ else
 .PHONY: build
 build:
 	@echo 'ERROR: Missing Stan submodules.'
-	@echo 'Please run the following commands to fix:'
+	@echo 'Please run the following to fix:'
 	@echo ''
-	@echo 'git submodule init'
-	@echo 'git submodule update --recursive'
+	@echo 'git submodule update --init --recursive'
 	@echo ''
 	@echo 'And try building again'
 	@exit 1
@@ -223,11 +290,7 @@ clean-deps:
 	$(RM) $(call findfiles,src,*.d.*) $(call findfiles,src/stan,*.d.*) $(call findfiles,$(MATH)/stan,*.d.*)
 	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
-clean-manual:
-	$(RM) -r doc
-	cd src/docs/cmdstan-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
-
-clean-all: clean clean-deps clean-libraries clean-manual
+clean-all: clean clean-deps clean-libraries
 	$(RM) bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	$(RM) -r src/cmdstan/main*.o bin/cmdstan
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
@@ -262,17 +325,8 @@ stan-revert:
 	git submodule update --init --recursive
 
 ##
-# Manual related
+# Debug target that prints compile command for CmdStan executable
 ##
-
-.PHONY: src/docs/cmdstan-guide/cmdstan-guide.tex
-manual: src/docs/cmdstan-guide/cmdstan-guide.pdf
-	mkdir -p doc
-	mv -f src/docs/cmdstan-guide/cmdstan-guide.pdf doc/cmdstan-guide-$(CMDSTAN_VERSION_DOC).pdf
-
-%.pdf: %.tex
-	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
-
 
 .PHONY: compile_info
 compile_info:
