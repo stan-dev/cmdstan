@@ -8,6 +8,7 @@
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
+#include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
@@ -131,7 +132,6 @@ int command(int argc, const char *argv[]) {
   parser.print(info);
   write_parallel_info(info);
   write_opencl_device(info);
-  info();
 
   // Cross-check arguments
   if (parser.arg("method")->arg("generate_quantities")) {
@@ -188,11 +188,16 @@ int command(int argc, const char *argv[]) {
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
+  std::vector<std::string> model_compile_info = model.model_compile_info();
+  write_compile_info(info, model_compile_info);
+  info();
+
   write_stan(sample_writer);
   write_model(sample_writer, model.model_name());
   parser.print(sample_writer);
   write_parallel_info(sample_writer);
   write_opencl_device(sample_writer);
+  write_compile_info(sample_writer, model_compile_info);
 
   write_stan(diagnostic_writer);
   write_model(diagnostic_writer, model.model_name());
