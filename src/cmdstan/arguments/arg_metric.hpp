@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARG_METRIC_HPP
 
 #include <cmdstan/arguments/arg_dense_e.hpp>
+#include <cmdstan/arguments/arg_auto_e.hpp>
 #include <cmdstan/arguments/arg_diag_e.hpp>
 #include <cmdstan/arguments/arg_unit_e.hpp>
 #include <cmdstan/arguments/list_argument.hpp>
@@ -17,6 +18,7 @@ class arg_metric : public list_argument {
     _values.push_back(new arg_unit_e());
     _values.push_back(new arg_diag_e());
     _values.push_back(new arg_dense_e());
+    _values.push_back(new arg_auto_e());
 
     _default_cursor = 1;
     _cursor = _default_cursor;
