@@ -117,7 +117,9 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
+#ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
+#endif
   argument_parser parser(valid_arguments);
   int err_code = parser.parse_args(argc, argv, info, err);
   if (err_code != 0) {
@@ -131,22 +133,25 @@ int command(int argc, const char *argv[]) {
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
 
-//   int_argument* opencl_device_id = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("device"));
-//   int_argument* opencl_platform_id = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("platform"));
+#ifdef STAN_OPENCL
+  int_argument *opencl_device_id
+      = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("device"));
+  int_argument *opencl_platform_id
+      = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("platform"));
 
-//   // Either both device and platform are set or neither in which case we default to compile-time constants
-//   if (opencl_device_id->is_default() ^ opencl_platform_id->is_default()) {
-//     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
-//     return err_code;
-//   } else if (!opencl_device_id->is_default() && !opencl_platform_id->is_default()) {
-// #ifdef STAN_OPENCL
-//     stan::math::opencl_context.select_device(opencl_platform_id->value(), opencl_device_id->value());
-// #else
-//     std::cerr << "OpenCL device and platorm IDs are set but the model was not compiled with STAN_OPENCL enabled." << std::endl;
-//     std::cerr << "Write STAN_OPENCL=true to the make/local file and recompile." << std::endl;
-//     return err_code;
-// #endif
-//   }
+  // Either both device and platform are set or neither in which case we default
+  // to compile-time constants
+  if ((opencl_device_id->is_default() && !opencl_platform_id->is_default())
+      || (!opencl_device_id->is_default()
+          && opencl_platform_id->is_default())) {
+    std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
+    return err_code;
+  } else if (!opencl_device_id->is_default()
+             && !opencl_platform_id->is_default()) {
+    stan::math::opencl_context.select_device(opencl_platform_id->value(),
+                                             opencl_device_id->value());
+  }
+#endif
 
   parser.print(info);
   write_parallel_info(info);
