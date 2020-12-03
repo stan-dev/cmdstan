@@ -12,7 +12,7 @@ class arg_seed : public int_argument {
   arg_seed() : int_argument() {
     _name = "seed";
     _description = "Random number generator seed";
-    _validity = "integer > 0 or -1 to generate seed from system time";
+    _validity = "integer >= 0 or -1 to generate seed from system time";
     _default = "-1";
     _default_value = -1;
     _constrained = true;
@@ -25,7 +25,7 @@ class arg_seed : public int_argument {
               .total_milliseconds();
   }
 
-  bool is_valid(int value) { return value > 0 || value == _default_value; }
+  bool is_valid(int value) { return value >= 0 || value == _default_value; }
 
   unsigned int random_value() {
     if (_value == _default_value) {
