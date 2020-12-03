@@ -97,7 +97,8 @@ class argument_parser {
         err(cat_name + " is either mistyped or misplaced.");
 #ifndef STAN_OPENCL
         if (cat_name == "opencl") {
-          err("Re-compile the model with STAN_OPENCL to use OpenCL CmdStan arguments.");
+          err("Re-compile the model with STAN_OPENCL to use OpenCL CmdStan "
+              "arguments.");
         }
 #endif
         std::vector<std::string> valid_paths;
