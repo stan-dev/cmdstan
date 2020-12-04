@@ -82,7 +82,6 @@ model {
   b_varmat ~ normal(0.0, prior_scale_b ./ sds_X);
 
   Intercept ~ normal(0.0, prior_scale_Intercept);
-
   z_age_varmat ~ std_normal();
   z_educ_varmat ~ std_normal();
   z_educ_age_varmat ~ std_normal();
