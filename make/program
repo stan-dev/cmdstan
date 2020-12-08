@@ -29,7 +29,7 @@ CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS)
 $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
 endif
 
-ifneq ($(findstring allow_undefined,$(STANCFLAGS)),)
+ifneq ($(findstring allow_undefined,$(STANCFLAGS))$(findstring allow-undefined,$(STANCFLAGS)),)
 $(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
 endif
 
