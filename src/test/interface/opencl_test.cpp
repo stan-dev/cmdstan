@@ -1,6 +1,6 @@
 #ifdef STAN_OPENCL
 
-#include <stan/math/opencl/opencl.hpp>
+#include <stan/math.hpp>
 #include <gtest/gtest.h>
 
 TEST(StanUiCommand, opencl_ready) {
