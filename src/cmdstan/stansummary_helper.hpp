@@ -7,10 +7,11 @@
 #include <iomanip>
 #include <ios>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <boost/program_options.hpp>
+
 
 /**
  * Determine size, and number of decimals required
@@ -286,7 +287,6 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
  *
  * @param vector of strings
  * @return vector of doubles
- * @throws boost::program_options::error if input is ill-formed.
  */
 Eigen::VectorXd percentiles_to_probs(
     const std::vector<std::string> percentiles) {
@@ -305,7 +305,7 @@ Eigen::VectorXd percentiles_to_probs(
       message_stream << "position " << i << ", value " << percentiles[i] << ". "
                      << "Values must be in range (1,99), inclusive, "
                      << "and strictly increasing.";
-      throw boost::program_options::error(message_stream.str());
+      throw std::invalid_argument(message_stream.str());
     }
     probs[i] = pct * 1.0 / 100.0;
   }

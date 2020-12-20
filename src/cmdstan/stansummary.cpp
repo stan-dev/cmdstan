@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <boost/program_options.hpp>
+#include <CLI11/CLI11.hpp>
 
 /**
  * Compute summary statistics over HMC sampler output
@@ -36,131 +36,50 @@ Options:
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
 )";
-  if (argc < 2) {  // pre-empt boost::program_options
+  if (argc < 2) {
     std::cout << usage << std::endl;
     return -1;
   }
 
   // Command-line arguments
-  int sig_figs;
+  int sig_figs = 2;
   int autocorr_idx;
   std::string csv_filename;
-  std::string percentiles_spec;
+  std::string percentiles_spec = "5,50,95";
   std::vector<std::string> filenames;
-  boost::program_options::options_description desc("Allowed options");
-  desc.add_options()("help,h", "Produce help message")(
-      "sig_figs,s",
-      boost::program_options::value<int>(&sig_figs)->default_value(2),
-      "Significant figures, default 2.")(
-      "autocorr,a", boost::program_options::value<int>(&autocorr_idx),
-      "Display the chain autocorrelation.")(
-      "csv_filename,c",
-      boost::program_options::value<std::string>(&csv_filename),
-      "Write statistics to a csv.")(
-      "percentiles,p",
-      boost::program_options::value<std::string>(&percentiles_spec)
-          ->default_value("5,50,95"),
-      "Percentiles to report.")(
-      "input_files,i",
-      boost::program_options::value<std::vector<std::string> >(&filenames),
-      "Sampler csv files. ");
-  boost::program_options::positional_options_description p;
-  p.add("input_files", -1);
 
-  // Parse, validate command-line
-  boost::program_options::variables_map vm;
-  try {
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv)
-            .options(desc)
-            .positional(p)
-            .run(),
-        vm);
-    boost::program_options::notify(vm);
-  } catch (const boost::program_options::error &e) {
-    std::cout << "Invalid argument: " << e.what() << std::endl;
+  CLI::App app{"Allowed options"};
+  app.add_option("--sig_figs,-s", sig_figs,
+		  "Significant figures, default 2.", true)
+    ->check(CLI::PositiveNumber & CLI::Range(1,18));
+  app.add_option("--autocorr,-a", autocorr_idx,
+		  "Display the chain autocorrelation.", true)
+    ->check(CLI::PositiveNumber);
+  app.add_option("--csv_filename,-c", csv_filename,
+		  "Write statistics to a csv.", true)
+    ->check(CLI::NonexistentPath);
+  app.add_option("--percentiles,-p", percentiles_spec,
+		  "Percentiles to report.", true);
+  app.add_option("input_files,i", filenames,
+		  "Sampler csv files.", true)
+    ->required()->each(CLI::ExistingFile);
+
+  CLI11_PARSE(app, argc, argv);
+  std::cout << "CLI11 config: " << app.get_description() << std::endl;
+  
+  if (autocorr_idx > filenames.size()) {
+    std::cout << "Bad value for option --autocorr: " << autocorr_idx
+	      << ", exiting." << std::endl;
     std::cout << std::endl << usage << std::endl;
     return -1;
   }
-  if (vm.count("help")) {
-    std::cout << std::endl << usage << std::endl;
-    return 0;
-  }
-  if (vm.count("input_files")) {
-    for (size_t i = 0; i < filenames.size(); ++i) {
-      if (FILE *file = fopen(filenames[i].c_str(), "r")) {
-        fclose(file);
-      } else {
-        std::cout << "Invalid input file: " << filenames[i] << ", exiting."
-                  << std::endl;
-        std::cout << std::endl << usage << std::endl;
-        return -1;
-      }
-    }
-    if (filenames.size() == 1)
-      std::cout << "Input file: ";
-    else
-      std::cout << "Input files: ";
-    for (size_t i = 0; i < filenames.size(); ++i) {
-      std::cout << filenames[i];
-      if (i < filenames.size() - 1)
-        std::cout << ", ";
-    }
-    std::cout << std::endl;
-  } else {
-    std::cout
-        << "No Stan csv file(s) specified, expecting one or more filenames."
-        << std::endl;
-    std::cout << std::endl << usage << std::endl;
-    return -1;
-  }
-  if (vm.count("csv_filename")) {
-    if (FILE *file = fopen(csv_filename.c_str(), "w")) {
-      fclose(file);
-    } else {
-      std::cout << "Invalid output csv file: " << csv_filename << ", exiting."
-                << std::endl;
-      std::cout << std::endl << usage << std::endl;
-      return -1;
-    }
-    std::cout << "Ouput csv_file: " << csv_filename << std::endl;
-  }
-  if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-    if (sig_figs < 1 || sig_figs > 18) {
-      std::cout << "Bad value for option --sig_figs: "
-                << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
-      std::cout << std::endl << usage << std::endl;
-      return -1;
-    }
-    std::cout << "Significant digits: " << vm["sig_figs"].as<int>()
-              << std::endl;
-  }
-  if (vm.count("autocorr")) {
-    if (autocorr_idx < 1 || autocorr_idx > filenames.size()) {
-      std::cout << "Bad value for option --autocorr: " << autocorr_idx
-                << ", exiting." << std::endl;
-      std::cout << std::endl << usage << std::endl;
-      return -1;
-    }
-    std::cout << "Autocorrelation for chain: " << autocorr_idx << std::endl;
-  }
-  if (vm.count("percentiles") && !vm["percentiles"].defaulted()) {
-    std::cout << "Percentiles: " << percentiles_spec << std::endl;
-  }
+
   std::vector<std::string> percentiles;
-  boost::algorithm::trim(
-      percentiles_spec);  // split treats leading space as token
+  boost::algorithm::trim(percentiles_spec);
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   Eigen::VectorXd probs;
-  try {
-    probs = percentiles_to_probs(percentiles);
-  } catch (const boost::program_options::error &e) {
-    std::cout << "Bad value for option --percentiles: " << e.what()
-              << std::endl;
-    std::cout << std::endl << usage << std::endl;
-    return -1;
-  }
+  probs = percentiles_to_probs(percentiles);
 
   // Parse csv files into sample, metadata
   stan::io::stan_csv_metadata metadata;
@@ -231,17 +150,16 @@ Options:
   std::cout << std::endl;
   write_sampler_info(metadata, "", &std::cout);
 
-  if (vm.count("autocorr")) {
+  if (app.count("autocorr")) {
     autocorrelation(chains, metadata, autocorr_idx, max_name_length);
     std::cout << std::endl;
   }
 
   // Write to csv file (optional)
-  if (vm.count("csv_filename")) {
+  if (app.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
-    if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-      csv_file << std::setprecision(vm["sig_figs"].as<int>());
-    }
+    csv_file << std::setprecision(sig_figs);
+
     write_header(header, column_widths, max_name_length, true, &csv_file);
     write_params(chains, lp_param, column_widths, model_formats,
                  max_name_length, sig_figs, 0, true, &csv_file);
