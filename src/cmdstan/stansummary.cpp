@@ -60,7 +60,7 @@ Options:
     ->check(CLI::NonexistentPath);
   app.add_option("--percentiles,-p", percentiles_spec,
 		  "Percentiles to report.", true);
-  app.add_option("input_files,i", filenames,
+  app.add_option("input_files", filenames,
 		  "Sampler csv files.", true)
     ->required()->each(CLI::ExistingFile);
 
@@ -150,13 +150,13 @@ Options:
   std::cout << std::endl;
   write_sampler_info(metadata, "", &std::cout);
 
-  if (app.count("autocorr")) {
+  if (app.count("--autocorr")) {
     autocorrelation(chains, metadata, autocorr_idx, max_name_length);
     std::cout << std::endl;
   }
 
   // Write to csv file (optional)
-  if (app.count("csv_filename")) {
+  if (app.count("--csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
     csv_file << std::setprecision(sig_figs);
 

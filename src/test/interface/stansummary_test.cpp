@@ -218,14 +218,16 @@ TEST(CommandStansummary, param_tests) {
   EXPECT_TRUE(rhat_theta < 1.01);
 }
 
+// good csv file, no draws
 TEST(CommandStansummary, functional_test__issue_342) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "matrix_output.csv";
-
+  std::cout << command << " " << csv_file << std::endl;
   run_command_output out = run_command(command + " " + csv_file);
+  std::cout << out << std::endl;
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
 
