@@ -13,7 +13,7 @@
 /**
  * Compute summary statistics over HMC sampler output
  * read in from stan_csv files.
- * Command line options handled by boost::program_options.
+ * Command line options handled by CLI11 lib.
  *
  * @param argc Number of arguments
  * @param argv Arguments
