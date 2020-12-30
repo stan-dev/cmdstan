@@ -49,20 +49,20 @@ Options:
   std::vector<std::string> filenames;
 
   CLI::App app{"Allowed options"};
-  app.add_option("--sig_figs,-s", sig_figs,
-		  "Significant figures, default 2.", true)
-    ->check(CLI::Range(1,18));
+  app.add_option("--sig_figs,-s", sig_figs, "Significant figures, default 2.",
+                 true)
+      ->check(CLI::Range(1, 18));
   app.add_option("--autocorr,-a", autocorr_idx,
-		  "Display the chain autocorrelation.", true)
-    ->check(CLI::PositiveNumber);
+                 "Display the chain autocorrelation.", true)
+      ->check(CLI::PositiveNumber);
   app.add_option("--csv_filename,-c", csv_filename,
-		  "Write statistics to a csv.", true)
-    ->check(CLI::NonexistentPath);
-  app.add_option("--percentiles,-p", percentiles_spec,
-		  "Percentiles to report.", true);
-  app.add_option("input_files", filenames,
-		  "Sampler csv files.", true)
-    ->required()->check(CLI::ExistingFile);
+                 "Write statistics to a csv.", true)
+      ->check(CLI::NonexistentPath);
+  app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
+                 true);
+  app.add_option("input_files", filenames, "Sampler csv files.", true)
+      ->required()
+      ->check(CLI::ExistingFile);
 
   try {
     CLI11_PARSE(app, argc, argv);
@@ -74,7 +74,7 @@ Options:
   // Check options semantic consistency
   if (app.count("--autocorr") && autocorr_idx > filenames.size()) {
     std::cout << "Option --autocorr: " << autocorr_idx
-	      << " not a valid chain id." << std::endl;
+              << " not a valid chain id." << std::endl;
     return -1;
   }
   std::vector<std::string> percentiles;
@@ -86,7 +86,7 @@ Options:
     probs = percentiles_to_probs(percentiles);
   } catch (const std::invalid_argument &e) {
     std::cout << "Option --percentiles " << percentiles_spec << ": "
-	      << e.what();
+              << e.what();
     return -1;
   }
   if (app.count("--csv_filename")) {
@@ -176,7 +176,7 @@ Options:
   // Write to csv file (optional)
   if (app.count("--csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
-    csv_file << std::setprecision(app.count("--sig_figs")?sig_figs:6);
+    csv_file << std::setprecision(app.count("--sig_figs") ? sig_figs : 6);
 
     write_header(header, column_widths, max_name_length, true, &csv_file);
     write_params(chains, lp_param, column_widths, model_formats,

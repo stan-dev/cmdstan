@@ -248,8 +248,7 @@ TEST(CommandStansummary, bad_input_files) {
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "no_such_file";
-  run_command_output out
-    = run_command(command + " " + csv_file);
+  run_command_output out = run_command(command + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
@@ -263,8 +262,8 @@ TEST(CommandStansummary, bad_csv_file_arg) {
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
-  std::string arg_csv_file
-      = "--csv_filename " + path_separator + "bin" + path_separator + "hi_mom.csv";
+  std::string arg_csv_file = "--csv_filename " + path_separator + "bin"
+                             + path_separator + "hi_mom.csv";
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
@@ -279,22 +278,22 @@ TEST(CommandStansummary, bad_sig_figs_arg) {
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output"
-    + path_separator + "bernoulli_chain_1.csv";
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
   std::string arg_sig_figs = "--sig_figs -1";
 
   run_command_output out
-    = run_command(command + " " + arg_sig_figs + " " + csv_file);
+      = run_command(command + " " + arg_sig_figs + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
-    << "\"" << out.command << "\" failed to quit with an error";
+      << "\"" << out.command << "\" failed to quit with an error";
 
   arg_sig_figs = "--sig_figs 101";
   expected_message = "--sig_figs: Value 101 not in range";
   out = run_command(command + " " + arg_sig_figs + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
-    << "\"" << out.command << "\" failed to quit with an error";
+      << "\"" << out.command << "\" failed to quit with an error";
 }
 
 TEST(CommandStansummary, bad_autocorr_arg) {

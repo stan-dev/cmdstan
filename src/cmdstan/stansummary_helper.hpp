@@ -12,7 +12,6 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
-
 /**
  * Determine size, and number of decimals required
  * to display a value to a given level of significance.
@@ -301,8 +300,9 @@ Eigen::VectorXd percentiles_to_probs(
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
-      throw std::invalid_argument("values must be in range (1,99)"
-				  ", inclusive, and strictly increasing.");
+      throw std::invalid_argument(
+          "values must be in range (1,99)"
+          ", inclusive, and strictly increasing.");
     }
     probs[i] = pct * 1.0 / 100.0;
   }
@@ -332,7 +332,7 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
   if (stan_csv.samples.rows() < 1) {
     std::stringstream message_stream("");
     message_stream << "No sampling draws found in Stan CSV file: "
-		   << filenames[0] << ".";
+                   << filenames[0] << ".";
     throw std::invalid_argument(message_stream.str());
   }
   warmup_times(0) = stan_csv.timing.warmup;
@@ -350,7 +350,7 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
     if (stan_csv.samples.rows() < 1) {
       std::stringstream message_stream("");
       message_stream << "No sampling draws found in Stan CSV file: "
-		     << filenames[chain] << ".";
+                     << filenames[chain] << ".";
       throw std::invalid_argument(message_stream.str());
     }
     chains.add(stan_csv);
