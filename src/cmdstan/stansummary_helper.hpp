@@ -301,11 +301,8 @@ Eigen::VectorXd percentiles_to_probs(
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
-      std::stringstream message_stream("");
-      message_stream << "position " << i << ", value " << percentiles[i] << ". "
-                     << "Values must be in range (1,99), inclusive, "
-                     << "and strictly increasing.";
-      throw std::invalid_argument(message_stream.str());
+      throw std::invalid_argument("values must be in range (1,99)"
+				  ", inclusive, and strictly increasing.");
     }
     probs[i] = pct * 1.0 / 100.0;
   }

@@ -51,7 +51,7 @@ Options:
   CLI::App app{"Allowed options"};
   app.add_option("--sig_figs,-s", sig_figs,
 		  "Significant figures, default 2.", true)
-    ->check(CLI::PositiveNumber & CLI::Range(1,18));
+    ->check(CLI::Range(1,18));
   app.add_option("--autocorr,-a", autocorr_idx,
 		  "Display the chain autocorrelation.", true)
     ->check(CLI::PositiveNumber);
@@ -62,24 +62,42 @@ Options:
 		  "Percentiles to report.", true);
   app.add_option("input_files", filenames,
 		  "Sampler csv files.", true)
-    ->required()->each(CLI::ExistingFile);
+    ->required()->check(CLI::ExistingFile);
 
-  CLI11_PARSE(app, argc, argv);
-  std::cout << "CLI11 config: " << app.get_description() << std::endl;
-  
-  if (autocorr_idx > filenames.size()) {
-    std::cout << "Bad value for option --autocorr: " << autocorr_idx
-	      << ", exiting." << std::endl;
-    std::cout << std::endl << usage << std::endl;
-    return -1;
+  try {
+    CLI11_PARSE(app, argc, argv);
+  } catch (const CLI::ParseError &e) {
+    std::cout << e.get_exit_code();
+    return app.exit(e);
   }
 
+  // Check options semantic consistency
+  if (app.count("--autocorr") && autocorr_idx > filenames.size()) {
+    std::cout << "Option --autocorr: " << autocorr_idx
+	      << " not a valid chain id." << std::endl;
+    return -1;
+  }
   std::vector<std::string> percentiles;
   boost::algorithm::trim(percentiles_spec);
   boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
                           boost::token_compress_on);
   Eigen::VectorXd probs;
-  probs = percentiles_to_probs(percentiles);
+  try {
+    probs = percentiles_to_probs(percentiles);
+  } catch (const std::invalid_argument &e) {
+    std::cout << "Option --percentiles " << percentiles_spec << ": "
+	      << e.what();
+    return -1;
+  }
+  if (app.count("--csv_filename")) {
+    if (FILE *file = fopen(csv_filename.c_str(), "w")) {
+      fclose(file);
+    } else {
+      std::cout << "Cannot save to csv_filename: " << csv_filename << "."
+                << std::endl;
+      return -1;
+    }
+  }
 
   // Parse csv files into sample, metadata
   stan::io::stan_csv_metadata metadata;
@@ -158,7 +176,7 @@ Options:
   // Write to csv file (optional)
   if (app.count("--csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
-    csv_file << std::setprecision(sig_figs);
+    csv_file << std::setprecision(app.count("--sig_figs")?sig_figs:6);
 
     write_header(header, column_widths, max_name_length, true, &csv_file);
     write_params(chains, lp_param, column_widths, model_formats,
