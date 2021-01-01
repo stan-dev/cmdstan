@@ -85,8 +85,8 @@ Options:
   try {
     probs = percentiles_to_probs(percentiles);
   } catch (const std::invalid_argument &e) {
-    std::cout << "Option --percentiles " << percentiles_spec << ": "
-	      << e.what() << std::endl;
+    std::cout << "Option --percentiles " << percentiles_spec << ": " << e.what()
+              << std::endl;
     return -1;
   }
   if (app.count("--csv_filename")) {
