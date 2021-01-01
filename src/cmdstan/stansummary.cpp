@@ -86,7 +86,7 @@ Options:
     probs = percentiles_to_probs(percentiles);
   } catch (const std::invalid_argument &e) {
     std::cout << "Option --percentiles " << percentiles_spec << ": "
-	      << e.what();
+	      << e.what() << std::endl;
     return -1;
   }
   if (app.count("--csv_filename")) {
@@ -94,6 +94,17 @@ Options:
       fclose(file);
     } else {
       std::cout << "Cannot save to csv_filename: " << csv_filename << "."
+                << std::endl;
+      return -1;
+    }
+  }
+  for (int i = 0; i < filenames.size(); ++i) {
+    std::ifstream infile;
+    infile.open(filenames[i].c_str());
+    if (infile.good()) {
+      infile.close();
+    } else {
+      std::cout << "Cannot read input csv file: " << filenames[i] << "."
                 << std::endl;
       return -1;
     }
