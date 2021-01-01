@@ -329,6 +329,7 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
   std::ifstream ifstream;
   ifstream.open(filenames[0].c_str());
   stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
+  ifstream.close();
   if (stan_csv.samples.rows() < 1) {
     std::stringstream message_stream("");
     message_stream << "No sampling draws found in Stan CSV file: "
@@ -338,7 +339,6 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
   stan::mcmc::chains<> chains(stan_csv);
-  ifstream.close();
   thin(0) = stan_csv.metadata.thin;
   metadata = stan_csv.metadata;
 
@@ -347,6 +347,7 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
        chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
+    ifstream.close();
     if (stan_csv.samples.rows() < 1) {
       std::stringstream message_stream("");
       message_stream << "No sampling draws found in Stan CSV file: "
@@ -354,7 +355,6 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
       throw std::invalid_argument(message_stream.str());
     }
     chains.add(stan_csv);
-    ifstream.close();
     thin(chain) = stan_csv.metadata.thin;
     warmup_times(chain) = stan_csv.timing.warmup;
     sampling_times(chain) = stan_csv.timing.sampling;
