@@ -81,7 +81,7 @@ struct run_command_output {
 
   run_command_output(const std::string command, const std::string output,
                      const long time, const int err_code)
-    : command(command),
+      : command(command),
         output(output),
         time(time),
         err_code(err_code),
@@ -218,7 +218,7 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
   }
   return output;
 }
-  
+
 }  // namespace test
 }  // namespace cmdstan
 #endif
