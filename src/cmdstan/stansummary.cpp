@@ -211,8 +211,7 @@ Options:
       csv_file.close();
     }
   } catch (const std::invalid_argument &e) {
-    std::cout << "Error during processing. " << e.what()
-              << std::endl;
+    std::cout << "Error during processing. " << e.what() << std::endl;
     return -1;
   }
 
