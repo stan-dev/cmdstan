@@ -7,10 +7,10 @@
 #include <iomanip>
 #include <ios>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <boost/program_options.hpp>
 
 /**
  * Determine size, and number of decimals required
@@ -286,7 +286,6 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
  *
  * @param vector of strings
  * @return vector of doubles
- * @throws boost::program_options::error if input is ill-formed.
  */
 Eigen::VectorXd percentiles_to_probs(
     const std::vector<std::string> percentiles) {
@@ -301,11 +300,9 @@ Eigen::VectorXd percentiles_to_probs(
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
-      std::stringstream message_stream("");
-      message_stream << "position " << i << ", value " << percentiles[i] << ". "
-                     << "Values must be in range (1,99), inclusive, "
-                     << "and strictly increasing.";
-      throw boost::program_options::error(message_stream.str());
+      throw std::invalid_argument(
+          "values must be in range (1,99)"
+          ", inclusive, and strictly increasing.");
     }
     probs[i] = pct * 1.0 / 100.0;
   }
@@ -332,10 +329,16 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
   std::ifstream ifstream;
   ifstream.open(filenames[0].c_str());
   stan::io::stan_csv stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
+  ifstream.close();
+  if (stan_csv.samples.rows() < 1) {
+    std::stringstream message_stream("");
+    message_stream << "No sampling draws found in Stan CSV file: "
+                   << filenames[0] << ".";
+    throw std::invalid_argument(message_stream.str());
+  }
   warmup_times(0) = stan_csv.timing.warmup;
   sampling_times(0) = stan_csv.timing.sampling;
   stan::mcmc::chains<> chains(stan_csv);
-  ifstream.close();
   thin(0) = stan_csv.metadata.thin;
   metadata = stan_csv.metadata;
 
@@ -344,8 +347,14 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
        chain++) {
     ifstream.open(filenames[chain].c_str());
     stan_csv = stan::io::stan_csv_reader::parse(ifstream, out);
-    chains.add(stan_csv);
     ifstream.close();
+    if (stan_csv.samples.rows() < 1) {
+      std::stringstream message_stream("");
+      message_stream << "No sampling draws found in Stan CSV file: "
+                     << filenames[chain] << ".";
+      throw std::invalid_argument(message_stream.str());
+    }
+    chains.add(stan_csv);
     thin(chain) = stan_csv.metadata.thin;
     warmup_times(chain) = stan_csv.timing.warmup;
     sampling_times(chain) = stan_csv.timing.sampling;
