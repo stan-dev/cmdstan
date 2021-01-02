@@ -4,43 +4,12 @@ bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) -fvisibility=hidden $(OUTPUT_OPTION) $<
 
-
-ifeq ($(OS),Windows_NT)
-# bitness check to decide which program_options .a file to select
-# logic based on: https://docs.microsoft.com/en-us/archive/blogs/david.wang/howto-detect-process-bitness
-WINBITNESS=64
-ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-ifeq ($(PROCESSOR_ARCHITEW6432),)
-WINBITNESS=32
-endif
-endif
-BOOST_PROGRAM_OPTIONS_LIB=$(BOOST)/stage/lib/libboost_program_options*.a
-BOOST_BUILD_OPTS= address-model=$(WINBITNESS)
-else
-BOOST_PROGRAM_OPTIONS_LIB=$(BOOST)/stage/lib/libboost_program_options.a
-ifeq ($(OS),Darwin)
-BOOST_BUILD_OPTS ?= toolset=$(CXX_TYPE)
-else
-BOOST_BUILD_OPTS=
-endif
-endif
-
 .PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI = 
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o $(BOOST_PROGRAM_OPTIONS_LIB)
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(BOOST_PROGRAM_OPTIONS_LIB) $(LDLIBS) $(OUTPUT_OPTION)
-
-# BOOST program_options build rules:
-$(BOOST_PROGRAM_OPTIONS_LIB):
-	@mkdir -p $(dir $@)
-ifeq ($(OS),Windows_NT)
-	cd $(BOOST); ./bootstrap.bat gcc
-else
-	cd $(BOOST); ./bootstrap.sh
-endif
-	cd $(BOOST); ./b2  $(BOOST_BUILD_OPTS) --visibility=hidden --with-program_options cxxstd=11 variant=release link=static
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
 endif
