@@ -7,12 +7,14 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_opencl.hpp>
+#include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
+#include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -117,6 +119,7 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
+  valid_arguments.push_back(new arg_profile_file());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
@@ -871,7 +874,15 @@ int command(int argc, const char *argv[]) {
           init_writer, sample_writer, diagnostic_writer);
     }
   }
-
+  stan::math::profile_map profile_data = model.get_profile_data();
+  if (profile_data.size() > 0) {
+    std::fstream profile_stream(
+        dynamic_cast<string_argument *>(parser.arg("profile_file"))->value().c_str(),
+        std::fstream::out
+    );
+    stan::callbacks::stream_writer profile_writer(profile_stream, "");
+    write_profiling(profile_writer, profile_data);
+  }
   output_stream.close();
   diagnostic_stream.close();
   for (size_t i = 0; i < valid_arguments.size(); ++i)
