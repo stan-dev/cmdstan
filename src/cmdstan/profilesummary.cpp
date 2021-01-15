@@ -140,7 +140,7 @@ Options:
         << "\t\t"<< it->second.forward_time
         << "\t\t"<< it->second.reverse_time << std::endl;
     }
-    std::cout << "Memory information: " << std::endl << std::endl
+    std::cout << std::endl << "Memory information: " << std::endl << std::endl
     << "\t\t" << "ChainStack" << "\t\t" << "NoChainStack" <<  std::endl;
     for (it = profile_map.begin(); it != profile_map.end(); it++)
     {
@@ -149,7 +149,7 @@ Options:
         << "\t\t"<< it->second.nochain_stack_total
         << std::endl;
     }
-    std::cout << "Autodiff information: " << std::endl << std::endl
+    std::cout << std::endl << "Autodiff information: " << std::endl << std::endl
     << "\t\t" << "NoADPasses" << "\t\t" << "AdPasses" <<  std::endl;
     for (it = profile_map.begin(); it != profile_map.end(); it++)
     {
