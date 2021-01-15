@@ -110,7 +110,6 @@ Options:
         }
         profile_data& p = profile_map[name];
         p.time_total += std::stod(line_cells[2]);
-        p.time_total += std::stod(line_cells[2]);
         p.forward_time += std::stod(line_cells[3]);
         p.reverse_time += std::stod(line_cells[4]);
         p.chain_stack_total += std::stoi(line_cells[5]);
@@ -124,7 +123,19 @@ Options:
 
     size_t n_files = filenames.size();
 
-    // TODO: Iterate over all profiles and if n_threads > n_files do sum*n_files/threads
+
+    profile_data_map::iterator it;
+    for (it = profile_map.begin(); it != profile_map.end(); it++)
+    {
+      if (it->second.n_threads > n_files) {
+          double ratio = n_files/it->second.n_threads;
+          it->second.time_total *= ratio;
+          it->second.forward_time *= ratio;
+          it->second.reverse_time *= ratio;
+          it->second.no_autodiff_passes *= ratio;
+          it->second.autodiff_passes *= ratio;
+      }
+    }
     
     std::cout << std::setprecision(sig_figs)
     << "Profile information combined from " << n_files << " file(s)"
