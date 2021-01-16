@@ -120,7 +120,6 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
-  valid_arguments.push_back(new arg_profile_file());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
