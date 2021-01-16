@@ -12,7 +12,7 @@ void write_profiling(stan::callbacks::writer& writer,
                      stan::math::profile_map& p) {
     stan::math::profile_map::iterator it;
     std::stringstream profile_csv_stream;
-    profile_csv_stream << "name,thread_id,time_total,forward_time,reverse_time,chain_stack_total,nochain_stack_total,autodiff_passes,no_autodiff_passes" << std::endl;
+    profile_csv_stream << "name,thread_id,time,forward_time,reverse_time,chain_stack,no_chain_stack,autodiff_calls,no_autodiff_calls" << std::endl;
     for (it = p.begin(); it != p.end(); it++) {
         profile_csv_stream 
             // name
