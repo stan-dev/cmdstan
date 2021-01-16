@@ -5,10 +5,10 @@ bin/cmdstan/%.o : src/cmdstan/%.cpp
 	$(COMPILE.cpp) -fvisibility=hidden $(OUTPUT_OPTION) $<
 
 .PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) bin/profilesummary$(EXE) : CPPFLAGS_MPI =
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) bin/profilesummary$(EXE) : LDFLAGS_MPI = 
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) bin/profilesummary$(EXE) : LDLIBS_MPI =
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) bin/profilesummary$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI = 
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
