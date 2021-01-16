@@ -64,6 +64,7 @@
 // forward declaration for function defined in another translation unit
 stan::model::model_base &new_model(stan::io::var_context &data_context,
                                    unsigned int seed, std::ostream *msg_stream);
+stan::math::profile_map &get_stan_profile_data();
 
 namespace cmdstan {
 
@@ -874,7 +875,7 @@ int command(int argc, const char *argv[]) {
           init_writer, sample_writer, diagnostic_writer);
     }
   }
-  stan::math::profile_map profile_data = model.get_profile_data();
+  stan::math::profile_map& profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
     std::fstream profile_stream(
         dynamic_cast<string_argument *>(parser.arg("profile_file"))->value().c_str(),
