@@ -20,17 +20,16 @@ void write_profiling(std::ostream& output, stan::math::profile_map& p) {
   stan::math::profile_map::iterator it;
 
   output << "name,thread_id,total_time,forward_time,reverse_time,chain_"
-    "stack,no_chain_stack,autodiff_calls,no_autodiff_calls" << std::endl;
+            "stack,no_chain_stack,autodiff_calls,no_autodiff_calls"
+         << std::endl;
   for (it = p.begin(); it != p.end(); it++) {
     output << it->first.first << "," << it->first.second << ","
-	   << (it->second.get_fwd_time()
-	       + it->second.get_rev_time())
-	   << "," << it->second.get_fwd_time() << ","
-	   << it->second.get_rev_time() << ","
-	   << it->second.get_chain_stack_used() << ","
-	   << it->second.get_nochain_stack_used() << ","
-	   << it->second.get_num_rev_passes() << ","
-	   << it->second.get_num_no_AD_fwd_passes() << std::endl;
+           << (it->second.get_fwd_time() + it->second.get_rev_time()) << ","
+           << it->second.get_fwd_time() << "," << it->second.get_rev_time()
+           << "," << it->second.get_chain_stack_used() << ","
+           << it->second.get_nochain_stack_used() << ","
+           << it->second.get_num_rev_passes() << ","
+           << it->second.get_num_no_AD_fwd_passes() << std::endl;
   }
 }
 }  // namespace cmdstan

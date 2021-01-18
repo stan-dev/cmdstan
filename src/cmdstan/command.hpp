@@ -877,10 +877,10 @@ int command(int argc, const char *argv[]) {
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
     std::string profile_file_name
-        = dynamic_cast<string_argument *>(parser.arg("output")->arg("profile_file"))
+        = dynamic_cast<string_argument *>(
+              parser.arg("output")->arg("profile_file"))
               ->value();
-    std::fstream profile_stream(profile_file_name.c_str(),
-				std::fstream::out);
+    std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
     if (!sig_figs_arg->is_default()) {
       profile_stream << std::setprecision(sig_figs_arg->value());
     }
