@@ -11,9 +11,9 @@ namespace cmdstan {
 
 /**
  * Writes the data from the map of profiles in a CSV format
- * to the supplied writer.
+ * to the output.
  *
- * @param writer object of a Stan writer class to write to.
+ * @param output stream to write output to
  * @param p reference to the map of profiles
  */
 void write_profiling(std::ostream& output, stan::math::profile_map& p) {
