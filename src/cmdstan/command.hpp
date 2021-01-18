@@ -876,13 +876,16 @@ int command(int argc, const char *argv[]) {
   }
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
-    std::fstream profile_stream(
-        dynamic_cast<string_argument *>(parser.arg("profile_file"))
-            ->value()
-            .c_str(),
-        std::fstream::out);
-    stan::callbacks::stream_writer profile_writer(profile_stream, "");
-    write_profiling(profile_writer, profile_data);
+    std::string profile_file_name
+        = dynamic_cast<string_argument *>(parser.arg("output")->arg("profile_file"))
+              ->value();
+    std::fstream profile_stream(profile_file_name.c_str(),
+				std::fstream::out);
+    if (!sig_figs_arg->is_default()) {
+      profile_stream << std::setprecision(sig_figs_arg->value());
+    }
+    write_profiling(profile_stream, profile_data);
+    profile_stream.close();
   }
   output_stream.close();
   diagnostic_stream.close();
