@@ -236,7 +236,8 @@ TEST(CommandStansummary, variational_inference) {
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "variational_inference_output.csv";
+                         + "interface" + path_separator
+                         + "variational_inference_output.csv";
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }

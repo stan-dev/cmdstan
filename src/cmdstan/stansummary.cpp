@@ -119,8 +119,8 @@ Options:
 
     // check for stan csv file parse errors written to output stream
     std::stringstream cout_ss;
-    stan::mcmc::chains<> chains = parse_csv_files
-      (filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+    stan::mcmc::chains<> chains = parse_csv_files(
+        filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
 
     // Get column headers for sampler, model params
     size_t max_name_length = 0;
