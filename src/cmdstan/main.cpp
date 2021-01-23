@@ -29,7 +29,7 @@ int main(int argc, const char *argv[]) {
 
   CLI::App app{"Stan program"};
   app.set_version_flag("-v,--version", std::string("CmdStan v") + CMDSTAN_VERSION + "; CLI11 prototype");
-    
+
   app.require_subcommand(1);
   cmdstan::setup_sample(app, shared_options, sample_options);
   cmdstan::setup_optimize(app, shared_options, optimize_options);
@@ -53,6 +53,7 @@ int main(int argc, const char *argv[]) {
 
   std::string subcommand = app.get_subcommands()[0]->get_name();
   int return_code;
+
   try {
     if (subcommand == "sample")
       return_code = cmdstan::sample(app, shared_options, sample_options);
@@ -73,7 +74,7 @@ int main(int argc, const char *argv[]) {
     std::cerr << e.what() << std::endl;
     return_code = stan::services::error_codes::SOFTWARE;
   }
-  
+
 #ifdef STAN_MPI
   cluster.stop_listen();
 #endif

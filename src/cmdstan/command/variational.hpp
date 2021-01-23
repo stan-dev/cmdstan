@@ -44,6 +44,8 @@ namespace cmdstan {
 
     std::fstream output_stream(shared_options.output_file.c_str(),
 			       std::fstream::out);
+    if (app.get_subcommand()->count("--sig_figs"))
+      output_stream << std::setprecision(shared_options.sig_figs);
     stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
     std::fstream diagnostic_stream(shared_options.diagnostic_file.c_str(),

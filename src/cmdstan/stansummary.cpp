@@ -34,7 +34,7 @@ Options:
                               comma-separated integers from (1,99), inclusive.
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
-                              Must be an integer from (1, 10), inclusive.
+                              Must be an integer from (1, 18), inclusive.
 )";
   if (argc < 2) {  // pre-empt boost::program_options
     std::cout << usage << std::endl;
@@ -126,7 +126,7 @@ Options:
     std::cout << "Ouput csv_file: " << csv_filename << std::endl;
   }
   if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
-    if (sig_figs < 1 || sig_figs > 10) {
+    if (sig_figs < 1 || sig_figs > 18) {
       std::cout << "Bad value for option --sig_figs: "
                 << vm["sig_figs"].as<int>() << ", exiting." << std::endl;
       std::cout << std::endl << usage << std::endl;
@@ -239,6 +239,9 @@ Options:
   // Write to csv file (optional)
   if (vm.count("csv_filename")) {
     std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
+    if (vm.count("sig_figs") && !vm["sig_figs"].defaulted()) {
+      csv_file << std::setprecision(vm["sig_figs"].as<int>());
+    }
     write_header(header, column_widths, max_name_length, true, &csv_file);
     write_params(chains, lp_param, column_widths, model_formats,
                  max_name_length, sig_figs, 0, true, &csv_file);

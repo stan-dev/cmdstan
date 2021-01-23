@@ -18,12 +18,16 @@ BOOST_PROGRAM_OPTIONS_LIB=$(BOOST)/stage/lib/libboost_program_options*.a
 BOOST_BUILD_OPTS= address-model=$(WINBITNESS)
 else
 BOOST_PROGRAM_OPTIONS_LIB=$(BOOST)/stage/lib/libboost_program_options.a
+ifeq ($(OS),Darwin)
+BOOST_BUILD_OPTS ?= toolset=$(CXX_TYPE)
+else
 BOOST_BUILD_OPTS=
+endif
 endif
 
 .PRECIOUS: bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : CPPFLAGS_MPI =
-bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI =
+bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDFLAGS_MPI = 
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : LDLIBS_MPI =
 bin/print$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE) : bin/%$(EXE) : bin/cmdstan/%.o $(BOOST_PROGRAM_OPTIONS_LIB)
 	@mkdir -p $(dir $@)

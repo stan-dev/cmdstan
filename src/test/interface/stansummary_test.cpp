@@ -439,3 +439,52 @@ TEST(CommandStansummary, check_csv_output) {
   if (return_code != 0)
     FAIL();
 }
+
+TEST(CommandStansummary, check_csv_output_sig_figs) {
+  std::string csv_header
+      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
+  std::string lp = "\"lp__\",-7.3,0.037,0.77,-9.1,-7,-6.8,4.4e+02,1.9e+04,1";
+  std::string energy = "\"energy__\",7.8,0.051,1,6.8,7.5,9.9,4.1e+02,1.8e+04,1";
+  std::string theta
+      = "\"theta\",0.26,0.0061,0.12,0.079,0.25,0.47,3.8e+02,1.7e+04,1";
+
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+
+  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+                                + "interface" + path_separator
+                                + "example_output" + path_separator
+                                + "tmp_test_target_csv_file.csv";
+  std::string arg_csv_file = "--csv_file " + target_csv_file;
+  std::string arg_sig_figs = "--sig_figs 2";
+
+  run_command_output out = run_command(command + " " + arg_csv_file + " "
+                                       + arg_sig_figs + " " + csv_file);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::ifstream target_stream(target_csv_file.c_str());
+  if (!target_stream.is_open())
+    FAIL();
+  std::string line;
+  std::getline(target_stream, line);
+  EXPECT_EQ(csv_header, line);
+  std::getline(target_stream, line);
+  EXPECT_EQ(lp, line);
+  std::getline(target_stream, line);  // accept_stat
+  std::getline(target_stream, line);  // stepsize
+  std::getline(target_stream, line);  // treedepth
+  std::getline(target_stream, line);  // n_leapfrog
+  std::getline(target_stream, line);  // divergent
+  std::getline(target_stream, line);  // energy
+  EXPECT_EQ(energy, line);
+  std::getline(target_stream, line);
+  EXPECT_EQ(theta, line);
+  target_stream.close();
+  int return_code = std::remove(target_csv_file.c_str());
+  if (return_code != 0)
+    FAIL();
+}

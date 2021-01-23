@@ -20,6 +20,7 @@ namespace cmdstan {
     std::string output_file = "output.csv";
     std::string diagnostic_file = "";
     int refresh = 100;
+    int sig_figs = -1;
   };
 
   struct DiagnoseOptions {
@@ -135,6 +136,11 @@ namespace cmdstan {
       ->add_option("-r,--refresh", shared_options.refresh,
 		   "Number of iterations between screen updates")
       ->check(CLI::NonNegativeNumber);
+
+    app
+      ->add_option("--sig_figs", shared_options.sig_figs,
+		   "The number of significant figures used for the output CSV files")
+      ->check(CLI::Range(-1, 18));
   }
 
 
@@ -445,6 +451,8 @@ namespace cmdstan {
 	     + option(shared_options.diagnostic_file, app.count("--diagnostic_file")));
       writer("  refresh = "
 	     + option(shared_options.refresh, app.count("--refresh")));
+      writer("  sig_figs = "
+	     + option(shared_options.sig_figs, app.count("--sig_figs")));
     }
   }
 
