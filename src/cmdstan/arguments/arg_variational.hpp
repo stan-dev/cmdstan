@@ -5,7 +5,11 @@
 #include <cmdstan/arguments/arg_variational_adapt.hpp>
 #include <cmdstan/arguments/arg_variational_algo.hpp>
 #include <cmdstan/arguments/arg_variational_eta.hpp>
-#include <cmdstan/arguments/arg_variational_eval_elbo.hpp>
+#include <cmdstan/arguments/arg_variational_eval_window.hpp>
+#include <cmdstan/arguments/arg_variational_rhat_cut.hpp>
+#include <cmdstan/arguments/arg_variational_mcse_cut.hpp>
+#include <cmdstan/arguments/arg_variational_ess_cut.hpp>
+#include <cmdstan/arguments/arg_variational_num_chains.hpp>
 #include <cmdstan/arguments/arg_variational_iter.hpp>
 #include <cmdstan/arguments/arg_variational_num_samples.hpp>
 #include <cmdstan/arguments/arg_variational_output_samples.hpp>
@@ -35,12 +39,11 @@ class arg_variational : public categorical_argument {
         elbo_samples::default_value()));
     _subarguments.push_back(new arg_variational_eta());
     _subarguments.push_back(new arg_variational_adapt());
-    _subarguments.push_back(
-        new arg_tolerance("tol_rel_obj", tol_rel_obj::description().c_str(),
-                          tol_rel_obj::default_value()));
-    _subarguments.push_back(new arg_variational_eval_elbo(
-        "eval_elbo", eval_elbo::description().c_str(),
-        eval_elbo::default_value()));
+    _subarguments.push_back(new arg_variational_eval_window());
+    _subarguments.push_back(new arg_variational_rhat_cut());
+    _subarguments.push_back(new arg_variational_mcse_cut());
+    _subarguments.push_back(new arg_variational_ess_cut());
+    _subarguments.push_back(new arg_variational_num_chains());
     _subarguments.push_back(new arg_variational_output_samples(
         "output_samples", output_draws::description().c_str(),
         output_draws::default_value()));

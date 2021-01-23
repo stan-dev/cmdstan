@@ -833,13 +833,19 @@ int command(int argc, const char *argv[]) {
         = dynamic_cast<int_argument *>(
               parser.arg("method")->arg("variational")->arg("iter"))
               ->value();
-    double tol_rel_obj
-        = dynamic_cast<real_argument *>(
-              parser.arg("method")->arg("variational")->arg("tol_rel_obj"))
-              ->value();
     double eta = dynamic_cast<real_argument *>(
                      parser.arg("method")->arg("variational")->arg("eta"))
                      ->value();
+    int eval_window = dynamic_cast<int_argument *>
+      (parser.arg("method")->arg("variational")->arg("eval_window"))->value();
+    double rhat_cut = dynamic_cast<real_argument *>
+      (parser.arg("method")->arg("variational")->arg("rhat_cut"))->value();
+    double mcse_cut = dynamic_cast<real_argument *>
+      (parser.arg("method")->arg("variational")->arg("mcse_cut"))->value();
+    double ess_cut = dynamic_cast<real_argument *>
+      (parser.arg("method")->arg("variational")->arg("ess_cut"))->value();
+    int num_chains = dynamic_cast<int_argument *>
+      (parser.arg("method")->arg("variational")->arg("num_chains"))->value();
     bool adapt_engaged = dynamic_cast<bool_argument *>(parser.arg("method")
                                                            ->arg("variational")
                                                            ->arg("adapt")
@@ -850,26 +856,24 @@ int command(int argc, const char *argv[]) {
                                                             ->arg("adapt")
                                                             ->arg("iter"))
                                ->value();
-    int eval_elbo
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("eval_elbo"))
-              ->value();
     int output_samples
         = dynamic_cast<int_argument *>(
               parser.arg("method")->arg("variational")->arg("output_samples"))
               ->value();
 
     if (algo->value() == "fullrank") {
-      return_code = stan::services::experimental::advi::fullrank(
+      throw std::exception();
+      /*return_code = stan::services::experimental::advi::fullrank(
           model, *init_context, random_seed, id, init_radius, grad_samples,
           elbo_samples, max_iterations, tol_rel_obj, eta, adapt_engaged,
           adapt_iterations, eval_elbo, output_samples, interrupt, logger,
-          init_writer, sample_writer, diagnostic_writer);
+          init_writer, sample_writer, diagnostic_writer);*/
     } else if (algo->value() == "meanfield") {
       return_code = stan::services::experimental::advi::meanfield(
           model, *init_context, random_seed, id, init_radius, grad_samples,
-          elbo_samples, max_iterations, tol_rel_obj, eta, adapt_engaged,
-          adapt_iterations, eval_elbo, output_samples, interrupt, logger,
+          elbo_samples, max_iterations, eta,
+	  eval_window, rhat_cut, mcse_cut, ess_cut, num_chains, adapt_engaged,
+          adapt_iterations, output_samples, interrupt, logger,
           init_writer, sample_writer, diagnostic_writer);
     }
   }
