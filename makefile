@@ -22,7 +22,6 @@ help:
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
 RAPIDJSON ?= lib/rapidjson_1.1.0/
-ARG_PARSER ?= lib/arg_parser-1.15/
 CLI11 ?= lib/CLI11-1.9.1-105399a/include/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON) -I $(CLI11)
 USER_HEADER ?= $(dir $<)user_header.hpp

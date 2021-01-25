@@ -458,9 +458,10 @@ TEST(StanUiCommand, random_seed_fail_1) {
 
   std::string command
       = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=0 "
+        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=-2 "
         + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
         + " --refresh=0 --output_file=test/output.csv";
+  std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body))
     << "expected: \"" << expected_message << "\"" << std::endl
@@ -469,7 +470,7 @@ TEST(StanUiCommand, random_seed_fail_1) {
 }
 
 TEST(StanUiCommand, random_seed_fail_2) {
-  std::string expected_message = "--seed: Number less or equal to 0:";
+  std::string expected_message = "is not a valid value for \"seed\"";
 
   std::vector<std::string> model_path;
   model_path.push_back("src");

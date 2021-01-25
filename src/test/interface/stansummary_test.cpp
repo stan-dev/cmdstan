@@ -4,6 +4,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
+#include <CLI/CLI.hpp>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;
@@ -218,13 +219,25 @@ TEST(CommandStansummary, param_tests) {
   EXPECT_TRUE(rhat_theta < 1.01);
 }
 
+// good csv file, no draws
 TEST(CommandStansummary, functional_test__issue_342) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "matrix_output.csv";
+  run_command_output out = run_command(command + " " + csv_file);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+}
 
+// good csv file, variational inference
+TEST(CommandStansummary, variational_inference) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator
+                         + "variational_inference_output.csv";
   run_command_output out = run_command(command + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
@@ -241,13 +254,12 @@ TEST(CommandStansummary, no_args) {
 }
 
 TEST(CommandStansummary, bad_input_files) {
-  std::string expected_message = "Invalid input file";
+  std::string expected_message = "File does not exist";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "no_such_file";
-
   run_command_output out = run_command(command + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
@@ -255,15 +267,15 @@ TEST(CommandStansummary, bad_input_files) {
 }
 
 TEST(CommandStansummary, bad_csv_file_arg) {
-  std::string expected_message = "Invalid output csv file";
+  std::string expected_message = "Cannot save to csv_filename";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
-  std::string arg_csv_file
-      = "--csv_file " + path_separator + "bin" + path_separator + "hi_mom.csv";
+  std::string arg_csv_file = "--csv_filename " + path_separator + "bin"
+                             + path_separator + "hi_mom.csv";
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
@@ -273,7 +285,7 @@ TEST(CommandStansummary, bad_csv_file_arg) {
 }
 
 TEST(CommandStansummary, bad_sig_figs_arg) {
-  std::string expected_message = "Bad value for option --sig_figs";
+  std::string expected_message = "--sig_figs: Value -1 not in range";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
@@ -289,6 +301,7 @@ TEST(CommandStansummary, bad_sig_figs_arg) {
       << "\"" << out.command << "\" failed to quit with an error";
 
   arg_sig_figs = "--sig_figs 101";
+  expected_message = "--sig_figs: Value 101 not in range";
   out = run_command(command + " " + arg_sig_figs + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
@@ -296,7 +309,7 @@ TEST(CommandStansummary, bad_sig_figs_arg) {
 }
 
 TEST(CommandStansummary, bad_autocorr_arg) {
-  std::string expected_message = "Bad value for option --autocorr";
+  std::string expected_message = "--autocorr: Number less or equal to 0";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
@@ -317,6 +330,7 @@ TEST(CommandStansummary, bad_autocorr_arg) {
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
+  expected_message = "not a valid chain id";
   arg_autocorr = "--autocorr 2";
   out = run_command(command + " " + arg_autocorr + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
@@ -325,15 +339,15 @@ TEST(CommandStansummary, bad_autocorr_arg) {
 }
 
 TEST(CommandStansummary, bad_percentiles_arg) {
-  std::string expected_message = "Percentiles";
+  std::string expected_message = "Option --percentiles";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
-  std::string arg_percentiles = "--percentiles -1";
 
+  std::string arg_percentiles = "--percentiles -1";
   run_command_output out
       = run_command(command + " " + arg_percentiles + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
@@ -411,7 +425,7 @@ TEST(CommandStansummary, check_csv_output) {
                                 + "interface" + path_separator
                                 + "example_output" + path_separator
                                 + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_file=" + target_csv_file;
+  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
@@ -459,7 +473,7 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
                                 + "interface" + path_separator
                                 + "example_output" + path_separator
                                 + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_file " + target_csv_file;
+  std::string arg_csv_file = "--csv_filename " + target_csv_file;
   std::string arg_sig_figs = "--sig_figs 2";
 
   run_command_output out = run_command(command + " " + arg_csv_file + " "

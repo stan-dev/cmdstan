@@ -2,6 +2,7 @@
 #define CMDSTAN_COMMAND_GENERATE_QUANTITIES_HPP
 
 #include <cmdstan/cli.hpp>
+#include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
@@ -66,6 +67,7 @@ namespace cmdstan {
 
     stan::model::model_base &model
       = new_model(*var_context, shared_options.seed, &std::cout);
+    std::vector<std::string> model_compile_info = model.model_compile_info();
 
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
@@ -126,7 +128,6 @@ namespace cmdstan {
       ::standalone_generate(model,
 			    fitted_params.samples.block(0, hmc_fixed_cols, num_rows, num_cols),
 			    shared_options.seed, interrupt, logger, sample_writer);
-    return stan::services::error_codes::CONFIG;
   }
 }  // namespace cmdstan
 #endif

@@ -2,10 +2,12 @@
 #define CMDSTAN_COMMAND_DIAGNOSE_HPP
 
 #include <cmdstan/cli.hpp>
+#include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_stan.hpp>
+#include <cmdstan/write_profiling.hpp>
 #include <cmdstan/command/util.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -57,11 +59,14 @@ namespace cmdstan {
     stan::model::model_base &model
       = new_model(*var_context, shared_options.seed, &std::cout);
 
+    std::vector<std::string> model_compile_info = model.model_compile_info();
+
     write_stan(sample_writer);
     write_model(sample_writer, model.model_name());
     print_old_command_header(app, shared_options, diagnose_options, sample_writer);
     write_parallel_info(sample_writer);
     write_opencl_device(sample_writer);
+    write_compile_info(sample_writer, model_compile_info);
 
     std::shared_ptr<stan::io::var_context> init_context = get_var_context(shared_options.init_file);
 

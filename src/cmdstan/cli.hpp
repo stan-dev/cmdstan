@@ -19,8 +19,13 @@ namespace cmdstan {
       .total_milliseconds();
     std::string output_file = "output.csv";
     std::string diagnostic_file = "";
+    std::string profile_file = "profile.csv";
     int refresh = 100;
     int sig_figs = -1;
+#ifdef STAN_OPENCL
+    int opencl_device = -1;
+    int opencl_platform = -1;
+#endif
   };
 
   struct DiagnoseOptions {
@@ -133,6 +138,9 @@ namespace cmdstan {
       ->add_option("--diagnostic_file", shared_options.diagnostic_file,
 		   "Auxiliary output file for diagnostic information");
     app
+      ->add_option("--profile_file", shared_options.profile_file,
+		   "Auxiliary output for profile information");
+    app
       ->add_option("-r,--refresh", shared_options.refresh,
 		   "Number of iterations between screen updates")
       ->check(CLI::NonNegativeNumber);
@@ -141,6 +149,22 @@ namespace cmdstan {
       ->add_option("--sig_figs", shared_options.sig_figs,
 		   "The number of significant figures used for the output CSV files")
       ->check(CLI::Range(-1, 18));
+
+#ifdef STAN_OPENCL
+    // Note: check for whether both options are simultaneously set happens after parse
+    //       in main.cpp
+    CLI::App* opencl
+      = app->add_option_group("opencl",
+			      "OpenCL options: both options must be set or both must be left as default");
+    opencl
+      ->add_option("--opencl_platform", shared_options.opencl_platform,
+		   "ID of the OpenCL platform to use")
+      ->check(CLI::NonNegativeNumber);
+    opencl
+      ->add_option("--opencl_device", shared_options.opencl_device,
+		   "ID of the OpenCL device to use")
+      ->check(CLI::NonNegativeNumber);
+#endif
   }
 
 
@@ -453,6 +477,16 @@ namespace cmdstan {
 	     + option(shared_options.refresh, app.count("--refresh")));
       writer("  sig_figs = "
 	     + option(shared_options.sig_figs, app.count("--sig_figs")));
+      writer("  profile_file = "
+	     + option(shared_options.profile_file, app.count("--profile_file")));
+
+#ifdef STAN_OPENCL
+      writer("opencl");
+      writer("  device = "
+	     + option(shared_options.opencl_device, app.count("--opencl_device")));
+      writer("  platform = "
+	     + option(shared_options.opencl_device, app.count("--opencl_platform")));
+#endif
     }
   }
 

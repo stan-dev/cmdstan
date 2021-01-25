@@ -52,7 +52,20 @@ int main(int argc, const char *argv[]) {
   stan::math::init_threadpool_tbb();
 
   std::string subcommand = app.get_subcommands()[0]->get_name();
-  int return_code;
+  int return_code = 0;
+
+#ifdef STAN_OPENCL
+  if (app.get_subcommand()->count("--opencl_device")
+      ^ app.get_subcommand()->count("--opencl_platform")) {
+    std::cerr << "Please set both OpenCL device (--opencl_device) and platform (--opencl_platform) ids."
+	      << std::endl;
+    return stan::services::error_codes::USAGE;
+  }
+  if (app.get_subcommand()->count("--opencl_device") && app.get_subcommand()->count("--opencl_platform"))
+    stan::math::opencl_context.select_device(shared_options.opencl_platform,
+					     shared_options.opencl_device);
+#endif
+
 
   try {
     if (subcommand == "sample")
@@ -67,6 +80,7 @@ int main(int argc, const char *argv[]) {
     if (subcommand == "generate_quantities")
       return_code = cmdstan::generate_quantities(app, shared_options,
 						 generate_quantities_options);
+    export_profile_info(app, shared_options);
   } catch(std::runtime_error& e) {
     std::cerr << e.what() << std::endl;
     return_code = stan::services::error_codes::USAGE;
