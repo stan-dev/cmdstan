@@ -38,5 +38,5 @@ jobs:
     - name: Compile & run the example model
       run: |
         mingw32-make examples/bernoulli/bernoulli.exe
-        ./examples/bernoulli/bernoulli.exe sample data file=examples/bernoulli/bernoulli.data.json
+        ./examples/bernoulli/bernoulli.exe sample --data_file examples/bernoulli/bernoulli.data.json
       shell: powershell
