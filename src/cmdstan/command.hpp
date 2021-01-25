@@ -7,12 +7,14 @@
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_opencl.hpp>
+#include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
+#include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -62,6 +64,7 @@
 // forward declaration for function defined in another translation unit
 stan::model::model_base &new_model(stan::io::var_context &data_context,
                                    unsigned int seed, std::ostream *msg_stream);
+stan::math::profile_map &get_stan_profile_data();
 
 namespace cmdstan {
 
@@ -156,6 +159,7 @@ int command(int argc, const char *argv[]) {
   parser.print(info);
   write_parallel_info(info);
   write_opencl_device(info);
+  info();
 
   // Cross-check arguments
   if (parser.arg("method")->arg("generate_quantities")) {
@@ -213,8 +217,6 @@ int command(int argc, const char *argv[]) {
       = new_model(*var_context, random_seed, &std::cout);
 
   std::vector<std::string> model_compile_info = model.model_compile_info();
-  write_compile_info(info, model_compile_info);
-  info();
 
   write_stan(sample_writer);
   write_model(sample_writer, model.model_name());
@@ -871,7 +873,19 @@ int command(int argc, const char *argv[]) {
           init_writer, sample_writer, diagnostic_writer);
     }
   }
-
+  stan::math::profile_map &profile_data = get_stan_profile_data();
+  if (profile_data.size() > 0) {
+    std::string profile_file_name
+        = dynamic_cast<string_argument *>(
+              parser.arg("output")->arg("profile_file"))
+              ->value();
+    std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
+    if (!sig_figs_arg->is_default()) {
+      profile_stream << std::setprecision(sig_figs_arg->value());
+    }
+    write_profiling(profile_stream, profile_data);
+    profile_stream.close();
+  }
   output_stream.close();
   diagnostic_stream.close();
   for (size_t i = 0; i < valid_arguments.size(); ++i)
