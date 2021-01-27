@@ -46,9 +46,6 @@ CmdStan](https://github.com/stan-dev/cmdstan/wiki/Getting-Started-with-CmdStan) 
 
 ## Troubleshooting
 
-As of version 2.22, CmdStan has switched to the new Stan-to-C++ compiler, called [stanc3](https://github.com/stan-dev/stanc3).  This compiler is intended to be backwards compatible with the existing Stan language and should accept all models that compile under the release 2.21 compiler, (see this [list of bug fixes](https://github.com/
-
-Further information is available on the CmdStan wiki page https://github.com/stan-dev/cmdstan/wiki/Troubleshooting-the-stanc3-compiler
-stan-dev/stanc3/wiki/changes-from-stanc2)).
+As of version 2.22, CmdStan has switched to the new Stan-to-C++ compiler, called [stanc3](https://github.com/stan-dev/stanc3).  This compiler is intended to be backwards compatible with the existing Stan language and should accept all models that compile under the release 2.21 compiler, (see this [list of bug fixes](https://github.com/stan-dev/stanc3/wiki/changes-from-stanc2)). 
 
 If a model that compiled for versions prior to 2.22, please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [CmdStan](https://github.com/stan-dev/cmdstan) repository.
