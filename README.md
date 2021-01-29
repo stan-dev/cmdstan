@@ -47,24 +47,5 @@ CmdStan](https://github.com/stan-dev/cmdstan/wiki/Getting-Started-with-CmdStan) 
 ## Troubleshooting
 
 As of version 2.22, CmdStan has switched to the new Stan-to-C++ compiler, called [stanc3](https://github.com/stan-dev/stanc3).  This compiler is intended to be backwards compatible with the existing Stan language and should accept all models that compile under the release 2.21 compiler, (see this [list of bug fixes](https://github.com/stan-dev/stanc3/wiki/changes-from-stanc2)). 
-The old C++ compiler is still available as program `bin/stanc2`.
-This compiler is not longer being maintained, i.e., existing bugs will not be fixed
-and new functions and features are only available in the stanc3 compiler.
-Its intended use is as a diagnostic tool and backup for the new stanc3 compiler and
 
-If you experience any problems or noticeable changes in compilation, execution, or outputs of model after switching to CmdStan 2.22, you can use the stanc2 compiler via the `make` option `STANC2`:
-```
-> make STANC2=TRUE my_program
-```
-
-If using the old compiler fixes the issues in your model, please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [CmdStan](https://github.com/stan-dev/cmdstan) repository.
-
-To permanently enable the stanc2 compiler, add the following to your `make/local` file:
-```
-STANC2=true
-```
-to the `make/local` file.
-
-If using the old compiler fixes the issues in your model, please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [CmdStan](https://github.com/stan-dev/cmdstan) repository.
-
-Further information is available on the CmdStan wiki page https://github.com/stan-dev/cmdstan/wiki/Troubleshooting-the-stanc3-compiler
+If a model that compiled for versions prior to 2.22, please report a bug on the [stanc3](https://github.com/stan-dev/stanc3) repository. Otherwise, report the issue to the [CmdStan](https://github.com/stan-dev/cmdstan) repository.
