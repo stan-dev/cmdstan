@@ -11,10 +11,10 @@ class arg_variational_mcse_cut : public real_argument {
     _name = "mcse_cut";
     _description = "mcse threshold to set iterate averaging limit";
     _validity = "0 < mcse_cut";
-    _default = "20";
-    _default_value = 20.0;
+    _default = "0.02";
+    _default_value = 0.02;
     _constrained = true;
-    _good_value = 20.0;
+    _good_value = 1.0;
     _bad_value = -1.0;
     _value = _default_value;
   }

@@ -6,6 +6,7 @@
 #include <cmdstan/arguments/arg_variational_algo.hpp>
 #include <cmdstan/arguments/arg_variational_eta.hpp>
 #include <cmdstan/arguments/arg_variational_eval_window.hpp>
+#include <cmdstan/arguments/arg_variational_window_size.hpp>
 #include <cmdstan/arguments/arg_variational_rhat_cut.hpp>
 #include <cmdstan/arguments/arg_variational_mcse_cut.hpp>
 #include <cmdstan/arguments/arg_variational_ess_cut.hpp>
@@ -40,6 +41,7 @@ class arg_variational : public categorical_argument {
     _subarguments.push_back(new arg_variational_eta());
     _subarguments.push_back(new arg_variational_adapt());
     _subarguments.push_back(new arg_variational_eval_window());
+    _subarguments.push_back(new arg_variational_window_size());
     _subarguments.push_back(new arg_variational_rhat_cut());
     _subarguments.push_back(new arg_variational_mcse_cut());
     _subarguments.push_back(new arg_variational_ess_cut());

@@ -829,7 +829,7 @@ int command(int argc, const char *argv[]) {
         = dynamic_cast<int_argument *>(
               parser.arg("method")->arg("variational")->arg("elbo_samples"))
               ->value();
-    int max_iterations
+    int iter
         = dynamic_cast<int_argument *>(
               parser.arg("method")->arg("variational")->arg("iter"))
               ->value();
@@ -838,6 +838,8 @@ int command(int argc, const char *argv[]) {
                      ->value();
     int eval_window = dynamic_cast<int_argument *>
       (parser.arg("method")->arg("variational")->arg("eval_window"))->value();
+    double window_size = dynamic_cast<real_argument *>
+      (parser.arg("method")->arg("variational")->arg("window_size"))->value();
     double rhat_cut = dynamic_cast<real_argument *>
       (parser.arg("method")->arg("variational")->arg("rhat_cut"))->value();
     double mcse_cut = dynamic_cast<real_argument *>
@@ -862,19 +864,19 @@ int command(int argc, const char *argv[]) {
               ->value();
 
     if (algo->value() == "fullrank") {
-      throw std::exception();
-      /*return_code = stan::services::experimental::advi::fullrank(
+      return_code = stan::services::experimental::advi::fullrank(
           model, *init_context, random_seed, id, init_radius, grad_samples,
-          elbo_samples, max_iterations, tol_rel_obj, eta, adapt_engaged,
-          adapt_iterations, eval_elbo, output_samples, interrupt, logger,
-          init_writer, sample_writer, diagnostic_writer);*/
+          elbo_samples, iter, eta, eval_window, window_size, rhat_cut,
+          mcse_cut, ess_cut, num_chains, adapt_engaged, adapt_iterations, 
+          output_samples, interrupt, logger, init_writer, sample_writer, 
+          diagnostic_writer);
     } else if (algo->value() == "meanfield") {
       return_code = stan::services::experimental::advi::meanfield(
           model, *init_context, random_seed, id, init_radius, grad_samples,
-          elbo_samples, max_iterations, eta,
-	  eval_window, rhat_cut, mcse_cut, ess_cut, num_chains, adapt_engaged,
-          adapt_iterations, output_samples, interrupt, logger,
-          init_writer, sample_writer, diagnostic_writer);
+          elbo_samples, iter, eta, eval_window, window_size, rhat_cut,
+          mcse_cut, ess_cut, num_chains, adapt_engaged, adapt_iterations, 
+          output_samples, interrupt, logger, init_writer, sample_writer, 
+          diagnostic_writer);
     }
   }
   stan::math::profile_map &profile_data = get_stan_profile_data();

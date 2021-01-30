@@ -11,8 +11,8 @@ class arg_variational_rhat_cut : public real_argument {
     _name = "rhat_cut";
     _description = "Rhat threshold to stop preliminary optimization";
     _validity = "1.0 < rhat_cut";
-    _default = "1.1";
-    _default_value = 1.1;
+    _default = "1.2";
+    _default_value = 1.2;
     _constrained = true;
     _good_value = 1.1;
     _bad_value = 0.9;
