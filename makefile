@@ -130,7 +130,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.25.0
+CMDSTAN_VERSION := 2.26.0
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -171,7 +171,7 @@ endif
 	@echo '    > make foo/bar$(EXE)'
 	@echo ''
 	@echo '    This target will:'
-	@echo '    1. Install the Stan compiler (bin/stanc or bin/stanc2), as needed.'
+	@echo '    1. Install the Stan compiler (bin/stanc), as needed.'
 	@echo '    2. Use the Stan compiler to generate C++ code, foo/bar.hpp.'
 	@echo '    3. Compile the C++ code using $(CC) $(CC_MAJOR).$(CC_MINOR) to generate foo/bar$(EXE)'
 	@echo ''
@@ -183,7 +183,6 @@ endif
 	@echo '    USER_HEADER: when STANCFLAGS has --allow_undefined, this is the name of the'
 	@echo '      header file that is included. This defaults to "user_header.hpp" in the'
 	@echo '      directory of the Stan program.'
-	@echo '    STANC2: When set, use bin/stanc2 to generate C++ code.'
 	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
 	@echo '      the nightly version.'
 	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance           '
@@ -292,7 +291,7 @@ clean-deps:
 	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
 clean-all: clean clean-deps clean-libraries
-	$(RM) bin/stanc$(EXE) bin/stanc2$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	$(RM) -r src/cmdstan/main*.o bin/cmdstan
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
