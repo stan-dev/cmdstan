@@ -846,6 +846,12 @@ int command(int argc, const char *argv[]) {
       (parser.arg("method")->arg("variational")->arg("mcse_cut"))->value();
     double ess_cut = dynamic_cast<real_argument *>
       (parser.arg("method")->arg("variational")->arg("ess_cut"))->value();
+    int check_frequency = dynamic_cast<real_argument *>
+    (parser.arg("method")->arg("variational")->arg("check_frequency"))->value();
+    int min_window_size = dynamic_cast<real_argument *>
+    (parser.arg("method")->arg("variational")->arg("min_window_size"))->value();
+    int num_grid_points = dynamic_cast<real_argument *>
+    (parser.arg("method")->arg("variational")->arg("num_grid_points"))->value();
     int num_chains = dynamic_cast<int_argument *>
       (parser.arg("method")->arg("variational")->arg("num_chains"))->value();
     bool adapt_engaged = dynamic_cast<bool_argument *>(parser.arg("method")

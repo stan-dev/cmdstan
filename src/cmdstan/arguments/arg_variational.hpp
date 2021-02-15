@@ -10,6 +10,9 @@
 #include <cmdstan/arguments/arg_variational_rhat_cut.hpp>
 #include <cmdstan/arguments/arg_variational_mcse_cut.hpp>
 #include <cmdstan/arguments/arg_variational_ess_cut.hpp>
+#include <cmdstan/arguments/arg_variational_check_frequency.hpp>
+#include <cmdstan/arguments/arg_variational_min_window_size.hpp>
+#include <cmdstan/arguments/arg_variational_num_grid_points.hpp>
 #include <cmdstan/arguments/arg_variational_num_chains.hpp>
 #include <cmdstan/arguments/arg_variational_iter.hpp>
 #include <cmdstan/arguments/arg_variational_num_samples.hpp>
@@ -45,6 +48,9 @@ class arg_variational : public categorical_argument {
     _subarguments.push_back(new arg_variational_rhat_cut());
     _subarguments.push_back(new arg_variational_mcse_cut());
     _subarguments.push_back(new arg_variational_ess_cut());
+    _subarguments.push_back(new arg_variational_check_frequency());
+    _subarguments.push_back(new arg_variational_min_window_size());
+    _subarguments.push_back(new arg_variational_num_grid_points());
     _subarguments.push_back(new arg_variational_num_chains());
     _subarguments.push_back(new arg_variational_output_samples(
         "output_samples", output_draws::description().c_str(),
