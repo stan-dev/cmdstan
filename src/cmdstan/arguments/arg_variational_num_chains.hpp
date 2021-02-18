@@ -11,8 +11,8 @@ class arg_variational_num_chains : public int_argument {
     _name = "num_chains";
     _description = "Iterations in each evaluation window";
     _validity = "0 < num_chains";
-    _default = "4";
-    _default_value = 4;
+    _default = "1";
+    _default_value = 1;
     _constrained = true;
     _good_value = 2.0;
     _bad_value = -1.0;

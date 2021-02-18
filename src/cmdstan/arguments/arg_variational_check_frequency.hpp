@@ -11,10 +11,10 @@ namespace cmdstan {
           _name = "check_frequency";
           _description = "How often samples are checked for convergence";
           _validity = "0 < check_frequency";
-          _default = "25";
-          _default_value = 25;
+          _default = "200";
+          _default_value = 200;
           _constrained = true;
-          _good_value = 25;
+          _good_value = 200;
           _bad_value = -1.0;
           _value = _default_value;
         }
