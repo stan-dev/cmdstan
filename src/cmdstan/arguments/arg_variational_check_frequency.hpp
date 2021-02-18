@@ -5,12 +5,12 @@
 
 namespace cmdstan {
 
-    class arg_variational_check_frequency : public real_argument {
+    class arg_variational_check_frequency : public int_argument {
     public:
-        arg_variational_check_frequency() : real_argument() {
+        arg_variational_check_frequency() : int_argument() {
           _name = "check_frequency";
           _description = "How often samples are checked for convergence";
-          _validity = "0.0 < check_frequency";
+          _validity = "0 < check_frequency";
           _default = "25";
           _default_value = 25;
           _constrained = true;
@@ -19,7 +19,7 @@ namespace cmdstan {
           _value = _default_value;
         }
 
-        bool is_valid(int value) { return value > 0.0; }
+        bool is_valid(int value) { return value > 0; }
     };
 
 }

@@ -1,13 +1,12 @@
 #ifndef CMDSTAN_RVI_ARG_VARIATIONAL_NUM_GRID_POINTS_HPP
 #define CMDSTAN_RVI_ARG_VARIATIONAL_NUM_GRID_POINTS_HPP
 #include <cmdstan/arguments/singleton_argument.hpp>
-num_grid_points
 namespace cmdstan {
 
-    class arg_variational_num_grid_points : public real_argument {
+    class arg_variational_num_grid_points : public int_argument {
     public:
-        arg_variational_num_grid_points() : real_argument() {
-          _name = "num_grid_pointsy";
+        arg_variational_num_grid_points() : int_argument() {
+          _name = "num_grid_points";
           _description = "Number of iterate values to calculate min(Rhat)";
           _validity = "0.0 < num_grid_points";
           _default = "5";

@@ -97,7 +97,6 @@ std::shared_ptr<stan::io::var_context> get_var_context(const std::string file) {
 }
 
 static int hmc_fixed_cols = 7;  // hmc sampler outputs columns __lp + 6
-
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
   stan::callbacks::stream_writer err(std::cout);
@@ -836,53 +835,35 @@ int command(int argc, const char *argv[]) {
     double eta = dynamic_cast<real_argument *>(
                      parser.arg("method")->arg("variational")->arg("eta"))
                      ->value();
-    int eval_window = dynamic_cast<int_argument *>
-      (parser.arg("method")->arg("variational")->arg("eval_window"))->value();
-    double window_size = dynamic_cast<real_argument *>
-      (parser.arg("method")->arg("variational")->arg("window_size"))->value();
-    double rhat_cut = dynamic_cast<real_argument *>
-      (parser.arg("method")->arg("variational")->arg("rhat_cut"))->value();
+    
     double mcse_cut = dynamic_cast<real_argument *>
       (parser.arg("method")->arg("variational")->arg("mcse_cut"))->value();
     double ess_cut = dynamic_cast<real_argument *>
       (parser.arg("method")->arg("variational")->arg("ess_cut"))->value();
-    int check_frequency = dynamic_cast<real_argument *>
+    int check_frequency = dynamic_cast<int_argument *>
     (parser.arg("method")->arg("variational")->arg("check_frequency"))->value();
-    int min_window_size = dynamic_cast<real_argument *>
+    int min_window_size = dynamic_cast<int_argument *>
     (parser.arg("method")->arg("variational")->arg("min_window_size"))->value();
-    int num_grid_points = dynamic_cast<real_argument *>
+    int num_grid_points = dynamic_cast<int_argument *>
     (parser.arg("method")->arg("variational")->arg("num_grid_points"))->value();
     int num_chains = dynamic_cast<int_argument *>
       (parser.arg("method")->arg("variational")->arg("num_chains"))->value();
-    bool adapt_engaged = dynamic_cast<bool_argument *>(parser.arg("method")
-                                                           ->arg("variational")
-                                                           ->arg("adapt")
-                                                           ->arg("engaged"))
-                             ->value();
-    int adapt_iterations = dynamic_cast<int_argument *>(parser.arg("method")
-                                                            ->arg("variational")
-                                                            ->arg("adapt")
-                                                            ->arg("iter"))
-                               ->value();
     int output_samples
         = dynamic_cast<int_argument *>(
               parser.arg("method")->arg("variational")->arg("output_samples"))
               ->value();
-
     if (algo->value() == "fullrank") {
       return_code = stan::services::experimental::advi::fullrank(
           model, *init_context, random_seed, id, init_radius, grad_samples,
-          elbo_samples, iter, eta, eval_window, window_size, rhat_cut,
-          mcse_cut, ess_cut, num_chains, adapt_engaged, adapt_iterations, 
-          output_samples, interrupt, logger, init_writer, sample_writer, 
-          diagnostic_writer);
+          elbo_samples, iter, eta, min_window_size,check_frequency,
+          num_grid_points,mcse_cut, ess_cut, num_chains, output_samples, 
+          interrupt, logger, init_writer, sample_writer, diagnostic_writer);
     } else if (algo->value() == "meanfield") {
       return_code = stan::services::experimental::advi::meanfield(
           model, *init_context, random_seed, id, init_radius, grad_samples,
-          elbo_samples, iter, eta, eval_window, window_size, rhat_cut,
-          mcse_cut, ess_cut, num_chains, adapt_engaged, adapt_iterations, 
-          output_samples, interrupt, logger, init_writer, sample_writer, 
-          diagnostic_writer);
+          elbo_samples, iter, eta, min_window_size,check_frequency,
+          num_grid_points,mcse_cut, ess_cut, num_chains, output_samples, 
+          interrupt, logger, init_writer, sample_writer, diagnostic_writer);
     }
   }
   stan::math::profile_map &profile_data = get_stan_profile_data();

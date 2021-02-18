@@ -5,9 +5,9 @@
 
 namespace cmdstan {
 
-    class arg_variational_min_window_size : public real_argument {
+    class arg_variational_min_window_size : public int_argument {
     public:
-        arg_variational_min_window_size() : real_argument() {
+        arg_variational_min_window_size() : int_argument() {
           _name = "min_window_size";
           _description = "Minimum size of window to produce optimal window size"
                          "related to check_frequcy and ess_cut";
