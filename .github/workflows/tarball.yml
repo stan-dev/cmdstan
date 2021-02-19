@@ -41,7 +41,7 @@ name: CmdStan tarball builder
           default: 'master'
 jobs:
   linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: ocaml/opam2:alpine-3.9-ocaml-4.07
       options: --user root
@@ -75,16 +75,16 @@ jobs:
           eval $(opam env)
           dune subst
           dune build @install --profile static
-          mv _build/default/src/stanc/stanc.exe linux-stanc
+          mv _build/default/src/stanc/stanc.exe ${{ github.job }}-stanc
       
       - name: Upload Linux stanc
         uses: actions/upload-artifact@v2
         with:
-          name: linux-stanc
-          path: linux-stanc
+          name: ${{ github.job }}-stanc
+          path: ${{ github.job }}-stanc
 
   windows:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: ubuntu:bionic
       options: --user root
@@ -100,7 +100,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.opam"
-          key: windows-stanc-binary-4.07
+          key: ${{ github.job }}-stanc-binary-4.07
 
       - name: Install dependencies
         run: |
@@ -123,13 +123,13 @@ jobs:
           eval $(opam env)
           dune subst
           dune build -x windows
-          mv _build/default.windows/src/stanc/stanc.exe windows-stanc
+          mv _build/default.windows/src/stanc/stanc.exe ${{ github.job }}-stanc
 
       - name: Upload Windows stanc
         uses: actions/upload-artifact@v2
         with:
-          name: windows-stanc
-          path: windows-stanc
+          name: ${{ github.job }}-stanc
+          path: ${{ github.job }}-stanc
   mac:
     runs-on: macOS-latest
     steps:    
@@ -144,7 +144,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.opam"
-          key: macOS-stanc-binary-4.07
+          key: ${{ github.job }}-stanc-binary-4.07
 
       - name: Install dependencies
         run: |
@@ -161,19 +161,22 @@ jobs:
           eval $(opam env)
           dune subst
           dune build @install
-          mv _build/default/src/stanc/stanc.exe mac-stanc
+          mv _build/default/src/stanc/stanc.exe ${{ github.job }}-stanc
       
       - name: Upload MacOS binaries
         uses: actions/upload-artifact@v2
         with:
-          name: mac-stanc
-          path: mac-stanc
+          name: ${{ github.job }}-stanc
+          path: ${{ github.job }}-stanc
   build:
     needs:  [linux, windows, mac]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
-    - uses: actions/setup-python@v1
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+        architecture: 'x64'
     - uses: actions/checkout@v2
       with:
         repository: ${{ github.event.inputs.cmdstan_repo }}
@@ -243,5 +246,3 @@ jobs:
       with:
         name:  cmdstan-${{ github.event.inputs.tarball_name }}
         path: 'cmdstan-${{ github.event.inputs.tarball_name }}.tar.gz'
-
-    
