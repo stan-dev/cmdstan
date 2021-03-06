@@ -1,6 +1,7 @@
 #ifndef CMDSTAN_COMMAND_HPP
 #define CMDSTAN_COMMAND_HPP
 
+#include <cmdstan/arguments/arg_chains.hpp>
 #include <cmdstan/arguments/arg_data.hpp>
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
@@ -10,6 +11,7 @@
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
+#include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
@@ -47,6 +49,7 @@
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -98,6 +101,27 @@ std::shared_ptr<stan::io::var_context> get_var_context(const std::string file) {
 
 static int hmc_fixed_cols = 7;  // hmc sampler outputs columns __lp + 6
 
+namespace internal {
+
+template <typename T> auto get_arg_pointer(T &&x) { return x; }
+
+template <typename T, typename... Args>
+auto get_arg_pointer(T &&x, const char *arg1, Args &&... args) {
+  return get_arg_pointer(x->arg(arg1), args...);
+}
+
+} // namespace internal
+
+template <typename T, typename... Args>
+auto get_arg(T &&x, const char *arg1, Args &&... args) {
+  return internal::get_arg_pointer(x.arg(arg1), args...);
+}
+
+template <typename caster, typename T, typename... Args>
+auto get_arg_val(caster &&v, T &&x, Args &&... args) {
+  return dynamic_cast<std::decay_t<caster> *>(get_arg(x, args...))->value();
+}
+
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
   stan::callbacks::stream_writer err(std::cout);
@@ -120,6 +144,7 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
+  valid_arguments.push_back(new arg_chains());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
@@ -132,6 +157,10 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return err_code;
 
+  unsigned int n_chains = 1;
+  n_chains =
+      dynamic_cast<u_int_argument *>(parser.arg("chains")->arg("n_chains"))
+          ->value();
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
@@ -182,10 +211,11 @@ int command(int argc, const char *argv[]) {
   stan::callbacks::writer init_writer;
   stan::callbacks::interrupt interrupt;
 
+  std::string output_file =
+      get_arg_val(string_argument(), parser, "output", "file");
+
   std::fstream output_stream(
-      dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
-          ->value()
-          .c_str(),
+      output_file,
       std::fstream::out);
 
   int_argument *sig_figs_arg
@@ -224,10 +254,39 @@ int command(int argc, const char *argv[]) {
   write_parallel_info(sample_writer);
   write_opencl_device(sample_writer);
   write_compile_info(sample_writer, model_compile_info);
-
   write_stan(diagnostic_writer);
   write_model(diagnostic_writer, model.model_name());
   parser.print(diagnostic_writer);
+
+
+  std::vector<std::unique_ptr<std::fstream>> output_streamers;
+  std::vector<stan::callbacks::stream_file_writer> sample_writers;
+  std::vector<std::unique_ptr<std::fstream>> diagnostic_streamers;
+  std::vector<stan::callbacks::stream_file_writer> diagnostic_writers;
+  for (int i = 0; i < n_chains; i++) {
+    output_streamers.emplace_back(std::make_unique<std::fstream>(
+        std::fstream(std::string("output") + std::to_string(i + 1) + ".csv",
+                     std::fstream::out)));
+    sample_writers.emplace_back(
+        stan::callbacks::stream_file_writer(output_streamers[i], "# "));
+    diagnostic_streamers.emplace_back(
+        std::make_unique<std::fstream>(std::fstream(
+            std::string("diagnostic_file") + std::to_string(i + 1) + ".csv")));
+    diagnostic_writers.emplace_back(
+        stan::callbacks::stream_file_writer(diagnostic_streamers[i], "# "));
+  }
+  for (int i = 0; i < n_chains; i++) {
+    write_stan(sample_writers[i]);
+    write_model(sample_writers[i], model.model_name());
+    parser.print(sample_writers[i]);
+    write_parallel_info(sample_writers[i]);
+    write_opencl_device(sample_writers[i]);
+    write_compile_info(sample_writers[i], model_compile_info);
+    write_stan(diagnostic_writers[i]);
+    write_model(diagnostic_writers[i], model.model_name());
+    parser.print(diagnostic_writers[i]);
+  }
+
 
   int refresh
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
@@ -577,8 +636,8 @@ int command(int argc, const char *argv[]) {
             model, *init_context, random_seed, id, init_radius, num_warmup,
             num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writer, sample_writer,
-            diagnostic_writer);
+            term_buffer, window, interrupt, logger, init_writer, sample_writers,
+            diagnostic_writers, n_chains);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
