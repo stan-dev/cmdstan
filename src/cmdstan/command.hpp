@@ -103,14 +103,17 @@ static int hmc_fixed_cols = 7;  // hmc sampler outputs columns __lp + 6
 
 namespace internal {
 
-template <typename T> auto get_arg_pointer(T &&x) { return x; }
+template <typename T>
+auto get_arg_pointer(T &&x) {
+  return x;
+}
 
 template <typename T, typename... Args>
 auto get_arg_pointer(T &&x, const char *arg1, Args &&... args) {
   return get_arg_pointer(x->arg(arg1), args...);
 }
 
-} // namespace internal
+}  // namespace internal
 
 template <typename T, typename... Args>
 auto get_arg(T &&x, const char *arg1, Args &&... args) {
@@ -158,9 +161,9 @@ int command(int argc, const char *argv[]) {
     return err_code;
 
   unsigned int n_chains = 1;
-  n_chains =
-      dynamic_cast<u_int_argument *>(parser.arg("chains")->arg("n_chains"))
-          ->value();
+  n_chains
+      = dynamic_cast<u_int_argument *>(parser.arg("chains")->arg("n_chains"))
+            ->value();
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
@@ -211,12 +214,10 @@ int command(int argc, const char *argv[]) {
   stan::callbacks::writer init_writer;
   stan::callbacks::interrupt interrupt;
 
-  std::string output_file =
-      get_arg_val(string_argument(), parser, "output", "file");
+  std::string output_file
+      = get_arg_val(string_argument(), parser, "output", "file");
 
-  std::fstream output_stream(
-      output_file,
-      std::fstream::out);
+  std::fstream output_stream(output_file, std::fstream::out);
 
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
@@ -258,7 +259,6 @@ int command(int argc, const char *argv[]) {
   write_model(diagnostic_writer, model.model_name());
   parser.print(diagnostic_writer);
 
-
   std::vector<std::unique_ptr<std::fstream>> output_streamers;
   std::vector<stan::callbacks::stream_file_writer> sample_writers;
   std::vector<std::unique_ptr<std::fstream>> diagnostic_streamers;
@@ -286,7 +286,6 @@ int command(int argc, const char *argv[]) {
     write_model(diagnostic_writers[i], model.model_name());
     parser.print(diagnostic_writers[i]);
   }
-
 
   int refresh
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
