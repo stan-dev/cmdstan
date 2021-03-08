@@ -4,9 +4,10 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(CXX = env.CXX) {
+def setupCXX(CXX = env.CXX, String stanc3_bin_url) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CXX = ${CXX}\n")
+    stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "STANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
+    writeFile(file: "make/local", text: "CXX = ${CXX}\n${stanc3_bin_url_str}")
 }
 
 def runTests(String prefix = "") {
@@ -32,7 +33,7 @@ def isBranch(String b) { env.BRANCH_NAME == b }
 Boolean isPR() { env.CHANGE_URL != null }
 String fork() { env.CHANGE_FORK ?: "stan-dev" }
 String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
-
+String stanc3_bin_url() { params.stanc3_bin_url ?: "nightly" }
 
 pipeline {
     agent none
@@ -42,6 +43,8 @@ pipeline {
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
         string(defaultValue: '', name: 'math_pr',
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
+        string(defaultValue: 'nightly', name: 'stanc3_bin_url',
+          description: 'Custom stanc3 binary url')
     }
     stages {
         stage('Kill previous builds') {
@@ -143,7 +146,7 @@ pipeline {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
-                        setupCXX()
+                        setupCXX(env.CXX, stanc3_bin_url())
                         runWinTests()
                     }
                     post {
@@ -170,7 +173,7 @@ pipeline {
                 stage('Linux interface tests with MPI') {
                     agent { label 'linux && mpi'}
                     steps {
-                        setupCXX("${MPICXX}")
+                        setupCXX("${MPICXX}", stanc3_bin_url())
                         sh "echo STAN_MPI=true >> make/local"
                         sh "echo CXX_TYPE=gcc >> make/local"
                         sh "make build-mpi > build-mpi.log 2>&1"
@@ -200,7 +203,7 @@ pipeline {
                 stage('Mac interface tests') {
                     agent { label 'osx'}
                     steps {
-                        setupCXX()
+                        setupCXX(env.CXX, stanc3_bin_url())
                         sh runTests("./")
                     }
                     post {
@@ -239,7 +242,8 @@ pipeline {
                                 parameters: [
                                     string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
                                     string(name: 'stan_pr', value: params.stan_pr),
-                                    string(name: 'math_pr', value: params.math_pr)
+                                    string(name: 'math_pr', value: params.math_pr),
+                                    string(name: 'stanc3_bin_url', value: params.stanc3_bin_url)
                                 ],
                                 wait:true
                             )
