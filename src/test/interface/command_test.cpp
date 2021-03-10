@@ -258,7 +258,7 @@ TEST(StanUiCommand, CheckCommand_default) {
 
   std::string command = convert_model_path(model_path);
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_help) {

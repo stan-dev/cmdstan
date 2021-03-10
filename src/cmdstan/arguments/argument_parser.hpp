@@ -19,9 +19,12 @@ class argument_parser {
 
   int parse_args(int argc, const char *argv[], stan::callbacks::writer &info,
                  stan::callbacks::writer &err) {
+    if (argc == 0) {
+      return stan::services::error_codes::USAGE;
+    }
     if (argc == 1) {
       print_usage(info, argv[0]);
-      return stan::services::error_codes::USAGE;
+      return stan::services::error_codes::OK;
     }
 
     std::vector<std::string> args;
