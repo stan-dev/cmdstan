@@ -128,7 +128,7 @@ int command(int argc, const char *argv[]) {
   if (err_code == stan::services::error_codes::USAGE) {
     if (argc > 1)
       std::cerr << "Failed to parse command arguments, cannot run model."
-		<< std::endl;
+                << std::endl;
     return err_code;
   } else if (err_code != 0) {
     std::cerr << "Unexpected failure, quitting." << std::endl;
