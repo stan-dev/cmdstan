@@ -5,7 +5,7 @@ int main(int argc, const char *argv[]) {
   try {
     return cmdstan::command(argc, argv);
   } catch (const std::exception &e) {
-    std::cout << e.what() << std::endl;
+    std::cerr << e.what() << std::endl;
     return stan::services::error_codes::SOFTWARE;
   }
 }
