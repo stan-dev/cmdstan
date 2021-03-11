@@ -126,7 +126,7 @@ int command(int argc, const char *argv[]) {
   argument_parser parser(valid_arguments);
   int err_code = parser.parse_args(argc, argv, info, err);
   if (err_code == stan::services::error_codes::USAGE) {
-    if (argc.size() > 1)
+    if (argc > 1)
       std::cerr << "Failed to parse command arguments, cannot run model."
 		<< std::endl;
     return err_code;

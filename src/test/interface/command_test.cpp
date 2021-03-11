@@ -249,7 +249,7 @@ TEST(StanUiCommand, user_init_domain_fail) {
       << "Failed running: " << out.command;
 }
 
-TEST(StanUiCommand, CheckCommand_default) {
+TEST(StanUiCommand, CheckCommand_no_args) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -258,7 +258,7 @@ TEST(StanUiCommand, CheckCommand_default) {
 
   std::string command = convert_model_path(model_path);
   run_command_output out = run_command(command);
-  EXPECT_EQ(int(stan::services::error_codes::SOFTWARE), out.err_code);
+  EXPECT_EQ(int(stan::services::error_codes::USAGE), out.err_code);
 }
 
 TEST(StanUiCommand, CheckCommand_help) {
