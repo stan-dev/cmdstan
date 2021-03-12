@@ -249,7 +249,7 @@ TEST(StanUiCommand, user_init_domain_fail) {
       << "Failed running: " << out.command;
 }
 
-TEST(StanUiCommand, CheckCommand_default) {
+TEST(StanUiCommand, CheckCommand_no_args) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");

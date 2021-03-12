@@ -59,8 +59,8 @@ TEST_F(CmdStanArgumentsArgumentParser, help) {
 }
 
 TEST_F(CmdStanArgumentsArgumentParser, unrecognized_argument) {
-  const char *argv[] = {"foo"};
-  int argc = 1;
+  const char *argv[] = {"foo", "bar"};
+  int argc = 2;
 
   err_code = parser->parse_args(argc, argv, writer, writer);
   EXPECT_EQ(int(error_codes::USAGE), err_code);
