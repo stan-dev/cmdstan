@@ -69,10 +69,7 @@ stan::math::profile_map &get_stan_profile_data();
 namespace cmdstan {
 
 struct return_codes {
-  enum {
-    OK = 0,
-    NOT_OK = 1
-  };
+  enum { OK = 0, NOT_OK = 1 };
 };
 
 #ifdef STAN_MPI
