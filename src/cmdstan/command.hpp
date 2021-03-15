@@ -226,7 +226,7 @@ int command(int argc, const char *argv[]) {
 
   // Instantiate model
   stan::model::model_base &model
-      = new_model(*var_context, random_seed, &std::cerr);
+      = new_model(*var_context, random_seed, &std::cout);
 
   std::vector<std::string> model_compile_info = model.model_compile_info();
 
