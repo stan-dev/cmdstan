@@ -3,9 +3,13 @@
 
 int main(int argc, const char *argv[]) {
   try {
-    return cmdstan::command(argc, argv);
+    int err_code = cmdstan::command(argc, argv);
+    if (err_code == 0)
+      return cmdstan::return_codes::OK;
+    else
+      return cmdstan::return_codes::NOT_OK;
   } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
-    return stan::services::error_codes::SOFTWARE;
+    return cmdstan::return_codes::NOT_OK;
   }
 }
