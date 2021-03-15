@@ -66,8 +66,7 @@ TEST(StanUiCommand, metric_file_test) {
 
               run_command_output out = run_command(command);
               if (adapt == "1" && num_warmup == "0") {
-                EXPECT_EQ(int(cmdstan::return_codes::NOT_OK),
-                          out.err_code);
+                EXPECT_EQ(int(cmdstan::return_codes::NOT_OK), out.err_code);
               } else {
                 EXPECT_EQ(int(cmdstan::return_codes::OK), out.err_code);
 
