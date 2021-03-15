@@ -12,24 +12,27 @@ library(cmdstanr)
 if(FALSE) {
     ## run if needed
     install_cmdstan(release_url = "https://github.com/rok-cesnovar/cmdstan/releases/download/adjoint_ode/cmdstan-adjoint-ode.tar.gz", cores = 4)
+
+    set_cmdstan_path("~/work/cmdstan")
 }
 
-
-##set_cmdstan_path("~/work/cmdstan")
 
 ## model which scales number of states and parameters
 stan_model_file <- file.path(cmdstan_path(), "examples", "linked-mass-flow", "linked-mass-flow.stan")
 ## model which scales only number of states, but recycles parameters
 stan_model_fixed_file <- file.path(cmdstan_path(), "examples", "linked-mass-flow", "linked-mass-flow-fixed.stan")
 
-##stan_model_file <- "linked-mass-flow.stan"
-##stan_model_fixed_file <- "linked-mass-flow-fixed.stan"
-
 mod <- cmdstan_model(stan_model_file)
 mod_fixed <- cmdstan_model(stan_model_fixed_file)
 
-base_data <- list(rel_tol=1e-6,
-                  abs_tol=1e-4,
+rel_tol_f <- 1E-8
+abs_tol_f <- 1E-8
+base_data <- list(rel_tol_f=rel_tol_f,
+                  abs_tol_f=abs_tol_f,
+                  rel_tol_b=rel_tol_f * 100,
+                  abs_tol_b=abs_tol_f * 100,
+                  rel_tol_q=rel_tol_f * 1000,
+                  abs_tol_q=abs_tol_f * 1000,
                   adjoint_integrator=0,
                   max_num_steps=10000,
                   num_checkpoints=150,
@@ -42,7 +45,7 @@ base_data <- list(rel_tol=1e-6,
                   sigma_y=0.2
                   )
 
-run_benchmark <- function(..., model, num_iter=250, adapt_delta=0.8) {
+run_benchmark <- function(..., model, num_iter=250, adapt_delta=0.8, metric="dense_e") {
     fit_args <- list(...)
     fit_data <- modifyList(base_data, fit_args)
     print(str(fit_data))
@@ -56,7 +59,8 @@ run_benchmark <- function(..., model, num_iter=250, adapt_delta=0.8) {
                    refresh = round(num_iter/5),
                    save_warmup=TRUE,
                    adapt_delta=adapt_delta,
-                   init=0.1
+                   init=0.1,
+                   metric=metric
                    ##verbose=TRUE
                )
     fit
@@ -86,7 +90,7 @@ summarize_benchmark <- function(fit) {
 bdf_fit <- run_benchmark(adjoint_integrator=0, model=mod, num_iter=50)
 adjoint_fit <- run_benchmark(adjoint_integrator=1, model=mod, num_iter=50)
 ## vary solvers, e.g.
-##adjoint_fit <- run_benchmark(adjoint_integrator=1, solver_f=2, solver_b=1, model=mod, num_iter=50)
+##adjoint_fit <- run_benchmark(adjoint_integrator=1, solver_f=2, solver_b=1, num_iter=50)
 
 str(summarize_benchmark(bdf_fit))
 str(summarize_benchmark(adjoint_fit))
@@ -100,7 +104,7 @@ str(summarize_benchmark(Ladjoint_fit))
 ## there is no gain by adjoint method if there are not more parameters
 ## than states
 Lbdf_fit_fixed <- run_benchmark(adjoint_integrator=0, system_size=5, model=mod_fixed, num_iter=50)
-Ladjoint_fit_fixed <- run_benchmark(adjoint_integrator=1, solver_f=2, solver_b=2, system_size=5, model=mod_fixed, num_iter=50)
+Ladjoint_fit_fixed <- run_benchmark(adjoint_integrator=1, solver_f=2, solver_b=2, system_size=5, model=mod_fixed, interpolation_polynomial=1, num_iter=50)
 
 str(summarize_benchmark(Lbdf_fit_fixed))
 str(summarize_benchmark(Ladjoint_fit_fixed))
