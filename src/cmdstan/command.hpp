@@ -68,6 +68,10 @@ stan::math::profile_map &get_stan_profile_data();
 
 namespace cmdstan {
 
+struct return_codes {
+  enum { OK = 0, NOT_OK = 1 };
+};
+
 #ifdef STAN_MPI
 stan::math::mpi_cluster &get_mpi_cluster() {
   static stan::math::mpi_cluster cluster;
@@ -129,13 +133,13 @@ int command(int argc, const char *argv[]) {
     if (argc > 1)
       std::cerr << "Failed to parse command arguments, cannot run model."
                 << std::endl;
-    return err_code;
+    return return_codes::NOT_OK;
   } else if (err_code != 0) {
     std::cerr << "Unexpected failure, quitting." << std::endl;
-    return err_code;
+    return return_codes::NOT_OK;
   }
   if (parser.help_printed())
-    return stan::services::error_codes::OK;
+    return return_codes::OK;
 
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
@@ -153,7 +157,7 @@ int command(int argc, const char *argv[]) {
       || (!opencl_device_id->is_default()
           && opencl_platform_id->is_default())) {
     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
-    return stan::services::error_codes::CONFIG;
+    return return_codes::NOT_OK;
   } else if (!opencl_device_id->is_default()
              && !opencl_platform_id->is_default()) {
     stan::math::opencl_context.select_device(opencl_platform_id->value(),
@@ -252,7 +256,7 @@ int command(int argc, const char *argv[]) {
   std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
 
   // Invoke specified method
-  int return_code = stan::services::error_codes::OK;
+  int return_code = return_codes::OK;
 
   if (parser.arg("method")->arg("generate_quantities")) {
     string_argument *fitted_params_file = dynamic_cast<string_argument *>(
