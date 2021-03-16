@@ -203,7 +203,7 @@ int main(int argc, const char *argv[]) {
     std::cout << bad_rhat_names.back() << std::endl;
 
     std::cout << "Such high values indicate incomplete mixing and biased"
-              << "estimation." << std::endl
+              << " estimation." << std::endl
               << "You should consider regularizating your model"
               << " with additional prior information or a more"
               << " effective parameterization." << std::endl
