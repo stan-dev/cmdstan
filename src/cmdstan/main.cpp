@@ -5,6 +5,7 @@
 #include <cmdstan/command/optimize.hpp>
 #include <cmdstan/command/sample.hpp>
 #include <cmdstan/command/variational.hpp>
+#include <cmdstan/return_codes.hpp>
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 #include <stan/services/error_codes.hpp>
 
