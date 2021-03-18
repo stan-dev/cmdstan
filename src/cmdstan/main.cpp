@@ -66,31 +66,32 @@ int main(int argc, const char *argv[]) {
 					     shared_options.opencl_device);
 #endif
 
-
   try {
+    int err_code;
     if (subcommand == "sample")
-      return_code = cmdstan::sample(app, shared_options, sample_options);
+      err_code = cmdstan::sample(app, shared_options, sample_options);
     if (subcommand == "optimize")
-      return_code = cmdstan::optimize(app, shared_options, optimize_options);
+      err_code = cmdstan::optimize(app, shared_options, optimize_options);
     if (subcommand == "variational")
-      return_code = cmdstan::variational(app, shared_options,
-					 variational_options);
+      err_code = cmdstan::variational(app, shared_options,
+				      variational_options);
     if (subcommand == "diagnose")
-      return_code = cmdstan::diagnose(app, shared_options, diagnose_options);
+      err_code = cmdstan::diagnose(app, shared_options, diagnose_options);
     if (subcommand == "generate_quantities")
-      return_code = cmdstan::generate_quantities(app, shared_options,
-						 generate_quantities_options);
+      err_code = cmdstan::generate_quantities(app, shared_options,
+					      generate_quantities_options);
     export_profile_info(app, shared_options);
-  } catch(std::runtime_error& e) {
+    if (err_code == 0)
+      return cmdstan::return_codes::OK;
+    else
+      return cmdstan::return_codes::NOT_OK;
+  } catch (const std::exception &e) {
     std::cerr << e.what() << std::endl;
-    return_code = stan::services::error_codes::USAGE;
-  } catch(std::domain_error& e) {
-    std::cerr << e.what() << std::endl;
-    return_code = stan::services::error_codes::SOFTWARE;
+    return cmdstan::return_codes::NOT_OK;
   }
 
 #ifdef STAN_MPI
   cluster.stop_listen();
 #endif
-  return return_code;
+  return cmdstan::return_codes::OK;
 }

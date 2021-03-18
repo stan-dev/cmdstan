@@ -4,6 +4,7 @@
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
+#include <boost/algorithm/string.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
@@ -88,7 +89,8 @@ TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
 
   EXPECT_EQ(success, true);
   EXPECT_NE(0, command_output.err_code);
-  char const *errmsg
+  std::string expected_message
       = "Must use --fixed_param for model that has no parameters";
-  EXPECT_NE(std::string::npos, command_output.output.find(errmsg));
+  EXPECT_TRUE(
+      boost::algorithm::contains(command_output.output, expected_message));
 }

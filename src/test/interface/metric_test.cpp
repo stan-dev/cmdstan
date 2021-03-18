@@ -65,10 +65,9 @@ TEST(StanUiCommand, metric_file_test) {
 
               run_command_output out = run_command(command);
               if (adapt && num_warmup == "0") {
-                EXPECT_EQ(int(stan::services::error_codes::CONFIG),
-                          out.err_code);
+		EXPECT_EQ(int(cmdstan::return_codes::NOT_OK), out.err_code);		
               } else {
-                EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
+                EXPECT_EQ(int(cmdstan::return_codes::OK), out.err_code);
 
                 std::fstream output_csv_stream("test/output.csv");
                 std::stringstream output_sstream;
