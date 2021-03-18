@@ -367,7 +367,8 @@ TEST(StanUiCommand, random_seed_specified_same) {
 
   std::string command
       = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=12345 "
+        + " sample --num_samples=10 --num_warmup=10 --init_zero "
+        + " --seed=12345 "
         + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
         + " --refresh=0 --output_file=test/output.csv";
   std::string cmd_output = run_command(command).output;
@@ -409,7 +410,8 @@ TEST(StanUiCommand, random_seed_specified_different) {
 
   std::string command
       = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=12345 "
+        + " sample --num_samples=10 --num_warmup=10 --init_zero "
+        + " --seed=12345 "
         + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
         + " --refresh=0 --output_file=test/output.csv";
   std::string cmd_output = run_command(command).output;
@@ -426,11 +428,12 @@ TEST(StanUiCommand, random_seed_specified_different) {
       break;
     }
   }
-  command = convert_model_path(model_path)
-            + " sample --num_samples=10 --num_warmup=10 --init_radius=0 "
-            + " --seed=45678 "
-            + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
-            + " --refresh=0 --output_file=test/output.csv";
+  command
+      = convert_model_path(model_path)
+        + " sample --num_samples=10 --num_warmup=10 --init_radius=0 "
+        + " --seed=45678 "
+        + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
+        + " --refresh=0 --output_file=test/output.csv";
   cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   split(lines, cmd_output, boost::is_any_of("\n"));
@@ -458,15 +461,16 @@ TEST(StanUiCommand, random_seed_fail_1) {
 
   std::string command
       = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=-2 "
+        + " sample --num_samples=10 --num_warmup=10 --init_zero "
+        + " --seed=-2 "
         + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
         + " --refresh=0 --output_file=test/output.csv";
   std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body))
-    << "expected: \"" << expected_message << "\"" << std::endl
-    << "found:    \"" << out.body << "\"" << std::endl
-    << out;
+      << "expected: \"" << expected_message << "\"" << std::endl
+      << "found:    \"" << out.body << "\"" << std::endl
+      << out;
 }
 
 TEST(StanUiCommand, random_seed_fail_2) {
@@ -480,14 +484,15 @@ TEST(StanUiCommand, random_seed_fail_2) {
 
   std::string command
       = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero " + " --seed=-2 "
+        + " sample --num_samples=10 --num_warmup=10 --init_zero "
+        + " --seed=-2 "
         + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
         + " --refresh=0 --output_file=test/output.csv";
   run_command_output out = run_command(command);
-  EXPECT_EQ(1, count_matches(expected_message, out.body)) 
-    << "expected: \"" << expected_message << "\"" << std::endl
-    << "found:    \"" << out.body << "\"" << std::endl
-    << out;
+  EXPECT_EQ(1, count_matches(expected_message, out.body))
+      << "expected: \"" << expected_message << "\"" << std::endl
+      << "found:    \"" << out.body << "\"" << std::endl
+      << out;
 }
 
 TEST(StanUiCommand, json_input) {
@@ -497,14 +502,13 @@ TEST(StanUiCommand, json_input) {
   model_path.push_back("test-models");
   model_path.push_back("ndim_array");
 
-  std::string command = convert_model_path(model_path)
-    + " sample "
-    + " --fixed_param"
-    + " --seed=12345 "
-    + " --data_file=src/test/test-models/ndim_array.data.json"
-    + " --refresh=0 --output_file=test/output.csv";
+  std::string command
+      = convert_model_path(model_path) + " sample " + " --fixed_param"
+        + " --seed=12345 "
+        + " --data_file=src/test/test-models/ndim_array.data.json"
+        + " --refresh=0 --output_file=test/output.csv";
   std::string cmd_output = run_command(command).output;
-  
+
   EXPECT_EQ(
       1, count_matches("d1_1: [[0,1,2,3],[4,5,6,7],[8,9,10,11]]", cmd_output));
   EXPECT_EQ(1,

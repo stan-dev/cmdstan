@@ -29,14 +29,17 @@ int main(int argc, const char *argv[]) {
   cmdstan::GenerateQuantitiesOptions generate_quantities_options;
 
   CLI::App app{"Stan program"};
-  app.set_version_flag("-v,--version", std::string("CmdStan v") + CMDSTAN_VERSION + "; CLI11 prototype");
+  app.set_version_flag(
+      "-v,--version",
+      std::string("CmdStan v") + CMDSTAN_VERSION + "; CLI11 prototype");
 
   app.require_subcommand(1);
   cmdstan::setup_sample(app, shared_options, sample_options);
   cmdstan::setup_optimize(app, shared_options, optimize_options);
   cmdstan::setup_variational(app, shared_options, variational_options);
   cmdstan::setup_diagnose(app, shared_options, diagnose_options);
-  cmdstan::setup_generate_quantities(app, shared_options, generate_quantities_options);
+  cmdstan::setup_generate_quantities(app, shared_options,
+                                     generate_quantities_options);
 
   try {
     app.parse(argc, argv);
@@ -58,13 +61,15 @@ int main(int argc, const char *argv[]) {
 #ifdef STAN_OPENCL
   if (app.get_subcommand()->count("--opencl_device")
       ^ app.get_subcommand()->count("--opencl_platform")) {
-    std::cerr << "Please set both OpenCL device (--opencl_device) and platform (--opencl_platform) ids."
-	      << std::endl;
+    std::cerr << "Please set both OpenCL device (--opencl_device) and platform "
+                 "(--opencl_platform) ids."
+              << std::endl;
     return stan::services::error_codes::USAGE;
   }
-  if (app.get_subcommand()->count("--opencl_device") && app.get_subcommand()->count("--opencl_platform"))
+  if (app.get_subcommand()->count("--opencl_device")
+      && app.get_subcommand()->count("--opencl_platform"))
     stan::math::opencl_context.select_device(shared_options.opencl_platform,
-					     shared_options.opencl_device);
+                                             shared_options.opencl_device);
 #endif
 
   try {
@@ -74,13 +79,12 @@ int main(int argc, const char *argv[]) {
     if (subcommand == "optimize")
       err_code = cmdstan::optimize(app, shared_options, optimize_options);
     if (subcommand == "variational")
-      err_code = cmdstan::variational(app, shared_options,
-				      variational_options);
+      err_code = cmdstan::variational(app, shared_options, variational_options);
     if (subcommand == "diagnose")
       err_code = cmdstan::diagnose(app, shared_options, diagnose_options);
     if (subcommand == "generate_quantities")
       err_code = cmdstan::generate_quantities(app, shared_options,
-					      generate_quantities_options);
+                                              generate_quantities_options);
     export_profile_info(app, shared_options);
     if (err_code == 0)
       return cmdstan::return_codes::OK;

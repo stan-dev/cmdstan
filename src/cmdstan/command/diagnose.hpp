@@ -27,58 +27,55 @@
 
 namespace cmdstan {
 
-  int diagnose(CLI::App& app,
-	       SharedOptions& shared_options,
-	       DiagnoseOptions& diagnose_options) {
-    stan::callbacks::stream_writer info(std::cout);
-    stan::callbacks::stream_writer err(std::cout);
-    stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
-					  std::cerr, std::cerr);
+int diagnose(CLI::App& app, SharedOptions& shared_options,
+             DiagnoseOptions& diagnose_options) {
+  stan::callbacks::stream_writer info(std::cout);
+  stan::callbacks::stream_writer err(std::cout);
+  stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
+                                        std::cerr, std::cerr);
 
-    // Read arguments
-    write_parallel_info(info);
-    write_opencl_device(info);
-    info();
+  // Read arguments
+  write_parallel_info(info);
+  write_opencl_device(info);
+  info();
 
-    stan::callbacks::writer init_writer;
-    stan::callbacks::interrupt interrupt;
+  stan::callbacks::writer init_writer;
+  stan::callbacks::interrupt interrupt;
 
-    std::fstream output_stream(shared_options.output_file.c_str(),
-			       std::fstream::out);
-    if (app.get_subcommand()->count("--sig_figs"))
-      output_stream << std::setprecision(shared_options.sig_figs);
-    stan::callbacks::stream_writer sample_writer(output_stream, "# ");
+  std::fstream output_stream(shared_options.output_file.c_str(),
+                             std::fstream::out);
+  if (app.get_subcommand()->count("--sig_figs"))
+    output_stream << std::setprecision(shared_options.sig_figs);
+  stan::callbacks::stream_writer sample_writer(output_stream, "# ");
 
-    //////////////////////////////////////////////////
-    //                Initialize Model              //
-    //////////////////////////////////////////////////
+  //////////////////////////////////////////////////
+  //                Initialize Model              //
+  //////////////////////////////////////////////////
 
-    std::shared_ptr<stan::io::var_context> var_context
+  std::shared_ptr<stan::io::var_context> var_context
       = get_var_context(shared_options.data_file);
 
-    stan::model::model_base &model
+  stan::model::model_base& model
       = new_model(*var_context, shared_options.seed, &std::cout);
 
-    std::vector<std::string> model_compile_info = model.model_compile_info();
+  std::vector<std::string> model_compile_info = model.model_compile_info();
 
-    write_stan(sample_writer);
-    write_model(sample_writer, model.model_name());
-    print_old_command_header(app, shared_options, diagnose_options, sample_writer);
-    write_parallel_info(sample_writer);
-    write_opencl_device(sample_writer);
-    write_compile_info(sample_writer, model_compile_info);
+  write_stan(sample_writer);
+  write_model(sample_writer, model.model_name());
+  print_old_command_header(app, shared_options, diagnose_options,
+                           sample_writer);
+  write_parallel_info(sample_writer);
+  write_opencl_device(sample_writer);
+  write_compile_info(sample_writer, model_compile_info);
 
-    std::shared_ptr<stan::io::var_context> init_context = get_var_context(shared_options.init_file);
+  std::shared_ptr<stan::io::var_context> init_context
+      = get_var_context(shared_options.init_file);
 
-    return stan::services::diagnose
-      ::diagnose(model, *init_context,
-		 shared_options.seed,
-		 shared_options.id,
-		 shared_options.init_radius,
-		 diagnose_options.epsilon,
-		 diagnose_options.threshold,
-		 interrupt, logger, init_writer,
-		 sample_writer);
-  }
+  return stan::services::diagnose ::diagnose(
+      model, *init_context, shared_options.seed, shared_options.id,
+      shared_options.init_radius, diagnose_options.epsilon,
+      diagnose_options.threshold, interrupt, logger, init_writer,
+      sample_writer);
+}
 }  // namespace cmdstan
 #endif

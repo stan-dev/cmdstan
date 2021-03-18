@@ -27,8 +27,7 @@ TEST(StanUiCommand, metric_file_test) {
         {"dense", "# Elements of inverse mass matrix:\n# 1.5"}}},
       {"test_model",
        {{"diag", "# Diagonal elements of inverse mass matrix:\n# 1.5, 1.8"},
-        {"dense",
-         "# Elements of inverse mass matrix:\n# 1.5, 1\n# 1, 1.5"}}}};
+        {"dense", "# Elements of inverse mass matrix:\n# 1.5, 1\n# 1, 1.5"}}}};
 
   for (auto model : models) {
     for (auto engine : engines) {
@@ -46,7 +45,8 @@ TEST(StanUiCommand, metric_file_test) {
               metric_file_path.push_back("src");
               metric_file_path.push_back("test");
               metric_file_path.push_back("test-models");
-              metric_file_path.push_back(model + "." + metric + "_e_metric.json");
+              metric_file_path.push_back(model + "." + metric
+                                         + "_e_metric.json");
 
               std::string metric_file(convert_model_path(metric_file_path));
               std::ifstream fs(metric_file.c_str());
@@ -56,16 +56,16 @@ TEST(StanUiCommand, metric_file_test) {
               metric_file = convert_model_path(metric_file_path);
 
               std::string command
-		= convert_model_path(model_path)
-		+ " sample --num_samples=100 --num_warmup=" + num_warmup
-		+ (adapt ? "": " --adapt_off")
-		+ " --" + engine + " --metric=" + metric
-		+ " --metric_file=" + convert_model_path(metric_file_path)
-		+ " --stepsize=" + stepsize + " --output_file=test/output.csv";
+                  = convert_model_path(model_path)
+                    + " sample --num_samples=100 --num_warmup=" + num_warmup
+                    + (adapt ? "" : " --adapt_off") + " --" + engine
+                    + " --metric=" + metric + " --metric_file="
+                    + convert_model_path(metric_file_path) + " --stepsize="
+                    + stepsize + " --output_file=test/output.csv";
 
               run_command_output out = run_command(command);
               if (adapt && num_warmup == "0") {
-		EXPECT_EQ(int(cmdstan::return_codes::NOT_OK), out.err_code);		
+                EXPECT_EQ(int(cmdstan::return_codes::NOT_OK), out.err_code);
               } else {
                 EXPECT_EQ(int(cmdstan::return_codes::OK), out.err_code);
 

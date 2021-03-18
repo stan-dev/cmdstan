@@ -14,9 +14,10 @@ TEST(interface, check_model_output) {
   model_path.push_back("test-models");
   model_path.push_back("printer");
 
-  std::string command
-      = convert_model_path(model_path) + " sample --num_warmup=1 --num_samples=0"
-        + " --output_file=" + convert_model_path(model_path) + ".csv";
+  std::string command = convert_model_path(model_path)
+                        + " sample --num_warmup=1 --num_samples=0"
+                        + " --output_file=" + convert_model_path(model_path)
+                        + ".csv";
 
   run_command_output out = run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);

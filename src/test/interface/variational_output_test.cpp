@@ -18,8 +18,7 @@ class CmdStan : public testing::Test {
 
     output_file = "test/output.csv";
 
-    base_command
-      = convert_model_path(model_path);
+    base_command = convert_model_path(model_path);
 
     output_command = " --output_file " + output_file;
 
@@ -47,7 +46,8 @@ class CmdStan : public testing::Test {
 };
 
 TEST_F(CmdStan, variational_default) {
-  run_command_output out = run_command(base_command + " variational" + output_command);
+  run_command_output out
+      = run_command(base_command + " variational" + output_command);
 
   ASSERT_EQ(0, out.err_code);
 
