@@ -1,5 +1,5 @@
-#ifndef CMDSTAN_CLI_HPP
-#define CMDSTAN_CLI_HPP
+#ifndef CMDSTAN_RETURN_CODES_HPP
+#define CMDSTAN_RETURN_CODES_HPP
 
 namespace cmdstan {
 
