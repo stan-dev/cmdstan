@@ -1,5 +1,5 @@
+#include <cmdstan/return_codes.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/services/error_codes.hpp>
 #include <test/test-models/proper.hpp>
 #include <test/utility.hpp>
 #include <boost/math/policies/error_handling.hpp>
