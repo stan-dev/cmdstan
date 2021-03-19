@@ -1,6 +1,7 @@
 #ifndef CMDSTAN_COMMAND_HPP
 #define CMDSTAN_COMMAND_HPP
 
+#include <cmdstan/arguments/arg_clamped_params.hpp>
 #include <cmdstan/arguments/arg_data.hpp>
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
@@ -122,6 +123,7 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_id());
   valid_arguments.push_back(new arg_data());
   valid_arguments.push_back(new arg_init());
+  valid_arguments.push_back(new arg_clamped_params());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
 #ifdef STAN_OPENCL
@@ -254,6 +256,11 @@ int command(int argc, const char *argv[]) {
   } catch (const boost::bad_lexical_cast &e) {
   }
   std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
+
+  // Read clamped parameters file
+  std::string clamped_params_filename
+      = dynamic_cast<string_argument *>(parser.arg("clamped_params"))->value();
+  std::shared_ptr<stan::io::var_context> clamped_params_context = get_var_context(clamped_params_filename);
 
   // Invoke specified method
   int return_code = return_codes::OK;
@@ -580,7 +587,8 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, *init_context, random_seed, id, init_radius, num_warmup,
+	    model, *init_context, *clamped_params_context,
+	    random_seed, id, init_radius, num_warmup,
             num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writer, sample_writer,
