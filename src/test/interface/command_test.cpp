@@ -473,28 +473,6 @@ TEST(StanUiCommand, random_seed_fail_1) {
       << out;
 }
 
-TEST(StanUiCommand, random_seed_fail_2) {
-  std::string expected_message = "is not a valid value for \"seed\"";
-
-  std::vector<std::string> model_path;
-  model_path.push_back("src");
-  model_path.push_back("test");
-  model_path.push_back("test-models");
-  model_path.push_back("transformed_data_rng_test");
-
-  std::string command
-      = convert_model_path(model_path)
-        + " sample --num_samples=10 --num_warmup=10 --init_zero "
-        + " --seed=-2 "
-        + " --data_file=src/test/test-models/transformed_data_rng_test.init.R"
-        + " --refresh=0 --output_file=test/output.csv";
-  run_command_output out = run_command(command);
-  EXPECT_EQ(1, count_matches(expected_message, out.body))
-      << "expected: \"" << expected_message << "\"" << std::endl
-      << "found:    \"" << out.body << "\"" << std::endl
-      << out;
-}
-
 TEST(StanUiCommand, json_input) {
   std::vector<std::string> model_path;
   model_path.push_back("src");

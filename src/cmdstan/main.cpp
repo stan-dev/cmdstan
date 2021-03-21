@@ -44,7 +44,9 @@ int main(int argc, const char *argv[]) {
   try {
     app.parse(argc, argv);
   } catch (const CLI::ParseError &e) {
-    return app.exit(e);
+    if (app.exit(e) == 0)  // the help option returns 0.
+      return cmdstan::return_codes::OK;
+    return cmdstan::return_codes::NOT_OK;
   }
 
 #ifdef STAN_MPI
