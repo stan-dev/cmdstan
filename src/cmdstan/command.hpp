@@ -21,6 +21,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
+#include <stan/callbacks/file_stream_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
@@ -259,21 +260,17 @@ int command(int argc, const char *argv[]) {
   parser.print(diagnostic_writer);
 
 
-  std::vector<std::unique_ptr<std::fstream>> output_streamers;
-  std::vector<stan::callbacks::stream_file_writer> sample_writers;
+  std::vector<stan::callbacks::file_stream_writer> sample_writers;
   std::vector<std::unique_ptr<std::fstream>> diagnostic_streamers;
-  std::vector<stan::callbacks::stream_file_writer> diagnostic_writers;
+  std::vector<stan::callbacks::file_stream_writer> diagnostic_writers;
   for (int i = 0; i < n_chains; i++) {
-    output_streamers.emplace_back(std::make_unique<std::fstream>(
-        std::fstream(std::string("output") + std::to_string(i + 1) + ".csv",
-                     std::fstream::out)));
     sample_writers.emplace_back(
-        stan::callbacks::stream_file_writer(output_streamers[i], "# "));
-    diagnostic_streamers.emplace_back(
-        std::make_unique<std::fstream>(std::fstream(
-            std::string("diagnostic_file") + std::to_string(i + 1) + ".csv")));
+        stan::callbacks::file_stream_writer(std::make_unique<std::fstream>(
+            std::fstream(std::string("output") + std::to_string(i + 1) + ".csv",
+                         std::fstream::out)), "# "));
     diagnostic_writers.emplace_back(
-        stan::callbacks::stream_file_writer(diagnostic_streamers[i], "# "));
+        stan::callbacks::file_stream_writer(std::make_unique<std::fstream>(std::fstream(
+            std::string("diagnostic_file") + std::to_string(i + 1) + ".csv")), "# "));
   }
   for (int i = 0; i < n_chains; i++) {
     write_stan(sample_writers[i]);
@@ -303,7 +300,7 @@ int command(int argc, const char *argv[]) {
   } catch (const boost::bad_lexical_cast &e) {
   }
   std::shared_ptr<stan::io::var_context> init_context = get_var_context(init);
-
+  std::vector<std::shared_ptr<stan::io::var_context>> init_context_v(n_chains, init_context);
   int return_code = stan::services::error_codes::CONFIG;
 
   if (parser.arg("method")->arg("generate_quantities")) {
@@ -633,7 +630,7 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, *init_context, random_seed, id, init_radius, num_warmup,
+            model, init_context_v, random_seed, id, init_radius, num_warmup,
             num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writer, sample_writers,
