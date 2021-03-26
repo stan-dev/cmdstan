@@ -141,11 +141,14 @@ TEST(StanUiCommand, zero_init_value_fail) {
   run_command_output out = run_command(command);
   EXPECT_EQ(int(cmdstan::return_codes::NOT_OK), out.err_code);
 
-  EXPECT_TRUE(out.header.length() > 0U);
+  EXPECT_TRUE(out.header.length() > 0U) <<
+    out.output;
   EXPECT_TRUE(out.body.length() > 0U);
 
   EXPECT_EQ(1, count_matches(expected_message, out.body))
-      << "Failed running: " << out.command;
+    << "Failed running: " << out.command << std::endl
+    << "Expecting to find \"" << expected_message << "\" in" << std::endl
+    << out.body;
 }
 
 TEST(StanUiCommand, zero_init_domain_fail) {
@@ -167,7 +170,9 @@ TEST(StanUiCommand, zero_init_domain_fail) {
   EXPECT_TRUE(out.body.length() > 0U);
 
   EXPECT_EQ(1, count_matches(expected_message, out.body))
-      << "Failed running: " << out.command;
+        << "Failed running: " << out.command << std::endl
+	<< "Expecting to find \"" << expected_message << "\" in" << std::endl
+	<< out.body;
 }
 
 TEST(StanUiCommand, user_init_value_fail) {
@@ -196,7 +201,10 @@ TEST(StanUiCommand, user_init_value_fail) {
   EXPECT_TRUE(out.body.length() > 0U);
 
   EXPECT_EQ(1, count_matches(expected_message, out.body))
-      << "Failed running: " << out.command;
+        << "Failed running: " << out.command << std::endl
+	<< "Expecting to find \"" << expected_message << "\" in" << std::endl
+	<< out.body;
+
 }
 
 TEST(StanUiCommand, user_init_domain_fail) {
@@ -225,7 +233,9 @@ TEST(StanUiCommand, user_init_domain_fail) {
   EXPECT_TRUE(out.body.length() > 0U);
 
   EXPECT_EQ(1, count_matches(expected_message, out.body))
-      << "Failed running: " << out.command;
+    << "Failed running: " << out.command << std::endl
+    << "Expecting to find \"" << expected_message << "\" in" << std::endl
+    << out.body;
 }
 
 TEST(StanUiCommand, CheckCommand_no_args) {
