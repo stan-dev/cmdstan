@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 TEST(StanUiCommand, threadpool_init) {
-  tbb::task_scheduler_init &scheduler_init = stan::math::init_threadpool_tbb();
+  auto& scheduler_init = stan::math::init_threadpool_tbb();
   EXPECT_TRUE(scheduler_init.is_active());
   scheduler_init.terminate();
   EXPECT_FALSE(scheduler_init.is_active());
