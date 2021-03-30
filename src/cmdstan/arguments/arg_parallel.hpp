@@ -1,17 +1,16 @@
-#ifndef CMDSTAN_ARGUMENTS_ARG_CHAINS_HPP
-#define CMDSTAN_ARGUMENTS_ARG_CHAINS_HPP
+#ifndef CMDSTAN_ARGUMENTS_ARG_PARALLEL_HPP
+#define CMDSTAN_ARGUMENTS_ARG_PARALLEL_HPP
 
 #include <cmdstan/arguments/arg_num_chains.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
 
 namespace cmdstan {
 
-class arg_chains : public categorical_argument {
+class arg_parallel : public categorical_argument {
  public:
   arg_chains() {
-    _name = "chains";
-    _description = "Number of Chains";
-
+    _name = "parallel";
+    _description = "Options for parallelism";
     _subarguments.push_back(new arg_num_chains());
   }
 };
