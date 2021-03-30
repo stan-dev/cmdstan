@@ -72,6 +72,10 @@ stan::math::profile_map &get_stan_profile_data();
 
 namespace cmdstan {
 
+struct return_codes {
+  enum { OK = 0, NOT_OK = 1 };
+};
+
 #ifdef STAN_MPI
 stan::math::mpi_cluster &get_mpi_cluster() {
   static stan::math::mpi_cluster cluster;
@@ -210,7 +214,7 @@ auto get_arg_val(caster &&v, T &&x, Args &&... args) {
 
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
-  stan::callbacks::stream_writer err(std::cout);
+  stan::callbacks::stream_writer err(std::cerr);
   stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
                                         std::cerr, std::cerr);
 
@@ -230,18 +234,23 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
-  valid_arguments.push_back(new arg_chains());
+  valid_arguments.push_back(new arg_parallel());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
   argument_parser parser(valid_arguments);
   int err_code = parser.parse_args(argc, argv, info, err);
-  if (err_code != 0) {
-    std::cout << "Failed to parse arguments, terminating Stan" << std::endl;
-    return err_code;
+  if (err_code == stan::services::error_codes::USAGE) {
+    if (argc > 1)
+      std::cerr << "Failed to parse command arguments, cannot run model."
+                << std::endl;
+    return return_codes::NOT_OK;
+  } else if (err_code != 0) {
+    std::cerr << "Unexpected failure, quitting." << std::endl;
+    return return_codes::NOT_OK;
   }
   if (parser.help_printed())
-    return err_code;
+    return return_codes::OK;
 
   unsigned int n_chains = 1;
   n_chains =
@@ -263,7 +272,7 @@ int command(int argc, const char *argv[]) {
       || (!opencl_device_id->is_default()
           && opencl_platform_id->is_default())) {
     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
-    return err_code;
+    return return_codes::NOT_OK;
   } else if (!opencl_device_id->is_default()
              && !opencl_platform_id->is_default()) {
     stan::math::opencl_context.select_device(opencl_platform_id->value(),
@@ -276,6 +285,8 @@ int command(int argc, const char *argv[]) {
   write_opencl_device(info);
   info();
 
+  std::stringstream msg;
+
   // Cross-check arguments
   if (parser.arg("method")->arg("generate_quantities")) {
     std::string fitted_sample_fname
@@ -287,13 +298,13 @@ int command(int argc, const char *argv[]) {
         = dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
               ->value();
     if (fitted_sample_fname.compare(output_fname) == 0) {
-      std::stringstream msg;
       msg << "Filename conflict, fitted_params file " << output_fname
           << " and output file have same name, must be different." << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
 
+  // Open output streams
   stan::callbacks::writer init_writer;
   stan::callbacks::interrupt interrupt;
 
@@ -308,7 +319,8 @@ int command(int argc, const char *argv[]) {
   std::shared_ptr<stan::io::var_context> var_context
       = get_var_context(filename);
 
-  stan::model::model_base& model
+  // Instantiate model
+  stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
   std::vector<std::string> model_compile_info = model.model_compile_info();
@@ -368,7 +380,7 @@ int command(int argc, const char *argv[]) {
     }
     auto diagnostic_filename = diagnostic_name + name_iterator(i) + diagnostic_ending;
     diagnostic_writers.emplace_back(std::make_unique<std::fstream>(
-            diagnostic_filename), "# ");
+            diagnostic_filename, std::fstream::out), "# ");
   }
   for (int i = 0; i < n_chains; i++) {
     write_stan(sample_writers[i]);
@@ -387,6 +399,8 @@ int command(int argc, const char *argv[]) {
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
             ->value();
   unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
+
+  // Read initial parameter values or user-specified radius
   std::string init
       = dynamic_cast<string_argument *>(parser.arg("init"))->value();
   double init_radius = 2.0;
@@ -404,21 +418,18 @@ int command(int argc, const char *argv[]) {
     string_argument *fitted_params_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
     if (fitted_params_file->is_default()) {
-      info(
-          "Must specify argument fitted_params which is a csv file "
-          "containing "
-          "the sample.");
-      return_code = stan::services::error_codes::CONFIG;
+      msg << "Missing fitted_params argument, cannot run generate_quantities "
+             "without fitted sample.";
+      throw std::invalid_argument(msg.str());
     }
+    // read sample from cmdstan csv output file
     std::string fname(fitted_params_file->value());
     std::ifstream stream(fname.c_str());
     if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      std::stringstream msg;
       msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
     stan::io::stan_csv fitted_params;
-    std::stringstream msg;
     stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
                                              &msg);
     if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
@@ -441,7 +452,6 @@ int command(int argc, const char *argv[]) {
     size_t num_rows = fitted_params.metadata.num_samples;
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
-      std::stringstream msg;
       msg << "Mismatch between model and fitted_parameters csv file \"" << fname
           << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
@@ -449,7 +459,6 @@ int command(int argc, const char *argv[]) {
     for (size_t i = 0; i < num_cols; ++i) {
       if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols])
           != 0) {
-        std::stringstream msg;
         msg << "Mismatch between model and fitted_parameters csv file \""
             << fname << "\"" << std::endl;
         throw std::invalid_argument(msg.str());
@@ -565,10 +574,11 @@ int command(int argc, const char *argv[]) {
     bool adapt_engaged
         = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
 
-    if (model.num_params_r() == 0 && algo->value() != "fixed_param") {
-      info("Must use algorithm=fixed_param for model that has no parameters.");
-      return_code = stan::services::error_codes::CONFIG;
-    } else if (algo->value() == "fixed_param") {
+    if (model.num_params_r() == 0 || algo->value() == "fixed_param") {
+      if (algo->value() != "fixed_param")
+        info(
+            "Model contains no parameters, running fixed_param sampler, "
+            "no updates to Markov chain");
       return_code = stan::services::sample::fixed_param(
           model, *(init_contexts[0]), random_seed, id, init_radius, num_samples,
           num_thin, refresh, interrupt, logger, init_writers[0], sample_writers[0],
@@ -1016,10 +1026,6 @@ int command(int argc, const char *argv[]) {
     write_profiling(profile_stream, profile_data);
     profile_stream.close();
   }
-  /*
-  output_stream.close();
-  diagnostic_stream.close();
-  */
   for (size_t i = 0; i < valid_arguments.size(); ++i) {
     delete valid_arguments.at(i);
   }

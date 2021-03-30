@@ -8,7 +8,7 @@ namespace cmdstan {
 
 class arg_parallel : public categorical_argument {
  public:
-  arg_chains() {
+  arg_parallel() {
     _name = "parallel";
     _description = "Options for parallelism";
     _subarguments.push_back(new arg_num_chains());
