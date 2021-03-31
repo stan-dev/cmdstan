@@ -105,12 +105,12 @@ using context_vector = std::vector<shared_context_ptr>;
  * @param file The name of the file. For multi-chain we will attempt to find
  *  {file_name}_1{file_ending} and if that fails try to use the named file as
  *  the data for each chain.
- * @param n_chains The number of chains to run.
+ * @param n_chain The number of chains to run.
  * @return An std vector of shared pointers to var contexts
  */
-context_vector get_vec_var_context(const std::string &file, size_t n_chains) {
+context_vector get_vec_var_context(const std::string &file, size_t n_chain) {
   using stan::io::var_context;
-  if (n_chains == 1) {
+  if (n_chain == 1) {
     return context_vector(1, get_var_context(file));
   } else {
     auto make_context = [](auto &&file, auto &&stream,
@@ -134,7 +134,7 @@ context_vector get_vec_var_context(const std::string &file, size_t n_chains) {
     if (file == "") {
       using stan::io::dump;
       std::fstream stream(file.c_str(), std::fstream::in);
-      return context_vector(n_chains, std::make_shared<dump>(dump(stream)));
+      return context_vector(n_chain, std::make_shared<dump>(dump(stream)));
     } else {
       size_t file_marker_pos = file.find_last_of(".");
       if (file_marker_pos > file.size()) {
@@ -172,9 +172,9 @@ context_vector get_vec_var_context(const std::string &file, size_t n_chains) {
       } else {
         // If we found file_1 then we'll assume file_{1...N} exists
         context_vector ret;
-        ret.reserve(n_chains);
+        ret.reserve(n_chain);
         ret.push_back(make_context(file_1, stream_1, file_ending));
-        for (size_t i = 1; i < n_chains; ++i) {
+        for (size_t i = 1; i < n_chain; ++i) {
           std::string file_i
               = std::string(file_name + "_" + std::to_string(i) + file_ending);
           std::fstream stream_i(file_1.c_str(), std::fstream::in);
@@ -196,7 +196,7 @@ context_vector get_vec_var_context(const std::string &file, size_t n_chains) {
   // This should not happen
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
-  return context_vector(n_chains, std::make_shared<dump>(dump(stream)));
+  return context_vector(n_chain, std::make_shared<dump>(dump(stream)));
 }
 
 static constexpr int hmc_fixed_cols
@@ -266,9 +266,9 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  unsigned int n_chains = 1;
-  n_chains
-      = dynamic_cast<u_int_argument *>(parser.arg("parallel")->arg("n_chains"))
+  unsigned int n_chain = 1;
+  n_chain
+      = dynamic_cast<u_int_argument *>(parser.arg("parallel")->arg("n_chain"))
             ->value();
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
@@ -376,21 +376,21 @@ int command(int argc, const char *argv[]) {
   }
 
   std::vector<stan::callbacks::file_stream_writer> sample_writers;
-  sample_writers.reserve(n_chains);
+  sample_writers.reserve(n_chain);
   std::vector<stan::callbacks::file_stream_writer> diagnostic_writers;
-  diagnostic_writers.reserve(n_chains);
-  std::vector<stan::callbacks::writer> init_writers{n_chains,
+  diagnostic_writers.reserve(n_chain);
+  std::vector<stan::callbacks::writer> init_writers{n_chain,
                                                     stan::callbacks::writer{}};
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
-  auto name_iterator = [n_chains](auto i) {
-    if (n_chains == 1) {
+  auto name_iterator = [n_chain](auto i) {
+    if (n_chain == 1) {
       return std::string("");
     } else {
       return std::string("_" + std::to_string(i + 1));
     }
   };
-  for (int i = 0; i < n_chains; i++) {
+  for (int i = 0; i < n_chain; i++) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     sample_writers.emplace_back(
         std::make_unique<std::fstream>(output_filename, std::fstream::out),
@@ -405,7 +405,7 @@ int command(int argc, const char *argv[]) {
         std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out),
         "# ");
   }
-  for (int i = 0; i < n_chains; i++) {
+  for (int i = 0; i < n_chain; i++) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
     parser.print(sample_writers[i]);
@@ -433,7 +433,7 @@ int command(int argc, const char *argv[]) {
   } catch (const boost::bad_lexical_cast &e) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
-      = get_vec_var_context(init, n_chains);
+      = get_vec_var_context(init, n_chain);
   int return_code = stan::services::error_codes::CONFIG;
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
@@ -616,7 +616,7 @@ int command(int argc, const char *argv[]) {
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
               ->value());
       context_vector metric_contexts
-          = get_vec_var_context(metric_filename, n_chains);
+          = get_vec_var_context(metric_filename, n_chain);
       categorical_argument *adapt
           = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
       categorical_argument *hmc
@@ -678,11 +678,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, *(init_contexts[0]), random_seed, id, init_radius,
+            model, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writers[0],
-            sample_writers[0], diagnostic_writers[0]);
+            term_buffer, window, interrupt, logger, init_writers,
+            sample_writers, diagnostic_writers, n_chain);
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == true) {
         int max_depth = dynamic_cast<int_argument *>(
@@ -706,11 +706,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, *(init_contexts[0]), *(metric_contexts[0]), random_seed, id,
+            model, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
             t0, init_buffer, term_buffer, window, interrupt, logger,
-            init_writers[0], sample_writers[0], diagnostic_writers[0]);
+            init_writers, sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == false && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -759,7 +759,7 @@ int command(int argc, const char *argv[]) {
             num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers, n_chains);
+            sample_writers, diagnostic_writers, n_chain);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -786,7 +786,7 @@ int command(int argc, const char *argv[]) {
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers, n_chains);
+            sample_writers, diagnostic_writers, n_chain);
       } else if (engine->value() == "nuts" && metric->value() == "unit_e"
                  && adapt_engaged == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
