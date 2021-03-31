@@ -21,7 +21,6 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <stan/callbacks/file_stream_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
@@ -375,9 +374,11 @@ int command(int argc, const char *argv[]) {
         = output_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
 
-  std::vector<stan::callbacks::file_stream_writer> sample_writers;
+  std::vector<std::fstream> sample_fstreams;
+  std::vector<stan::callbacks::stream_writer> sample_writers;
   sample_writers.reserve(n_chains);
-  std::vector<stan::callbacks::file_stream_writer> diagnostic_writers;
+  std::vector<std::fstream> diagnostic_fstreams;
+  std::vector<stan::callbacks::stream_writer> diagnostic_writers;
   diagnostic_writers.reserve(n_chains);
   std::vector<stan::callbacks::writer> init_writers{n_chains,
                                                     stan::callbacks::writer{}};
@@ -390,21 +391,26 @@ int command(int argc, const char *argv[]) {
       return std::string("_" + std::to_string(i + 1));
     }
   };
+
   for (int i = 0; i < n_chains; i++) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
-    sample_writers.emplace_back(
-        std::make_unique<std::fstream>(output_filename, std::fstream::out),
-        "# ");
+    sample_fstreams.emplace_back(std::fstream(output_filename, std::fstream::out));
     if (!sig_figs_arg->is_default()) {
-      sample_writers[i].get_stream()
+      sample_fstreams.back()
           << std::setprecision(sig_figs_arg->value());
     }
     auto diagnostic_filename
         = diagnostic_name + name_iterator(i) + diagnostic_ending;
-    diagnostic_writers.emplace_back(
-        std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out),
-        "# ");
+    diagnostic_fstreams.emplace_back(std::fstream(diagnostic_filename, std::fstream::out));
   }
+
+  // The sample writers are allocated separately so that references to the
+  // elements of the fstream vector are not invalidated by inserts
+  for(int i = 0; i < n_chains; i++) {
+    sample_writers.emplace_back(sample_fstreams[i], "# ");
+    diagnostic_writers.emplace_back(diagnostic_fstreams[i], "# ");
+  }
+
   for (int i = 0; i < n_chains; i++) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
