@@ -239,7 +239,6 @@ int command(int argc, const char *argv[]) {
     return 0;
 #endif
 
-  stan::math::init_threadpool_tbb();
 
   // Read arguments
   std::vector<argument *> valid_arguments;
@@ -266,9 +265,15 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
+  int n_threads = 1;
+  n_threads
+      = dynamic_cast<int_argument *>(parser.arg("parallel")->arg("threads"))
+            ->value();
+
+  stan::math::init_threadpool_tbb(n_threads);
   unsigned int n_chain = 1;
   n_chain
-      = dynamic_cast<u_int_argument *>(parser.arg("parallel")->arg("n_chain"))
+      = dynamic_cast<u_int_argument *>(parser.arg("parallel")->arg("chains"))
             ->value();
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
@@ -710,7 +715,7 @@ int command(int argc, const char *argv[]) {
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
             t0, init_buffer, term_buffer, window, interrupt, logger,
-            init_writers, sample_writers, diagnostic_writers);
+            init_writers, sample_writers, diagnostic_writers, n_chain);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == false && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
