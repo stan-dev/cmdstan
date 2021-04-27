@@ -14,8 +14,8 @@ TEST(interface, output_sig_figs_1) {
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1" + " output file="
-        + cmdstan::test::convert_model_path(model_path) + ".csv sig_figs=1";
+        + " sample --num_warmup=200 --num_samples=1" + " --output_file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv --sig_figs=1";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -42,8 +42,8 @@ TEST(interface, output_sig_figs_2) {
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1" + " output file="
-        + cmdstan::test::convert_model_path(model_path) + ".csv sig_figs=2";
+        + " sample --num_warmup=200 --num_samples=1" + " --output_file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv --sig_figs=2";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -70,8 +70,8 @@ TEST(interface, output_sig_figs_9) {
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1" + " output file="
-        + cmdstan::test::convert_model_path(model_path) + ".csv sig_figs=9";
+        + " sample --num_warmup=200 --num_samples=1" + " --output_file="
+        + cmdstan::test::convert_model_path(model_path) + ".csv --sig_figs=9";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);

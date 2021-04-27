@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <boost/algorithm/string.hpp>
-#include <CLI11/CLI11.hpp>
+#include <CLI/CLI.hpp>
 
 /**
  * Compute summary statistics over HMC sampler output

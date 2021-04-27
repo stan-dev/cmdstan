@@ -7,6 +7,8 @@ STAN_TARGETS = $(patsubst %.stan,%$(EXE),$(wildcard $(patsubst %$(EXE),%.stan,$(
 CMDSTAN_MAIN ?= src/cmdstan/main.cpp
 CMDSTAN_MAIN_O = $(patsubst %.cpp,%$(STAN_FLAGS).o,$(CMDSTAN_MAIN))
 
+$(CMDSTAN_MAIN_O): CXXFLAGS += -DCMDSTAN_VERSION="\"$(CMDSTAN_VERSION)\""
+
 $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 	@echo ''
 	@echo '--- Compiling the main object file. This might take up to a minute. ---'

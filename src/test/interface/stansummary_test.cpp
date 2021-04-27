@@ -4,7 +4,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
-#include <CLI11/CLI11.hpp>
+#include <CLI/CLI.hpp>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;
