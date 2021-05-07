@@ -230,11 +230,13 @@ int command(int argc, const char *argv[]) {
 
   write_stan(sample_writer);
   write_model(sample_writer, model.model_name());
-  
+
   // write current datetime to the CSV
-  const std::time_t current_datetime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  const std::time_t current_datetime
+      = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   std::stringstream current_datetime_msg;
-  current_datetime_msg << std::put_time(std::localtime(&current_datetime), "%F %T");
+  current_datetime_msg << std::put_time(std::localtime(&current_datetime),
+                                        "%F %T");
   sample_writer("start_datetime = " + current_datetime_msg.str());
 
   parser.print(sample_writer);
