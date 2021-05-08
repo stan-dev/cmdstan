@@ -16,6 +16,7 @@
 #include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
+#include <cmdstan/write_stan_flags.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
