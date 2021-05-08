@@ -10,6 +10,7 @@
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
+#include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
@@ -46,9 +47,7 @@
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
-#include <chrono>
 #include <fstream>
-#include <iomanip>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
@@ -231,15 +230,7 @@ int command(int argc, const char *argv[]) {
 
   write_stan(sample_writer);
   write_model(sample_writer, model.model_name());
-
-  // write current datetime to the CSV
-  const std::time_t current_datetime
-      = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-  std::stringstream current_datetime_msg;
-  current_datetime_msg << std::put_time(std::localtime(&current_datetime),
-                                        "%F %T");
-  sample_writer("start_datetime = " + current_datetime_msg.str());
-
+  write_datetime(sample_writer);
   parser.print(sample_writer);
   write_parallel_info(sample_writer);
   write_opencl_device(sample_writer);
