@@ -8,29 +8,29 @@ namespace cmdstan {
 
 void write_stan_flags(stan::callbacks::writer &writer) {
 #ifdef STAN_OPENCL
-        writer("STAN_OPENCL=true");
+  writer("STAN_OPENCL=true");
 #else
-        writer("STAN_OPENCL=false");
+  writer("STAN_OPENCL=false");
 #endif
 #ifdef STAN_THREADS
-        writer("STAN_THREADS=true");
+  writer("STAN_THREADS=true");
 #else
-        writer("STAN_THREADS=false");
+  writer("STAN_THREADS=false");
 #endif
 #ifdef STAN_MPI
-        writer("STAN_MPI=true");
+  writer("STAN_MPI=true");
 #else
-        writer("STAN_MPI=false");
+  writer("STAN_MPI=false");
 #endif
 #ifdef STAN_NO_RANGE_CHECKS
-        writer("STAN_NO_RANGE_CHECKS=true");
+  writer("STAN_NO_RANGE_CHECKS=true");
 #else
-        writer("STAN_NO_RANGE_CHECKS=false");
+  writer("STAN_NO_RANGE_CHECKS=false");
 #endif
 #ifdef STAN_CPP_OPTIMS
-        writer("STAN_CPP_OPTIMS=true");
+  writer("STAN_CPP_OPTIMS=true");
 #else
-        writer("STAN_CPP_OPTIMS=false");
+  writer("STAN_CPP_OPTIMS=false");
 #endif
 }
 
