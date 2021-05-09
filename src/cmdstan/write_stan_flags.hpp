@@ -7,11 +7,6 @@
 namespace cmdstan {
 
 void write_stan_flags(stan::callbacks::writer &writer) {
-#ifdef STAN_OPENCL
-  writer("STAN_OPENCL=true");
-#else
-  writer("STAN_OPENCL=false");
-#endif
 #ifdef STAN_THREADS
   writer("STAN_THREADS=true");
 #else
@@ -21,6 +16,11 @@ void write_stan_flags(stan::callbacks::writer &writer) {
   writer("STAN_MPI=true");
 #else
   writer("STAN_MPI=false");
+#endif
+#ifdef STAN_OPENCL
+        writer("STAN_OPENCL=true");
+#else
+        writer("STAN_OPENCL=false");
 #endif
 #ifdef STAN_NO_RANGE_CHECKS
   writer("STAN_NO_RANGE_CHECKS=true");
