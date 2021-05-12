@@ -21,7 +21,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <stan/callbacks/file_stream_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
@@ -380,9 +380,9 @@ int command(int argc, const char *argv[]) {
         = output_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
 
-  std::vector<stan::callbacks::file_stream_writer> sample_writers;
+  std::vector<stan::callbacks::unique_stream_writer> sample_writers;
   sample_writers.reserve(n_chain);
-  std::vector<stan::callbacks::file_stream_writer> diagnostic_writers;
+  std::vector<stan::callbacks::unique_stream_writer> diagnostic_writers;
   diagnostic_writers.reserve(n_chain);
   std::vector<stan::callbacks::writer> init_writers{n_chain,
                                                     stan::callbacks::writer{}};
@@ -683,11 +683,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, init_contexts, random_seed, id, init_radius,
+            model, n_chain, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers, n_chain);
+            sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == true) {
         int max_depth = dynamic_cast<int_argument *>(
@@ -711,11 +711,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, init_contexts, metric_contexts, random_seed, id,
+            model, n_chain, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
             t0, init_buffer, term_buffer, window, interrupt, logger,
-            init_writers, sample_writers, diagnostic_writers, n_chain);
+            init_writers, sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == false && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -760,11 +760,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, init_contexts, random_seed, id, init_radius, num_warmup,
+            model, n_chain, init_contexts, random_seed, id, init_radius, num_warmup,
             num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers, n_chain);
+            sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -787,11 +787,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, init_contexts, metric_contexts, random_seed, id, init_radius,
+            model, n_chain, init_contexts, metric_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers, n_chain);
+            sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "unit_e"
                  && adapt_engaged == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
