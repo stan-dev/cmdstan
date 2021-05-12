@@ -239,7 +239,6 @@ int command(int argc, const char *argv[]) {
     return 0;
 #endif
 
-
   // Read arguments
   std::vector<argument *> valid_arguments;
   valid_arguments.push_back(new arg_id());
@@ -760,8 +759,8 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, n_chain, init_contexts, random_seed, id, init_radius, num_warmup,
-            num_samples, num_thin, save_warmup, refresh, stepsize,
+            model, n_chain, init_contexts, random_seed, id, init_radius,
+            num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
             sample_writers, diagnostic_writers);
@@ -787,11 +786,11 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, n_chain, init_contexts, metric_contexts, random_seed, id, init_radius,
-            num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-            stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers);
+            model, n_chain, init_contexts, metric_contexts, random_seed, id,
+            init_radius, num_warmup, num_samples, num_thin, save_warmup,
+            refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
+            t0, init_buffer, term_buffer, window, interrupt, logger,
+            init_writers, sample_writers, diagnostic_writers);
       } else if (engine->value() == "nuts" && metric->value() == "unit_e"
                  && adapt_engaged == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
