@@ -162,7 +162,7 @@ int main(int argc, const char *argv[]) {
                   << std::endl
                   << std::endl;
       } else {
-        std::cout << "E-BFMI satisfactory for all transitions." << std::endl
+        std::cout << "E-BFMI satisfactory." << std::endl
                   << std::endl;
       }
     } else if (chains.param_name(i).find("__") == std::string::npos) {
