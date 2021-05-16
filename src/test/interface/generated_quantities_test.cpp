@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
+#include <stan/io/stan_csv_reader.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::multiple_command_separator;
@@ -17,6 +18,8 @@ class CmdStan : public testing::Test {
     bern_data = {"src", "test", "test-models", "bern.data.json"};
     bern_fitted_params
         = {"src", "test", "test-models", "bern_fitted_params.csv"};
+    bern_fitted_params_warmup
+        = {"src", "test", "test-models", "bern_fitted_params_warmup.csv"};
     default_file_path = {"src", "test", "test-models", "output.csv"};
     dev_null_path = {"/dev", "null"};
     gq_non_scalar_model = {"src", "test", "test-models", "gq_non_scalar"};
@@ -28,6 +31,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_extra_model;
   std::vector<std::string> bern_data;
   std::vector<std::string> bern_fitted_params;
+  std::vector<std::string> bern_fitted_params_warmup;
   std::vector<std::string> default_file_path;
   std::vector<std::string> dev_null_path;
   std::vector<std::string> gq_non_scalar_model;
@@ -113,3 +117,42 @@ TEST_F(CmdStan, generate_quantities_csv_conflict) {
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
 }
+
+TEST_F(CmdStan, generate_quantities_has_warmup) {
+  std::stringstream ss;
+  ss << convert_model_path(bern_gq_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(default_file_path)
+     << " method=generate_quantities fitted_params="
+     << convert_model_path(bern_fitted_params_warmup);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+
+  std::stringstream msg;
+  std::string fp_path = convert_model_path(bern_fitted_params_warmup);
+  std::string gq_output_path = convert_model_path(default_file_path);
+
+  std::ifstream fp_stream(fp_path.c_str());
+  stan::io::stan_csv fitted_params;
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
+					   &msg);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg, false);
+  stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
+					  fitted_params.timing, &msg);
+  fp_stream.close();
+
+  std::ifstream gq_stream(gq_output_path.c_str());
+  stan::io::stan_csv gq_output;
+  stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
+					  gq_output.timing, &msg);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata,
+					   &msg);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg, false);
+  stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
+					  gq_output.timing, &msg);
+  gq_stream.close();
+
+  ASSERT_EQ(fitted_params.samples.rows(), gq_output.samples.rows());
+}
+
