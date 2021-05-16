@@ -290,12 +290,13 @@ int command(int argc, const char *argv[]) {
                                             fitted_params.timing, &msg);
     stream.close();
 
-    std::cout << "qg num samples: " << fitted_params.samples.rows() << std::endl;
+    std::cout << "qg num samples: " << fitted_params.samples.rows()
+              << std::endl;
 
     std::vector<std::string> param_names;
     model.constrained_param_names(param_names, false, false);
     size_t num_cols = param_names.size();
-    size_t num_rows = fitted_params.samples.rows(); // this is the fix
+    size_t num_rows = fitted_params.samples.rows();  // this is the fix
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
       msg << "Mismatch between model and fitted_parameters csv file \"" << fname
