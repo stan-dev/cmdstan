@@ -63,7 +63,7 @@ test-models-hpp:
 ##
 # Tests that depend on compiled models
 ##
-test/interface/generated_quantities_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, gq_model test_model))
+test/interface/generated_quantities_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, bern_gq_model  bern_extra_model test_model))
 test/interface/command_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, printer domain_fail proper value_fail transformed_data_rng_test ndim_array))
 test/interface/metric_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, test_model proper))
 test/interface/csv_header_consistency_test$(EXE): src/test/test-models/csv_header_consistency$(EXE)

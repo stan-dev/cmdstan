@@ -289,11 +289,10 @@ int command(int argc, const char *argv[]) {
     stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples,
                                             fitted_params.timing, &msg);
     stream.close();
-
     std::vector<std::string> param_names;
     model.constrained_param_names(param_names, false, false);
     size_t num_cols = param_names.size();
-    size_t num_rows = fitted_params.metadata.num_samples;
+    size_t num_rows = fitted_params.samples.rows();
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
       msg << "Mismatch between model and fitted_parameters csv file \"" << fname
