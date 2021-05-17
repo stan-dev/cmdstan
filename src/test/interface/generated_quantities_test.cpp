@@ -51,6 +51,7 @@ TEST_F(CmdStan, generate_quantities_good) {
      << convert_model_path(bern_fitted_params);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+  std::cout << out << std::endl;
   ASSERT_FALSE(out.hasError);
 }
 
@@ -130,6 +131,7 @@ TEST_F(CmdStan, generate_quantities_warmup) {
      << convert_model_path(bern_fitted_params_warmup);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+  std::cout << out << std::endl;
   ASSERT_FALSE(out.hasError);
 
   std::stringstream msg;
@@ -169,6 +171,7 @@ TEST_F(CmdStan, generate_quantities_thin) {
      << convert_model_path(bern_fitted_params_thin);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+  std::cout << out << std::endl;
   ASSERT_FALSE(out.hasError);
 
   std::stringstream msg;
