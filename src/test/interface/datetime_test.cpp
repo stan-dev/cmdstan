@@ -28,7 +28,7 @@ TEST(interface, csv_header_consistency) {
 
   std::ifstream in;
   in.open(samples.c_str());
-  
+
   std::stringstream ss;
   std::string line;
 
@@ -62,7 +62,7 @@ TEST(interface, csv_header_consistency) {
   time_t theTime = time(NULL);
   struct tm *aTime = std::gmtime(&theTime);
 
-  EXPECT_EQ(std::atoi(value.substr(0,4).c_str()), (aTime->tm_year+1900));
-  EXPECT_EQ(value.substr(value.size()-3,3), "UTC");
+  EXPECT_EQ(std::atoi(value.substr(0, 4).c_str()), (aTime->tm_year + 1900));
+  EXPECT_EQ(value.substr(value.size() - 3, 3), "UTC");
   in.close();
 }
