@@ -10,6 +10,7 @@
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
+#include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
@@ -230,6 +231,7 @@ int command(int argc, const char *argv[]) {
 
   write_stan(sample_writer);
   write_model(sample_writer, model.model_name());
+  write_datetime(sample_writer);
   parser.print(sample_writer);
   write_parallel_info(sample_writer);
   write_opencl_device(sample_writer);
