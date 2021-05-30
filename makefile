@@ -234,7 +234,7 @@ help-dev:
 	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
-	@echo '- info   : prints compiler flags for compiling a CmdStan executable.'
+	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build-mpi
