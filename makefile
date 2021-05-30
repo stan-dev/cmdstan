@@ -185,7 +185,8 @@ endif
 	@echo '      directory of the Stan program.'
 	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
 	@echo '      the nightly version.'
-	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance           '
+	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance.'
+	@echo '    STAN_NO_RANGE_CHECKS: Removes the range checks from the model for performance.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
@@ -233,7 +234,7 @@ help-dev:
 	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
-	@echo '- compile_info   : prints compiler flags for compiling a CmdStan executable.'
+	@echo '- info   : prints compiler flags for compiling a CmdStan executable.'
 	@echo '--------------------------------------------------------------------------------'
 
 .PHONY: build-mpi
