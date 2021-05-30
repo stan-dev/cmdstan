@@ -1,4 +1,5 @@
-# This file contains examples for makefile flags that can be used in Cmdstan's make/local file
+# To use this template, make a copy from make/local.example to make/local and uncomment options as needed.
+# Be sure to run `make clean-all` before compiling a model to make sure everything gets rebuilt.
 
 # Change the C++ compiler
 # CXX=clang++
@@ -18,12 +19,14 @@
 # This example enables pedantic mode
 # STANCFLAGS+= --warn-pedantic
 
-# Enable C++ compiler and linker optimization recommended by Stan developers
+# Enable C++ compiler and linker optimization recommended by Stan developers.
+# Can significantly slow down compilation.
 # STAN_CPP_OPTIMS=true
 
-# Remove range checks from the model for faster runtime
+# Remove range checks from the model for faster runtime. Use this flag with caution
+# and only once the indexing has been validated. In case of any unexpected behavior
+# remove the flag for easier debugging.
 # STAN_NO_RANGE_CHECKS=true
 
 # Adding other arbitrary C++ compiler flags
-# CXXFLAGS+= -march=native -mtune=native
-
+# CXXFLAGS+= -funroll-loops
