@@ -1,0 +1,29 @@
+# This file contains examples for makefile flags that can be used in Cmdstan's make/local file
+
+# Change the C++ compiler
+# CXX=clang++
+
+# Enable threading
+# STAN_THREADS=true
+
+# Enable the MPI backend (requires also setting (replace gcc with clang on Mac)
+# STAN_MPI=true
+# CXX=mpicxx
+# TBB_CXX_TYPE=gcc
+
+# Enable the OpenCL backend
+# STAN_OPENCL=true
+
+# Add flags that are forwarded to the Stan-to-C++ compiler (stanc3).
+# This example enables pedantic mode
+# STANCFLAGS+= --warn-pedantic
+
+# Enable C++ compiler and linker optimization recommended by Stan developers
+# STAN_CPP_OPTIMS=true
+
+# Remove range checks from the model for faster runtime
+# STAN_NO_RANGE_CHECKS=true
+
+# Adding other arbitrary C++ compiler flags
+# CXXFLAGS+= -march=native -mtune=native
+
