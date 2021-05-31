@@ -1,0 +1,32 @@
+# To use this template, make a copy from make/local.example to make/local and uncomment options as needed.
+# Be sure to run `make clean-all` before compiling a model to make sure everything gets rebuilt.
+
+# Change the C++ compiler
+# CXX=clang++
+
+# Enable threading
+# STAN_THREADS=true
+
+# Enable the MPI backend (requires also setting (replace gcc with clang on Mac)
+# STAN_MPI=true
+# CXX=mpicxx
+# TBB_CXX_TYPE=gcc
+
+# Enable the OpenCL backend
+# STAN_OPENCL=true
+
+# Add flags that are forwarded to the Stan-to-C++ compiler (stanc3).
+# This example enables pedantic mode
+# STANCFLAGS+= --warn-pedantic
+
+# Enable C++ compiler and linker optimization recommended by Stan developers.
+# Can significantly slow down compilation.
+# STAN_CPP_OPTIMS=true
+
+# Remove range checks from the model for faster runtime. Use this flag with caution
+# and only once the indexing has been validated. In case of any unexpected behavior
+# remove the flag for easier debugging.
+# STAN_NO_RANGE_CHECKS=true
+
+# Adding other arbitrary C++ compiler flags
+# CXXFLAGS+= -funroll-loops
