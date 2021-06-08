@@ -75,37 +75,5 @@ else
 	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
-
-# bin/stanc2 build rules
-bin/stanc2$(EXE) : $(TBB_TARGETS)
-bin/stanc2$(EXE) : O = $(O_STANC)
-bin/stanc2$(EXE) : CPPFLAGS_MPI =
-bin/stanc2$(EXE) : LDFLAGS_MPI =
-bin/stanc2$(EXE) : LDLIBS_MPI =
-bin/stanc2$(EXE) : bin/cmdstan/libstanc.a
-bin/stanc2$(EXE) : bin/cmdstan/stanc.o
-	@mkdir -p $(dir $@)
-	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
-
-# libstanc build rules
-STANC_TEMPLATE_INSTANTIATION_CPP := $(call findfiles,$(STAN)src/stan/lang,*_inst.cpp) $(call findfiles,$(STAN)src/stan/lang,*_def.cpp)
-STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:$(STAN)src/stan/%.cpp=bin/cmdstan/%.o)
-
-bin/cmdstan/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
-	@mkdir -p $(dir $@)
-	$(AR) -rs $@ $^
-
-$(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
-$(STANC_TEMPLATE_INSTANTIATION) : bin/cmdstan/%.o : $(STAN)src/stan/%.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
-
-$(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP)) : DEPTARGETS = -MT $(patsubst stan/src/stan/lang/%.d,bin/cmdstan/lang/%.o,$@) -MT $@
-
-ifneq ($(filter bin/stanc2$(EXE) bin/stan/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
-endif
-# end libstanc build rules
-
 endif
 # end bin/stanc build rules

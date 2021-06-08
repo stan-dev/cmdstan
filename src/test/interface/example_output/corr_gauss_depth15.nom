@@ -5,7 +5,7 @@ Checking sampler transitions for divergences.
 No divergent transitions found.
 
 Checking E-BFMI - sampler transitions HMC potential energy.
-E-BFMI satisfactory for all transitions.
+E-BFMI satisfactory.
 
 Effective sample size satisfactory.
 

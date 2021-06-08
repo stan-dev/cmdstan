@@ -162,8 +162,7 @@ int main(int argc, const char *argv[]) {
                   << std::endl
                   << std::endl;
       } else {
-        std::cout << "E-BFMI satisfactory for all transitions." << std::endl
-                  << std::endl;
+        std::cout << "E-BFMI satisfactory." << std::endl << std::endl;
       }
     } else if (chains.param_name(i).find("__") == std::string::npos) {
       double n_eff = chains.effective_sample_size(i);
@@ -203,7 +202,7 @@ int main(int argc, const char *argv[]) {
     std::cout << bad_rhat_names.back() << std::endl;
 
     std::cout << "Such high values indicate incomplete mixing and biased"
-              << "estimation." << std::endl
+              << " estimation." << std::endl
               << "You should consider regularizating your model"
               << " with additional prior information or a more"
               << " effective parameterization." << std::endl
