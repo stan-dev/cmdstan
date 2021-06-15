@@ -409,12 +409,12 @@ int command(int argc, const char *argv[]) {
       auto diagnostic_filename
           = diagnostic_name + name_iterator(i) + "boiii" + diagnostic_ending;
       diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out),
+          std::make_unique<std::fstream>(diagnostic_filename,
+                                         std::fstream::out),
           "# ");
     } else {
       diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>("", std::fstream::out),
-          "# ");
+          std::make_unique<std::fstream>("", std::fstream::out), "# ");
     }
   }
   for (int i = 0; i < n_chain; i++) {
