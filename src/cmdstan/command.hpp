@@ -12,12 +12,14 @@
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_chain.hpp>
+#include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
 #include <cmdstan/write_opencl_device.hpp>
 #include <cmdstan/write_parallel_info.hpp>
 #include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
+#include <cmdstan/write_stan_flags.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -418,6 +420,7 @@ int command(int argc, const char *argv[]) {
   for (int i = 0; i < n_chain; i++) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
+    write_datetime(sample_writers[i]);
     parser.print(sample_writers[i]);
     write_parallel_info(sample_writers[i]);
     write_opencl_device(sample_writers[i]);
@@ -478,11 +481,10 @@ int command(int argc, const char *argv[]) {
     stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples,
                                             fitted_params.timing, &msg);
     stream.close();
-
     std::vector<std::string> param_names;
     model.constrained_param_names(param_names, false, false);
     size_t num_cols = param_names.size();
-    size_t num_rows = fitted_params.metadata.num_samples;
+    size_t num_rows = fitted_params.samples.rows();
     // check that all parameter names are in sample, in order
     if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
       msg << "Mismatch between model and fitted_parameters csv file \"" << fname

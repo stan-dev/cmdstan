@@ -130,7 +130,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.26.1
+CMDSTAN_VERSION := 2.27.0
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -185,7 +185,8 @@ endif
 	@echo '      directory of the Stan program.'
 	@echo '    STANC3_VERSION: When set, uses that tagged version specified; otherwise, downloads'
 	@echo '      the nightly version.'
-	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance           '
+	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance.'
+	@echo '    STAN_NO_RANGE_CHECKS: Removes the range checks from the model for performance.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
