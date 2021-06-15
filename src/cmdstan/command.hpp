@@ -403,11 +403,17 @@ int command(int argc, const char *argv[]) {
       sample_writers[i].get_stream()
           << std::setprecision(sig_figs_arg->value());
     }
-    auto diagnostic_filename
-        = diagnostic_name + name_iterator(i) + diagnostic_ending;
-    diagnostic_writers.emplace_back(
-        std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out),
-        "# ");
+    if (diagnostic_file != "") {
+      auto diagnostic_filename
+          = diagnostic_name + name_iterator(i) + "boiii" + diagnostic_ending;
+      diagnostic_writers.emplace_back(
+          std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out),
+          "# ");
+    } else {
+      diagnostic_writers.emplace_back(
+          std::make_unique<std::fstream>("", std::fstream::out),
+          "# ");
+    }
   }
   for (int i = 0; i < n_chain; i++) {
     write_stan(sample_writers[i]);
