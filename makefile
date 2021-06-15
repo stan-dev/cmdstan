@@ -338,3 +338,6 @@ compile_info:
 ##
 .PHONY: print-%
 print-%  : ; @echo $* = $($*)
+
+.PHONY: clean-build
+clean-build: clean-all build
