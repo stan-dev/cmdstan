@@ -119,6 +119,29 @@ class json_data : public stan::io::var_context {
     return empty_vec_r_;
   }
 
+  std::vector<std::complex<double>> vals_c(const std::string &name) const {
+    if (contains_r_only(name)) {
+      auto vec_r = (vars_r_.find(name)->second).first;
+      std::vector<std::complex<double>> ret_c(vec_r.size() / 2);
+      size_t comp_iter;
+      size_t real_iter;
+      for (comp_iter = 0, real_iter = 0; real_iter < vec_r.size(); comp_iter += 1, real_iter += 2) {
+        ret_c[comp_iter] = std::complex<double>{vec_r[real_iter], vec_r[real_iter + 1]};
+      }
+      return ret_c;
+    } else if (contains_i(name)) {
+      std::vector<int> vec_int = (vars_i_.find(name)->second).first;
+      std::vector<std::complex<double>> vec_c(vec_int.size() / 2);
+      size_t comp_iter;
+      size_t real_iter;
+      for (comp_iter = 0, real_iter = 0; real_iter < vec_int.size(); comp_iter += 1, real_iter += 2) {
+        vec_c[comp_iter] = std::complex<double>{static_cast<double>(vec_int[real_iter]), static_cast<double>(vec_int[real_iter + 1])};
+      }
+      return vec_c;
+    }
+    return std::vector<std::complex<double>>{};
+  }
+
   /**
    * Return the dimensions for the variable with the specified
    * name.
