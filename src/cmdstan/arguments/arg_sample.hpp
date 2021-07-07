@@ -23,6 +23,7 @@ class arg_sample : public categorical_argument {
     _subarguments.push_back(new arg_thin());
     _subarguments.push_back(new arg_adapt());
     _subarguments.push_back(new arg_sample_algo());
+    _subarguments.push_back(new arg_num_chains());
   }
 };
 

@@ -1,11 +1,12 @@
 #ifndef CMDSTAN_COMMAND_HPP
 #define CMDSTAN_COMMAND_HPP
 
-#include <cmdstan/arguments/arg_parallel.hpp>
 #include <cmdstan/arguments/arg_data.hpp>
 #include <cmdstan/arguments/arg_id.hpp>
 #include <cmdstan/arguments/arg_init.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
+#include <cmdstan/arguments/arg_num_threads.hpp>
+#include <cmdstan/arguments/arg_num_chains.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
 #include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
@@ -224,7 +225,7 @@ auto get_arg(T &&x, const char *arg1, Args &&... args) {
 }
 
 template <typename caster, typename T, typename... Args>
-auto get_arg_val(caster &&v, T &&x, Args &&... args) {
+auto get_arg_val(T&& x, Args&&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(x, args...))->value();
 }
 
@@ -248,7 +249,8 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_init());
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
-  valid_arguments.push_back(new arg_parallel());
+  valid_arguments.push_back(new arg_num_threads());
+  valid_arguments.push_back(new arg_num_chains());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
@@ -266,16 +268,13 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  int n_threads = 1;
-  n_threads
-      = dynamic_cast<int_argument *>(parser.arg("parallel")->arg("threads"))
-            ->value();
+  int n_threads = get_arg_val<int_argument>(parser, "threads");
 
   stan::math::init_threadpool_tbb(n_threads);
   unsigned int n_chain = 1;
-  n_chain
-      = dynamic_cast<u_int_argument *>(parser.arg("parallel")->arg("chains"))
-            ->value();
+  if (parser.arg("method")->arg("sample")) {
+    n_chain = get_arg_val<u_int_argument>(parser, "method", "sample", "chains");
+  }
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
@@ -331,10 +330,7 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
   //                Initialize Model              //
   //////////////////////////////////////////////////
-
-  std::string filename(
-      dynamic_cast<string_argument *>(parser.arg("data")->arg("file"))
-          ->value());
+  std::string filename = get_arg_val<string_argument>(parser, "data", "file");
 
   std::shared_ptr<stan::io::var_context> var_context
       = get_var_context(filename);
@@ -350,7 +346,7 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
 
   std::string output_file
-      = get_arg_val(string_argument(), parser, "output", "file");
+      = get_arg_val<string_argument>(parser, "output", "file");
   if (output_file == "") {
     throw std::invalid_argument(
         std::string("File output name must not be blank"));
@@ -367,7 +363,7 @@ int command(int argc, const char *argv[]) {
   }
 
   std::string diagnostic_file
-      = get_arg_val(string_argument(), parser, "output", "diagnostic_file");
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   size_t diagnostic_marker_pos = diagnostic_file.find_last_of(".");
   std::string diagnostic_name;
   std::string diagnostic_ending;
@@ -381,9 +377,9 @@ int command(int argc, const char *argv[]) {
         = output_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
 
-  std::vector<stan::callbacks::unique_stream_writer> sample_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>> sample_writers;
   sample_writers.reserve(n_chain);
-  std::vector<stan::callbacks::unique_stream_writer> diagnostic_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>> diagnostic_writers;
   diagnostic_writers.reserve(n_chain);
   std::vector<stan::callbacks::writer> init_writers{n_chain,
                                                     stan::callbacks::writer{}};
