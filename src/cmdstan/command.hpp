@@ -276,7 +276,19 @@ int command(int argc, const char *argv[]) {
 #ifdef STAN_THREADS
   n_threads = get_arg_val<int_argument>(parser, "num_threads");
 #endif
+  // Need to make sure these two ways to set thread # match.
+  int env_threads = stan::math::internal::get_num_threads();
+  if (env_threads != n_threads) {
+    if (env_threads != 1) {
+      std::stringstream thread_msg;
+      thread_msg << "STAN_NUM_THREADS= " << env_threads
+          << " but argument num_threads= " << n_threads <<
+          ". Please either only set one or make sure they are equal.";
+      throw std::invalid_argument(thread_msg.str());      
+    }
+  }
   stan::math::init_threadpool_tbb(n_threads);
+
   unsigned int n_chain = 1;
   if (parser.arg("method")->arg("sample")) {
     n_chain = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");

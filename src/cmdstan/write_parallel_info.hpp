@@ -10,7 +10,6 @@ namespace cmdstan {
 void write_parallel_info(stan::callbacks::writer &writer) {
 #ifdef STAN_MPI
   writer("mpi_enabled = 1");
-#else
 #endif
 }
 
