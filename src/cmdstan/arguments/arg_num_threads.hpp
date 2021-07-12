@@ -8,7 +8,7 @@ namespace cmdstan {
 class arg_num_threads : public int_argument {
  public:
   arg_num_threads() : int_argument() {
-    _name = "threads";
+    _name = "num_threads";
     _description = std::string("Number of threads available to the program.");
     _default = "-1";
     _default_value = -1;

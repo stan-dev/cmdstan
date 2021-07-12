@@ -208,25 +208,30 @@ static constexpr int hmc_fixed_cols
 namespace internal {
 
 template <typename T>
-auto get_arg_pointer(T &&x) {
+inline constexpr auto get_arg_pointer(T &&x) {
   return x;
 }
 
 template <typename T, typename... Args>
-auto get_arg_pointer(T &&x, const char *arg1, Args &&... args) {
+inline constexpr auto get_arg_pointer(T &&x, const char *arg1, Args &&... args) {
   return get_arg_pointer(x->arg(arg1), args...);
 }
 
 }  // namespace internal
 
 template <typename T, typename... Args>
-auto get_arg(T &&x, const char *arg1, Args &&... args) {
+inline constexpr auto get_arg(T &&x, const char *arg1, Args &&... args) {
   return internal::get_arg_pointer(x.arg(arg1), args...);
 }
 
 template <typename caster, typename T, typename... Args>
-auto get_arg_val(T&& x, Args&&... args) {
+inline constexpr auto get_arg_val(T&& x, Args&&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(x, args...))->value();
+}
+
+template <typename caster, typename T, typename... Args>
+inline constexpr auto get_arg_val(T&& x, const char* arg_name) {
+  return dynamic_cast<std::decay_t<caster> *>(x.arg(arg_name))->value();
 }
 
 int command(int argc, const char *argv[]) {
@@ -250,7 +255,6 @@ int command(int argc, const char *argv[]) {
   valid_arguments.push_back(new arg_random());
   valid_arguments.push_back(new arg_output());
   valid_arguments.push_back(new arg_num_threads());
-  valid_arguments.push_back(new arg_num_chains());
 #ifdef STAN_OPENCL
   valid_arguments.push_back(new arg_opencl());
 #endif
@@ -268,12 +272,14 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  int n_threads = get_arg_val<int_argument>(parser, "threads");
-
+  int n_threads = 1;
+#ifdef STAN_THREADS
+  n_threads = get_arg_val<int_argument>(parser, "num_threads");
+#endif
   stan::math::init_threadpool_tbb(n_threads);
   unsigned int n_chain = 1;
   if (parser.arg("method")->arg("sample")) {
-    n_chain = get_arg_val<u_int_argument>(parser, "method", "sample", "chains");
+    n_chain = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
   }
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
