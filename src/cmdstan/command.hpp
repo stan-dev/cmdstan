@@ -108,98 +108,97 @@ using context_vector = std::vector<shared_context_ptr>;
  * @param file The name of the file. For multi-chain we will attempt to find
  *  {file_name}_1{file_ending} and if that fails try to use the named file as
  *  the data for each chain.
- * @param n_chain The number of chains to run.
+ * @param num_chains The number of chains to run.
  * @return An std vector of shared pointers to var contexts
  */
-context_vector get_vec_var_context(const std::string &file, size_t n_chain) {
+context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   using stan::io::var_context;
-  if (n_chain == 1) {
+  if (num_chains == 1) {
     return context_vector(1, get_var_context(file));
-  } else {
-    auto make_context = [](auto &&file, auto &&stream,
-                           auto &&file_ending) -> shared_context_ptr {
-      if (file_ending == ".json") {
-        using cmdstan::json::json_data;
-        return std::make_shared<json_data>(json_data(stream));
-      } else if (file_ending == ".csv") {
-        using stan::io::dump;
-        return std::make_shared<stan::io::dump>(dump(stream));
-      } else {
-        std::stringstream msg;
-        msg << "file ending of " << file_ending
-            << " is not supported by cmdstan";
-        throw std::invalid_argument(msg.str());
-        using stan::io::dump;
-        return std::make_shared<dump>(dump(stream));
-      }
-    };
-    // use default for all chain inits
-    if (file == "") {
+  }
+  auto make_context = [](auto &&file, auto &&stream,
+                         auto &&file_ending) -> shared_context_ptr {
+    if (file_ending == ".json") {
+      using cmdstan::json::json_data;
+      return std::make_shared<json_data>(json_data(stream));
+    } else if (file_ending == ".csv") {
       using stan::io::dump;
-      std::fstream stream(file.c_str(), std::fstream::in);
-      return context_vector(n_chain, std::make_shared<dump>(dump(stream)));
+      return std::make_shared<stan::io::dump>(dump(stream));
     } else {
-      size_t file_marker_pos = file.find_last_of(".");
-      if (file_marker_pos > file.size()) {
+      std::stringstream msg;
+      msg << "file ending of " << file_ending
+          << " is not supported by cmdstan";
+      throw std::invalid_argument(msg.str());
+      using stan::io::dump;
+      return std::make_shared<dump>(dump(stream));
+    }
+  };
+  // use default for all chain inits
+  if (file == "") {
+    using stan::io::dump;
+    std::fstream stream(file.c_str(), std::fstream::in);
+    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
+  } else {
+    size_t file_marker_pos = file.find_last_of(".");
+    if (file_marker_pos > file.size()) {
+      std::stringstream msg;
+      msg << "Found: \"" << file
+          << "\" but user specied files must end in .json or .csv";
+      throw std::invalid_argument(msg.str());
+    }
+    std::string file_name = file.substr(0, file_marker_pos);
+    std::string file_ending = file.substr(file_marker_pos, file.size());
+    if (file_ending != ".json" || file_ending != ".csv") {
+      std::stringstream msg;
+      msg << "file ending of " << file_ending
+          << " is not supported by cmdstan";
+      throw std::invalid_argument(msg.str());
+    }
+    std::string file_1
+        = std::string(file_name + "_" + std::to_string(1) + file_ending);
+    std::fstream stream_1(file_1.c_str(), std::fstream::in);
+    // Check if file_1 exists, if so then we'll assume num_chains of these exist.
+    if (stream_1.rdstate() & std::ifstream::failbit) {
+      // if that fails we will try to find a base file
+      std::fstream stream(file.c_str(), std::fstream::in);
+      if (stream.rdstate() & std::ifstream::failbit) {
+        std::string file_name_err = std::string(
+            "\"" + file_1 + "\" and base file \"" + file + "\"");
         std::stringstream msg;
-        msg << "Found: \"" << file
-            << "\" but user specied files must end in .json or .csv";
+        msg << "Searching for  \"" << file_name_err << std::endl;
+        msg << "Can't open either of specified files," << file_name_err
+            << std::endl;
         throw std::invalid_argument(msg.str());
-      }
-      std::string file_name = file.substr(0, file_marker_pos);
-      std::string file_ending = file.substr(file_marker_pos, file.size());
-      if (file_ending != ".json" || file_ending != ".csv") {
-        std::stringstream msg;
-        msg << "file ending of " << file_ending
-            << " is not supported by cmdstan";
-        throw std::invalid_argument(msg.str());
-      }
-      std::string file_1
-          = std::string(file_name + "_" + std::to_string(1) + file_ending);
-      std::fstream stream_1(file_1.c_str(), std::fstream::in);
-      // Check if file_1 exists, if so then we'll assume n_chain of these exist.
-      if (stream_1.rdstate() & std::ifstream::failbit) {
-        // if that fails we will try to find a base file
-        std::fstream stream(file.c_str(), std::fstream::in);
-        if (stream.rdstate() & std::ifstream::failbit) {
-          std::string file_name_err = std::string(
-              "\"" + file_1 + "\" and base file \"" + file + "\"");
-          std::stringstream msg;
-          msg << "Searching for  \"" << file_name_err << std::endl;
-          msg << "Can't open either of specified files," << file_name_err
-              << std::endl;
-          throw std::invalid_argument(msg.str());
-        } else {
-          return context_vector(1, make_context(file, stream, file_ending));
-        }
       } else {
-        // If we found file_1 then we'll assume file_{1...N} exists
-        context_vector ret;
-        ret.reserve(n_chain);
-        ret.push_back(make_context(file_1, stream_1, file_ending));
-        for (size_t i = 1; i < n_chain; ++i) {
-          std::string file_i
-              = std::string(file_name + "_" + std::to_string(i) + file_ending);
-          std::fstream stream_i(file_1.c_str(), std::fstream::in);
-          // If any stream fails at this point something went wrong with file
-          // names.
-          if (stream_i.rdstate() & std::ifstream::failbit) {
-            std::string file_name_err = std::string(
-                "\"" + file_1 + "\" but cannot open \"" + file_i + "\"");
-            std::stringstream msg;
-            msg << "Found " << file_name_err << std::endl;
-            throw std::invalid_argument(msg.str());
-          }
-          ret.push_back(make_context(file_i, stream_i, file_ending));
-        }
-        return ret;
+        return context_vector(1, make_context(file, stream, file_ending));
       }
+    } else {
+      // If we found file_1 then we'll assume file_{1...N} exists
+      context_vector ret;
+      ret.reserve(num_chains);
+      ret.push_back(make_context(file_1, stream_1, file_ending));
+      for (size_t i = 1; i < num_chains; ++i) {
+        std::string file_i
+            = std::string(file_name + "_" + std::to_string(i) + file_ending);
+        std::fstream stream_i(file_1.c_str(), std::fstream::in);
+        // If any stream fails at this point something went wrong with file
+        // names.
+        if (stream_i.rdstate() & std::ifstream::failbit) {
+          std::string file_name_err = std::string(
+              "\"" + file_1 + "\" but cannot open \"" + file_i + "\"");
+          std::stringstream msg;
+          msg << "Found " << file_name_err << std::endl;
+          throw std::invalid_argument(msg.str());
+        }
+        ret.push_back(make_context(file_i, stream_i, file_ending));
+      }
+      return ret;
     }
   }
   // This should not happen
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
-  return context_vector(n_chain, std::make_shared<dump>(dump(stream)));
+  return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
 static constexpr int hmc_fixed_cols
@@ -272,26 +271,46 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  int n_threads = 1;
-#ifdef STAN_THREADS
-  n_threads = get_arg_val<int_argument>(parser, "num_threads");
-#endif
+  int num_threads = get_arg_val<int_argument>(parser, "num_threads");
   // Need to make sure these two ways to set thread # match.
   int env_threads = stan::math::internal::get_num_threads();
-  if (env_threads != n_threads) {
+  if (env_threads != num_threads) {
     if (env_threads != 1) {
       std::stringstream thread_msg;
       thread_msg << "STAN_NUM_THREADS= " << env_threads
-          << " but argument num_threads= " << n_threads <<
+          << " but argument num_threads= " << num_threads <<
           ". Please either only set one or make sure they are equal.";
-      throw std::invalid_argument(thread_msg.str());      
+      throw std::invalid_argument(thread_msg.str());
     }
   }
-  stan::math::init_threadpool_tbb(n_threads);
+  stan::math::init_threadpool_tbb(num_threads);
 
-  unsigned int n_chain = 1;
-  if (parser.arg("method")->arg("sample")) {
-    n_chain = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
+  unsigned int num_chains = 1;
+  auto user_method = parser.arg("method");
+  if (user_method->arg("sample")) {
+    num_chains = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
+    auto sample_arg = parser.arg("method")->arg("sample");
+    list_argument *algo
+        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
+    categorical_argument *adapt
+        = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
+    const bool adapt_engaged
+        = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
+    const bool is_hmc = algo->value() == "hmc";
+    if (num_chains > 1) {
+      if (is_hmc && adapt_engaged) {
+        list_argument *engine
+            = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
+        list_argument *metric
+            = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
+        if (engine->value() != "nuts" && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
+          std::stringstream hmc_msg;
+          hmc_msg << "num_chains can currently only be used for NUTS with adaptation"
+          " and dense_e or diag_e metric";
+          throw std::invalid_argument(hmc_msg.str());
+        }
+      }
+    }
   }
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
@@ -396,21 +415,21 @@ int command(int argc, const char *argv[]) {
   }
 
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>> sample_writers;
-  sample_writers.reserve(n_chain);
+  sample_writers.reserve(num_chains);
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>> diagnostic_writers;
-  diagnostic_writers.reserve(n_chain);
-  std::vector<stan::callbacks::writer> init_writers{n_chain,
+  diagnostic_writers.reserve(num_chains);
+  std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
-  auto name_iterator = [n_chain](auto i) {
-    if (n_chain == 1) {
+  auto name_iterator = [num_chains](auto i) {
+    if (num_chains == 1) {
       return std::string("");
     } else {
       return std::string("_" + std::to_string(i + 1));
     }
   };
-  for (int i = 0; i < n_chain; i++) {
+  for (int i = 0; i < num_chains; i++) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     sample_writers.emplace_back(
         std::make_unique<std::fstream>(output_filename, std::fstream::out),
@@ -431,7 +450,7 @@ int command(int argc, const char *argv[]) {
           std::make_unique<std::fstream>("", std::fstream::out), "# ");
     }
   }
-  for (int i = 0; i < n_chain; i++) {
+  for (int i = 0; i < num_chains; i++) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
     write_datetime(sample_writers[i]);
@@ -460,9 +479,8 @@ int command(int argc, const char *argv[]) {
   } catch (const boost::bad_lexical_cast &e) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
-      = get_vec_var_context(init, n_chain);
+      = get_vec_var_context(init, num_chains);
   int return_code = stan::services::error_codes::CONFIG;
-  auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
     // read sample from cmdstan csv output file
     string_argument *fitted_params_file = dynamic_cast<string_argument *>(
@@ -642,7 +660,7 @@ int command(int argc, const char *argv[]) {
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
               ->value());
       context_vector metric_contexts
-          = get_vec_var_context(metric_filename, n_chain);
+          = get_vec_var_context(metric_filename, num_chains);
       categorical_argument *adapt
           = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
       categorical_argument *hmc
@@ -651,7 +669,6 @@ int command(int argc, const char *argv[]) {
           = dynamic_cast<real_argument *>(hmc->arg("stepsize"))->value();
       double stepsize_jitter
           = dynamic_cast<real_argument *>(hmc->arg("stepsize_jitter"))->value();
-
       if (adapt_engaged == true && num_warmup == 0) {
         info(
             "The number of warmup samples (num_warmup) must be greater than "
@@ -704,7 +721,7 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, n_chain, init_contexts, random_seed, id, init_radius,
+            model, num_chains, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
@@ -732,7 +749,7 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
-            model, n_chain, init_contexts, metric_contexts, random_seed, id,
+            model, num_chains, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
             t0, init_buffer, term_buffer, window, interrupt, logger,
@@ -781,7 +798,7 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, n_chain, init_contexts, random_seed, id, init_radius,
+            model, num_chains, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
             term_buffer, window, interrupt, logger, init_writers,
@@ -808,7 +825,7 @@ int command(int argc, const char *argv[]) {
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, n_chain, init_contexts, metric_contexts, random_seed, id,
+            model, num_chains, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, delta, gamma, kappa,
             t0, init_buffer, term_buffer, window, interrupt, logger,

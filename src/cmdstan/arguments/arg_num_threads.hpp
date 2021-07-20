@@ -14,8 +14,11 @@ class arg_num_threads : public int_argument {
     _default_value = 1;
     _value = _default_value;
   }
-
-  bool is_valid(unsigned int value) { return value > -2; }
+#ifdef STAN_THREADS
+  bool is_valid(int value) { return value > -2 && value != 0; }
+#else
+  bool is_valid(int value) { return value == 1; }
+#endif
 };
 
 }  // namespace cmdstan
