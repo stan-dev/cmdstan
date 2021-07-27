@@ -126,8 +126,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       return std::make_shared<stan::io::dump>(dump(stream));
     } else {
       std::stringstream msg;
-      msg << "file ending of " << file_ending
-          << " is not supported by cmdstan";
+      msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
       using stan::io::dump;
       return std::make_shared<dump>(dump(stream));
@@ -150,20 +149,20 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     std::string file_ending = file.substr(file_marker_pos, file.size());
     if (file_ending != ".json" || file_ending != ".csv") {
       std::stringstream msg;
-      msg << "file ending of " << file_ending
-          << " is not supported by cmdstan";
+      msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
     }
     std::string file_1
         = std::string(file_name + "_" + std::to_string(1) + file_ending);
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
-    // Check if file_1 exists, if so then we'll assume num_chains of these exist.
+    // Check if file_1 exists, if so then we'll assume num_chains of these
+    // exist.
     if (stream_1.rdstate() & std::ifstream::failbit) {
       // if that fails we will try to find a base file
       std::fstream stream(file.c_str(), std::fstream::in);
       if (stream.rdstate() & std::ifstream::failbit) {
-        std::string file_name_err = std::string(
-            "\"" + file_1 + "\" and base file \"" + file + "\"");
+        std::string file_name_err
+            = std::string("\"" + file_1 + "\" and base file \"" + file + "\"");
         std::stringstream msg;
         msg << "Searching for  \"" << file_name_err << std::endl;
         msg << "Can't open either of specified files," << file_name_err
@@ -212,7 +211,8 @@ inline constexpr auto get_arg_pointer(T &&x) {
 }
 
 template <typename T, typename... Args>
-inline constexpr auto get_arg_pointer(T &&x, const char *arg1, Args &&... args) {
+inline constexpr auto get_arg_pointer(T &&x, const char *arg1,
+                                      Args &&... args) {
   return get_arg_pointer(x->arg(arg1), args...);
 }
 
@@ -224,12 +224,12 @@ inline constexpr auto get_arg(T &&x, const char *arg1, Args &&... args) {
 }
 
 template <typename caster, typename T, typename... Args>
-inline constexpr auto get_arg_val(T&& x, Args&&... args) {
+inline constexpr auto get_arg_val(T &&x, Args &&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(x, args...))->value();
 }
 
 template <typename caster, typename T, typename... Args>
-inline constexpr auto get_arg_val(T&& x, const char* arg_name) {
+inline constexpr auto get_arg_val(T &&x, const char *arg_name) {
   return dynamic_cast<std::decay_t<caster> *>(x.arg(arg_name))->value();
 }
 
@@ -278,8 +278,8 @@ int command(int argc, const char *argv[]) {
     if (env_threads != 1) {
       std::stringstream thread_msg;
       thread_msg << "STAN_NUM_THREADS= " << env_threads
-          << " but argument num_threads= " << num_threads <<
-          ". Please either only set one or make sure they are equal.";
+                 << " but argument num_threads= " << num_threads
+                 << ". Please either only set one or make sure they are equal.";
       throw std::invalid_argument(thread_msg.str());
     }
   }
@@ -288,7 +288,8 @@ int command(int argc, const char *argv[]) {
   unsigned int num_chains = 1;
   auto user_method = parser.arg("method");
   if (user_method->arg("sample")) {
-    num_chains = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
+    num_chains
+        = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
     auto sample_arg = parser.arg("method")->arg("sample");
     list_argument *algo
         = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
@@ -303,10 +304,12 @@ int command(int argc, const char *argv[]) {
             = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
         list_argument *metric
             = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-        if (engine->value() != "nuts" && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
+        if (engine->value() != "nuts"
+            && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
           std::stringstream hmc_msg;
-          hmc_msg << "num_chains can currently only be used for NUTS with adaptation"
-          " and dense_e or diag_e metric";
+          hmc_msg << "num_chains can currently only be used for NUTS with "
+                     "adaptation"
+                     " and dense_e or diag_e metric";
           throw std::invalid_argument(hmc_msg.str());
         }
       }
@@ -414,9 +417,11 @@ int command(int argc, const char *argv[]) {
         = output_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
 
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>> sample_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+      sample_writers;
   sample_writers.reserve(num_chains);
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>> diagnostic_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+      diagnostic_writers;
   diagnostic_writers.reserve(num_chains);
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
