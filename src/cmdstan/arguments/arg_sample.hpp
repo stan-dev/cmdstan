@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARG_SAMPLE_HPP
 
 #include <cmdstan/arguments/arg_adapt.hpp>
+#include <cmdstan/arguments/arg_num_chains.hpp>
 #include <cmdstan/arguments/arg_num_samples.hpp>
 #include <cmdstan/arguments/arg_num_warmup.hpp>
 #include <cmdstan/arguments/arg_sample_algo.hpp>
