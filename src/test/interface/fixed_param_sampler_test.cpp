@@ -92,4 +92,7 @@ TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
       = "Model contains no parameters, running fixed_param sampler";
   EXPECT_TRUE(
       boost::algorithm::contains(command_output.output, expected_message));
+
+  // stopped here - see datetime_test - check that header has "fixed_param = 1"
+
 }
