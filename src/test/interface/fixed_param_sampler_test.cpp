@@ -6,6 +6,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 
+using cmdstan::test::count_matches;
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
@@ -78,21 +79,81 @@ TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
   std::string command = convert_model_path(model_path);
   command += " sample output file=" + convert_model_path(model_path) + ".csv";
   run_command_output command_output;
-
   bool success = true;
-
   try {
     command_output = run_command(command);
   } catch (...) {
     success = false;
   }
-
   EXPECT_EQ(success, true);
   std::string expected_message
       = "Model contains no parameters, running fixed_param sampler";
   EXPECT_TRUE(
       boost::algorithm::contains(command_output.output, expected_message));
 
-  // stopped here - see datetime_test - check that header has "fixed_param = 1"
+  std::ifstream ifstream(convert_model_path(model_path) + ".csv");
+  std::string output_file((std::istreambuf_iterator<char>(ifstream)),
+                          std::istreambuf_iterator<char>());
+  ifstream.close();
+
+  EXPECT_EQ(1, count_matches("# fixed_param = 1", output_file))
+      << "# fixed_param = 1" << std::endl
+      << output_file;
+}
+
+TEST(McmcFixedParamSampler, check_csv_header_has_fixed_param) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("empty");
+
+  std::string command = convert_model_path(model_path);
+  command += " sample algorithm=fixed_param output file=" + convert_model_path(model_path) + ".csv";
+  run_command_output command_output;
+  bool success = true;
+  try {
+    command_output = run_command(command);
+  } catch (...) {
+    success = false;
+  }
+  EXPECT_EQ(success, true);
+
+  std::ifstream ifstream(convert_model_path(model_path) + ".csv");
+  std::string output_file((std::istreambuf_iterator<char>(ifstream)),
+                          std::istreambuf_iterator<char>());
+  ifstream.close();
+
+  EXPECT_EQ(1, count_matches("# fixed_param = 1", output_file))
+      << " fixed_param = 1" << std::endl
+      << output_file;
+}
+
+TEST(McmcFixedParamSampler, check_csv_header_doesnt_have_fixed_param) {
+  std::vector<std::string> model_path;
+  model_path.push_back("src");
+  model_path.push_back("test");
+  model_path.push_back("test-models");
+  model_path.push_back("test");
+
+  std::string command = convert_model_path(model_path);
+  command += " sample output file=" + convert_model_path(model_path) + ".csv";
+  run_command_output command_output;
+  bool success = true;
+  try {
+    command_output = run_command(command);
+  } catch (...) {
+    success = false;
+  }
+  EXPECT_EQ(success, true);
+
+  std::ifstream ifstream(convert_model_path(model_path) + ".csv");
+  std::string output_file((std::istreambuf_iterator<char>(ifstream)),
+                          std::istreambuf_iterator<char>());
+  ifstream.close();
+
+  EXPECT_EQ(0, count_matches("# fixed_param = 1", output_file))
+      << "# fixed_param = 1" << std::endl
+      << output_file;
 
 }

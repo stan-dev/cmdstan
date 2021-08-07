@@ -6,8 +6,7 @@
 #include <string>
 
 namespace cmdstan {
-void write_fixed_param(stan::callbacks::writer& writer,
-                        std::vector<std::string>& fixed_param) {
+void write_fixed_param(stan::callbacks::writer& writer) {
   std::stringstream fixed_param_msg;
   fixed_param_msg << "fixed_param = 1";
   writer(fixed_param_msg.str());

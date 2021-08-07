@@ -426,7 +426,7 @@ int command(int argc, const char *argv[]) {
         info(
             "Model contains no parameters, running fixed_param sampler, "
             "no updates to Markov chain");
-      write_fixed_param(sample_writer)
+      write_fixed_param(sample_writer);
       return_code = stan::services::sample::fixed_param(
           model, *init_context, random_seed, id, init_radius, num_samples,
           num_thin, refresh, interrupt, logger, init_writer, sample_writer,
