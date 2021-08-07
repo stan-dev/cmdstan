@@ -6,8 +6,8 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 
-using cmdstan::test::count_matches;
 using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
@@ -109,7 +109,8 @@ TEST(McmcFixedParamSampler, check_csv_header_has_fixed_param) {
   model_path.push_back("empty");
 
   std::string command = convert_model_path(model_path);
-  command += " sample algorithm=fixed_param output file=" + convert_model_path(model_path) + ".csv";
+  command += " sample algorithm=fixed_param output file="
+             + convert_model_path(model_path) + ".csv";
   run_command_output command_output;
   bool success = true;
   try {
@@ -155,5 +156,4 @@ TEST(McmcFixedParamSampler, check_csv_header_doesnt_have_fixed_param) {
   EXPECT_EQ(0, count_matches("# fixed_param = 1", output_file))
       << "# fixed_param = 1" << std::endl
       << output_file;
-
 }
