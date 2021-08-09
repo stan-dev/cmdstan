@@ -436,13 +436,14 @@ int command(int argc, const char *argv[]) {
   };
   for (int i = 0; i < num_chains; i++) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
-    sample_writers.emplace_back(
-        std::make_unique<std::fstream>(output_filename, std::fstream::out),
-        "# ");
+    auto unique_fstream  =std::make_unique<std::fstream>(output_filename, std::fstream::out);
     if (!sig_figs_arg->is_default()) {
-      sample_writers[i].get_stream()
+      unique_fstream
           << std::setprecision(sig_figs_arg->value());
     }
+    sample_writers.emplace_back(
+        std::move(unique_fstream),
+        "# ");
     if (diagnostic_file != "") {
       auto diagnostic_filename
           = diagnostic_name + name_iterator(i) + "boiii" + diagnostic_ending;
