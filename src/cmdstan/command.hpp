@@ -439,8 +439,7 @@ int command(int argc, const char *argv[]) {
     auto unique_fstream
         = std::make_unique<std::fstream>(output_filename, std::fstream::out);
     if (!sig_figs_arg->is_default()) {
-      (*unique_fstream.get())
-          << std::setprecision(sig_figs_arg->value());
+      (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
     }
     sample_writers.emplace_back(std::move(unique_fstream), "# ");
     if (diagnostic_file != "") {
