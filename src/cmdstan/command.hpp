@@ -438,7 +438,7 @@ int command(int argc, const char *argv[]) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     auto unique_fstream  =std::make_unique<std::fstream>(output_filename, std::fstream::out);
     if (!sig_figs_arg->is_default()) {
-      unique_fstream
+      (*unique_fstream.get())
           << std::setprecision(sig_figs_arg->value());
     }
     sample_writers.emplace_back(
