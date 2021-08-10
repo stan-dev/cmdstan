@@ -57,6 +57,9 @@ endif
 	$(RM) $(subst  \,/,$*).o
 ifeq ($(OS),Windows_NT)
 ifneq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
+	@echo $(findstring tbb.dll, $(notdir $(shell where tbb.dll)))
+	@echo $(notdir $(shell where tbb.dll))
+	@echo $(shell where tbb.dll)
 	@echo 'Intel TBB is not in PATH.'
 	@echo 'Consider calling '
 	@echo '$(HELP_MAKE) install-tbb'
