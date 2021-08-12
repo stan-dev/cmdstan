@@ -14,8 +14,9 @@ TEST(interface, output_multi) {
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234" + " output file="
-        + cmdstan::test::convert_model_path(model_path) + ".csv";
+        + " sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234"
+        + " output file=" + cmdstan::test::convert_model_path(model_path)
+        + ".csv";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -31,8 +32,11 @@ TEST(interface, output_multi) {
     Eigen::VectorXi thin(filenames.size());
     stan::mcmc::chains<> chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-    constexpr std::array<const char*, 9> names{"lp__", "accept_stat__", "stepsize__", "treedepth__", "n_leapfrog__",
-     "divergent__", "energy__", "mu1", "mu2",};
+    constexpr std::array<const char*, 9> names{
+        "lp__",        "accept_stat__", "stepsize__",
+        "treedepth__", "n_leapfrog__",  "divergent__",
+        "energy__",    "mu1",           "mu2",
+    };
     const auto chain_param_names = chains.param_names();
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
@@ -49,8 +53,11 @@ TEST(interface, output_multi) {
     Eigen::VectorXi thin(filenames.size());
     stan::mcmc::chains<> chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-    constexpr std::array<const char*, 9> names{"lp__", "accept_stat__", "stepsize__", "treedepth__", "n_leapfrog__",
-     "divergent__", "energy__", "mu1", "mu2",};
+    constexpr std::array<const char*, 9> names{
+        "lp__",        "accept_stat__", "stepsize__",
+        "treedepth__", "n_leapfrog__",  "divergent__",
+        "energy__",    "mu1",           "mu2",
+    };
     const auto chain_param_names = chains.param_names();
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
