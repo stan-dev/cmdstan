@@ -220,7 +220,8 @@ inline constexpr auto get_arg_pointer(T &&x) {
 }
 
 /**
- * Given a pointer to a list of argument pointers, extract the named argument from the list.
+ * Given a pointer to a list of argument pointers, extract the named argument
+ * from the list.
  * @tparam List A pointer to a list that has a valid arg(const char*) method
  * @tparam Args A paramter pack of const char*
  * @param arg_list The list argument to access the arg from
@@ -228,7 +229,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  * @param args An optional pack of named arguments to access from the first arg.
  */
 template <typename List, typename... Args>
-inline constexpr auto get_arg_pointer(List&& arg_list, const char *arg1,
+inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
                                       Args &&... args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
@@ -244,14 +245,16 @@ inline constexpr auto get_arg_pointer(List&& arg_list, const char *arg1,
  * @param args An optional pack of named arguments to access from the first arg.
  */
 template <typename List, typename... Args>
-inline constexpr auto get_arg(List &&arg_list, const char *arg1, Args &&... args) {
+inline constexpr auto get_arg(List &&arg_list, const char *arg1,
+                              Args &&... args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
 /**
  * Given an argument return its value. Because all of the elements in
  * our list of command line arguments is an `argument` class with no
- * `value()` method, we must give the function the type of the argument class we want to access.
+ * `value()` method, we must give the function the type of the argument class we
+ * want to access.
  * @tparam caster The type to cast the `argument` class in the list to.
  * @tparam Arg An object that inherits from `argument`.
  * @param argument holds the argument to access
@@ -266,7 +269,8 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * Given a list of arguments, index into the args and return the value held
  * by the underlying element in the list. Because all of the elements in
  * our list of command line arguments is an `argument` class with no
- * `value()` method, we must give the function the type of the argument class we want to access.
+ * `value()` method, we must give the function the type of the argument class we
+ * want to access.
  * @tparam caster The type to cast the `argument` class in the list to.
  * @tparam List A pointer or object that inherits from `argument`.
  * @param arg_list holds the arguments to access
@@ -274,7 +278,8 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  */
 template <typename caster, typename List, typename... Args>
 inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
-  return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))->value();
+  return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
+      ->value();
 }
 
 int command(int argc, const char *argv[]) {
@@ -351,7 +356,9 @@ int command(int argc, const char *argv[]) {
             = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
         if (engine->value() != "nuts"
             && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
-          throw std::invalid_argument("num_chains can currently only be used for NUTS with adaptation and dense_e or diag_e metric");
+          throw std::invalid_argument(
+              "num_chains can currently only be used for NUTS with adaptation "
+              "and dense_e or diag_e metric");
         }
       }
     }
