@@ -55,20 +55,21 @@ void test_real_var(cmdstan::json::json_data &jdata, const std::string &text,
 }
 
 void test_complex_var(cmdstan::json::json_data &jdata, const std::string &text,
-                   const std::string &name,
-                   const std::vector<std::complex<double>> &expected_vals,
-                   const std::vector<size_t> &expected_dims) {
+                      const std::string &name,
+                      const std::vector<std::complex<double>> &expected_vals,
+                      const std::vector<size_t> &expected_dims) {
   EXPECT_EQ(true, (jdata.contains_r(name) || jdata.contains_i(name)));
   std::vector<size_t> dims = jdata.dims_r(name);
-  if(dims.size() == 1){
+  if (dims.size() == 1) {
     dims.clear();
-  }else{ 
+  } else {
     dims.pop_back();
   }
   EXPECT_EQ(expected_dims.size(), dims.size());
   for (size_t i = 0; i < dims.size(); i++)
     EXPECT_EQ(expected_dims[i], dims[i]);
-  std::vector<std::complex<double>> vals = jdata.vals_c(name);; 
+  std::vector<std::complex<double>> vals = jdata.vals_c(name);
+  ;
   EXPECT_EQ(expected_vals.size(), vals.size());
   for (size_t i = 0; i < vals.size(); i++)
     EXPECT_EQ(expected_vals[i], vals[i]);
@@ -300,8 +301,8 @@ TEST(ioJson, jsonData_real_array_3D) {
 }
 
 TEST(ioJson, jsonData_complex_array_3D) {
-  std::string txt = 
-        "{ \"foo\" : [ [ [ [11.1, 11.2], [11.3, 11.4] ], [ [12.1,"
+  std::string txt
+      = "{ \"foo\" : [ [ [ [11.1, 11.2], [11.3, 11.4] ], [ [12.1,"
         " 12.2], [12.3, 12.4] ], "
         "[ [13.1, 13.2], [13.3, 13.4]] ],"
         " [ [ [21.1, 21.2], [21.3, 21.4] ], [ [22.1, 22.2], "

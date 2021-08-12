@@ -125,29 +125,31 @@ class json_data : public stan::io::var_context {
    */
   std::vector<std::complex<double>> vals_c(const std::string &name) const {
     if (contains_r_only(name)) {
-      auto&& vec_r = (vars_r_.find(name)->second);
-      auto&& val_r = vec_r.first;
-      auto&& dim_r = vec_r.second;
+      auto &&vec_r = (vars_r_.find(name)->second);
+      auto &&val_r = vec_r.first;
+      auto &&dim_r = vec_r.second;
       std::vector<std::complex<double>> vec_c(val_r.size() / 2);
       int offset = 1;
       for (int i = 0; i < dim_r.size() - 1; ++i) {
         offset *= dim_r[i];
       }
       for (int i = 0; i < vec_c.size(); ++i) {
-        vec_c[i] = std::complex<double>{static_cast<double>(val_r[i]), static_cast<double>(val_r[i + offset])};
+        vec_c[i] = std::complex<double>{static_cast<double>(val_r[i]),
+                                        static_cast<double>(val_r[i + offset])};
       }
       return vec_c;
     } else if (contains_i(name)) {
-      auto&& vec_i = (vars_i_.find(name)->second);
-      auto&& val_i = vec_i.first;
-      auto&& dim_i = vec_i.second;
+      auto &&vec_i = (vars_i_.find(name)->second);
+      auto &&val_i = vec_i.first;
+      auto &&dim_i = vec_i.second;
       std::vector<std::complex<double>> vec_c(val_i.size() / 2);
       int offset = 1;
       for (int i = 0; i < dim_i.size() - 1; ++i) {
         offset *= dim_i[i];
       }
       for (int i = 0; i < vec_c.size(); ++i) {
-        vec_c[i] = std::complex<double>{static_cast<double>(val_i[i]), static_cast<double>(val_i[i + offset])};
+        vec_c[i] = std::complex<double>{static_cast<double>(val_i[i]),
+                                        static_cast<double>(val_i[i + offset])};
       }
       return vec_c;
     }
