@@ -10,11 +10,11 @@ TEST(interface, output_multi) {
   model_path.push_back("src");
   model_path.push_back("test");
   model_path.push_back("test-models");
-  model_path.push_back("proper_sig_figs");
+  model_path.push_back("test_model");
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1 num_chains=2" + " output file="
+        + " sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234" + " output file="
         + cmdstan::test::convert_model_path(model_path) + ".csv";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
@@ -31,7 +31,12 @@ TEST(interface, output_multi) {
     Eigen::VectorXi thin(filenames.size());
     stan::mcmc::chains<> chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-    EXPECT_NEAR(chains.samples(8)(0, 0), 0.1, 1E-16);
+    constexpr std::array<const char*, 9> names{"lp__", "accept_stat__", "stepsize__", "treedepth__", "n_leapfrog__",
+     "divergent__", "energy__", "mu1", "mu2",};
+    const auto chain_param_names = chains.param_names();
+    for (size_t i = 0; i < 9; ++i) {
+      EXPECT_EQ(names[i], chain_param_names[i]);
+    }
   }
   {
     std::string csv_file
@@ -44,6 +49,11 @@ TEST(interface, output_multi) {
     Eigen::VectorXi thin(filenames.size());
     stan::mcmc::chains<> chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-    EXPECT_NEAR(chains.samples(8)(0, 0), 0.1, 1E-16);
+    constexpr std::array<const char*, 9> names{"lp__", "accept_stat__", "stepsize__", "treedepth__", "n_leapfrog__",
+     "divergent__", "energy__", "mu1", "mu2",};
+    const auto chain_param_names = chains.param_names();
+    for (size_t i = 0; i < 9; ++i) {
+      EXPECT_EQ(names[i], chain_param_names[i]);
+    }
   }
 }
