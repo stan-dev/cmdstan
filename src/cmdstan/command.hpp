@@ -87,6 +87,11 @@ stan::math::mpi_cluster &get_mpi_cluster() {
 #endif
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
+
+/**
+ * Given the name of a file, return a shared pointer holding the data contents.
+ * @param file A system file to read from.
+ */
 inline shared_context_ptr get_var_context(const std::string file) {
   std::fstream stream(file.c_str(), std::fstream::in);
   if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
@@ -205,32 +210,71 @@ static constexpr int hmc_fixed_cols
 
 namespace internal {
 
+/**
+ * Base of helper function for getting arguments
+ * @param x A pointer to an argument in the argument pointer list
+ */
 template <typename T>
 inline constexpr auto get_arg_pointer(T &&x) {
   return x;
 }
 
-template <typename T, typename... Args>
-inline constexpr auto get_arg_pointer(T &&x, const char *arg1,
+/**
+ * Given a pointer to a list of argument pointers, extract the named argument from the list.
+ * @tparam List A pointer to a list that has a valid arg(const char*) method
+ * @tparam Args A paramter pack of const char*
+ * @param arg_list The list argument to access the arg from
+ * @param arg1 The name of the first argument to extract
+ * @param args An optional pack of named arguments to access from the first arg.
+ */
+template <typename List, typename... Args>
+inline constexpr auto get_arg_pointer(List&& arg_list, const char *arg1,
                                       Args &&... args) {
-  return get_arg_pointer(x->arg(arg1), args...);
+  return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
 }  // namespace internal
 
-template <typename T, typename... Args>
-inline constexpr auto get_arg(T &&x, const char *arg1, Args &&... args) {
-  return internal::get_arg_pointer(x.arg(arg1), args...);
+/**
+ * Given a list of argument pointers, extract the named argument from the list.
+ * @tparam List An list argument that has a valid arg(const char*) method
+ * @tparam Args A paramter pack of const char*
+ * @param arg_list The list argument to access the arg from
+ * @param arg1 The name of the first argument to extract
+ * @param args An optional pack of named arguments to access from the first arg.
+ */
+template <typename List, typename... Args>
+inline constexpr auto get_arg(List &&arg_list, const char *arg1, Args &&... args) {
+  return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
-template <typename caster, typename T, typename... Args>
-inline constexpr auto get_arg_val(T &&x, Args &&... args) {
-  return dynamic_cast<std::decay_t<caster> *>(get_arg(x, args...))->value();
+/**
+ * Given an argument return its value. Because all of the elements in
+ * our list of command line arguments is an `argument` class with no
+ * `value()` method, we must give the function the type of the argument class we want to access.
+ * @tparam caster The type to cast the `argument` class in the list to.
+ * @tparam Arg An object that inherits from `argument`.
+ * @param argument holds the argument to access
+ * @param arg_name The name of the argument to access.
+ */
+template <typename caster, typename Arg>
+inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
+  return dynamic_cast<std::decay_t<caster> *>(argument.arg(arg_name))->value();
 }
 
-template <typename caster, typename T, typename... Args>
-inline constexpr auto get_arg_val(T &&x, const char *arg_name) {
-  return dynamic_cast<std::decay_t<caster> *>(x.arg(arg_name))->value();
+/**
+ * Given a list of arguments, index into the args and return the value held
+ * by the underlying element in the list. Because all of the elements in
+ * our list of command line arguments is an `argument` class with no
+ * `value()` method, we must give the function the type of the argument class we want to access.
+ * @tparam caster The type to cast the `argument` class in the list to.
+ * @tparam List A pointer or object that inherits from `argument`.
+ * @param arg_list holds the arguments to access
+ * @param args A parameter pack of names of arguments to index into.
+ */
+template <typename caster, typename List, typename... Args>
+inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+  return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))->value();
 }
 
 int command(int argc, const char *argv[]) {
@@ -287,6 +331,7 @@ int command(int argc, const char *argv[]) {
 
   unsigned int num_chains = 1;
   auto user_method = parser.arg("method");
+  // num_chains > 1 is only supported in diag_e and dense_e of hmc
   if (user_method->arg("sample")) {
     num_chains
         = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
@@ -306,11 +351,7 @@ int command(int argc, const char *argv[]) {
             = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
         if (engine->value() != "nuts"
             && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
-          std::stringstream hmc_msg;
-          hmc_msg << "num_chains can currently only be used for NUTS with "
-                     "adaptation"
-                     " and dense_e or diag_e metric";
-          throw std::invalid_argument(hmc_msg.str());
+          throw std::invalid_argument("num_chains can currently only be used for NUTS with adaptation and dense_e or diag_e metric");
         }
       }
     }
@@ -444,7 +485,7 @@ int command(int argc, const char *argv[]) {
     sample_writers.emplace_back(std::move(unique_fstream), "# ");
     if (diagnostic_file != "") {
       auto diagnostic_filename
-          = diagnostic_name + name_iterator(i) + "boiii" + diagnostic_ending;
+          = diagnostic_name + name_iterator(i) + diagnostic_ending;
       diagnostic_writers.emplace_back(
           std::make_unique<std::fstream>(diagnostic_filename,
                                          std::fstream::out),
