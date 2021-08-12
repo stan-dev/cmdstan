@@ -119,6 +119,10 @@ class json_data : public stan::io::var_context {
     return empty_vec_r_;
   }
 
+  /**
+   * Read out a vector of complex numbers from the specifed name.
+   * @param name Name of Variable.
+   */
   std::vector<std::complex<double>> vals_c(const std::string &name) const {
     if (contains_r_only(name)) {
       auto&& vec_r = (vars_r_.find(name)->second);
