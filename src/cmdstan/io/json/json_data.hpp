@@ -121,7 +121,7 @@ class json_data : public stan::io::var_context {
   }
 
   /**
-   * Read out the complex values for the variable with the specifed 
+   * Read out the complex values for the variable with the specifed
    * name and return a flat vector of complex values.
    *
    * @param name Name of Variable of type string.
