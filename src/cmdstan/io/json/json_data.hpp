@@ -121,8 +121,11 @@ class json_data : public stan::io::var_context {
   }
 
   /**
-   * Read out a vector of complex numbers from the specifed name.
-   * @param name Name of Variable.
+   * Read out the complex values for the variable with the specifed 
+   * name and return a flat vector of complex values.
+   *
+   * @param name Name of Variable of type string.
+   * @return Vector of complex numbers with values equal to the read input.
    */
   std::vector<std::complex<double>> vals_c(const std::string &name) const {
     if (contains_r_only(name)) {
@@ -135,8 +138,7 @@ class json_data : public stan::io::var_context {
         offset *= dim_r[i];
       }
       for (int i = 0; i < vec_c.size(); ++i) {
-        vec_c[i] = std::complex<double>{static_cast<double>(val_r[i]),
-                                        static_cast<double>(val_r[i + offset])};
+        vec_c[i] = std::complex<double>{val_r[i], val_r[i + offset]};
       }
       return vec_c;
     } else if (contains_i(name)) {

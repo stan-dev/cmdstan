@@ -60,16 +60,11 @@ void test_complex_var(cmdstan::json::json_data &jdata, const std::string &text,
                       const std::vector<size_t> &expected_dims) {
   EXPECT_EQ(true, (jdata.contains_r(name) || jdata.contains_i(name)));
   std::vector<size_t> dims = jdata.dims_r(name);
-  if (dims.size() == 1) {
-    dims.clear();
-  } else {
-    dims.pop_back();
-  }
+  dims.pop_back();
   EXPECT_EQ(expected_dims.size(), dims.size());
   for (size_t i = 0; i < dims.size(); i++)
     EXPECT_EQ(expected_dims[i], dims[i]);
   std::vector<std::complex<double>> vals = jdata.vals_c(name);
-  ;
   EXPECT_EQ(expected_vals.size(), vals.size());
   for (size_t i = 0; i < vals.size(); i++)
     EXPECT_EQ(expected_vals[i], vals[i]);
