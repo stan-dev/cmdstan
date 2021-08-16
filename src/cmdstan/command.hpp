@@ -473,13 +473,14 @@ int command(int argc, const char *argv[]) {
   diagnostic_writers.reserve(num_chains);
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
+  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
-  auto name_iterator = [num_chains](auto i) {
+  auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
     } else {
-      return std::string("_" + std::to_string(i + 1));
+      return std::string("_" + std::to_string(i + id));
     }
   };
   for (int i = 0; i < num_chains; i++) {
@@ -518,7 +519,6 @@ int command(int argc, const char *argv[]) {
   int refresh
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
             ->value();
-  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
 
   // Read initial parameter values or user-specified radius
   std::string init

@@ -14,7 +14,7 @@ TEST(interface, output_multi) {
 
   std::string command
       = cmdstan::test::convert_model_path(model_path)
-        + " sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234"
+        + " id=10 sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234"
         + " output file=" + cmdstan::test::convert_model_path(model_path)
         + ".csv";
 
@@ -23,7 +23,7 @@ TEST(interface, output_multi) {
   EXPECT_FALSE(out.hasError);
   {
     std::string csv_file
-        = cmdstan::test::convert_model_path(model_path) + "_1.csv";
+        = cmdstan::test::convert_model_path(model_path) + "_10.csv";
     std::vector<std::string> filenames;
     filenames.push_back(csv_file);
     stan::io::stan_csv_metadata metadata;
@@ -44,7 +44,7 @@ TEST(interface, output_multi) {
   }
   {
     std::string csv_file
-        = cmdstan::test::convert_model_path(model_path) + "_2.csv";
+        = cmdstan::test::convert_model_path(model_path) + "_11.csv";
     std::vector<std::string> filenames;
     filenames.push_back(csv_file);
     stan::io::stan_csv_metadata metadata;
