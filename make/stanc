@@ -22,6 +22,22 @@ else ifeq ($(OS),Darwin)
  STANC_XATTR := $(shell xattr bin/mac-stanc 2>/dev/null)
 else ifeq ($(OS),Linux)
  OS_TAG := linux
+ ifeq ($(shell uname -m),mips64)
+  ARCH_TAG := -mips64el
+ else ifeq ($(shell uname -m),ppc64le)
+  ARCH_TAG := -ppc64el
+ else ifeq ($(shell uname -m),s390x)
+  ARCH_TAG := -s390x
+ else ifeq ($(shell uname -m),aarch64)
+  ARCH_TAG := -arm64
+ else ifeq ($(shell uname -m),armv7l)
+  ifeq ($(readelf -A /proc/self/exe | grep Tag_ABI_VFP_args),)
+    ARCH_TAG := -armel
+  else
+    ARCH_TAG := -armhf
+  endif
+ endif
+
 else ifeq ($(OS),missing-submodules)
  CMDSTAN_SUBMODULES = 0
 else
@@ -45,7 +61,7 @@ ifeq ($(OS_TAG),windows)
 else
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)$(ARCH_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
 
@@ -72,7 +88,7 @@ else
 # get latest stanc3 - Linux & MacOS
     bin/stanc$(EXE) :
 	@mkdir -p $(dir $@)
-	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)$(ARCH_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
 endif
 endif
