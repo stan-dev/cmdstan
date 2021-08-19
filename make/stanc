@@ -31,7 +31,7 @@ else ifeq ($(OS),Linux)
  else ifeq ($(shell uname -m),aarch64)
   ARCH_TAG := -arm64
  else ifeq ($(shell uname -m),armv7l)
-  ifeq ($(readelf -A /proc/self/exe | grep Tag_ABI_VFP_args),)
+  ifeq ($(shell readelf -A /usr/bin/file | grep Tag_ABI_VFP_args),)
     ARCH_TAG := -armel
   else
     ARCH_TAG := -armhf
