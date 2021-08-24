@@ -16,7 +16,7 @@ TEST(interface, output_multi) {
       = cmdstan::test::convert_model_path(model_path)
         + " id=10 sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234"
         + " output file=" + cmdstan::test::convert_model_path(model_path)
-        + ".csv";
+        + ".csv diagnostic_file=" + cmdstan::test::convert_model_path(model_path) + "_diag.csv";
 
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
@@ -41,6 +41,9 @@ TEST(interface, output_multi) {
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
     }
+    std::string diag_name = cmdstan::test::convert_model_path(model_path) + "_diag_10.csv";
+    std::ifstream diag_file(diag_name);
+    EXPECT_TRUE(diag_file.good());
   }
   {
     std::string csv_file
@@ -62,5 +65,8 @@ TEST(interface, output_multi) {
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
     }
+    std::string diag_name = cmdstan::test::convert_model_path(model_path) + "_diag_11.csv";
+    std::ifstream diag_file(diag_name);
+    EXPECT_TRUE(diag_file.good());
   }
 }

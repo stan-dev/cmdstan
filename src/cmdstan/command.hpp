@@ -462,7 +462,7 @@ int command(int argc, const char *argv[]) {
   } else {
     diagnostic_name = diagnostic_file.substr(0, diagnostic_marker_pos);
     diagnostic_ending
-        = output_file.substr(diagnostic_marker_pos, diagnostic_file.size());
+        = diagnostic_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
 
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
