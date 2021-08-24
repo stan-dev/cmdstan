@@ -41,7 +41,8 @@ TEST(interface, output_multi) {
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
     }
-    std::string diag_name = cmdstan::test::convert_model_path(model_path) + "_diag_10.csv";
+    std::string diag_name
+        = cmdstan::test::convert_model_path(model_path) + "_diag_10.csv";
     std::ifstream diag_file(diag_name);
     EXPECT_TRUE(diag_file.good());
   }
@@ -65,7 +66,8 @@ TEST(interface, output_multi) {
     for (size_t i = 0; i < 9; ++i) {
       EXPECT_EQ(names[i], chain_param_names[i]);
     }
-    std::string diag_name = cmdstan::test::convert_model_path(model_path) + "_diag_11.csv";
+    std::string diag_name
+        = cmdstan::test::convert_model_path(model_path) + "_diag_11.csv";
     std::ifstream diag_file(diag_name);
     EXPECT_TRUE(diag_file.good());
   }
