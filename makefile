@@ -244,7 +244,7 @@ build-mpi: $(MPI_TARGETS)
 
 ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER)
+build: bin/stanc$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
@@ -338,3 +338,6 @@ compile_info:
 ##
 .PHONY: print-%
 print-%  : ; @echo $* = $($*)
+
+.PHONY: clean-build
+clean-build: clean-all build

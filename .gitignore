@@ -46,5 +46,7 @@ make/local
 src/docs/**/*.pdf
 
 output.csv
-
+output*.csv
 *.d
+# gdb
+.gdb_history
