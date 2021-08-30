@@ -209,9 +209,12 @@ class json_data_handler : public cmdstan::json::json_handler {
     incr_dim_size();
   }
 
-  // NOLINTNEXTLINE(runtime/int)
   void number_long(long n) {
     set_last_dim();
+    // if integer overflow, promote numeric data to double
+    if (n > (long)std::numeric_limits<int>::max()
+        || n < (long)std::numeric_limits<int>::min())
+      promote_to_double();
     if (is_int_) {
       values_i_.push_back(n);
     } else {
@@ -220,9 +223,11 @@ class json_data_handler : public cmdstan::json::json_handler {
     incr_dim_size();
   }
 
-  // NOLINTNEXTLINE(runtime/int)
   void number_unsigned_long(unsigned long n) {
     set_last_dim();
+    // if integer overflow, promote numeric data to double
+    if (n > (unsigned long)std::numeric_limits<int>::max())
+      promote_to_double();
     if (is_int_) {
       values_i_.push_back(n);
     } else {
