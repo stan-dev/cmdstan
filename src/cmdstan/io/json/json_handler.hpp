@@ -19,12 +19,12 @@ class json_handler {
   ~json_handler() {}
 
   /**
-   * Handle the the start of the text.
+   * Handle the start of the text.
    */
   virtual void start_text() {}
 
   /**
-   * Handle the the end of the text.
+   * Handle the end of the text.
    */
   virtual void end_text() {}
 
@@ -61,7 +61,7 @@ class json_handler {
   virtual void boolean(bool p) {}
 
   /**
-   * Handle a the specified double-precision floating point
+   * Handle the specified double-precision floating point
    * value.
    *
    * @param x Value to handle.
@@ -69,7 +69,7 @@ class json_handler {
   virtual void number_double(double x) {}
 
   /**
-   * Handle a the specified long integer value.
+   * Handle the specified long integer value.
    *
    * @param n Value to handle.
    */
@@ -77,7 +77,7 @@ class json_handler {
   virtual void number_long(long n) {}
 
   /**
-   * Handle a the specified unsigned long integer value.
+   * Handle the specified unsigned long integer value.
    *
    * @param n Value to handle.
    */
