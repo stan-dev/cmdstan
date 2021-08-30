@@ -238,7 +238,8 @@ class json_data_handler : public cmdstan::json::json_handler {
   }
 
   void number_unsigned_int64(uint64_t n) {
-    // the number doesn't fit in int (otherwise number_unsigned_int() would be called)
+    // the number doesn't fit in int (otherwise number_unsigned_int() would be
+    // called)
     number_double(n);
   }
 
