@@ -153,6 +153,15 @@ class json_data_handler : public cmdstan::json::json_handler {
     reset();
   }
 
+  void promote_to_double() {
+    if (is_int_) {
+      for (std::vector<int>::iterator it = values_i_.begin();
+           it != values_i_.end(); ++it)
+        values_r_.push_back(*it);
+      is_int_ = false;
+    }
+  }
+
   void null() {
     std::stringstream errorMsg;
     errorMsg << "variable: " << key_ << ", error: null values not allowed";
@@ -182,12 +191,7 @@ class json_data_handler : public cmdstan::json::json_handler {
       errorMsg << "variable: " << key_ << ", error: string values not allowed";
       throw json_error(errorMsg.str());
     }
-    if (is_int_) {
-      for (std::vector<int>::iterator it = values_i_.begin();
-           it != values_i_.end(); ++it)
-        values_r_.push_back(*it);
-    }
-    is_int_ = false;
+    promote_to_double();
     values_r_.push_back(tmp);
     incr_dim_size();
   }
@@ -200,12 +204,7 @@ class json_data_handler : public cmdstan::json::json_handler {
 
   void number_double(double x) {
     set_last_dim();
-    if (is_int_) {
-      for (std::vector<int>::iterator it = values_i_.begin();
-           it != values_i_.end(); ++it)
-        values_r_.push_back(*it);
-    }
-    is_int_ = false;
+    promote_to_double();
     values_r_.push_back(x);
     incr_dim_size();
   }
