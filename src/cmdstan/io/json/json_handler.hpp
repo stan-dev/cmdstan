@@ -69,20 +69,32 @@ class json_handler {
   virtual void number_double(double x) {}
 
   /**
-   * Handle the specified long integer value.
+   * Handle the specified integer value.
    *
    * @param n Value to handle.
    */
-  // NOLINTNEXTLINE(runtime/int)
-  virtual void number_long(long n) {}
+  virtual void number_int(int n) {}
 
   /**
-   * Handle the specified unsigned long integer value.
+   * Handle the specified unsigned integer value.
    *
    * @param n Value to handle.
    */
-  // NOLINTNEXTLINE(runtime/int)
-  virtual void number_unsigned_long(unsigned long n) {}
+  virtual void number_unsigned_int(unsigned n) {}
+
+  /**
+   * Handle the specified 64-bit integer value.
+   *
+   * @param n Value to handle.
+   */
+  virtual void number_int64(int64_t n) {}
+
+  /**
+   * Handle the specified unsigned 64-bit integer value.
+   *
+   * @param n Value to handle.
+   */
+  virtual void number_unsigned_int64(uint64_t n) {}
 
   /**
    * Handle the specified string value.

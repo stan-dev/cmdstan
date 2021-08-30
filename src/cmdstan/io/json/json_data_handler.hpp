@@ -209,12 +209,8 @@ class json_data_handler : public cmdstan::json::json_handler {
     incr_dim_size();
   }
 
-  void number_long(long n) {
+  void number_int(int n) {
     set_last_dim();
-    // if integer overflow, promote numeric data to double
-    if (n > (long)std::numeric_limits<int>::max()
-        || n < (long)std::numeric_limits<int>::min())
-      promote_to_double();
     if (is_int_) {
       values_i_.push_back(n);
     } else {
@@ -223,13 +219,40 @@ class json_data_handler : public cmdstan::json::json_handler {
     incr_dim_size();
   }
 
-  void number_unsigned_long(unsigned long n) {
+  void number_unsigned_int(unsigned n) {
     set_last_dim();
     // if integer overflow, promote numeric data to double
-    if (n > (unsigned long)std::numeric_limits<int>::max())
+    if (n > (unsigned)std::numeric_limits<int>::max())
       promote_to_double();
     if (is_int_) {
-      values_i_.push_back(n);
+      values_i_.push_back((int)n);
+    } else {
+      values_r_.push_back(n);
+    }
+    incr_dim_size();
+  }
+
+  void number_int64(int64_t n) {
+    set_last_dim();
+    // if integer overflow, promote numeric data to double
+    if (n > (int64_t)std::numeric_limits<int>::max()
+        || n < (int64_t)std::numeric_limits<int>::min())
+      promote_to_double();
+    if (is_int_) {
+      values_i_.push_back((int)n);
+    } else {
+      values_r_.push_back(n);
+    }
+    incr_dim_size();
+  }
+
+  void number_unsigned_int64(uint64_t n) {
+    set_last_dim();
+    // if integer overflow, promote numeric data to double
+    if (n > (uint64_t)std::numeric_limits<int>::max())
+      promote_to_double();
+    if (is_int_) {
+      values_i_.push_back((int)n);
     } else {
       values_r_.push_back(n);
     }
