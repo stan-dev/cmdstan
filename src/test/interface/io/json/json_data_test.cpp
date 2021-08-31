@@ -666,3 +666,41 @@ TEST(ioJson, jsonData_signed_neg_Infinity_str) {
   std::vector<size_t> expected_dims;
   test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
 }
+
+TEST(ioJson, jsonData_max_int) {
+  std::string txt = "{ \"foo\" : [-2147483648, 2147483647] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  expected_vals_i.push_back(-2147483648);
+  expected_vals_i.push_back(2147483647);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
+  test_int_var(jdata, txt, "foo", expected_vals_i, expected_dims);
+}
+
+TEST(ioJson, jsonData_promote_large_int_to_double) {
+  std::string txt = "{ \"foo\" : -2147483649, \"bar\": 2147483648 }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<double> foo_vals_r;
+  foo_vals_r.push_back(-2147483649.0);
+  std::vector<double> bar_vals_r;
+  bar_vals_r.push_back(2147483648.0);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
+}
+
+TEST(ioJson, jsonData_promote_extra_large_int_to_double) {
+  std::string txt = "{ \"foo\" : 4294967295, \"bar\": 9223372036854775807 }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<double> foo_vals_r;
+  foo_vals_r.push_back(4294967295.0);
+  std::vector<double> bar_vals_r;
+  bar_vals_r.push_back(9223372036854775807.0);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
+}

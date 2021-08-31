@@ -21,8 +21,10 @@ class recording_handler : public cmdstan::json::json_handler {
   void string(const std::string &s) { os_ << "STR:\"" << s << "\""; }
   void key(const std::string &key) { os_ << "KEY:\"" << key << "\""; }
   void number_double(double x) { os_ << "D(REAL):" << x; }
-  void number_long(long n) { os_ << "L(INT):" << n; }
-  void number_unsigned_long(unsigned long n) { os_ << "UL(INT):" << n; }
+  void number_int(int n) { os_ << "I(INT):" << n; }
+  void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
+  void number_int64(int64_t n) { os_ << "I64(INT):" << n; }
+  void number_unsigned_int64(uint64_t n) { os_ << "U64(INT):" << n; }
 };
 
 bool hasEnding(std::string const &fullString, std::string const &ending) {
@@ -59,7 +61,7 @@ TEST(ioJson, jsonParserA0) {
   test_parser("[0]",
               "S:text"
               "S:arr"
-              "UL(INT):0"
+              "U(INT):0"
               "E:arr"
               "E:text");
 }
@@ -68,7 +70,7 @@ TEST(ioJson, jsonParserA1) {
   test_parser("[5]",
               "S:text"
               "S:arr"
-              "UL(INT):5"
+              "U(INT):5"
               "E:arr"
               "E:text");
 }
@@ -77,8 +79,8 @@ TEST(ioJson, jsonParserA2) {
   test_parser("[5,10]",
               "S:text"
               "S:arr"
-              "UL(INT):5"
-              "UL(INT):10"
+              "U(INT):5"
+              "U(INT):10"
               "E:arr"
               "E:text");
 }
@@ -122,8 +124,8 @@ TEST(ioJson, jsonParserA7) {
   test_parser("[ -1, -2, \"-inf\"]",
               "S:text"
               "S:arr"
-              "L(INT):-1"
-              "L(INT):-2"
+              "I(INT):-1"
+              "I(INT):-2"
               "STR:\"-inf\""
               "E:arr"
               "E:text");
@@ -134,12 +136,12 @@ TEST(ioJson, jsonParserA8) {
               "S:text"
               "S:arr"
               "S:arr"
-              "L(INT):-1"
-              "L(INT):-2"
+              "I(INT):-1"
+              "I(INT):-2"
               "E:arr"
               "S:arr"
-              "UL(INT):1"
-              "UL(INT):2"
+              "U(INT):1"
+              "U(INT):2"
               "E:arr"
               "E:arr"
               "E:text");
@@ -151,26 +153,52 @@ TEST(ioJson, jsonParserA9) {
               "S:arr"
               "S:arr"
               "S:arr"
-              "UL(INT):1"
-              "UL(INT):2"
+              "U(INT):1"
+              "U(INT):2"
               "E:arr"
               "S:arr"
-              "UL(INT):3"
-              "UL(INT):4"
+              "U(INT):3"
+              "U(INT):4"
               "E:arr"
               "E:arr"
               "S:arr"
               "S:arr"
-              "UL(INT):5"
-              "UL(INT):6"
+              "U(INT):5"
+              "U(INT):6"
               "E:arr"
               "S:arr"
-              "UL(INT):7"
-              "UL(INT):8"
+              "U(INT):7"
+              "U(INT):8"
               "E:arr"
               "E:arr"
               "E:arr"
               "E:text");
+}
+
+TEST(ioJson, jsonParserA10) {
+  std::stringstream textReport;
+  textReport << "S:text"
+             << "S:arr"
+             << "I(INT):-2147483648"
+             << "U(INT):2147483647"
+             << "I64(INT):-2147483649"
+             << "U(INT):2147483648"
+             << "U(INT):4294967295"
+             << "U64(INT):4294967296"
+             << "I64(INT):-9223372036854775808"
+             << "U64(INT):9223372036854775807"
+             << "U64(INT):18446744073709551615"
+             << "D(REAL):" << -9223372036854775809.0
+             << "U64(INT):9223372036854775808"
+             << "D(REAL):" << 18446744073709551616.0 << "E:arr"
+             << "E:text";
+
+  test_parser(
+      "[ -2147483648, 2147483647, -2147483649, 2147483648, "
+      "4294967295, 4294967296, "
+      "-9223372036854775808, 9223372036854775807, 18446744073709551615, "
+      "-9223372036854775809, 9223372036854775808, 18446744073709551616 ]",
+      textReport.str());
 }
 
 TEST(ioJson, jsonParserO1) {
@@ -178,7 +206,7 @@ TEST(ioJson, jsonParserO1) {
               "S:text"
               "S:obj"
               "KEY:\"foo\""
-              "UL(INT):1"
+              "U(INT):1"
               "E:obj"
               "E:text");
 }
@@ -190,7 +218,7 @@ TEST(ioJson, jsonParserO11) {
               "KEY:\"foo\""
               "S:obj"
               "KEY:\"bar\""
-              "UL(INT):1"
+              "U(INT):1"
               "E:obj"
               "E:obj"
               "E:text");
@@ -203,9 +231,9 @@ TEST(ioJson, jsonParserO12) {
               "KEY:\"foo\""
               "S:obj"
               "KEY:\"bar\""
-              "UL(INT):1"
+              "U(INT):1"
               "KEY:\"baz\""
-              "UL(INT):2"
+              "U(INT):2"
               "E:obj"
               "E:obj"
               "E:text");
@@ -221,8 +249,8 @@ TEST(ioJson, jsonParserO13) {
               "S:obj"
               "KEY:\"baz\""
               "S:arr"
-              "UL(INT):1"
-              "UL(INT):2"
+              "U(INT):1"
+              "U(INT):2"
               "E:arr"
               "E:obj"
               "E:obj"
@@ -242,12 +270,12 @@ TEST(ioJson, jsonParserO14) {
       "S:obj"
       "KEY:\"baz\""
       "S:arr"
-      "UL(INT):1"
-      "UL(INT):2"
+      "U(INT):1"
+      "U(INT):2"
       "E:arr"
       "E:obj"
       "E:obj"
-      "L(INT):-3"
+      "I(INT):-3"
       "D(REAL):-4.44"
       "E:arr"
       "E:obj"
@@ -259,9 +287,9 @@ TEST(ioJson, jsonParserO2) {
               "S:text"
               "S:obj"
               "KEY:\"foo\""
-              "UL(INT):1"
+              "U(INT):1"
               "KEY:\"bar\""
-              "UL(INT):2"
+              "U(INT):2"
               "E:obj"
               "E:text");
 }
@@ -271,12 +299,12 @@ TEST(ioJson, jsonParserO3) {
               "S:text"
               "S:obj"
               "KEY:\"foo\""
-              "UL(INT):1"
+              "U(INT):1"
               "KEY:\"bar\""
-              "UL(INT):2"
+              "U(INT):2"
               "KEY:\"baz\""
               "S:arr"
-              "UL(INT):2"
+              "U(INT):2"
               "E:arr"
               "E:obj"
               "E:text");
@@ -287,11 +315,11 @@ TEST(ioJson, jsonParserO4) {
   textReport << "S:text"
              << "S:obj"
              << "KEY:\"foo\""
-             << "UL(INT):1"
+             << "U(INT):1"
              << "KEY:\"baz\""
              << "S:arr"
-             << "UL(INT):2"
-             << "UL(INT):3"
+             << "U(INT):2"
+             << "U(INT):3"
              << "D(REAL):" << 4.01001 << "E:arr"
              << "E:obj"
              << "E:text";
