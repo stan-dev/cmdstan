@@ -7,8 +7,8 @@ No divergent transitions found.
 Checking E-BFMI - sampler transitions HMC potential energy.
 E-BFMI satisfactory.
 
-Effective sample size satisfactory.
+Effective sample size satisfactory for all parameters..
 
-Split R-hat values satisfactory all parameters.
+Split R-hat values satisfactory for all parameters.
 
 Processing complete, no problems detected.

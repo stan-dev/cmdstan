@@ -188,7 +188,7 @@ int main(int argc, const char *argv[]) {
               << " may be substantially lower than quoted." << std::endl
               << std::endl;
   } else {
-    std::cout << "Effective sample size satisfactory." << std::endl
+    std::cout << "Effective sample size satisfactory for all parameters." << std::endl
               << std::endl;
   }
 
@@ -208,7 +208,7 @@ int main(int argc, const char *argv[]) {
               << " effective parameterization." << std::endl
               << std::endl;
   } else {
-    std::cout << "Split R-hat values satisfactory all parameters." << std::endl
+    std::cout << "Split R-hat values satisfactory for all parameters." << std::endl
               << std::endl;
   }
   if (!has_errors)

@@ -11,8 +11,8 @@ Checking E-BFMI - sampler transitions HMC potential energy.
 The E-BFMI, 0.26, is below the nominal threshold of 0.3 which suggests that HMC may have trouble exploring the target distribution.
 If possible, try to reparameterize the model.
 
-Effective sample size satisfactory.
+Effective sample size satisfactory for all parameters..
 
-Split R-hat values satisfactory all parameters.
+Split R-hat values satisfactory for all parameters.
 
 Processing complete.
