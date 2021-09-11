@@ -18,6 +18,8 @@ $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 ##
 $(STAN)src/stan/model/model_header$(STAN_FLAGS).d : $(STAN)src/stan/model/model_header.hpp
 	$(COMPILE.cpp) $(DEPFLAGS) $<
+
+ifneq ($(PRECOMPILED_MODEL_HEADER),)
 $(STAN)src/stan/model/model_header$(STAN_FLAGS).d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
 $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
@@ -26,7 +28,8 @@ $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch : $(STAN)src/stan/model/
 
 ifeq ($(CXX_TYPE),clang)
 CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
-$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
+$(STAN_TARGETS) examples/bernoulli/bernoulli$(EXE) $(patsubst %.stan,%$(EXE),$(wildcard src/test/test-models/*.stan)) : %$(EXE)
+endif
 endif
 
 ifneq ($(findstring allow_undefined,$(STANCFLAGS))$(findstring allow-undefined,$(STANCFLAGS)),)
