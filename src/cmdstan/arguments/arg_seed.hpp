@@ -12,7 +12,7 @@ class arg_seed : public long_long_int_argument {
   arg_seed() : long_long_int_argument() {
     _name = "seed";
     _description = "Random number generator seed";
-    _validity = "integer >= 0 or -1 to generate seed from system time";
+    _validity = "non-negative integer < 214748368  or -1 to generate seed from system time";
     _default = "-1";
     _default_value = -1;
     _constrained = true;
