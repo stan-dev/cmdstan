@@ -485,15 +485,6 @@ TEST(StanUiCommand, random_seed_fail_1) {
   std::string cmd_output = run_command(command).output;
   run_command_output out = run_command(command);
   EXPECT_EQ(1, count_matches(expected_message, out.body));
-
-  std::string command_2
-      = convert_model_path(model_path)
-        + " sample num_samples=10 num_warmup=10 init=0 " + " random seed=2147483648 "
-        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
-        + " output refresh=0 file=test/output.csv";
-  std::string cmd_output_2 = run_command(command).output;
-  run_command_output out_2 = run_command(command);
-  EXPECT_EQ(1, count_matches(expected_message, out_2.body));
 }
 
 TEST(StanUiCommand, random_seed_fail_2) {
@@ -505,8 +496,9 @@ TEST(StanUiCommand, random_seed_fail_2) {
   model_path.push_back("test-models");
   model_path.push_back("transformed_data_rng_test");
 
-  int max = std::numeric_limits<int>::max();
-  unsigned int maxplus = max + 100;
+  long long int max = std::numeric_limits<unsigned int>::max();
+  long long int maxplus = max + 100;
+
   std::string command
       = convert_model_path(model_path)
         + " sample num_samples=10 num_warmup=10 init=0 "
