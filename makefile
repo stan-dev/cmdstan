@@ -108,7 +108,15 @@ endif
 STAN_FLAGS=$(STAN_FLAG_THREADS)$(STAN_FLAG_MPI)$(STAN_FLAG_OPENCL)
 
 ifeq ($(OS),Windows_NT)
+ifeq (clang,$(CXX_TYPE))
 PRECOMPILED_HEADERS ?= false
+else
+ifeq ($(shell expr $(CXX_MAJOR) \>= 8), 1)
+PRECOMPILED_HEADERS ?= true
+else
+PRECOMPILED_HEADERS ?= false
+endif
+endif
 else
 PRECOMPILED_HEADERS ?= true
 endif
