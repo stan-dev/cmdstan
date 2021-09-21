@@ -499,15 +499,29 @@ TEST(StanUiCommand, random_seed_fail_2) {
   long long int max = std::numeric_limits<unsigned int>::max();
   long long int maxplus = max + 100;
 
-  std::string command
-      = convert_model_path(model_path)
-        + " sample num_samples=10 num_warmup=10 init=0 "
-        + " random seed=" + std::to_string(maxplus) + " "
-        + " data file=src/test/test-models/transformed_data_rng_test.init.R"
-        + " output refresh=0 file=test/output.csv";
-  std::string cmd_output = run_command(command).output;
-  run_command_output out = run_command(command);
-  EXPECT_EQ(1, count_matches(expected_message, out.body));
+  {
+    std::string command
+          = convert_model_path(model_path)
+            + " sample num_samples=10 num_warmup=10 init=0 "
+            + " random seed=" + std::to_string(max) + " "
+            + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+            + " output refresh=0 file=test/output.csv";
+      std::string cmd_output = run_command(command).output;
+      run_command_output out = run_command(command);
+      EXPECT_EQ(0, count_matches(expected_message, out.body));
+  }
+
+  {
+    std::string command
+          = convert_model_path(model_path)
+            + " sample num_samples=10 num_warmup=10 init=0 "
+            + " random seed=" + std::to_string(maxplus) + " "
+            + " data file=src/test/test-models/transformed_data_rng_test.init.R"
+            + " output refresh=0 file=test/output.csv";
+      std::string cmd_output = run_command(command).output;
+      run_command_output out = run_command(command);
+      EXPECT_EQ(1, count_matches(expected_message, out.body));
+  }
 }
 
 TEST(StanUiCommand, json_input) {
