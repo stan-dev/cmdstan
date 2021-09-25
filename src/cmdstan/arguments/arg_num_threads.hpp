@@ -9,7 +9,9 @@ class arg_num_threads : public int_argument {
  public:
   arg_num_threads() : int_argument() {
     _name = "num_threads";
-    _description = std::string("Number of threads available to the program. For full effect, the model must be compiled with STAN_THREADS=true.");
+    _description = std::string(
+        "Number of threads available to the program. For full effect, the "
+        "model must be compiled with STAN_THREADS=true.");
 #ifdef STAN_THREADS
     _validity = "num_threads > 0 || num_threads == -1";
 #else
