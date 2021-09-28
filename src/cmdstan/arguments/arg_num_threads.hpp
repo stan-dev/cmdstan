@@ -18,7 +18,7 @@ class arg_num_threads : public int_argument {
 #else
     _validity = "num_threads == 1";
 #endif
-    _default = boost::lexical_cast<std::string>(stan::math::internal::get_num_threads());
+    _default = "1 or the value of the STAN_NUM_THREADS environment variable if set.";
     _default_value = stan::math::internal::get_num_threads();
     _good_value = 1.0;
     _bad_value = -2.0;
