@@ -40,19 +40,19 @@ struct RapidJSONHandler {
     return check_start();
   }
   bool Int(int i) {
-    h_.number_long(i);
+    h_.number_int(i);
     return check_start();
   }
   bool Uint(unsigned u) {
-    h_.number_unsigned_long(u);
+    h_.number_unsigned_int(u);
     return check_start();
   }
   bool Int64(int64_t i) {
-    h_.number_long(i);
+    h_.number_int64(i);
     return check_start();
   }
   bool Uint64(uint64_t u) {
-    h_.number_unsigned_long(u);
+    h_.number_unsigned_int64(u);
     return check_start();
   }
   bool Double(double d) {

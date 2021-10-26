@@ -10,6 +10,8 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
+#include <complex>
+
 void test_int_var(cmdstan::json::json_data &jdata, const std::string &text,
                   const std::string &name,
                   const std::vector<int> &expected_vals,
@@ -52,6 +54,22 @@ void test_real_var(cmdstan::json::json_data &jdata, const std::string &text,
     EXPECT_EQ(expected_vals[i], vals[i]);
 }
 
+void test_complex_var(cmdstan::json::json_data &jdata, const std::string &text,
+                      const std::string &name,
+                      const std::vector<std::complex<double>> &expected_vals,
+                      const std::vector<size_t> &expected_dims) {
+  EXPECT_EQ(true, (jdata.contains_r(name) || jdata.contains_i(name)));
+  std::vector<size_t> dims = jdata.dims_r(name);
+  dims.pop_back();
+  EXPECT_EQ(expected_dims.size(), dims.size());
+  for (size_t i = 0; i < dims.size(); i++)
+    EXPECT_EQ(expected_dims[i], dims[i]);
+  std::vector<std::complex<double>> vals = jdata.vals_c(name);
+  EXPECT_EQ(expected_vals.size(), vals.size());
+  for (size_t i = 0; i < vals.size(); i++)
+    EXPECT_EQ(expected_vals[i], vals[i]);
+}
+
 void test_exception(const std::string &input,
                     const std::string &exception_text) {
   try {
@@ -82,6 +100,16 @@ TEST(ioJson, jsonData_scalar_real) {
   expected_vals.push_back(1.1);
   std::vector<size_t> expected_dims;
   test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+}
+
+TEST(ioJson, jsonData_scalar_complex) {
+  std::string txt = "{ \"foo\" : [1.1, 2.2] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<std::complex<double>> expected_vals;
+  expected_vals.push_back(std::complex<double>(1.1, 2.2));
+  std::vector<size_t> expected_dims;
+  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_mult_vars) {
@@ -144,6 +172,18 @@ TEST(ioJson, jsonData_real_array_1D) {
   test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
+TEST(ioJson, jsonData_complex_array_1D) {
+  std::string txt = "{ \"foo\" : [ [1.1, 2.2], [3, 4] ] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<std::complex<double>> expected_vals;
+  expected_vals.push_back(std::complex<double>(1.1, 2.2));
+  expected_vals.push_back(std::complex<double>(3, 4));
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
+  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+}
+
 TEST(ioJson, jsonData_array_1D_inf) {
   std::string txt = "{ \"foo\" : [ 1.1, \"Inf\" ] }";
   std::stringstream in(txt);
@@ -198,6 +238,21 @@ TEST(ioJson, jsonData_real_array_2D) {
   test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
+TEST(ioJson, jsonData_complex_array_2D) {
+  std::string txt = "{ \"foo\" : [ [ [1, 2], [3, 4] ], [ [5, 6], [7, 8] ] ] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<std::complex<double>> expected_vals;
+  expected_vals.push_back(std::complex<double>(1, 2));
+  expected_vals.push_back(std::complex<double>(5, 6));
+  expected_vals.push_back(std::complex<double>(3, 4));
+  expected_vals.push_back(std::complex<double>(7, 8));
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
+  expected_dims.push_back(2);
+  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+}
+
 TEST(ioJson, jsonData_real_array_3D) {
   std::string txt
       = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, 12.3, 12.4 "
@@ -238,6 +293,35 @@ TEST(ioJson, jsonData_real_array_3D) {
   expected_dims.push_back(3);  // three cols
   expected_dims.push_back(4);  // four shelves
   test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+}
+
+TEST(ioJson, jsonData_complex_array_3D) {
+  std::string txt
+      = "{ \"foo\" : [ [ [ [11.1, 11.2], [11.3, 11.4] ], [ [12.1,"
+        " 12.2], [12.3, 12.4] ], "
+        "[ [13.1, 13.2], [13.3, 13.4]] ],"
+        " [ [ [21.1, 21.2], [21.3, 21.4] ], [ [22.1, 22.2], "
+        "[22.3, 22.4] ], [ [23.1, 23.2], [23.3, 23.4]] ] ] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<std::complex<double>> expected_vals;
+  expected_vals.push_back(std::complex<double>(11.1, 11.2));
+  expected_vals.push_back(std::complex<double>(21.1, 21.2));
+  expected_vals.push_back(std::complex<double>(12.1, 12.2));
+  expected_vals.push_back(std::complex<double>(22.1, 22.2));
+  expected_vals.push_back(std::complex<double>(13.1, 13.2));
+  expected_vals.push_back(std::complex<double>(23.1, 23.2));
+  expected_vals.push_back(std::complex<double>(11.3, 11.4));
+  expected_vals.push_back(std::complex<double>(21.3, 21.4));
+  expected_vals.push_back(std::complex<double>(12.3, 12.4));
+  expected_vals.push_back(std::complex<double>(22.3, 22.4));
+  expected_vals.push_back(std::complex<double>(13.3, 13.4));
+  expected_vals.push_back(std::complex<double>(23.3, 23.4));
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
+  expected_dims.push_back(3);
+  expected_dims.push_back(2);
+  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_int_array_3D) {
@@ -581,4 +665,42 @@ TEST(ioJson, jsonData_signed_neg_Infinity_str) {
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
   test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+}
+
+TEST(ioJson, jsonData_max_int) {
+  std::string txt = "{ \"foo\" : [-2147483648, 2147483647] }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<int> expected_vals_i;
+  expected_vals_i.push_back(-2147483648);
+  expected_vals_i.push_back(2147483647);
+  std::vector<size_t> expected_dims;
+  expected_dims.push_back(2);
+  test_int_var(jdata, txt, "foo", expected_vals_i, expected_dims);
+}
+
+TEST(ioJson, jsonData_promote_large_int_to_double) {
+  std::string txt = "{ \"foo\" : -2147483649, \"bar\": 2147483648 }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<double> foo_vals_r;
+  foo_vals_r.push_back(-2147483649.0);
+  std::vector<double> bar_vals_r;
+  bar_vals_r.push_back(2147483648.0);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
+}
+
+TEST(ioJson, jsonData_promote_extra_large_int_to_double) {
+  std::string txt = "{ \"foo\" : 4294967295, \"bar\": 9223372036854775807 }";
+  std::stringstream in(txt);
+  cmdstan::json::json_data jdata(in);
+  std::vector<double> foo_vals_r;
+  foo_vals_r.push_back(4294967295.0);
+  std::vector<double> bar_vals_r;
+  bar_vals_r.push_back(9223372036854775807.0);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
 }

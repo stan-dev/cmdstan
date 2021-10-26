@@ -32,6 +32,7 @@ jobs:
       shell: powershell
     - name: Build Math libs & add to PATH
       run: |
+        make print-PRECOMPILED_HEADERS
         mingw32-make -f stan/lib/stan_math/make/standalone math-libs
         echo "D:/a/cmdstan/cmdstan/stan/lib/stan_math/lib/tbb" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
       shell: powershell

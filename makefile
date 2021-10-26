@@ -108,7 +108,15 @@ endif
 STAN_FLAGS=$(STAN_FLAG_THREADS)$(STAN_FLAG_MPI)$(STAN_FLAG_OPENCL)
 
 ifeq ($(OS),Windows_NT)
+ifeq (clang,$(CXX_TYPE))
 PRECOMPILED_HEADERS ?= false
+else
+ifeq ($(shell expr $(CXX_MAJOR) \>= 8), 1)
+PRECOMPILED_HEADERS ?= true
+else
+PRECOMPILED_HEADERS ?= false
+endif
+endif
 else
 PRECOMPILED_HEADERS ?= true
 endif
@@ -130,7 +138,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.27.0
+CMDSTAN_VERSION := 2.28.1
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -244,7 +252,7 @@ build-mpi: $(MPI_TARGETS)
 
 ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
-build: bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER)
+build: bin/stanc$(EXE) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
@@ -338,3 +346,6 @@ compile_info:
 ##
 .PHONY: print-%
 print-%  : ; @echo $* = $($*)
+
+.PHONY: clean-build
+clean-build: clean-all build

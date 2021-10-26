@@ -153,6 +153,15 @@ class json_data_handler : public cmdstan::json::json_handler {
     reset();
   }
 
+  void promote_to_double() {
+    if (is_int_) {
+      for (std::vector<int>::iterator it = values_i_.begin();
+           it != values_i_.end(); ++it)
+        values_r_.push_back(*it);
+      is_int_ = false;
+    }
+  }
+
   void null() {
     std::stringstream errorMsg;
     errorMsg << "variable: " << key_ << ", error: null values not allowed";
@@ -182,12 +191,7 @@ class json_data_handler : public cmdstan::json::json_handler {
       errorMsg << "variable: " << key_ << ", error: string values not allowed";
       throw json_error(errorMsg.str());
     }
-    if (is_int_) {
-      for (std::vector<int>::iterator it = values_i_.begin();
-           it != values_i_.end(); ++it)
-        values_r_.push_back(*it);
-    }
-    is_int_ = false;
+    promote_to_double();
     values_r_.push_back(tmp);
     incr_dim_size();
   }
@@ -200,18 +204,12 @@ class json_data_handler : public cmdstan::json::json_handler {
 
   void number_double(double x) {
     set_last_dim();
-    if (is_int_) {
-      for (std::vector<int>::iterator it = values_i_.begin();
-           it != values_i_.end(); ++it)
-        values_r_.push_back(*it);
-    }
-    is_int_ = false;
+    promote_to_double();
     values_r_.push_back(x);
     incr_dim_size();
   }
 
-  // NOLINTNEXTLINE(runtime/int)
-  void number_long(long n) {
+  void number_int(int n) {
     set_last_dim();
     if (is_int_) {
       values_i_.push_back(n);
@@ -221,15 +219,28 @@ class json_data_handler : public cmdstan::json::json_handler {
     incr_dim_size();
   }
 
-  // NOLINTNEXTLINE(runtime/int)
-  void number_unsigned_long(unsigned long n) {
+  void number_unsigned_int(unsigned n) {
     set_last_dim();
+    // if integer overflow, promote numeric data to double
+    if (n > (unsigned)std::numeric_limits<int>::max())
+      promote_to_double();
     if (is_int_) {
-      values_i_.push_back(n);
+      values_i_.push_back((int)n);
     } else {
       values_r_.push_back(n);
     }
     incr_dim_size();
+  }
+
+  void number_int64(int64_t n) {
+    // the number doesn't fit in int (otherwise number_int() would be called)
+    number_double(n);
+  }
+
+  void number_unsigned_int64(uint64_t n) {
+    // the number doesn't fit in int (otherwise number_unsigned_int() would be
+    // called)
+    number_double(n);
   }
 
   void save_current_key_value_pair() {
