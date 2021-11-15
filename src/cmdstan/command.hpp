@@ -174,7 +174,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
             << std::endl;
         throw std::invalid_argument(msg.str());
       } else {
-        return context_vector(num_chains, make_context(file, stream, file_ending));
+        return context_vector(num_chains,
+                              make_context(file, stream, file_ending));
       }
     } else {
       // If we found file_1 then we'll assume file_{1...N} exists
