@@ -11,6 +11,7 @@
 #include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/arguments/arg_pathfinder.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>
@@ -38,6 +39,7 @@
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/newton.hpp>
+#include <stan/services/pathfinder/single.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
@@ -672,6 +674,52 @@ int command(int argc, const char *argv[]) {
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
           interrupt, logger, init_writers[0], sample_writers[0]);
+    }
+  }
+
+  else if (user_method->arg("pathfinder")) {
+    list_argument *algo = dynamic_cast<list_argument *>(
+        parser.arg("method")->arg("pathfinder")->arg("algorithm"));
+    int num_iterations = dynamic_cast<int_argument *>(
+                             parser.arg("method")->arg("pathfinder")->arg("iter"))
+                             ->value();
+    bool save_iterations
+        = dynamic_cast<bool_argument *>(
+              parser.arg("method")->arg("pathfinder")->arg("save_iterations"))
+              ->value();
+    int num_elbo_draws
+        = dynamic_cast<u_int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_elbo_draws"))
+              ->value();
+    int num_draws
+        = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_draws"))
+              ->value();
+    if (algo->value() == "single") {
+      int history_size = dynamic_cast<int_argument *>(
+                             algo->arg("single")->arg("history_size"))
+                             ->value();
+      double init_alpha
+          = dynamic_cast<real_argument *>(algo->arg("single")->arg("init_alpha"))
+                ->value();
+      double tol_obj
+          = dynamic_cast<real_argument *>(algo->arg("single")->arg("tol_obj"))
+                ->value();
+      double tol_rel_obj = dynamic_cast<real_argument *>(
+                               algo->arg("single")->arg("tol_rel_obj"))
+                               ->value();
+      double tol_grad
+          = dynamic_cast<real_argument *>(algo->arg("single")->arg("tol_grad"))
+                ->value();
+      double tol_rel_grad = dynamic_cast<real_argument *>(
+                                algo->arg("single")->arg("tol_rel_grad"))
+                                ->value();
+      double tol_param
+          = dynamic_cast<real_argument *>(algo->arg("single")->arg("tol_param"))
+                ->value();
+      return_code = stan::services::optimize::pathfinder_lbfgs_single(
+          model, *(init_contexts[0]), random_seed, id, init_radius,
+          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+          tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
+          interrupt, num_elbo_draws, num_draws, 1, logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
     }
   } else if (user_method->arg("sample")) {
     auto sample_arg = parser.arg("method")->arg("sample");

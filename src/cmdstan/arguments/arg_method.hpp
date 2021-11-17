@@ -4,6 +4,7 @@
 #include <cmdstan/arguments/arg_diagnose.hpp>
 #include <cmdstan/arguments/arg_generate_quantities.hpp>
 #include <cmdstan/arguments/arg_optimize.hpp>
+#include <cmdstan/arguments/arg_pathfinder.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
 #include <cmdstan/arguments/arg_variational.hpp>
 #include <cmdstan/arguments/list_argument.hpp>
@@ -21,6 +22,7 @@ class arg_method : public list_argument {
     _values.push_back(new arg_variational());
     _values.push_back(new arg_diagnose());
     _values.push_back(new arg_generate_quantities());
+    _values.push_back(new arg_pathfinder());
 
     _default_cursor = 0;
     _cursor = _default_cursor;
