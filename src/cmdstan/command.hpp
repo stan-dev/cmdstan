@@ -500,8 +500,7 @@ int command(int argc, const char *argv[]) {
                                          std::fstream::out),
           "# ");
     } else {
-      diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>("", std::fstream::out), "# ");
+      diagnostic_writers.emplace_back(nullptr, "# ");
     }
   }
   for (int i = 0; i < num_chains; i++) {
