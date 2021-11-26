@@ -2,13 +2,13 @@ Checking sampler transitions treedepth.
 Treedepth satisfactory for all transitions.
 
 Checking sampler transitions for divergences.
-7 of 1000 (0.7%) transitions ended with a divergence.
+7 of 1000 (0.70%) transitions ended with a divergence.
 These divergent transitions indicate that HMC is not fully able to explore the posterior distribution.
 Try increasing adapt delta closer to 1.
 If this doesn't remove all divergences, try to reparameterize the model.
 
 Checking E-BFMI - sampler transitions HMC potential energy.
-The E-BFMI, 0.26, is below the nominal threshold of 0.3 which suggests that HMC may have trouble exploring the target distribution.
+The E-BFMI, 0.26, is below the nominal threshold of 0.30 which suggests that HMC may have trouble exploring the target distribution.
 If possible, try to reparameterize the model.
 
 Effective sample size satisfactory.
