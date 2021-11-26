@@ -47,6 +47,8 @@ int main(int argc, const char *argv[]) {
     std::cout << "No valid input files, exiting." << std::endl;
     return 0;
   }
+  
+  std::cout << std::fixed << std::setprecision(2);
 
   // Parse specified files
   std::cout << "Processing csv files: " << filenames[0];
@@ -96,7 +98,7 @@ int main(int argc, const char *argv[]) {
         has_errors = true;
         double pct = 100 * static_cast<double>(n_max) / num_samples;
         std::cout << n_max << " of " << num_samples << " ("
-                  << std::setprecision(2) << pct << "%)"
+                  << pct << "%)"
                   << " transitions hit the maximum treedepth limit of "
                   << max_limit << ", or 2^" << max_limit << " leapfrog steps."
                   << std::endl
@@ -115,7 +117,6 @@ int main(int argc, const char *argv[]) {
       if (n_divergent > 0) {
         has_errors = true;
         std::cout << n_divergent << " of " << num_samples << " ("
-                  << std::setprecision(2)
                   << 100 * static_cast<double>(n_divergent) / num_samples
                   << "%) transitions ended with a divergence." << std::endl
                   << "These divergent transitions indicate that HMC is not "
