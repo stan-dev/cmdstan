@@ -47,7 +47,7 @@ int main(int argc, const char *argv[]) {
     std::cout << "No valid input files, exiting." << std::endl;
     return 0;
   }
-  
+
   std::cout << std::fixed << std::setprecision(2);
 
   // Parse specified files
@@ -97,8 +97,7 @@ int main(int argc, const char *argv[]) {
       if (n_max > 0) {
         has_errors = true;
         double pct = 100 * static_cast<double>(n_max) / num_samples;
-        std::cout << n_max << " of " << num_samples << " ("
-                  << pct << "%)"
+        std::cout << n_max << " of " << num_samples << " (" << pct << "%)"
                   << " transitions hit the maximum treedepth limit of "
                   << max_limit << ", or 2^" << max_limit << " leapfrog steps."
                   << std::endl
