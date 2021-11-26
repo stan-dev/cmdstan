@@ -57,14 +57,12 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.opam"
-          key: linux-stanc-binary-4.07
+          key: linux-stanc-binary-4.12.0
 
       - name: Install dependencies
         run: |
-          sudo apk update
-          sudo apk add build-base bzip2 git tar curl ca-certificates openssl m4 bash
           opam init --disable-sandboxing -y
-          opam switch 4.07.0 || opam switch create 4.07.0
+          opam switch 4.12.0 || opam switch create 4.12.0
           eval $(opam env)
           opam repo add internet https://opam.ocaml.org
           opam update
@@ -100,7 +98,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.opam"
-          key: ${{ github.job }}-stanc-binary-4.07
+          key: windows-stanc-binary-4.12.0
 
       - name: Install dependencies
         run: |
@@ -109,14 +107,14 @@ jobs:
           unzip pkg-config libpcre3-dev mingw-w64 gcc wget gawk bubblewrap
           wget https://github.com/ocaml/opam/releases/download/2.0.4/opam-2.0.4-x86_64-linux
           sudo install opam-2.0.4-x86_64-linux /usr/local/bin/opam
-          opam init --comp 4.02.3 --disable-sandboxing -y
+          opam init $1 --disable-sandboxing -y
           eval $(opam env)
-          opam switch 4.07.0 || opam switch create 4.07.0
+          opam switch stanc || opam switch create stanc ocaml-base-compiler.4.12.0
           eval $(opam env)
-          opam update
           bash -x scripts/install_build_deps_windows.sh
-          eval $(opam env)
-          opam install -y js_of_ocaml-compiler.3.4.0 js_of_ocaml-ppx.3.4.0 js_of_ocaml.3.4.0
+          eval $(opam env)  
+          opam pin -y js_of_ocaml-ppx 3.11.0
+          opam install -y js_of_ocaml-ppx
 
       - name: Build Windows binaries
         run: |
@@ -144,7 +142,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: "~/.opam"
-          key: ${{ github.job }}-stanc-binary-4.07
+          key: macOS-stanc-binary-4.12.0
 
       - name: Install dependencies
         run: |
@@ -152,7 +150,7 @@ jobs:
           brew install opam
           opam init --disable-sandboxing -y
           eval $(opam env)
-          opam switch 4.07.0 || opam switch create 4.07.0          
+          opam switch 4.12.0 || opam switch create 4.12.0          
           eval $(opam env)
           bash -x scripts/install_build_deps.sh
 
