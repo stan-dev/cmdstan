@@ -689,10 +689,6 @@ int command(int argc, const char *argv[]) {
         = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
     bool adapt_engaged
         = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-    if (model.num_params_r() == 0) {
-      // nothing to adapt (and the adaptive sampler wouldn't work correctly)
-      adapt_engaged = false;
-    }
 
     if (algo->value() == "fixed_param") {
       return_code = stan::services::sample::fixed_param(
