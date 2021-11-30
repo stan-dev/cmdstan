@@ -43,6 +43,10 @@ pipeline {
         string(defaultValue: '', name: 'math_pr',
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
+    environment {
+        CXX = 'clang++-6.0'
+        PARALLEL = 8
+    }
     stages {
         stage('Kill previous builds') {
             when {
@@ -53,7 +57,12 @@ pipeline {
             steps { script { utils.killOldBuilds() } }
         }
         stage('Clean & Setup') {
-            agent any
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
                 retry(3) { checkout scm }
                 sh 'git clean -xffd'
@@ -68,7 +77,12 @@ pipeline {
             post { always { deleteDir() }}
         }
         stage('Verify changes') {
-            agent { label 'linux' }
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
                 script {
 
@@ -86,10 +100,14 @@ pipeline {
             }
         }
         stage("Clang-format") {
-            agent any
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
                 sh "printenv"
-                deleteDir()
                 retry(3) { checkout scm }
                 withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
                     usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
@@ -168,7 +186,12 @@ pipeline {
                 }
 
                 stage('Linux interface tests with MPI') {
-                    agent { label 'linux && mpi'}
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'linux'
+                        }
+                    }
                     steps {
                         setupCXX("${MPICXX}")
                         sh "echo STAN_MPI=true >> make/local"
@@ -198,7 +221,12 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent { label 'osx'}
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'osx'
+                        }
+                    }
                     steps {
                         setupCXX()
                         sh runTests("./")
@@ -223,6 +251,7 @@ pipeline {
                         }
                     }
                 }
+flatiron
 
                 stage('Upstream CmdStan Performance tests') {
                     when {
@@ -250,16 +279,17 @@ pipeline {
             }
         }
     }
+    // Below lines are commented to avoid spamming emails during migration/debug
     post {
         success {
            script {
                if (env.BRANCH_NAME == "develop") {
                    build job: "CmdStan Performance Tests/master", wait:false
                }
-               utils.mailBuildResults("SUCCESSFUL")
+               //utils.mailBuildResults("SUCCESSFUL")
            }
         }
-        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
-        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
+        //unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        //failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }
