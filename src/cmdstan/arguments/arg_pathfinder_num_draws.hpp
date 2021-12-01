@@ -7,12 +7,13 @@ namespace cmdstan {
 
 class arg_num_draws : public int_argument {
  public:
-  arg_num_draws() : int_argument() {
-    _name = "num_draws";
-    _description = "Total number of num_drawsations";
+  arg_num_draws(const char* name = "num_draws",
+   const char* desc = "Total number of draws", int def = 2000, const char* def_str = "2000") : int_argument() {
+    _name = name;
+    _description = desc;
     _validity = "0 < num_draws";
-    _default = "2000";
-    _default_value = 2000;
+    _default = def_str;
+    _default_value = def;
     _constrained = true;
     _good_value = 2.0;
     _bad_value = -1.0;

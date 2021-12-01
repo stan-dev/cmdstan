@@ -1,9 +1,8 @@
 #ifndef CMDSTAN_ARGUMENTS_ARG_PATHFINDER_ALGO_HPP
 #define CMDSTAN_ARGUMENTS_ARG_PATHFINDER_ALGO_HPP
 
-#include <cmdstan/arguments/arg_pathfinder_single.hpp>
 #include <cmdstan/arguments/arg_pathfinder_multi.hpp>
-#include <cmdstan/arguments/arg_newton.hpp>
+#include <cmdstan/arguments/arg_pathfinder_single.hpp>
 #include <cmdstan/arguments/list_argument.hpp>
 
 namespace cmdstan {
