@@ -4,10 +4,11 @@
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <cmdstan/arguments/arg_pathfinder_elbo_draws.hpp>
 #include <cmdstan/arguments/arg_pathfinder_algo.hpp>
+#include <cmdstan/arguments/arg_lbfgs.hpp>
 
 namespace cmdstan {
 
-class arg_pathfinder : public categorical_argument {
+class arg_pathfinder : public arg_lbfgs {
  public:
   arg_pathfinder() {
     _name = "pathfinder";

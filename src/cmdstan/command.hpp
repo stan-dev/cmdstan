@@ -391,6 +391,17 @@ inline auto setup_writers(Model&& model, Parser&& parser, unsigned int num_chain
     write_model(diagnostic_writers[i], model.model_name());
     parser.print(diagnostic_writers[i]);
   }
+  write_stan(top_level_sample_writer);
+  write_model(top_level_sample_writer, model.model_name());
+  write_datetime(top_level_sample_writer);
+  parser.print(top_level_sample_writer);
+  write_parallel_info(top_level_sample_writer);
+  write_opencl_device(top_level_sample_writer);
+  write_compile_info(top_level_sample_writer, model_compile_info);
+  write_stan(top_level_diagnostic_writer);
+  write_model(top_level_diagnostic_writer, model.model_name());
+  parser.print(top_level_diagnostic_writer);
+
   return std::make_tuple(std::move(sample_writers),
    std::move(diagnostic_writers), std::move(top_level_sample_writer),
    std::move(top_level_diagnostic_writer));
@@ -483,7 +494,7 @@ int command(int argc, const char *argv[]) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("pathfinder")->arg("algorithm"));
     if (algo->value() == "multi") {
-      num_chains = get_arg_val<int_argument>(parser, "method", "pathfinder", "multi", "num_paths");
+      num_chains = get_arg_val<int_argument>(parser, "method", "pathfinder", "algorithm", "multi", "num_paths");
     }
   }
   arg_seed *random_arg
@@ -558,10 +569,10 @@ int command(int argc, const char *argv[]) {
   unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
 
   auto writer_tuple = setup_writers(model, parser, num_chains, model_compile_info);
-  auto sample_writers = std::get<0>(std::move(writer_tuple));
-  auto diagnostic_writers = std::get<1>(std::move(writer_tuple));
-  auto top_level_sample_writer = std::get<2>(std::move(writer_tuple));
-  auto top_level_diagnostic_writer = std::get<3>(std::move(writer_tuple));
+  auto sample_writers = std::move(std::get<0>(std::move(writer_tuple)));
+  auto diagnostic_writers = std::move(std::get<1>(std::move(writer_tuple)));
+  auto top_level_sample_writer = std::move(std::get<2>(std::move(writer_tuple)));
+  auto top_level_diagnostic_writer = std::move(std::get<3>(std::move(writer_tuple)));
   std::vector<stan::callbacks::writer> init_writers(num_chains,
                                                     stan::callbacks::writer{});
 
@@ -762,7 +773,7 @@ int command(int argc, const char *argv[]) {
     if (algo->value() == "single") {
       bool save_iterations
           = dynamic_cast<bool_argument *>(
-                parser.arg("method")->arg("pathfinder")->arg("save_iterations"))
+                parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("single")->arg("save_iterations"))
                 ->value();
       return_code = stan::services::optimize::pathfinder_lbfgs_single(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -772,7 +783,7 @@ int command(int argc, const char *argv[]) {
     } else if (algo->value() == "multi") {
       bool save_iterations
           = dynamic_cast<bool_argument *>(
-                parser.arg("method")->arg("pathfinder")->arg("save_iterations"))
+                parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")->arg("save_iterations"))
                 ->value();
       int psis_draws
           = dynamic_cast<int_argument *>(algo->arg("multi")->arg("psis_draws"))
