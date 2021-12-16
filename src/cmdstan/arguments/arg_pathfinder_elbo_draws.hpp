@@ -5,9 +5,9 @@
 
 namespace cmdstan {
 
-class arg_num_elbo_draws : public u_int_argument {
+class arg_num_elbo_draws : public int_argument {
  public:
-  arg_num_elbo_draws() : u_int_argument() {
+  arg_num_elbo_draws() : int_argument() {
     _name = "num_elbo_draws";
     _description = "todo";
     _default = "25";

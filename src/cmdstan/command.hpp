@@ -743,7 +743,7 @@ int command(int argc, const char *argv[]) {
                              parser.arg("method")->arg("pathfinder")->arg("iter"))
                              ->value();
     int num_elbo_draws
-        = dynamic_cast<u_int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_elbo_draws"))
+        = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_elbo_draws"))
               ->value();
     int num_draws
         = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_draws"))
