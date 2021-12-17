@@ -283,130 +283,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
       ->value();
 }
 
-template <typename Model, typename Parser>
-inline auto setup_writers(Model&& model, Parser&& parser, unsigned int num_chains, std::vector<std::string>& model_compile_info) {
-  std::string output_file
-      = get_arg_val<string_argument>(parser, "output", "file");
-  if (output_file == "") {
-    throw std::invalid_argument(
-        std::string("File output name must not be blank"));
-  }
-  std::string output_name;
-  std::string output_ending;
-  size_t output_marker_pos = output_file.find_last_of(".");
-  if (output_marker_pos > output_file.size()) {
-    output_name = output_file;
-    output_ending = "";
-  } else {
-    output_name = output_file.substr(0, output_marker_pos);
-    output_ending = output_file.substr(output_marker_pos, output_file.size());
-  }
-
-  std::string diagnostic_file
-      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  size_t diagnostic_marker_pos = diagnostic_file.find_last_of(".");
-  std::string diagnostic_name;
-  std::string diagnostic_ending;
-  // no . seperator found.
-  if (diagnostic_marker_pos > diagnostic_file.size()) {
-    diagnostic_name = diagnostic_file;
-    diagnostic_ending = "";
-  } else {
-    diagnostic_name = diagnostic_file.substr(0, diagnostic_marker_pos);
-    diagnostic_ending
-        = diagnostic_file.substr(diagnostic_marker_pos, diagnostic_file.size());
-  }
-  auto user_method = parser.arg("method");
-  stan::callbacks::unique_stream_writer<std::ostream> top_level_sample_writer;
-  stan::callbacks::unique_stream_writer<std::ostream> top_level_diagnostic_writer;
-  bool save_pathfinder_iterations = true;
-  if (user_method->arg("pathfinder")) {
-    if (parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")) {
-      save_pathfinder_iterations = dynamic_cast<bool_argument *>(parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")->arg("save_iterations"))->value();
-      auto output_filename = output_name + output_ending;
-      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
-      if (diagnostic_file != "") {
-        auto diagnostic_filename = diagnostic_name + diagnostic_ending;
-        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
-      } else {
-        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
-      }
-    } else {
-      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
-      top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
-    }
-  } else {
-    top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
-    top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
-  }
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
-      sample_writers;
-  sample_writers.reserve(num_chains);
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
-      diagnostic_writers;
-  diagnostic_writers.reserve(num_chains);
-  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
-  int_argument *sig_figs_arg
-      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
-  auto name_iterator = [num_chains, id](auto i) {
-    if (num_chains == 1) {
-      return std::string("");
-    } else {
-      return std::string("_" + std::to_string(i + id));
-    }
-  };
-  for (int i = 0; i < num_chains; i++) {
-    if (!save_pathfinder_iterations) {
-      sample_writers.emplace_back(nullptr, "# ");
-      diagnostic_writers.emplace_back(nullptr, "# ");
-    } else {
-      auto output_filename = output_name + name_iterator(i) + output_ending;
-      auto unique_fstream
-          = std::make_unique<std::fstream>(output_filename, std::fstream::out);
-      if (!sig_figs_arg->is_default()) {
-        (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
-      }
-      sample_writers.emplace_back(std::move(unique_fstream), "# ");
-      if (diagnostic_file != "") {
-        auto diagnostic_filename
-            = diagnostic_name + name_iterator(i) + diagnostic_ending;
-        diagnostic_writers.emplace_back(
-            std::make_unique<std::fstream>(diagnostic_filename,
-                                           std::fstream::out),
-            "# ");
-      } else {
-        diagnostic_writers.emplace_back(nullptr, "# ");
-      }
-    }
-  }
-  for (int i = 0; i < num_chains; i++) {
-    write_stan(sample_writers[i]);
-    write_model(sample_writers[i], model.model_name());
-    write_datetime(sample_writers[i]);
-    parser.print(sample_writers[i]);
-    write_parallel_info(sample_writers[i]);
-    write_opencl_device(sample_writers[i]);
-    write_compile_info(sample_writers[i], model_compile_info);
-    write_stan(diagnostic_writers[i]);
-    write_model(diagnostic_writers[i], model.model_name());
-    parser.print(diagnostic_writers[i]);
-  }
-  write_stan(top_level_sample_writer);
-  write_model(top_level_sample_writer, model.model_name());
-  write_datetime(top_level_sample_writer);
-  parser.print(top_level_sample_writer);
-  write_parallel_info(top_level_sample_writer);
-  write_opencl_device(top_level_sample_writer);
-  write_compile_info(top_level_sample_writer, model_compile_info);
-  write_stan(top_level_diagnostic_writer);
-  write_model(top_level_diagnostic_writer, model.model_name());
-  parser.print(top_level_diagnostic_writer);
-
-  return std::make_tuple(std::move(sample_writers),
-   std::move(diagnostic_writers), std::move(top_level_sample_writer),
-   std::move(top_level_diagnostic_writer));
-}
-
 static constexpr int hmc_fixed_cols
     = 7;  // hmc sampler outputs columns __lp + 6
 
@@ -463,8 +339,8 @@ int command(int argc, const char *argv[]) {
   stan::math::init_threadpool_tbb(num_threads);
 
   unsigned int num_chains = 1;
-  auto user_method = parser.arg("method");
   // num_chains > 1 is only supported in diag_e and dense_e of hmc
+  auto user_method = parser.arg("method");
   if (user_method->arg("sample")) {
     num_chains
         = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
@@ -529,7 +405,7 @@ int command(int argc, const char *argv[]) {
   std::stringstream msg;
 
   // Cross-check arguments
-  if (parser.arg("method")->arg("generate_quantities")) {
+  if (user_method->arg("generate_quantities")) {
     std::string fitted_sample_fname
         = dynamic_cast<string_argument *>(parser.arg("method")
                                               ->arg("generate_quantities")
@@ -568,19 +444,127 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
   unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
 
-  auto writer_tuple = setup_writers(model, parser, num_chains, model_compile_info);
-  auto sample_writers = std::move(std::get<0>(std::move(writer_tuple)));
-  auto diagnostic_writers = std::move(std::get<1>(std::move(writer_tuple)));
-  auto top_level_sample_writer = std::move(std::get<2>(std::move(writer_tuple)));
-  auto top_level_diagnostic_writer = std::move(std::get<3>(std::move(writer_tuple)));
+  std::string output_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  if (output_file == "") {
+    throw std::invalid_argument(
+        std::string("File output name must not be blank"));
+  }
+  std::string output_name;
+  std::string output_ending;
+  size_t output_marker_pos = output_file.find_last_of(".");
+  if (output_marker_pos > output_file.size()) {
+    output_name = output_file;
+    output_ending = "";
+  } else {
+    output_name = output_file.substr(0, output_marker_pos);
+    output_ending = output_file.substr(output_marker_pos, output_file.size());
+  }
+
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  size_t diagnostic_marker_pos = diagnostic_file.find_last_of(".");
+  std::string diagnostic_name;
+  std::string diagnostic_ending;
+  // no . seperator found.
+  if (diagnostic_marker_pos > diagnostic_file.size()) {
+    diagnostic_name = diagnostic_file;
+    diagnostic_ending = "";
+  } else {
+    diagnostic_name = diagnostic_file.substr(0, diagnostic_marker_pos);
+    diagnostic_ending
+        = diagnostic_file.substr(diagnostic_marker_pos, diagnostic_file.size());
+  }
+  stan::callbacks::unique_stream_writer<std::ostream> top_level_sample_writer;
+  stan::callbacks::unique_stream_writer<std::ostream> top_level_diagnostic_writer;
+  bool save_pathfinder_iterations = true;
+  if (user_method->arg("pathfinder")) {
+    if (parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")) {
+      save_pathfinder_iterations = dynamic_cast<bool_argument *>(parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")->arg("save_iterations"))->value();
+      auto output_filename = output_name + output_ending;
+      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
+      if (diagnostic_file != "") {
+        auto diagnostic_filename = diagnostic_name + diagnostic_ending;
+        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
+      } else {
+        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+      }
+    } else {
+      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+      top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+    }
+  } else {
+    top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+    top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+  }
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+      sample_writers;
+  sample_writers.reserve(num_chains);
+  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+      diagnostic_writers;
+  diagnostic_writers.reserve(num_chains);
+  int_argument *sig_figs_arg
+      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  for (int i = 0; i < num_chains; i++) {
+    if (!save_pathfinder_iterations) {
+      sample_writers.emplace_back(nullptr, "# ");
+      diagnostic_writers.emplace_back(nullptr, "# ");
+    } else {
+      auto output_filename = output_name + name_iterator(i) + output_ending;
+      auto unique_fstream
+          = std::make_unique<std::fstream>(output_filename, std::fstream::out);
+      if (!sig_figs_arg->is_default()) {
+        (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
+      }
+      sample_writers.emplace_back(std::move(unique_fstream), "# ");
+      if (diagnostic_file != "") {
+        auto diagnostic_filename
+            = diagnostic_name + name_iterator(i) + diagnostic_ending;
+        diagnostic_writers.emplace_back(
+            std::make_unique<std::fstream>(diagnostic_filename,
+                                           std::fstream::out),
+            "# ");
+      } else {
+        diagnostic_writers.emplace_back(nullptr, "# ");
+      }
+    }
+  }
+  for (int i = 0; i < num_chains; i++) {
+    write_stan(sample_writers[i]);
+    write_model(sample_writers[i], model.model_name());
+    write_datetime(sample_writers[i]);
+    parser.print(sample_writers[i]);
+    write_parallel_info(sample_writers[i]);
+    write_opencl_device(sample_writers[i]);
+    write_compile_info(sample_writers[i], model_compile_info);
+    write_stan(diagnostic_writers[i]);
+    write_model(diagnostic_writers[i], model.model_name());
+    parser.print(diagnostic_writers[i]);
+  }
+  write_stan(top_level_sample_writer);
+  write_model(top_level_sample_writer, model.model_name());
+  write_datetime(top_level_sample_writer);
+  parser.print(top_level_sample_writer);
+  write_parallel_info(top_level_sample_writer);
+  write_opencl_device(top_level_sample_writer);
+  write_compile_info(top_level_sample_writer, model_compile_info);
+  write_stan(top_level_diagnostic_writer);
+  write_model(top_level_diagnostic_writer, model.model_name());
+  parser.print(top_level_diagnostic_writer);
+
   std::vector<stan::callbacks::writer> init_writers(num_chains,
                                                     stan::callbacks::writer{});
 
   int refresh
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
             ->value();
-  int_argument *sig_figs_arg
-      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
 
   // Read initial parameter values or user-specified radius
   std::string init
