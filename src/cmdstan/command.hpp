@@ -152,7 +152,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
     std::string file_name = file.substr(0, file_marker_pos);
     std::string file_ending = file.substr(file_marker_pos, file.size());
-    if (file_ending != ".json" || file_ending != ".csv") {
+    if (file_ending != ".json" && file_ending != ".csv") {
       std::stringstream msg;
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
@@ -174,7 +174,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
             << std::endl;
         throw std::invalid_argument(msg.str());
       } else {
-        return context_vector(1, make_context(file, stream, file_ending));
+        return context_vector(num_chains,
+                              make_context(file, stream, file_ending));
       }
     } else {
       // If we found file_1 then we'll assume file_{1...N} exists
@@ -499,8 +500,7 @@ int command(int argc, const char *argv[]) {
                                          std::fstream::out),
           "# ");
     } else {
-      diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>("", std::fstream::out), "# ");
+      diagnostic_writers.emplace_back(nullptr, "# ");
     }
   }
   for (int i = 0; i < num_chains; i++) {
