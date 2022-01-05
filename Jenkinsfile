@@ -59,7 +59,7 @@ pipeline {
         stage('Clean & Setup') {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:gpu'
                     label 'linux'
                 }
             }
@@ -79,7 +79,7 @@ pipeline {
         stage('Verify changes') {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:gpu'
                     label 'linux'
                 }
             }
@@ -102,7 +102,7 @@ pipeline {
         stage("Clang-format") {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:gpu'
                     label 'linux'
                 }
             }
@@ -188,7 +188,7 @@ pipeline {
                 stage('Linux interface tests with MPI') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:gpu'
                             label 'linux'
                         }
                     }
@@ -223,7 +223,7 @@ pipeline {
                 stage('Mac interface tests') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:gpu'
                             label 'osx'
                         }
                     }
@@ -251,7 +251,6 @@ pipeline {
                         }
                     }
                 }
-flatiron
 
                 stage('Upstream CmdStan Performance tests') {
                     when {
@@ -264,7 +263,7 @@ flatiron
                     steps {
                         script{
                             build(
-                                job: "CmdStan Performance Tests/downstream_tests",
+                                job: "Stan/CmdStan Performance Tests/downstream_tests",
                                 parameters: [
                                     string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
                                     string(name: 'stan_pr', value: params.stan_pr),
@@ -284,7 +283,7 @@ flatiron
         success {
            script {
                if (env.BRANCH_NAME == "develop") {
-                   build job: "CmdStan Performance Tests/master", wait:false
+                   build job: "Stan/CmdStan Performance Tests/master", wait:false
                }
                //utils.mailBuildResults("SUCCESSFUL")
            }
