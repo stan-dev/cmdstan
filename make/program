@@ -40,9 +40,9 @@ endif
 # Model executable
 ##
 
-ifdef STAN_OPENCL
-STANCFLAGS+= --use-opencl
-endif
+#ifdef STAN_OPENCL
+#STANCFLAGS+= --use-opencl
+#endif
 
 %.hpp : %.stan bin/stanc$(EXE)
 	@echo ''
