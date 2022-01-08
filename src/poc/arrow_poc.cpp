@@ -18,13 +18,12 @@
 #include <parquet/exception.h>
 
 
-void write_parquet_file(const arrow::Table& table) {
+void write_parquet_file(const arrow::Table& table, const std::string &filename) {
   std::shared_ptr<arrow::io::FileOutputStream> outfile;
   PARQUET_ASSIGN_OR_THROW(
-      outfile, arrow::io::FileOutputStream::Open("csv-to-arrow-example.parquet"));
+      outfile, arrow::io::FileOutputStream::Open(filename));
   // The last argument to the function call is the size of the RowGroup in
-  // the parquet file. Normally you would choose this to be rather large but
-  // for the example, we use a small value to have multiple RowGroups.
+  // the parquet file.
   PARQUET_THROW_NOT_OK(
       parquet::arrow::WriteTable(table, arrow::default_memory_pool(), outfile, 1000));
 }
@@ -51,7 +50,7 @@ int main(int argc, const char *argv[]) {
 
   // Command-line arguments
   std::string csv_file;
-  std::string pqt_file = "output.pqt";
+  std::string pqt_file = "output.parquet";
 
   CLI::App app{"Allowed options"};
   app.add_option("--output_pqt,-o", pqt_file,
@@ -137,7 +136,7 @@ int main(int argc, const char *argv[]) {
               << " columns." << std::endl;
 
     // Write to csv file
-    write_parquet_file(*table);    
+    write_parquet_file(*table, pqt_file);    
     
   } catch (const std::exception &e) {
     std::cout << "Error during processing. " << e.what() << std::endl;

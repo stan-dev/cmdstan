@@ -1,7 +1,9 @@
 # Apache Arrow and Parquet Proof of Concept
 
 Program "arrow_poc.cpp" (arrow proof of concept) reads in a local CSV file
-and writes a Parquet file.  This requires using Arrow modules:
+and writes a Parquet file.
+
+It uses the following Arrow modules:
 
 - COMPUTE (core in memory representation)
 - CSV (CSV file format readers/writers)
@@ -47,4 +49,12 @@ make -j4 parquet
 make install   # default install location is /usr/local/lib - NSFW
 ```
 
-Once installed, can use GNU make to compile a program - see Makefile in this directory
+Once installed, use GNU make to compile a program - see Makefile in this directory -
+and run the program on one of the two test files included here
+
+```
+make
+./arrow_poc vanilla.csv -o vanilla.parquet
+```
+
+
