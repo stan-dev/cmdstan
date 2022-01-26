@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/categorical_argument.hpp>
 #include <cmdstan/arguments/arg_pathfinder_elbo_draws.hpp>
+#include <cmdstan/arguments/arg_pathfinder_num_eval_attempts.hpp>
 #include <cmdstan/arguments/arg_pathfinder_algo.hpp>
 #include <cmdstan/arguments/arg_lbfgs.hpp>
 
@@ -18,6 +19,7 @@ class arg_pathfinder : public arg_lbfgs {
     _subarguments.push_back(new arg_iter());
     _subarguments.push_back(new arg_num_elbo_draws());
     _subarguments.push_back(new arg_num_draws());
+    _subarguments.push_back(new arg_num_eval_attempts());
 
   }
 };
