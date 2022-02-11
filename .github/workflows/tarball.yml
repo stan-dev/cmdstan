@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: |
           opam init --disable-sandboxing -y
-          opam switch 4.12.0 || opam switch create 4.12.0
+          opam switch create 4.12.0
           eval $(opam env)
           opam repo add internet https://opam.ocaml.org
           opam update
@@ -109,7 +109,7 @@ jobs:
           sudo install opam-2.0.4-x86_64-linux /usr/local/bin/opam
           opam init $1 --disable-sandboxing -y
           eval $(opam env)
-          opam switch stanc || opam switch create stanc ocaml-base-compiler.4.12.0
+          opam switch create stanc ocaml-base-compiler.4.12.0
           eval $(opam env)
           bash -x scripts/install_build_deps_windows.sh
           eval $(opam env)  
@@ -150,7 +150,7 @@ jobs:
           brew install opam
           opam init --disable-sandboxing -y
           eval $(opam env)
-          opam switch 4.12.0 || opam switch create 4.12.0          
+          opam switch create 4.12.0
           eval $(opam env)
           bash -x scripts/install_build_deps.sh
 
