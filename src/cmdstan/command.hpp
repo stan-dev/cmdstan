@@ -43,6 +43,7 @@
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/services/sample/hmc_nuts_diag_e.hpp>
 #include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_diag_e_adapt_parallel.hpp>
 #include <stan/services/sample/hmc_nuts_unit_e.hpp>
 #include <stan/services/sample/hmc_nuts_unit_e_adapt.hpp>
 #include <stan/services/sample/hmc_static_dense_e.hpp>
@@ -849,12 +850,24 @@ int command(int argc, const char *argv[]) {
                   ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
-        return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-            model, num_chains, init_contexts, random_seed, id, init_radius,
-            num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-            stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writers,
-            sample_writers, diagnostic_writers);
+        bool parallel_tree
+            = dynamic_cast<bool_argument *>(sample_arg->arg("parallel_tree"))
+                  ->value();
+        if (parallel_tree) {
+          return_code = stan::services::sample::hmc_nuts_diag_e_adapt_parallel(
+              model, num_chains, init_contexts, random_seed, id, init_radius,
+              num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
+              stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
+              term_buffer, window, interrupt, logger, init_writers,
+              sample_writers, diagnostic_writers);
+        } else {
+          return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+              model, num_chains, init_contexts, random_seed, id, init_radius,
+              num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
+              stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
+              term_buffer, window, interrupt, logger, init_writers,
+              sample_writers, diagnostic_writers);
+        }
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
