@@ -17,9 +17,17 @@ def runTests(String prefix = "") {
 
 def runWinTests(String prefix = "") {
     withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
-       bat "echo %PATH%"
-       bat "mingw32-make -j${env.PARALLEL} build"
-       bat "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
+        bat """
+            SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+            SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+            SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+            SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+            SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+            SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+            SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+            mingw32-make -j${env.PARALLEL} build
+            python ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+        """
     }
 }
 
@@ -44,8 +52,11 @@ pipeline {
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
     }
     environment {
-        CXX = 'clang++-6.0'
+        MAC_CXX = 'clang++'
+        LINUX_CXX = 'clang++-6.0'
+        WIN_CXX = 'g++'
         PARALLEL = 8
+        MPICXX = 'mpicxx.openmpi'
     }
     stages {
         stage('Kill previous builds') {
@@ -85,7 +96,6 @@ pipeline {
             }
             steps {
                 script {
-
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
 
@@ -161,7 +171,7 @@ pipeline {
                 stage('Windows interface tests') {
                     agent { label 'windows' }
                     steps {
-                        setupCXX()
+                        setupCXX(WIN_CXX)
                         runWinTests()
                     }
                     post {
@@ -221,14 +231,9 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:gpu'
-                            label 'osx'
-                        }
-                    }
+                    agent { label 'osx' }
                     steps {
-                        setupCXX()
+                        setupCXX(MAC_CXX)
                         sh runTests("./")
                     }
                     post {
@@ -285,10 +290,10 @@ pipeline {
                if (env.BRANCH_NAME == "develop") {
                    build job: "Stan/CmdStan Performance Tests/master", wait:false
                }
-               //utils.mailBuildResults("SUCCESSFUL")
+               utils.mailBuildResults("SUCCESSFUL")
            }
         }
-        //unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
-        //failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
+        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }
