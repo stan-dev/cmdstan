@@ -129,7 +129,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     if (file_ending == ".json") {
       using cmdstan::json::json_data;
       return std::make_shared<json_data>(json_data(stream));
-    } else if (file_ending == ".csv") {
+    } else if (file_ending == ".R") {
       using stan::io::dump;
       return std::make_shared<stan::io::dump>(dump(stream));
     } else {
@@ -150,12 +150,12 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     if (file_marker_pos > file.size()) {
       std::stringstream msg;
       msg << "Found: \"" << file
-          << "\" but user specied files must end in .json or .csv";
+          << "\" but user specied files must end in .json or .R";
       throw std::invalid_argument(msg.str());
     }
     std::string file_name = file.substr(0, file_marker_pos);
     std::string file_ending = file.substr(file_marker_pos, file.size());
-    if (file_ending != ".json" && file_ending != ".csv") {
+    if (file_ending != ".json" && file_ending != ".R") {
       std::stringstream msg;
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
@@ -531,8 +531,6 @@ int command(int argc, const char *argv[]) {
             std::make_unique<std::fstream>(diagnostic_filename,
                                            std::fstream::out),
             "# ");
-      } else {
-        diagnostic_writers.emplace_back(nullptr, "# ");
       }
     }
   }
