@@ -531,6 +531,8 @@ int command(int argc, const char *argv[]) {
             std::make_unique<std::fstream>(diagnostic_filename,
                                            std::fstream::out),
             "# ");
+      } else {
+        diagnostic_writers.emplace_back(nullptr, "# ");
       }
     }
   }
