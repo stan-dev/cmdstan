@@ -763,7 +763,7 @@ int command(int argc, const char *argv[]) {
           = dynamic_cast<bool_argument *>(
                 parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("single")->arg("save_iterations"))
                 ->value();
-      return_code = stan::services::optimize::pathfinder_lbfgs_single(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
@@ -780,7 +780,7 @@ int command(int argc, const char *argv[]) {
           = dynamic_cast<int_argument *>(algo->arg("multi")->arg("num_paths"))
                 ->value();
 
-      return_code = stan::services::optimize::pathfinder_lbfgs_multi(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
           model, init_contexts, random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
