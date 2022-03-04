@@ -17,6 +17,7 @@ class CmdStan : public testing::Test {
     bern_data = {"src", "test", "test-models", "bern.data.json"};
     init_data = {"src", "test", "test-models", "bern_init.json"};
     init2_data = {"src", "test", "test-models", "bern_init2.json"};
+    init3_data = {"src", "test", "test-models", "bern_init2.R"};
     dev_null_path = {"/dev", "null"};
   }
   std::vector<std::string> bern_model;
@@ -24,6 +25,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_data;
   std::vector<std::string> init_data;
   std::vector<std::string> init2_data;
+  std::vector<std::string> init3_data;
 };
 
 TEST_F(CmdStan, multi_chain_single_init_file_good) {
@@ -45,6 +47,18 @@ TEST_F(CmdStan, multi_chain_multi_init_file_good) {
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " init=" << convert_model_path(init2_data)
+     << " method=sample num_chains=4";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+}
+
+TEST_F(CmdStan, multi_chain_multi_init_file_R) {
+  std::stringstream ss;
+  ss << convert_model_path(bern_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " init=" << convert_model_path(init3_data)
      << " method=sample num_chains=4";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
