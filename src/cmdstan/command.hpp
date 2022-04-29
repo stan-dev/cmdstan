@@ -767,7 +767,7 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
-          interrupt, num_elbo_draws, num_draws, num_eval_attempts, num_threads, logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
+          interrupt, num_elbo_draws, num_draws, num_eval_attempts, logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
     } else if (algo->value() == "multi") {
       bool save_iterations
           = dynamic_cast<bool_argument *>(
@@ -784,7 +784,7 @@ int command(int argc, const char *argv[]) {
           model, init_contexts, random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
-          interrupt, num_elbo_draws, num_draws, psis_draws, num_eval_attempts, num_threads, num_paths, logger,
+          interrupt, num_elbo_draws, num_draws, psis_draws, num_eval_attempts, num_paths, logger,
           init_writers, sample_writers, diagnostic_writers,
           top_level_sample_writer, top_level_diagnostic_writer);
     }
