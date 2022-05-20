@@ -270,7 +270,13 @@ class json_data : public stan::io::var_context {
     for (size_t i = 0; i < dims.size(); ++i) {
       num_elements *= dims[i];
     }
-    if (num_elements == 0)
+
+    size_t num_elements_expected = 1;
+    for (size_t i = 0; i < dims_declared.size(); ++i) {
+      num_elements_expected *= dims_declared[i];
+    }
+
+    if (num_elements == 0 && num_elements_expected == 0)
       return;
 
     if (dims.size() != dims_declared.size()) {

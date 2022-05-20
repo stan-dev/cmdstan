@@ -11,6 +11,7 @@
 #include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/arguments/arg_pathfinder.hpp>
 #include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>
@@ -38,6 +39,8 @@
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/newton.hpp>
+#include <stan/services/pathfinder/multi.hpp>
+#include <stan/services/pathfinder/single.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
@@ -206,9 +209,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
-static constexpr int hmc_fixed_cols
-    = 7;  // hmc sampler outputs columns __lp + 6
-
 namespace internal {
 
 /**
@@ -283,6 +283,9 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
       ->value();
 }
 
+static constexpr int hmc_fixed_cols
+    = 7;  // hmc sampler outputs columns __lp + 6
+
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
   stan::callbacks::stream_writer err(std::cerr);
@@ -336,8 +339,8 @@ int command(int argc, const char *argv[]) {
   stan::math::init_threadpool_tbb(num_threads);
 
   unsigned int num_chains = 1;
-  auto user_method = parser.arg("method");
   // num_chains > 1 is only supported in diag_e and dense_e of hmc
+  auto user_method = parser.arg("method");
   if (user_method->arg("sample")) {
     num_chains
         = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
@@ -362,6 +365,12 @@ int command(int argc, const char *argv[]) {
               "and dense_e or diag_e metric");
         }
       }
+    }
+  } else if (user_method->arg("pathfinder")) {
+    list_argument *algo = dynamic_cast<list_argument *>(
+        parser.arg("method")->arg("pathfinder")->arg("algorithm"));
+    if (algo->value() == "multi") {
+      num_chains = get_arg_val<int_argument>(parser, "method", "pathfinder", "algorithm", "multi", "num_paths");
     }
   }
   arg_seed *random_arg
@@ -396,7 +405,7 @@ int command(int argc, const char *argv[]) {
   std::stringstream msg;
 
   // Cross-check arguments
-  if (parser.arg("method")->arg("generate_quantities")) {
+  if (user_method->arg("generate_quantities")) {
     std::string fitted_sample_fname
         = dynamic_cast<string_argument *>(parser.arg("method")
                                               ->arg("generate_quantities")
@@ -433,6 +442,7 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
   //                Initialize Writers            //
   //////////////////////////////////////////////////
+  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
 
   std::string output_file
       = get_arg_val<string_argument>(parser, "output", "file");
@@ -465,16 +475,34 @@ int command(int argc, const char *argv[]) {
     diagnostic_ending
         = diagnostic_file.substr(diagnostic_marker_pos, diagnostic_file.size());
   }
-
+  stan::callbacks::unique_stream_writer<std::ostream> top_level_sample_writer;
+  stan::callbacks::unique_stream_writer<std::ostream> top_level_diagnostic_writer;
+  bool save_pathfinder_iterations = true;
+  if (user_method->arg("pathfinder")) {
+    if (parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")) {
+      save_pathfinder_iterations = dynamic_cast<bool_argument *>(parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")->arg("save_iterations"))->value();
+      auto output_filename = output_name + output_ending;
+      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
+      if (diagnostic_file != "") {
+        auto diagnostic_filename = diagnostic_name + diagnostic_ending;
+        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(std::make_unique<std::fstream>(output_filename, std::fstream::out), "# "));
+      } else {
+        top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+      }
+    } else {
+      top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+      top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+    }
+  } else {
+    top_level_sample_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+    top_level_diagnostic_writer = std::move(stan::callbacks::unique_stream_writer<std::ostream>(nullptr, ""));
+  }
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
       sample_writers;
   sample_writers.reserve(num_chains);
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
       diagnostic_writers;
   diagnostic_writers.reserve(num_chains);
-  std::vector<stan::callbacks::writer> init_writers{num_chains,
-                                                    stan::callbacks::writer{}};
-  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
   auto name_iterator = [num_chains, id](auto i) {
@@ -485,22 +513,27 @@ int command(int argc, const char *argv[]) {
     }
   };
   for (int i = 0; i < num_chains; i++) {
-    auto output_filename = output_name + name_iterator(i) + output_ending;
-    auto unique_fstream
-        = std::make_unique<std::fstream>(output_filename, std::fstream::out);
-    if (!sig_figs_arg->is_default()) {
-      (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
-    }
-    sample_writers.emplace_back(std::move(unique_fstream), "# ");
-    if (diagnostic_file != "") {
-      auto diagnostic_filename
-          = diagnostic_name + name_iterator(i) + diagnostic_ending;
-      diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>(diagnostic_filename,
-                                         std::fstream::out),
-          "# ");
-    } else {
+    if (!save_pathfinder_iterations) {
+      sample_writers.emplace_back(nullptr, "# ");
       diagnostic_writers.emplace_back(nullptr, "# ");
+    } else {
+      auto output_filename = output_name + name_iterator(i) + output_ending;
+      auto unique_fstream
+          = std::make_unique<std::fstream>(output_filename, std::fstream::out);
+      if (!sig_figs_arg->is_default()) {
+        (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
+      }
+      sample_writers.emplace_back(std::move(unique_fstream), "# ");
+      if (diagnostic_file != "") {
+        auto diagnostic_filename
+            = diagnostic_name + name_iterator(i) + diagnostic_ending;
+        diagnostic_writers.emplace_back(
+            std::make_unique<std::fstream>(diagnostic_filename,
+                                           std::fstream::out),
+            "# ");
+      } else {
+        diagnostic_writers.emplace_back(nullptr, "# ");
+      }
     }
   }
   for (int i = 0; i < num_chains; i++) {
@@ -515,6 +548,19 @@ int command(int argc, const char *argv[]) {
     write_model(diagnostic_writers[i], model.model_name());
     parser.print(diagnostic_writers[i]);
   }
+  write_stan(top_level_sample_writer);
+  write_model(top_level_sample_writer, model.model_name());
+  write_datetime(top_level_sample_writer);
+  parser.print(top_level_sample_writer);
+  write_parallel_info(top_level_sample_writer);
+  write_opencl_device(top_level_sample_writer);
+  write_compile_info(top_level_sample_writer, model_compile_info);
+  write_stan(top_level_diagnostic_writer);
+  write_model(top_level_diagnostic_writer, model.model_name());
+  parser.print(top_level_diagnostic_writer);
+
+  std::vector<stan::callbacks::writer> init_writers(num_chains,
+                                                    stan::callbacks::writer{});
 
   int refresh
       = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
@@ -671,6 +717,76 @@ int command(int argc, const char *argv[]) {
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
           interrupt, logger, init_writers[0], sample_writers[0]);
+    }
+  }
+
+  else if (user_method->arg("pathfinder")) {
+    list_argument *algo = dynamic_cast<list_argument *>(
+        parser.arg("method")->arg("pathfinder")->arg("algorithm"));
+    int num_iterations = dynamic_cast<int_argument *>(
+                             parser.arg("method")->arg("pathfinder")->arg("iter"))
+                             ->value();
+    int num_elbo_draws
+        = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_elbo_draws"))
+              ->value();
+    int num_draws
+        = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_draws"))
+              ->value();
+    int history_size = dynamic_cast<int_argument *>(
+                           parser.arg("method")->arg("pathfinder")->arg("history_size"))
+                           ->value();
+    double init_alpha
+        = dynamic_cast<real_argument *>(parser.arg("method")->arg("pathfinder")->arg("init_alpha"))
+              ->value();
+    double tol_obj
+        = dynamic_cast<real_argument *>(parser.arg("method")->arg("pathfinder")->arg("tol_obj"))
+              ->value();
+    double tol_rel_obj = dynamic_cast<real_argument *>(
+                             parser.arg("method")->arg("pathfinder")->arg("tol_rel_obj"))
+                             ->value();
+    double tol_grad
+        = dynamic_cast<real_argument *>(parser.arg("method")->arg("pathfinder")->arg("tol_grad"))
+              ->value();
+    double tol_rel_grad = dynamic_cast<real_argument *>(
+                              parser.arg("method")->arg("pathfinder")->arg("tol_rel_grad"))
+                              ->value();
+    double tol_param
+        = dynamic_cast<real_argument *>(parser.arg("method")->arg("pathfinder")->arg("tol_param"))
+              ->value();
+
+    int num_eval_attempts
+        = dynamic_cast<int_argument *>(parser.arg("method")->arg("pathfinder")->arg("num_eval_attempts"))
+              ->value();
+
+    if (algo->value() == "single") {
+      bool save_iterations
+          = dynamic_cast<bool_argument *>(
+                parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("single")->arg("save_iterations"))
+                ->value();
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
+          model, *(init_contexts[0]), random_seed, id, init_radius,
+          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+          tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
+          interrupt, num_elbo_draws, num_draws, num_eval_attempts, logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
+    } else if (algo->value() == "multi") {
+      bool save_iterations
+          = dynamic_cast<bool_argument *>(
+                parser.arg("method")->arg("pathfinder")->arg("algorithm")->arg("multi")->arg("save_iterations"))
+                ->value();
+      int psis_draws
+          = dynamic_cast<int_argument *>(algo->arg("multi")->arg("psis_draws"))
+                ->value();
+      int num_paths
+          = dynamic_cast<int_argument *>(algo->arg("multi")->arg("num_paths"))
+                ->value();
+
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
+          model, init_contexts, random_seed, id, init_radius,
+          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+          tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
+          interrupt, num_elbo_draws, num_draws, psis_draws, num_eval_attempts, num_paths, logger,
+          init_writers, sample_writers, diagnostic_writers,
+          top_level_sample_writer, top_level_diagnostic_writer);
     }
   } else if (user_method->arg("sample")) {
     auto sample_arg = parser.arg("method")->arg("sample");
