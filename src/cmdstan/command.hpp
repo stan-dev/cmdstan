@@ -690,11 +690,7 @@ int command(int argc, const char *argv[]) {
     bool adapt_engaged
         = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
 
-    if (model.num_params_r() == 0 || algo->value() == "fixed_param") {
-      if (algo->value() != "fixed_param")
-        info(
-            "Model contains no parameters, running fixed_param sampler, "
-            "no updates to Markov chain");
+    if (algo->value() == "fixed_param") {
       return_code = stan::services::sample::fixed_param(
           model, *(init_contexts[0]), random_seed, id, init_radius, num_samples,
           num_thin, refresh, interrupt, logger, init_writers[0],
