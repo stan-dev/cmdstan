@@ -361,6 +361,10 @@ int command(int argc, const char *argv[]) {
               "num_chains can currently only be used for NUTS with adaptation "
               "and dense_e or diag_e metric");
         }
+      } else {
+        throw std::invalid_argument(
+            "num_chains can currently only be used for HMC with adaptation "
+            "engaged");
       }
     }
   }
