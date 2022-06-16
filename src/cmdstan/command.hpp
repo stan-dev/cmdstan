@@ -358,13 +358,13 @@ int command(int argc, const char *argv[]) {
         if (engine->value() != "nuts"
             && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
           throw std::invalid_argument(
-              "num_chains can currently only be used for NUTS with adaptation "
-              "and dense_e or diag_e metric");
+              "Argument 'num_chains' can currently only be used for NUTS with "
+              "adaptation and dense_e or diag_e metric");
         }
       } else {
         throw std::invalid_argument(
-            "num_chains can currently only be used for HMC with adaptation "
-            "engaged");
+            "Argument 'num_chains' can currently only be used for HMC with "
+            "adaptation engaged");
       }
     }
   }
@@ -695,10 +695,17 @@ int command(int argc, const char *argv[]) {
         = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
 
     if (model.num_params_r() == 0 || algo->value() == "fixed_param") {
-      if (algo->value() != "fixed_param")
+      if (algo->value() != "fixed_param") {
         info(
             "Model contains no parameters, running fixed_param sampler, "
             "no updates to Markov chain");
+        if (num_chains > 1) {
+          throw std::invalid_argument(
+              "Argument 'num_chains' can currently only be used for HMC with "
+              "adaptation engaged. This model has no parameters, which "
+              "currently means only the fixed_param algorithm can be used");
+        }
+      }
       return_code = stan::services::sample::fixed_param(
           model, *(init_contexts[0]), random_seed, id, init_radius, num_samples,
           num_thin, refresh, interrupt, logger, init_writers[0],
