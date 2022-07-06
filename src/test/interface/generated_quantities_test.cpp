@@ -20,6 +20,8 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "bern_fitted_params.csv"};
     bern_fitted_params_warmup
         = {"src", "test", "test-models", "bern_fitted_params_warmup.csv"};
+    bern_optimized_params
+        = {"src", "test", "test-models", "bern_optimized_params.csv"};
     bern_fitted_params_thin
         = {"src", "test", "test-models", "bern_fitted_params_thin.csv"};
     default_file_path = {"src", "test", "test-models", "output.csv"};
@@ -34,6 +36,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_data;
   std::vector<std::string> bern_fitted_params;
   std::vector<std::string> bern_fitted_params_warmup;
+  std::vector<std::string> bern_optimized_params;
   std::vector<std::string> bern_fitted_params_thin;
   std::vector<std::string> default_file_path;
   std::vector<std::string> dev_null_path;
@@ -159,6 +162,47 @@ TEST_F(CmdStan, generate_quantities_warmup) {
 
   ASSERT_EQ(fitted_params.samples.rows(), gq_output.samples.rows());
 }
+
+
+TEST_F(CmdStan, generate_quantities_after_optimization) {
+  std::stringstream ss;
+  ss << convert_model_path(bern_gq_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(default_file_path)
+     << " method=generate_quantities fitted_params="
+     << convert_model_path(bern_optimized_params);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+
+  std::stringstream msg;
+  std::string fp_path = convert_model_path(bern_optimized_params);
+  std::string gq_output_path = convert_model_path(default_file_path);
+
+  std::ifstream fp_stream(fp_path.c_str());
+  stan::io::stan_csv fitted_params;
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
+                                           &msg);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg,
+                                         false);
+  stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
+                                          fitted_params.timing, &msg);
+  fp_stream.close();
+
+  std::ifstream gq_stream(gq_output_path.c_str());
+  stan::io::stan_csv gq_output;
+  stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
+                                          gq_output.timing, &msg);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata, &msg);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg,
+                                         false);
+  stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
+                                          gq_output.timing, &msg);
+  gq_stream.close();
+
+  ASSERT_EQ(fitted_params.samples.rows(), gq_output.samples.rows());
+}
+
 
 TEST_F(CmdStan, generate_quantities_thin) {
   std::stringstream ss;
