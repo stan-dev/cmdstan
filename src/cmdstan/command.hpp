@@ -228,7 +228,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&...args) {
+                                      Args &&... args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -244,7 +244,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&...args) {
+                              Args &&... args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -275,7 +275,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into.
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
       ->value();
 }
