@@ -163,7 +163,6 @@ TEST_F(CmdStan, generate_quantities_warmup) {
   ASSERT_EQ(fitted_params.samples.rows(), gq_output.samples.rows());
 }
 
-
 TEST_F(CmdStan, generate_quantities_after_optimization) {
   std::stringstream ss;
   ss << convert_model_path(bern_gq_model)
@@ -202,7 +201,6 @@ TEST_F(CmdStan, generate_quantities_after_optimization) {
 
   ASSERT_EQ(fitted_params.samples.rows(), gq_output.samples.rows());
 }
-
 
 TEST_F(CmdStan, generate_quantities_thin) {
   std::stringstream ss;
