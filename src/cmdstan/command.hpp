@@ -651,14 +651,19 @@ int command(int argc, const char *argv[]) {
       }
     }
 
-    double lp;
-    std::vector<double> gradients(params_r_size);
 
     std::string grad_output_file
         = get_arg_val<string_argument>(parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
 
-    output_stream << std::setprecision(sig_figs_arg->value());
+    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
+    for (size_t i = 1; i < params_r_size; i++) {
+      output_stream << "g_" << i << ",";
+    }
+    output_stream << "g_" << params_r_size << "\n";
+
+    double lp;
+    std::vector<double> gradients(params_r_size);
 
     for (size_t i = 0; i < params_r_vec_size; i++) {
       size_t i_iter = dims_params_i.size() > 0 ? i : 0;
