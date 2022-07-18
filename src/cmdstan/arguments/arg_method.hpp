@@ -6,6 +6,7 @@
 #include <cmdstan/arguments/arg_optimize.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
 #include <cmdstan/arguments/arg_variational.hpp>
+#include <cmdstan/arguments/arg_log_prob.hpp>
 #include <cmdstan/arguments/list_argument.hpp>
 
 namespace cmdstan {
@@ -21,6 +22,7 @@ class arg_method : public list_argument {
     _values.push_back(new arg_variational());
     _values.push_back(new arg_diagnose());
     _values.push_back(new arg_generate_quantities());
+    _values.push_back(new arg_log_prob());
 
     _default_cursor = 0;
     _cursor = _default_cursor;
