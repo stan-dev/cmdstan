@@ -595,6 +595,7 @@ int command(int argc, const char *argv[]) {
         model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
   } else if (user_method->arg("log_prob")) {
+
     string_argument *upars_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
     string_argument *cpars_file = dynamic_cast<string_argument *>(
@@ -625,31 +626,25 @@ int command(int argc, const char *argv[]) {
       u_params_r = (*upars_context).vals_r("params_r");
       dims_u_params_r = (*upars_context).dims_r("params_r");
 
-      u_params_vec_size = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
-      u_params_size = dims_u_params_r.size() == 2 ? dims_u_params_r[1]
-                                                  : dims_u_params_r[0];
+      u_params_vec_size
+        = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
+      u_params_size
+        = dims_u_params_r.size() == 2 ? dims_u_params_r[1] : dims_u_params_r[0];
     }
-
     if (!(cpars_file->is_default())) {
       std::string c_fname(cpars_file->value());
       std::ifstream c_stream(c_fname.c_str());
 
-<<<<<<< HEAD
-      size_t params_r_vec_size
-          = dims_params_r.size() == 2 ? dims_params_r[0] : 1;
-      size_t params_r_size
-          = dims_params_r.size() == 2 ? dims_params_r[1] : dims_params_r[0];
-=======
       std::shared_ptr<stan::io::var_context> cpars_context
           = get_var_context(c_fname);
->>>>>>> 6d0de74 (Add handling of constrained params, par names in csv)
 
       c_params_r = (*cpars_context).vals_r("params_r");
       dims_c_params_r = (*cpars_context).dims_r("params_r");
 
-      c_params_vec_size = dims_c_params_r.size() == 2 ? dims_c_params_r[0] : 1;
-      c_params_size = dims_c_params_r.size() == 2 ? dims_c_params_r[1]
-                                                  : dims_c_params_r[0];
+      c_params_vec_size
+        = dims_c_params_r.size() == 2 ? dims_c_params_r[0] : 1;
+      c_params_size
+        = dims_c_params_r.size() == 2 ? dims_c_params_r[1] : dims_c_params_r[0];
     }
     size_t num_par_sets = c_params_vec_size + u_params_vec_size;
     std::vector<std::vector<double>> params_r_ind(num_par_sets);
@@ -662,21 +657,23 @@ int command(int argc, const char *argv[]) {
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
     std::vector<int> dummy_params_i;
     for (size_t i = 0; i < c_params_vec_size; i++) {
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-          c_params_r.data() + i, c_params_size, StrideT(1, c_params_vec_size));
-      stan::io::array_var_context context(p_names, map_r, param_dimss);
-      model.transform_inits(context, dummy_params_i, params_r_ind[i], &msg);
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(c_params_r.data() + i,
+                                                    c_params_size,
+                                                    StrideT(1, c_params_vec_size));
+      stan::io::array_var_context context(param_names, map_r, param_dimss);
+      model.transform_inits(context, dummy_params_i, params_r_ind[i],
+                            &msg);
     }
     for (size_t i = c_params_vec_size; i < num_par_sets; i++) {
       size_t iter = i - c_params_vec_size;
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-          u_params_r.data() + iter, u_params_size,
-          StrideT(1, u_params_vec_size));
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(u_params_r.data() + iter,
+                                                    u_params_size,
+                                                    StrideT(1, u_params_vec_size));
       params_r_ind[i] = stan::math::to_array_1d(map_r);
     }
 
-    std::string grad_output_file = get_arg_val<string_argument>(
-        parser, "output", "log_prob_output_file");
+    std::string grad_output_file
+        = get_arg_val<string_argument>(parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
 
     output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
@@ -689,11 +686,10 @@ int command(int argc, const char *argv[]) {
     std::vector<double> gradients;
     for (size_t i = 0; i < num_par_sets; i++) {
       lp = stan::model::log_prob_grad<false, true>(
-<<<<<<< HEAD
-          model, params_r_ind[i], params_i_ind[i_iter], gradients);
-=======
-          model, params_r_ind[i], dummy_params_i, gradients);
->>>>>>> 6d0de74 (Add handling of constrained params, par names in csv)
+        model,
+        params_r_ind[i],
+        dummy_params_i,
+        gradients);
 
       output_stream << lp << ",";
 
