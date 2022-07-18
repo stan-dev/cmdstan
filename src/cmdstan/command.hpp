@@ -616,27 +616,23 @@ int command(int argc, const char *argv[]) {
     std::vector<int> params_i = (*upars_context).vals_i("params_i");
 
     std::vector<double> gradients;
-    double log_prob = stan::model::log_prob_grad<false, true>(model,
-                                                                params_r,
-                                                                params_i,
-                                                                gradients);
+    double log_prob = stan::model::log_prob_grad<false, true>(
+        model, params_r, params_i, gradients);
 
     std::string grad_output_file
-      = get_arg_val<string_argument>(parser, "output", "grad_output_file");
+        = get_arg_val<string_argument>(parser, "output", "grad_output_file");
 
     std::ofstream output_stream(grad_output_file);
 
-    output_stream << std::setprecision(sig_figs_arg->value())
-                  << "# log_prob\n" << log_prob
-                  << "\n# log_prob_grad\n";
+    output_stream << std::setprecision(sig_figs_arg->value()) << "# log_prob\n"
+                  << log_prob << "\n# log_prob_grad\n";
     // Ensure that comma-delimiter not appended to final value when printing
     if (gradients.size() > 1) {
-        std::copy(gradients.begin(),
-                    gradients.end() - 1,
-                    std::ostream_iterator<double>(output_stream, ","));
-        output_stream << gradients.back();
+      std::copy(gradients.begin(), gradients.end() - 1,
+                std::ostream_iterator<double>(output_stream, ","));
+      output_stream << gradients.back();
     } else {
-        output_stream << gradients[0];
+      output_stream << gradients[0];
     }
     output_stream.close();
   } else if (user_method->arg("diagnose")) {
