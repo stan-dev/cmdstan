@@ -595,75 +595,112 @@ int command(int argc, const char *argv[]) {
         model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
   } else if (user_method->arg("log_prob")) {
+
     string_argument *upars_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
-    if (upars_file->is_default()) {
-      msg << "Missing unconstrained_params, cannot calculate log-probability "
-             "without input parameters.";
+    string_argument *cpars_file = dynamic_cast<string_argument *>(
+        parser.arg("method")->arg("log_prob")->arg("constrained_params"));
+
+    if (upars_file->is_default() && cpars_file->is_default()) {
+      msg << "No input parameters provided, cannot calculate log-probability";
       throw std::invalid_argument(msg.str());
     }
 
-    std::string fname(upars_file->value());
-    std::ifstream stream(fname.c_str());
-    if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
+    size_t u_params_vec_size = 0;
+    size_t u_params_size = 0;
+    size_t c_params_vec_size = 0;
+    size_t c_params_size = 0;
+
+    std::vector<double> u_params_r;
+    std::vector<double> c_params_r;
+    std::vector<size_t> dims_u_params_r;
+    std::vector<size_t> dims_c_params_r;
+
+    if (!(upars_file->is_default())) {
+      std::string u_fname(upars_file->value());
+      std::ifstream u_stream(u_fname.c_str());
+
+      std::shared_ptr<stan::io::var_context> upars_context
+          = get_var_context(u_fname);
+
+      u_params_r = (*upars_context).vals_r("params_r");
+      dims_u_params_r = (*upars_context).dims_r("params_r");
+
+      u_params_vec_size
+        = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
+      u_params_size
+        = dims_u_params_r.size() == 2 ? dims_u_params_r[1] : dims_u_params_r[0];
     }
-    std::shared_ptr<stan::io::var_context> upars_context
-        = get_var_context(fname);
 
-    std::vector<double> params_r = (*upars_context).vals_r("params_r");
-    std::vector<size_t> dims_params_r = (*upars_context).dims_r("params_r");
-    std::vector<int> params_i = (*upars_context).vals_i("params_i");
-    std::vector<size_t> dims_params_i = (*upars_context).dims_i("params_i");
+    if (!(cpars_file->is_default())) {
+      std::string c_fname(cpars_file->value());
+      std::ifstream c_stream(c_fname.c_str());
 
+<<<<<<< HEAD
     size_t params_r_vec_size = dims_params_r.size() == 2 ? dims_params_r[0] : 1;
     size_t params_r_size
         = dims_params_r.size() == 2 ? dims_params_r[1] : dims_params_r[0];
+=======
+      std::shared_ptr<stan::io::var_context> cpars_context
+          = get_var_context(c_fname);
+>>>>>>> 6d0de74 (Add handling of constrained params, par names in csv)
 
-    std::vector<std::vector<double>> params_r_ind(params_r_vec_size);
+      c_params_r = (*cpars_context).vals_r("params_r");
+      dims_c_params_r = (*cpars_context).dims_r("params_r");
+
+      c_params_vec_size
+        = dims_c_params_r.size() == 2 ? dims_c_params_r[0] : 1;
+      c_params_size
+        = dims_c_params_r.size() == 2 ? dims_c_params_r[1] : dims_c_params_r[0];
+    }
+    size_t num_par_sets = c_params_vec_size + u_params_vec_size;
+    std::vector<std::vector<double>> params_r_ind(num_par_sets);
+    std::vector<std::string> p_names;
+    model.constrained_param_names(p_names, false, false);
+    std::vector<std::string> param_names;
+    std::vector<std::vector<size_t>> param_dimss;
+    stan::services::get_model_parameters(model, param_names, param_dimss);
 
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
-    for (size_t i = 0; i < params_r_vec_size; i++) {
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-          params_r.data() + i, params_r_size, StrideT(1, params_r_vec_size));
+    std::vector<int> dummy_params_i;
+    for (size_t i = 0; i < c_params_vec_size; i++) {
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(c_params_r.data() + i,
+                                                    c_params_size,
+                                                    StrideT(1, c_params_vec_size));
+      stan::io::array_var_context context(p_names, map_r, param_dimss);
+      model.transform_inits(context, dummy_params_i, params_r_ind[i],
+                            &msg);
+    }
+    for (size_t i = c_params_vec_size; i < num_par_sets; i++) {
+      size_t iter = i - c_params_vec_size;
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(u_params_r.data() + iter,
+                                                    u_params_size,
+                                                    StrideT(1, u_params_vec_size));
       params_r_ind[i] = stan::math::to_array_1d(map_r);
     }
 
-    size_t params_i_vec_size = 0;
-    size_t params_i_size = 0;
-    std::vector<std::vector<int>> params_i_ind(1);
-
-    if (dims_params_i.size() > 0) {
-      params_i_vec_size = dims_params_i.size() == 2 ? dims_params_i[0] : 1;
-      params_i_size
-          = dims_params_i.size() == 2 ? dims_params_i[1] : dims_params_i[0];
-
-      params_i_ind.resize(params_i_vec_size);
-      for (size_t i = 0; i < params_i_vec_size; i++) {
-        Eigen::Map<Eigen::VectorXi, 0, StrideT> map_i(
-            params_i.data() + i, params_i_size, StrideT(1, params_i_vec_size));
-        params_i_ind[i] = stan::math::to_array_1d(map_i);
-      }
-    }
-
-    std::string grad_output_file = get_arg_val<string_argument>(
-        parser, "output", "log_prob_output_file");
+    std::string grad_output_file
+        = get_arg_val<string_argument>(parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
 
     output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
-    for (size_t i = 1; i < params_r_size; i++) {
-      output_stream << "g_" << i << ",";
+    for (size_t i = 1; i < p_names.size(); i++) {
+      output_stream << "g_" << p_names[i] << ",";
     }
-    output_stream << "g_" << params_r_size << "\n";
+    output_stream << "g_" << p_names.back() << "\n";
 
     double lp;
-    std::vector<double> gradients(params_r_size);
-
-    for (size_t i = 0; i < params_r_vec_size; i++) {
-      size_t i_iter = dims_params_i.size() > 0 ? i : 0;
+    std::vector<double> gradients;
+    for (size_t i = 0; i < num_par_sets; i++) {
       lp = stan::model::log_prob_grad<false, true>(
+<<<<<<< HEAD
           model, params_r_ind[i], params_i_ind[i_iter], gradients);
+=======
+        model,
+        params_r_ind[i],
+        dummy_params_i,
+        gradients);
+>>>>>>> 6d0de74 (Add handling of constrained params, par names in csv)
 
       output_stream << lp << ",";
 
