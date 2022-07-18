@@ -585,16 +585,14 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
     for (size_t i = 0; i < num_cols; ++i) {
-      if (param_names[i].compare(fitted_params.header[i + meta_cols])
-          != 0) {
+      if (param_names[i].compare(fitted_params.header[i + meta_cols]) != 0) {
         msg << "Mismatch between model and fitted_parameters csv file \""
             << fname << "\"" << std::endl;
         throw std::invalid_argument(msg.str());
       }
     }
     return_code = stan::services::standalone_generate(
-        model,
-        fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
+        model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(

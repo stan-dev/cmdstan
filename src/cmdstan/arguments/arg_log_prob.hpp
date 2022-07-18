@@ -10,7 +10,7 @@ class arg_log_prob : public categorical_argument {
  public:
   arg_log_prob() {
     _name = "log_prob";
-    _description = "Return the log-probability given supplied (unconstrained) parameters";
+    _description = "Return the log-probability and its gradients, given supplied (unconstrained) parameters";
 
     _subarguments.push_back(new arg_log_prob_unconstrained_params());
   }
