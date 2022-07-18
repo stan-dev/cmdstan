@@ -206,9 +206,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
-static constexpr int hmc_fixed_cols
-    = 7;  // hmc sampler outputs columns __lp + 6
-
 namespace internal {
 
 /**
@@ -571,16 +568,24 @@ int command(int argc, const char *argv[]) {
     stream.close();
     std::vector<std::string> param_names;
     model.constrained_param_names(param_names, false, false);
+    size_t meta_cols = 0;
+    for (auto col_name : fitted_params.header) {
+      if (boost::algorithm::ends_with(col_name, "__")) {
+        meta_cols++;
+      } else {
+        break;
+      }
+    }
     size_t num_cols = param_names.size();
     size_t num_rows = fitted_params.samples.rows();
     // check that all parameter names are in sample, in order
-    if (num_cols + hmc_fixed_cols > fitted_params.header.size()) {
+    if (num_cols + meta_cols > fitted_params.header.size()) {
       msg << "Mismatch between model and fitted_parameters csv file \"" << fname
           << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
     for (size_t i = 0; i < num_cols; ++i) {
-      if (param_names[i].compare(fitted_params.header[i + hmc_fixed_cols])
+      if (param_names[i].compare(fitted_params.header[i + meta_cols])
           != 0) {
         msg << "Mismatch between model and fitted_parameters csv file \""
             << fname << "\"" << std::endl;
@@ -589,7 +594,7 @@ int command(int argc, const char *argv[]) {
     }
     return_code = stan::services::standalone_generate(
         model,
-        fitted_params.samples.block(0, hmc_fixed_cols, num_rows, num_cols),
+        fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(
