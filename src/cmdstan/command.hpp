@@ -617,18 +617,16 @@ int command(int argc, const char *argv[]) {
     std::vector<int> params_i = (*upars_context).vals_i("params_i");
     std::vector<size_t> dims_params_i = (*upars_context).dims_i("params_i");
 
-    size_t params_r_vec_size
-      = dims_params_r.size() == 2 ? dims_params_r[0] : 1;
+    size_t params_r_vec_size = dims_params_r.size() == 2 ? dims_params_r[0] : 1;
     size_t params_r_size
-      = dims_params_r.size() == 2 ? dims_params_r[1] : dims_params_r[0];
+        = dims_params_r.size() == 2 ? dims_params_r[1] : dims_params_r[0];
 
     std::vector<std::vector<double>> params_r_ind(params_r_vec_size);
 
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
     for (size_t i = 0; i < params_r_vec_size; i++) {
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(params_r.data() + i,
-                                                    params_r_size,
-                                                    StrideT(1, params_r_vec_size));
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
+          params_r.data() + i, params_r_size, StrideT(1, params_r_vec_size));
       params_r_ind[i] = stan::math::to_array_1d(map_r);
     }
 
@@ -637,23 +635,20 @@ int command(int argc, const char *argv[]) {
     std::vector<std::vector<int>> params_i_ind(1);
 
     if (dims_params_i.size() > 0) {
-      params_i_vec_size
-        = dims_params_i.size() == 2 ? dims_params_i[0] : 1;
+      params_i_vec_size = dims_params_i.size() == 2 ? dims_params_i[0] : 1;
       params_i_size
-        = dims_params_i.size() == 2 ? dims_params_i[1] : dims_params_i[0];
+          = dims_params_i.size() == 2 ? dims_params_i[1] : dims_params_i[0];
 
       params_i_ind.resize(params_i_vec_size);
       for (size_t i = 0; i < params_i_vec_size; i++) {
-      Eigen::Map<Eigen::VectorXi, 0, StrideT> map_i(params_i.data() + i,
-                                                    params_i_size,
-                                                    StrideT(1, params_i_vec_size));
-      params_i_ind[i] = stan::math::to_array_1d(map_i);
+        Eigen::Map<Eigen::VectorXi, 0, StrideT> map_i(
+            params_i.data() + i, params_i_size, StrideT(1, params_i_vec_size));
+        params_i_ind[i] = stan::math::to_array_1d(map_i);
       }
     }
 
-
-    std::string grad_output_file
-        = get_arg_val<string_argument>(parser, "output", "log_prob_output_file");
+    std::string grad_output_file = get_arg_val<string_argument>(
+        parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
 
     output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
@@ -668,10 +663,7 @@ int command(int argc, const char *argv[]) {
     for (size_t i = 0; i < params_r_vec_size; i++) {
       size_t i_iter = dims_params_i.size() > 0 ? i : 0;
       lp = stan::model::log_prob_grad<false, true>(
-        model,
-        params_r_ind[i],
-        params_i_ind[i_iter],
-        gradients);
+          model, params_r_ind[i], params_i_ind[i_iter], gradients);
 
       output_stream << lp << ",";
 
