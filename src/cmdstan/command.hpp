@@ -704,8 +704,7 @@ int command(int argc, const char *argv[]) {
     std::string grad_output_file = get_arg_val<string_argument>(
         parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
-    output_stream << std::setprecision(sig_figs_arg->value())
-                  << "lp_,";
+    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
@@ -719,10 +718,10 @@ int command(int argc, const char *argv[]) {
     for (size_t i = 0; i < num_par_sets; i++) {
       if (jacobian_adjust) {
         lp = stan::model::log_prob_grad<false, true>(model, params_r_ind[i],
-                                                    dummy_params_i, gradients);
+                                                     dummy_params_i, gradients);
       } else {
-        lp = stan::model::log_prob_grad<false, false>(model, params_r_ind[i],
-                                                    dummy_params_i, gradients);
+        lp = stan::model::log_prob_grad<false, false>(
+            model, params_r_ind[i], dummy_params_i, gradients);
       }
 
       output_stream << lp << ",";
