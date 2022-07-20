@@ -14,7 +14,9 @@ class arg_log_prob_constrained_params : public string_argument {
  public:
   arg_log_prob_constrained_params() : string_argument() {
     _name = "constrained_params";
-    _description = "Input file (JSON or R dump) of parameter values on constrained scale";
+    _description
+        = "Input file (JSON or R dump) of parameter values on constrained "
+          "scale";
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";

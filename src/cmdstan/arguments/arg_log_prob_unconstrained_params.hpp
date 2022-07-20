@@ -14,7 +14,9 @@ class arg_log_prob_unconstrained_params : public string_argument {
  public:
   arg_log_prob_unconstrained_params() : string_argument() {
     _name = "unconstrained_params";
-    _description = "Input file (JSON or R dump) of parameter values on unconstrained scale";
+    _description
+        = "Input file (JSON or R dump) of parameter values on unconstrained "
+          "scale";
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";

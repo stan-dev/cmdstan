@@ -22,8 +22,8 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "bern_unconstrained_params.json"};
     bern_constrained_params_json
         = {"src", "test", "test-models", "bern_constrained_params.json"};
-    bern_unconstrained_params_short
-        = {"src", "test", "test-models", "bern_unconstrained_params_short.json"};
+    bern_unconstrained_params_short = {"src", "test", "test-models",
+                                       "bern_unconstrained_params_short.json"};
     bern_constrained_params_short
         = {"src", "test", "test-models", "bern_constrained_params_short.json"};
     dev_null_path = {"/dev", "null"};
@@ -37,7 +37,6 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_unconstrained_params_short;
   std::vector<std::string> bern_constrained_params_short;
   std::vector<std::string> dev_null_path;
-
 };
 
 TEST_F(CmdStan, log_prob_good_rdump) {

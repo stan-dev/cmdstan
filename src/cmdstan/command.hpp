@@ -604,7 +604,8 @@ int command(int argc, const char *argv[]) {
               parser.arg("method")->arg("log_prob")->arg("jacobian_adjust"))
               ->value();
     if (upars_file->is_default() && cpars_file->is_default()) {
-      msg << "No input parameters provided, cannot calculate log probability density";
+      msg << "No input parameters provided, cannot calculate log probability "
+             "density";
       throw std::invalid_argument(msg.str());
     }
 
@@ -637,8 +638,9 @@ int command(int argc, const char *argv[]) {
 
     if (u_params_size > 0 && u_params_size != param_names.size()) {
       msg << "Incorrect number of unconstrained parameters provided! "
-             "Model has " << param_names.size() << " parameters but " <<
-             u_params_size << " were found.";
+             "Model has "
+          << param_names.size() << " parameters but " << u_params_size
+          << " were found.";
       throw std::invalid_argument(msg.str());
     }
 
@@ -663,8 +665,9 @@ int command(int argc, const char *argv[]) {
 
     if (c_params_size > 0 && c_params_size != param_names.size()) {
       msg << "Incorrect number of constrained parameters provided! "
-             "Model has " << param_names.size() << " parameters but " <<
-             c_params_size << " were found.";
+             "Model has "
+          << param_names.size() << " parameters but " << c_params_size
+          << " were found.";
       throw std::invalid_argument(msg.str());
     }
 
@@ -672,8 +675,7 @@ int command(int argc, const char *argv[]) {
     size_t num_par_sets = c_params_vec_size + u_params_vec_size;
     std::vector<std::vector<double>> params_r_ind(num_par_sets);
 
-
-      // Use Map with inner stride to operate on all values from parameter set
+    // Use Map with inner stride to operate on all values from parameter set
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
     std::vector<int> dummy_params_i;
     for (size_t i = 0; i < c_params_vec_size; i++) {
@@ -709,8 +711,8 @@ int command(int argc, const char *argv[]) {
       std::vector<double> gradients;
       for (size_t i = 0; i < num_par_sets; i++) {
         if (jacobian_adjust) {
-          lp = stan::model::log_prob_grad<false, true>(model, params_r_ind[i],
-                                                      dummy_params_i, gradients);
+          lp = stan::model::log_prob_grad<false, true>(
+              model, params_r_ind[i], dummy_params_i, gradients);
         } else {
           lp = stan::model::log_prob_grad<false, false>(
               model, params_r_ind[i], dummy_params_i, gradients);
@@ -725,7 +727,7 @@ int command(int argc, const char *argv[]) {
       }
       output_stream.close();
       return stan::services::error_codes::error_codes::OK;
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       output_stream.close();
       return stan::services::error_codes::error_codes::DATAERR;
     }
