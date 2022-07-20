@@ -629,6 +629,19 @@ int command(int argc, const char *argv[]) {
                                                   : dims_u_params_r[0];
     }
 
+    // Store names and dims for constructing array_var_context
+    // and unconstraining transform
+    std::vector<std::string> param_names;
+    std::vector<std::vector<size_t>> param_dimss;
+    stan::services::get_model_parameters(model, param_names, param_dimss);
+
+    if (u_params_size > 0 && u_params_size != param_names.size()) {
+      msg << "Incorrect number of unconstrained parameters provided! "
+             "Model has " << param_names.size() << " parameters but " <<
+             u_params_size << " were found.";
+      throw std::invalid_argument(msg.str());
+    }
+
     size_t c_params_vec_size = 0;
     size_t c_params_size = 0;
     std::vector<double> c_params_r;
@@ -648,12 +661,12 @@ int command(int argc, const char *argv[]) {
                                                   : dims_c_params_r[0];
     }
 
-
-    // Store names and dims for constructing array_var_context
-    // and unconstraining transform
-    std::vector<std::string> param_names;
-    std::vector<std::vector<size_t>> param_dimss;
-    stan::services::get_model_parameters(model, param_names, param_dimss);
+    if (c_params_size > 0 && c_params_size != param_names.size()) {
+      msg << "Incorrect number of constrained parameters provided! "
+             "Model has " << param_names.size() << " parameters but " <<
+             c_params_size << " were found.";
+      throw std::invalid_argument(msg.str());
+    }
 
     // Store in single nested array to allow single loop for calc and print
     size_t num_par_sets = c_params_vec_size + u_params_vec_size;
@@ -711,8 +724,10 @@ int command(int argc, const char *argv[]) {
         output_stream << "\n";
       }
       output_stream.close();
+      return stan::services::error_codes::error_codes::OK;
     } catch (const std::exception& e) {
       output_stream.close();
+      return stan::services::error_codes::error_codes::DATAERR;
     }
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
