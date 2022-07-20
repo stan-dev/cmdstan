@@ -594,6 +594,143 @@ int command(int argc, const char *argv[]) {
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
+  } else if (user_method->arg("log_prob")) {
+    string_argument *upars_file = dynamic_cast<string_argument *>(
+        parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
+    string_argument *cpars_file = dynamic_cast<string_argument *>(
+        parser.arg("method")->arg("log_prob")->arg("constrained_params"));
+    bool jacobian_adjust
+        = dynamic_cast<bool_argument *>(
+              parser.arg("method")->arg("log_prob")->arg("jacobian_adjust"))
+              ->value();
+    if (upars_file->is_default() && cpars_file->is_default()) {
+      msg << "No input parameters provided, cannot calculate log probability "
+             "density";
+      throw std::invalid_argument(msg.str());
+    }
+
+    size_t u_params_vec_size = 0;
+    size_t u_params_size = 0;
+    std::vector<double> u_params_r;
+    std::vector<size_t> dims_u_params_r;
+    if (!(upars_file->is_default())) {
+      std::string u_fname(upars_file->value());
+      std::ifstream u_stream(u_fname.c_str());
+
+      std::shared_ptr<stan::io::var_context> upars_context
+          = get_var_context(u_fname);
+
+      u_params_r = (*upars_context).vals_r("params_r");
+      dims_u_params_r = (*upars_context).dims_r("params_r");
+
+      // Detect whether multiple sets of parameter values have been passed
+      // and set the sizes accordingly
+      u_params_vec_size = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
+      u_params_size = dims_u_params_r.size() == 2 ? dims_u_params_r[1]
+                                                  : dims_u_params_r[0];
+    }
+
+    // Store names and dims for constructing array_var_context
+    // and unconstraining transform
+    std::vector<std::string> param_names;
+    std::vector<std::vector<size_t>> param_dimss;
+    stan::services::get_model_parameters(model, param_names, param_dimss);
+
+    if (u_params_size > 0 && u_params_size != param_names.size()) {
+      msg << "Incorrect number of unconstrained parameters provided! "
+             "Model has "
+          << param_names.size() << " parameters but " << u_params_size
+          << " were found.";
+      throw std::invalid_argument(msg.str());
+    }
+
+    size_t c_params_vec_size = 0;
+    size_t c_params_size = 0;
+    std::vector<double> c_params_r;
+    std::vector<size_t> dims_c_params_r;
+    if (!(cpars_file->is_default())) {
+      std::string c_fname(cpars_file->value());
+      std::ifstream c_stream(c_fname.c_str());
+
+      std::shared_ptr<stan::io::var_context> cpars_context
+          = get_var_context(c_fname);
+
+      c_params_r = (*cpars_context).vals_r("params_r");
+      dims_c_params_r = (*cpars_context).dims_r("params_r");
+
+      c_params_vec_size = dims_c_params_r.size() == 2 ? dims_c_params_r[0] : 1;
+      c_params_size = dims_c_params_r.size() == 2 ? dims_c_params_r[1]
+                                                  : dims_c_params_r[0];
+    }
+
+    if (c_params_size > 0 && c_params_size != param_names.size()) {
+      msg << "Incorrect number of constrained parameters provided! "
+             "Model has "
+          << param_names.size() << " parameters but " << c_params_size
+          << " were found.";
+      throw std::invalid_argument(msg.str());
+    }
+
+    // Store in single nested array to allow single loop for calc and print
+    size_t num_par_sets = c_params_vec_size + u_params_vec_size;
+    std::vector<std::vector<double>> params_r_ind(num_par_sets);
+
+    // Use Map with inner stride to operate on all values from parameter set
+    using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
+    std::vector<int> dummy_params_i;
+    for (size_t i = 0; i < c_params_vec_size; i++) {
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
+          c_params_r.data() + i, c_params_size, StrideT(1, c_params_vec_size));
+
+      stan::io::array_var_context context(param_names, map_r, param_dimss);
+      model.transform_inits(context, dummy_params_i, params_r_ind[i], &msg);
+    }
+
+    for (size_t i = c_params_vec_size; i < num_par_sets; i++) {
+      size_t iter = i - c_params_vec_size;
+      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
+          u_params_r.data() + iter, u_params_size,
+          StrideT(1, u_params_vec_size));
+
+      params_r_ind[i] = stan::math::to_array_1d(map_r);
+    }
+
+    std::string grad_output_file = get_arg_val<string_argument>(
+        parser, "output", "log_prob_output_file");
+    std::ofstream output_stream(grad_output_file);
+    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
+
+    std::vector<std::string> p_names;
+    model.constrained_param_names(p_names, false, false);
+    for (size_t i = 1; i < p_names.size(); i++) {
+      output_stream << "g_" << p_names[i] << ",";
+    }
+    output_stream << "g_" << p_names.back() << "\n";
+    try {
+      double lp;
+      std::vector<double> gradients;
+      for (size_t i = 0; i < num_par_sets; i++) {
+        if (jacobian_adjust) {
+          lp = stan::model::log_prob_grad<false, true>(
+              model, params_r_ind[i], dummy_params_i, gradients);
+        } else {
+          lp = stan::model::log_prob_grad<false, false>(
+              model, params_r_ind[i], dummy_params_i, gradients);
+        }
+
+        output_stream << lp << ",";
+
+        std::copy(gradients.begin(), gradients.end() - 1,
+                  std::ostream_iterator<double>(output_stream, ","));
+        output_stream << gradients.back();
+        output_stream << "\n";
+      }
+      output_stream.close();
+      return stan::services::error_codes::error_codes::OK;
+    } catch (const std::exception &e) {
+      output_stream.close();
+      return stan::services::error_codes::error_codes::DATAERR;
+    }
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
