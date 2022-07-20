@@ -604,26 +604,14 @@ int command(int argc, const char *argv[]) {
               parser.arg("method")->arg("log_prob")->arg("jacobian_adjust"))
               ->value();
     if (upars_file->is_default() && cpars_file->is_default()) {
-      msg << "No input parameters provided, cannot calculate log-probability";
+      msg << "No input parameters provided, cannot calculate log probability density";
       throw std::invalid_argument(msg.str());
     }
 
-    /*
-      By only updating the sizes/vectors if there is data present, the
-      calculation and printing can be agnostic from the combinations of
-      un-/constrained parameters passed
-    */
     size_t u_params_vec_size = 0;
     size_t u_params_size = 0;
-    size_t c_params_vec_size = 0;
-    size_t c_params_size = 0;
-
     std::vector<double> u_params_r;
-    std::vector<double> c_params_r;
     std::vector<size_t> dims_u_params_r;
-    std::vector<size_t> dims_c_params_r;
-    std::vector<int> dummy_params_i;
-
     if (!(upars_file->is_default())) {
       std::string u_fname(upars_file->value());
       std::ifstream u_stream(u_fname.c_str());
@@ -641,6 +629,10 @@ int command(int argc, const char *argv[]) {
                                                   : dims_u_params_r[0];
     }
 
+    size_t c_params_vec_size = 0;
+    size_t c_params_size = 0;
+    std::vector<double> c_params_r;
+    std::vector<size_t> dims_c_params_r;
     if (!(cpars_file->is_default())) {
       std::string c_fname(cpars_file->value());
       std::ifstream c_stream(c_fname.c_str());
@@ -656,37 +648,25 @@ int command(int argc, const char *argv[]) {
                                                   : dims_c_params_r[0];
     }
 
-    /*
-    Parameter names and dimensions required for constructing
-    array_var_context and subsequently transforming constrained parameters
-    to unconstrained scale
-    */
+
+    // Store names and dims for constructing array_var_context
+    // and unconstraining transform
     std::vector<std::string> param_names;
     std::vector<std::vector<size_t>> param_dimss;
     stan::services::get_model_parameters(model, param_names, param_dimss);
 
-    /*
-      Will store both constrained and unconstrained parameter sets in single
-      nested array so that only a single loop is required for calculation
-      and printing
-    */
+    // Store in single nested array to allow single loop for calc and print
     size_t num_par_sets = c_params_vec_size + u_params_vec_size;
     std::vector<std::vector<double>> params_r_ind(num_par_sets);
 
-    /*
-      An Eigen::Map with an inner stride is needed for viewing all parameter
-      values for a given set as a single vector when multiple parameter sets
-      are passed, as the var_context returns them appended by parameter, rather
-      than by set, i.e,:
-        [[a1, b1],[a2,b2]] => [a1, a2, b1, b2]
-    */
+
+      // Use Map with inner stride to operate on all values from parameter set
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
+    std::vector<int> dummy_params_i;
     for (size_t i = 0; i < c_params_vec_size; i++) {
       Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
           c_params_r.data() + i, c_params_size, StrideT(1, c_params_vec_size));
 
-      // Constrained parameters are unconstrained directly into the std::vector
-      // of unconstrained parameter sets to iterate over
       stan::io::array_var_context context(param_names, map_r, param_dimss);
       model.transform_inits(context, dummy_params_i, params_r_ind[i], &msg);
     }
@@ -696,8 +676,7 @@ int command(int argc, const char *argv[]) {
       Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
           u_params_r.data() + iter, u_params_size,
           StrideT(1, u_params_vec_size));
-      // As they are already on the correct scale, the unconstrained parameters
-      // can simply be appended after the constrained (if any)
+
       params_r_ind[i] = stan::math::to_array_1d(map_r);
     }
 
@@ -712,31 +691,29 @@ int command(int argc, const char *argv[]) {
       output_stream << "g_" << p_names[i] << ",";
     }
     output_stream << "g_" << p_names.back() << "\n";
+    try {
+      double lp;
+      std::vector<double> gradients;
+      for (size_t i = 0; i < num_par_sets; i++) {
+        if (jacobian_adjust) {
+          lp = stan::model::log_prob_grad<false, true>(model, params_r_ind[i],
+                                                      dummy_params_i, gradients);
+        } else {
+          lp = stan::model::log_prob_grad<false, false>(
+              model, params_r_ind[i], dummy_params_i, gradients);
+        }
 
-    double lp;
-    std::vector<double> gradients;
-    for (size_t i = 0; i < num_par_sets; i++) {
-      if (jacobian_adjust) {
-        lp = stan::model::log_prob_grad<false, true>(model, params_r_ind[i],
-                                                     dummy_params_i, gradients);
-      } else {
-        lp = stan::model::log_prob_grad<false, false>(
-            model, params_r_ind[i], dummy_params_i, gradients);
-      }
+        output_stream << lp << ",";
 
-      output_stream << lp << ",";
-
-      // Ensure that each row of values ends with a newline instead of delimeter
-      if (gradients.size() > 1) {
         std::copy(gradients.begin(), gradients.end() - 1,
                   std::ostream_iterator<double>(output_stream, ","));
         output_stream << gradients.back();
-      } else {
-        output_stream << gradients[0];
+        output_stream << "\n";
       }
-      output_stream << "\n";
+      output_stream.close();
+    } catch (const std::exception& e) {
+      output_stream.close();
     }
-    output_stream.close();
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
