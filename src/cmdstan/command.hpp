@@ -623,7 +623,7 @@ int command(int argc, const char *argv[]) {
       u_params_r = (*upars_context).vals_r("params_r");
       if (u_params_r.size() == 0) {
         msg << "Unconstrained parameters file has no variable 'params_r' with "
-                "unconstrained parameter values!";
+               "unconstrained parameter values!";
         throw std::invalid_argument(msg.str());
       }
       dims_u_params_r = (*upars_context).dims_r("params_r");
@@ -662,10 +662,12 @@ int command(int argc, const char *argv[]) {
           = get_var_context(c_fname);
       std::vector<std::string> input_cpar_names;
       (*cpars_context).names_r(input_cpar_names);
-      for (std::string& m_param_name : param_names) {
-        bool present =
-          std::any_of(input_cpar_names.begin(), input_cpar_names.end(),
-          [m_param_name](std::string& c_param_name) { return m_param_name == c_param_name; });
+      for (std::string &m_param_name : param_names) {
+        bool present
+            = std::any_of(input_cpar_names.begin(), input_cpar_names.end(),
+                          [m_param_name](std::string &c_param_name) {
+                            return m_param_name == c_param_name;
+                          });
 
         if (!present) {
           msg << "Constrained value(s) for parameter " << m_param_name
@@ -673,7 +675,8 @@ int command(int argc, const char *argv[]) {
           throw std::invalid_argument(msg.str());
         }
       }
-      model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0], &msg);
+      model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0],
+                            &msg);
     }
 
     // Use Map with inner stride to operate on all values from parameter set
