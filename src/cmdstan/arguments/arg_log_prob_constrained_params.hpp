@@ -6,9 +6,8 @@
 namespace cmdstan {
 /**
  * Argument for providing a file of parameters on the constrained scale
- * for use with the 'log_prob' method. The file can be in CSV or JSON format
- * and should contain a variable 'params_r' with either a vector or list/array
- * of vectors of constrained parameter values.
+ * for use with the 'log_prob' method. The file can be in JSON or R Dump format,
+ * using the same structure as the 'init' argument
  */
 class arg_log_prob_constrained_params : public string_argument {
  public:

@@ -621,6 +621,11 @@ int command(int argc, const char *argv[]) {
           = get_var_context(u_fname);
 
       u_params_r = (*upars_context).vals_r("params_r");
+      if (u_params_r.size() == 0) {
+        msg << "Unconstrained parameters file has no variable 'params_r' with "
+                "unconstrained parameter values!";
+        throw std::invalid_argument(msg.str());
+      }
       dims_u_params_r = (*upars_context).dims_r("params_r");
 
       // Detect whether multiple sets of parameter values have been passed
@@ -644,50 +649,37 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
 
-    size_t c_params_vec_size = 0;
-    size_t c_params_size = 0;
-    std::vector<double> c_params_r;
-    std::vector<size_t> dims_c_params_r;
+    int cpars_size = !(cpars_file->is_default()) ? 1 : 0;
+    // Store in single nested array to allow single loop for calc and print
+    size_t num_par_sets = u_params_vec_size + cpars_size;
+    std::vector<std::vector<double>> params_r_ind(num_par_sets);
+    std::vector<int> dummy_params_i;
     if (!(cpars_file->is_default())) {
       std::string c_fname(cpars_file->value());
       std::ifstream c_stream(c_fname.c_str());
 
       std::shared_ptr<stan::io::var_context> cpars_context
           = get_var_context(c_fname);
+      std::vector<std::string> input_cpar_names;
+      (*cpars_context).names_r(input_cpar_names);
+      for (std::string& m_param_name : param_names) {
+        bool present =
+          std::any_of(input_cpar_names.begin(), input_cpar_names.end(),
+          [m_param_name](std::string& c_param_name) { return m_param_name == c_param_name; });
 
-      c_params_r = (*cpars_context).vals_r("params_r");
-      dims_c_params_r = (*cpars_context).dims_r("params_r");
-
-      c_params_vec_size = dims_c_params_r.size() == 2 ? dims_c_params_r[0] : 1;
-      c_params_size = dims_c_params_r.size() == 2 ? dims_c_params_r[1]
-                                                  : dims_c_params_r[0];
+        if (!present) {
+          msg << "Constrained value(s) for parameter " << m_param_name
+              << " not found!";
+          throw std::invalid_argument(msg.str());
+        }
+      }
+      model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0], &msg);
     }
-
-    if (c_params_size > 0 && c_params_size != param_names.size()) {
-      msg << "Incorrect number of constrained parameters provided! "
-             "Model has "
-          << param_names.size() << " parameters but " << c_params_size
-          << " were found.";
-      throw std::invalid_argument(msg.str());
-    }
-
-    // Store in single nested array to allow single loop for calc and print
-    size_t num_par_sets = c_params_vec_size + u_params_vec_size;
-    std::vector<std::vector<double>> params_r_ind(num_par_sets);
 
     // Use Map with inner stride to operate on all values from parameter set
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
-    std::vector<int> dummy_params_i;
-    for (size_t i = 0; i < c_params_vec_size; i++) {
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-          c_params_r.data() + i, c_params_size, StrideT(1, c_params_vec_size));
-
-      stan::io::array_var_context context(param_names, map_r, param_dimss);
-      model.transform_inits(context, dummy_params_i, params_r_ind[i], &msg);
-    }
-
-    for (size_t i = c_params_vec_size; i < num_par_sets; i++) {
-      size_t iter = i - c_params_vec_size;
+    for (size_t i = cpars_size; i < num_par_sets; i++) {
+      size_t iter = i - cpars_size;
       Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
           u_params_r.data() + iter, u_params_size,
           StrideT(1, u_params_vec_size));
