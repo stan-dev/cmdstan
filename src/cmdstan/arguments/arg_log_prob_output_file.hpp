@@ -4,7 +4,10 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
 
 namespace cmdstan {
-
+/**
+ * Sub-argument to provide a custom path and filename for the output from
+ * the log_prob method
+ */
 class arg_log_prob_output_file : public string_argument {
  public:
   arg_log_prob_output_file() : string_argument() {
