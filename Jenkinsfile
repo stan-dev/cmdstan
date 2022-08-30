@@ -211,7 +211,6 @@ pipeline {
                         sh "echo STAN_MPI=true >> make/local"
                         sh "echo CXX_TYPE=gcc >> make/local"
                         sh "make build-mpi > build-mpi.log 2>&1"
-                        sh "cat make/local" // Debug
                         sh runTests("./")
                     }
                     post {
