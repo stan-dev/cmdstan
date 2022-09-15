@@ -485,7 +485,7 @@ int command(int argc, const char *argv[]) {
       return std::string("_" + std::to_string(i + id));
     }
   };
-  for (int i = 0; i < num_chains; i++) {
+  for (int i = 0; i < num_chains; ++i) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     auto unique_fstream
         = std::make_unique<std::fstream>(output_filename, std::fstream::out);
@@ -504,7 +504,7 @@ int command(int argc, const char *argv[]) {
       diagnostic_writers.emplace_back(nullptr, "# ");
     }
   }
-  for (int i = 0; i < num_chains; i++) {
+  for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
     write_datetime(sample_writers[i]);
@@ -620,13 +620,13 @@ int command(int argc, const char *argv[]) {
       std::shared_ptr<stan::io::var_context> upars_context
           = get_var_context(u_fname);
 
-      u_params_r = (*upars_context).vals_r("params_r");
+      u_params_r = upars_context->vals_r("params_r");
       if (u_params_r.size() == 0) {
         msg << "Unconstrained parameters file has no variable 'params_r' with "
                "unconstrained parameter values!";
         throw std::invalid_argument(msg.str());
       }
-      dims_u_params_r = (*upars_context).dims_r("params_r");
+      dims_u_params_r = upars_context->dims_r("params_r");
 
       // Detect whether multiple sets of parameter values have been passed
       // and set the sizes accordingly
@@ -649,27 +649,21 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
 
-    int cpars_size = !(cpars_file->is_default()) ? 1 : 0;
+    int has_cpars = !cpars_file->is_default();
     // Store in single nested array to allow single loop for calc and print
-    size_t num_par_sets = u_params_vec_size + cpars_size;
+    size_t num_par_sets = u_params_vec_size + has_cpars;
     std::vector<std::vector<double>> params_r_ind(num_par_sets);
     std::vector<int> dummy_params_i;
-    if (!(cpars_file->is_default())) {
-      std::string c_fname(cpars_file->value());
-      std::ifstream c_stream(c_fname.c_str());
+    if (!cpars_file->is_default()) {
+      std::string cpars_filename(cpars_file->value());
 
       std::shared_ptr<stan::io::var_context> cpars_context
-          = get_var_context(c_fname);
+          = get_var_context(cpars_filename);
       std::vector<std::string> input_cpar_names;
-      (*cpars_context).names_r(input_cpar_names);
-      for (std::string &m_param_name : param_names) {
-        bool present
-            = std::any_of(input_cpar_names.begin(), input_cpar_names.end(),
-                          [m_param_name](std::string &c_param_name) {
-                            return m_param_name == c_param_name;
-                          });
+      cpars_context->names_r(input_cpar_names);
 
-        if (!present) {
+      for (const std::string &m_param_name : param_names) {
+        if (!cpars_context->contains_r(m_param_name)) {
           msg << "Constrained value(s) for parameter " << m_param_name
               << " not found!";
           throw std::invalid_argument(msg.str());
@@ -681,8 +675,8 @@ int command(int argc, const char *argv[]) {
 
     // Use Map with inner stride to operate on all values from parameter set
     using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
-    for (size_t i = cpars_size; i < num_par_sets; i++) {
-      size_t iter = i - cpars_size;
+    for (size_t i = has_cpars; i < num_par_sets; ++i) {
+      size_t iter = i - has_cpars;
       Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
           u_params_r.data() + iter, u_params_size,
           StrideT(1, u_params_vec_size));
@@ -697,14 +691,14 @@ int command(int argc, const char *argv[]) {
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
-    for (size_t i = 1; i < p_names.size(); i++) {
+    for (size_t i = 1; i < p_names.size(); ++i) {
       output_stream << "g_" << p_names[i] << ",";
     }
     output_stream << "g_" << p_names.back() << "\n";
     try {
       double lp;
       std::vector<double> gradients;
-      for (size_t i = 0; i < num_par_sets; i++) {
+      for (size_t i = 0; i < num_par_sets; ++i) {
         if (jacobian_adjust) {
           lp = stan::model::log_prob_grad<false, true>(
               model, params_r_ind[i], dummy_params_i, gradients);
