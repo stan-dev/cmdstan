@@ -8,8 +8,8 @@ namespace cmdstan {
  * Argument for providing a file of parameters on the constrained scale
  * for use with the 'log_prob' method. The file can be in JSON or R Dump format,
  * using the same structure as the 'init' argument. Like the 'init' argument, if
- * the file has a '.json' extension it is treated as a JSON file, otherwise it is
- * treated as an RDump file.
+ * the file has a '.json' extension it is treated as a JSON file, otherwise it
+ * is treated as an RDump file.
  */
 class arg_log_prob_constrained_params : public string_argument {
  public:
