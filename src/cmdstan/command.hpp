@@ -648,7 +648,7 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
 
-    int has_cpars = !cpars_file->is_default();
+    bool has_cpars = !cpars_file->is_default();
     // Store in single nested array to allow single loop for calc and print
     size_t num_par_sets = u_params_vec_size + has_cpars;
     std::vector<std::vector<double>> params_r_ind(num_par_sets);
@@ -690,28 +690,28 @@ int command(int argc, const char *argv[]) {
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
-    for (size_t i = 0; i < p_names.size(); ++i) {
+    for (size_t i = 0; i < (p_names.size() - 1); ++i) {
       output_stream << "g_" << p_names[i] << ",";
     }
-    output_stream << "g_" << p_names.back() << "\n";
+    // Output last element separately so that no trailing comma is printed
+    output_stream << p_names.back() << "\n";
     try {
       double lp;
       std::vector<double> gradients;
-      for (size_t i = 0; i < num_par_sets; ++i) {
+      for (auto&& param_set : params_r_ind) {
         if (jacobian_adjust) {
           lp = stan::model::log_prob_grad<true, true>(
-              model, params_r_ind[i], dummy_params_i, gradients);
+              model, param_set, dummy_params_i, gradients);
         } else {
           lp = stan::model::log_prob_grad<true, false>(
-              model, params_r_ind[i], dummy_params_i, gradients);
+              model, param_set, dummy_params_i, gradients);
         }
 
         output_stream << lp << ",";
 
         std::copy(gradients.begin(), gradients.end() - 1,
                   std::ostream_iterator<double>(output_stream, ","));
-        output_stream << gradients.back();
-        output_stream << "\n";
+        output_stream << gradients.back() << "\n";
       }
       output_stream.close();
       return stan::services::error_codes::error_codes::OK;
