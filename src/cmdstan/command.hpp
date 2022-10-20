@@ -698,7 +698,7 @@ int command(int argc, const char *argv[]) {
     try {
       double lp;
       std::vector<double> gradients;
-      for (auto&& param_set : params_r_ind) {
+      for (auto &&param_set : params_r_ind) {
         if (jacobian_adjust) {
           lp = stan::model::log_prob_grad<true, true>(
               model, param_set, dummy_params_i, gradients);
