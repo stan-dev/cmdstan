@@ -640,11 +640,11 @@ int command(int argc, const char *argv[]) {
     std::vector<std::string> param_names;
     std::vector<std::vector<size_t>> param_dimss;
     stan::services::get_model_parameters(model, param_names, param_dimss);
-
-    if (u_params_size > 0 && u_params_size != param_names.size()) {
+    size_t num_upars = model.num_params_r();
+    if (u_params_size > 0 && u_params_size != num_upars) {
       msg << "Incorrect number of unconstrained parameters provided! "
              "Model has "
-          << param_names.size() << " parameters but " << u_params_size
+          << num_upars << " parameters but " << u_params_size
           << " were found.";
       throw std::invalid_argument(msg.str());
     }
@@ -691,7 +691,7 @@ int command(int argc, const char *argv[]) {
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
-    for (size_t i = 1; i < p_names.size(); ++i) {
+    for (size_t i = 0; i < p_names.size(); ++i) {
       output_stream << "g_" << p_names[i] << ",";
     }
     output_stream << "g_" << p_names.back() << "\n";
@@ -700,10 +700,10 @@ int command(int argc, const char *argv[]) {
       std::vector<double> gradients;
       for (size_t i = 0; i < num_par_sets; ++i) {
         if (jacobian_adjust) {
-          lp = stan::model::log_prob_grad<false, true>(
+          lp = stan::model::log_prob_grad<true, true>(
               model, params_r_ind[i], dummy_params_i, gradients);
         } else {
-          lp = stan::model::log_prob_grad<false, false>(
+          lp = stan::model::log_prob_grad<true, false>(
               model, params_r_ind[i], dummy_params_i, gradients);
         }
 
