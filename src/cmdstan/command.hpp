@@ -11,7 +11,6 @@
 #include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
-#include <cmdstan/io/json/json_data.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
@@ -30,6 +29,7 @@
 #include <stan/io/dump.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/stan_csv_reader.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/model/model_base.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
@@ -100,8 +100,8 @@ inline shared_context_ptr get_var_context(const std::string file) {
     throw std::invalid_argument(msg.str());
   }
   if (stan::io::ends_with(".json", file)) {
-    cmdstan::json::json_data var_context(stream);
-    return std::make_shared<cmdstan::json::json_data>(var_context);
+    stan::json::json_data var_context(stream);
+    return std::make_shared<stan::json::json_data>(var_context);
   }
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
@@ -124,7 +124,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   auto make_context = [](auto &&file, auto &&stream,
                          auto &&file_ending) -> shared_context_ptr {
     if (file_ending == ".json") {
-      using cmdstan::json::json_data;
+      using stan::json::json_data;
       return std::make_shared<json_data>(json_data(stream));
     } else if (file_ending == ".R") {
       using stan::io::dump;
