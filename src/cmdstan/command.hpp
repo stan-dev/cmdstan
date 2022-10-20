@@ -644,8 +644,7 @@ int command(int argc, const char *argv[]) {
     if (u_params_size > 0 && u_params_size != num_upars) {
       msg << "Incorrect number of unconstrained parameters provided! "
              "Model has "
-          << num_upars << " parameters but " << u_params_size
-          << " were found.";
+          << num_upars << " parameters but " << u_params_size << " were found.";
       throw std::invalid_argument(msg.str());
     }
 
