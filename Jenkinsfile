@@ -6,7 +6,9 @@ def skipRemainingStages = false
 
 def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
-    writeFile(file: "make/local", text: "CXX = ${CXX}\n")
+
+    stanc3_bin_url_str = params.stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n" : ""
+    writeFile(file: "make/local", text: "CXX=${CXX} \n${stanc3_bin_url_str}")
 }
 
 def runTests(String prefix = "") {
@@ -50,6 +52,8 @@ pipeline {
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
         string(defaultValue: '', name: 'math_pr',
                description: "Math PR to test against. Will check out this PR in the downstream Math repo.")
+        string(defaultValue: 'nightly', name: 'stanc3_bin_url',
+                  description: 'Custom stanc3 binary url')
     }
     environment {
         MAC_CXX = 'clang++'
@@ -203,7 +207,7 @@ pipeline {
                         }
                     }
                     steps {
-                        setupCXX("${MPICXX}")
+                        setupCXX(MPICXX)
                         sh "echo STAN_MPI=true >> make/local"
                         sh "echo CXX_TYPE=gcc >> make/local"
                         sh "make build-mpi > build-mpi.log 2>&1"

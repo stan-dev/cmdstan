@@ -21,7 +21,7 @@ help:
 
 STAN ?= stan/
 MATH ?= $(STAN)lib/stan_math/
-RAPIDJSON ?= lib/rapidjson_1.1.0/
+RAPIDJSON ?= $(STAN)lib/rapidjson_1.1.0/
 CLI11 ?= lib/CLI11-1.9.1/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON) -I $(CLI11)
 USER_HEADER ?= $(dir $<)user_header.hpp
@@ -149,7 +149,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.30.0
+CMDSTAN_VERSION := 2.30.1
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
