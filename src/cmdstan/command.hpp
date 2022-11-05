@@ -534,6 +534,10 @@ int command(int argc, const char *argv[]) {
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
   int return_code = stan::services::error_codes::CONFIG;
+
+  // ********************************************************************************
+  // invoke service method
+  // ********************************************************************************
   if (user_method->arg("generate_quantities")) {
     // read sample from cmdstan csv output file
     string_argument *fitted_params_file = dynamic_cast<string_argument *>(
@@ -594,6 +598,12 @@ int command(int argc, const char *argv[]) {
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
+    // ********************************************************************************
+  } else if (user_method->arg("laplace")) {
+    // parse input file - csv file or json - into vector theta-hat
+    // get argument "jacobian"
+    // send output to sample_writer
+    // ********************************************************************************
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
@@ -731,6 +741,7 @@ int command(int argc, const char *argv[]) {
       output_stream.close();
       return stan::services::error_codes::error_codes::DATAERR;
     }
+    // ********************************************************************************
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
@@ -746,6 +757,7 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
     }
+    // ********************************************************************************
   } else if (user_method->arg("optimize")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("optimize")->arg("algorithm"));
@@ -816,6 +828,7 @@ int command(int argc, const char *argv[]) {
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
           interrupt, logger, init_writers[0], sample_writers[0]);
     }
+    // ********************************************************************************
   } else if (user_method->arg("sample")) {
     auto sample_arg = parser.arg("method")->arg("sample");
     int num_warmup
@@ -1245,6 +1258,7 @@ int command(int argc, const char *argv[]) {
             logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
       }
     }
+    // ********************************************************************************
   } else if (user_method->arg("variational")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("variational")->arg("algorithm"));
@@ -1300,6 +1314,10 @@ int command(int argc, const char *argv[]) {
           logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
     }
   }
+  // ********************************************************************************
+  // end of services
+  // ********************************************************************************
+  
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
     std::string profile_file_name
