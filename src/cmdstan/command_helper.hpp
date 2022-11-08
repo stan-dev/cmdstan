@@ -88,6 +88,40 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
 }
 
 /**
+ * Get vector of constrainted parameter names from model.
+ * Throws exception when model has no parameters.
+ *
+ * @param model the instantiated model
+ * @param vector of constrained param names
+ */
+void get_constrained_params(const stan::model::model_base &model,
+                            std::vector<std::string> &param_names) {
+  model.constrained_param_names(param_names, false, false);
+  if (param_names.size() < 1) {
+    std::stringstream msg;
+    msg << "Model " << model.model_name() << " has no parameters, nothing to estimate." << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+}
+
+/**
+ * Opens input stream for file.
+ * Throws exception if stream cannot be opened.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @return input stream
+ */
+std::ifstream safe_open(const std::string fname) {
+  std::ifstream stream(fname.c_str());
+  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+    std::stringstream msg;
+    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  return stream;
+}
+
+/**
  * Get params block from draws matrix
  */
 void get_fitted_params(const std::string &fname,
@@ -96,13 +130,13 @@ void get_fitted_params(const std::string &fname,
                        size_t &col_offset,
                        size_t &num_rows,
                        size_t &num_cols) {
-  // read sample from cmdstan csv output file
+
   std::stringstream msg;
-  std::ifstream stream(fname.c_str());
-  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
+  std::vector<std::string> param_names;
+  get_constrained_params(model, param_names);
+  std::ifstream stream = safe_open(fname);
+
+  // get matrix of draws from sample
   stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
                                            &msg);
   if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
@@ -118,12 +152,11 @@ void get_fitted_params(const std::string &fname,
   stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples,
                                           fitted_params.timing, &msg);
   stream.close();
-  // validate sample contents
-  std::vector<std::string> param_names;
-  model.constrained_param_names(param_names, false, false);
+
+  // compute offset, size of parameters block
   col_offset = 0;
   for (auto col_name : fitted_params.header) {
-    if (boost::algorithm::ends_with(col_name, "__")) {
+    if (boost::ends_with(col_name, "__")) {
       col_offset++;
     } else {
       break;
@@ -131,7 +164,6 @@ void get_fitted_params(const std::string &fname,
   }
   num_cols = param_names.size();
   num_rows = fitted_params.samples.rows();
-  // check that all parameter names are in sample, in order
   if (num_cols + col_offset > fitted_params.header.size()) {
     msg << "Mismatch between model and fitted_parameters csv file \"" << fname
         << "\"" << std::endl;
@@ -146,39 +178,85 @@ void get_fitted_params(const std::string &fname,
   }
 }
 
-Eigen::VectorXd get_laplace_mode(const std::string &fname,
-                                 const stan::model::model_base &model) {
-  // theta_hat is length num_constrained_params
-  // instantiate theta_hat
-  // call file-format appropriate parser
-  Eigen::VectorXd foo(1);
-  return foo;
-}
-
 /**
  * Get vector of parameter modes from StanCSV file
  */
-void get_laplace_mode_csv(const std::string &fname,
-                          const std::vector<std::string> &params,
-                          Eigen::VectorXd &theta_hat) {
+void get_theta_hat_csv(const std::string &fname,
+                       const std::vector<std::string> &param_names,
+                       Eigen::VectorXd &theta_hat) {
+  std::stringstream msg;
+  std::ifstream in = safe_open(fname);
+  std::string line;
 
-  // read up to header
-  // get header, check names
-  // get next line, split; get theta-hats
+  // skip initial comments
+  while (in.peek() == '#')
+    std::getline(in, line);
+
+  // CSV header and optimization estimates
+  std::getline(in, line);
+  std::vector<std::string> names;
+  boost::algorithm::split(names, line, boost::is_any_of(","), boost::token_compress_on);
+  std::getline(in, line);
+  std::vector<std::string> values;
+  boost::algorithm::split(values, line, boost::is_any_of(","), boost::token_compress_on);
+  in.close();
+
+  size_t col_offset = 0;
+  for (auto name : names) {
+    if (boost::algorithm::ends_with(name, "__")) {
+      col_offset++;
+    } else {
+      break;
+    }
+  }
+  for (size_t i = 0; i < param_names.size(); ++i) {
+    if (param_names[i].compare(names[i + col_offset]) != 0) {
+      msg << "Mismatch between model params and StanCSV file \""
+          << fname << "\",  expecting param \"" << param_names[i]
+          << "\", found \"" << names[i + col_offset] << "\"" << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+    try {
+      theta_hat[i] = std::stof(values[i + col_offset]);
+    } catch (const std::exception &e) {
+      msg << "Error parsing CSV file, bad value for " << param_names[i]  << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+  }
 }
+
 
 /**
  * Get vector of parameter modes from JSON file
  */
-void get_laplace_mode_json(const std::string &fname,
-                          const std::vector<std::string> &params,
-                          Eigen::VectorXd &theta_hat) {
+void get_theta_hat_json(const std::string &fname,
+                        const std::vector<std::string> &param_names,
+                        Eigen::VectorXd &theta_hat) {
 
+  std::ifstream stream = safe_open(fname);
   // parse json
   // iterate through param names
   // assign json vals to theta_hat
-
+  stream.close();
 }
 
+
+Eigen::VectorXd get_laplace_mode(const std::string &fname,
+                                 const stan::model::model_base &model) {
+  std::stringstream msg;
+  std::vector<std::string> param_names;
+  get_constrained_params(model, param_names);
+  Eigen::VectorXd theta_hat(param_names.size());
+  std::string f2 = boost::to_lower_copy(fname);
+  if (boost::ends_with(f2, ".csv"))
+    get_theta_hat_csv(fname, param_names, theta_hat);
+  else if (boost::ends_with(f2, ".json"))
+    get_theta_hat_json(fname, param_names, theta_hat);
+  else {
+    msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  return theta_hat;
+}
 
 #endif

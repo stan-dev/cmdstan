@@ -50,8 +50,7 @@ TEST_F(CmdStan, laplace_missing_mode) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
      << " output file=" << convert_model_path(dev_null_path)
-     << " method=laplace mode="
-     << convert_model_path(multi_normal_optimized_params) << " 2>&1";
+     << " method=laplace mode=" << " 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);

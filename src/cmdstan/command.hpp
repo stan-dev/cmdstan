@@ -363,8 +363,10 @@ int command(int argc, const char *argv[]) {
   // Instantiate model
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
-
+  
   std::vector<std::string> model_compile_info = model.model_compile_info();
+  std::vector<std::string> model_params;
+  model.constrained_param_names(model_params, false, false);
 
   //////////////////////////////////////////////////
   //                Initialize Writers            //
@@ -494,11 +496,7 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
     bool jacobian = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
-
-    // parse input file - csv file or json - into vector theta-hat
-    // csv file - get header and first row of data
-    // json - parse as any other inits file
-
+    Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
 
     // send output to sample_writer
     return_code = return_codes::OK;
