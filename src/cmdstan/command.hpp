@@ -11,6 +11,7 @@
 #include <cmdstan/arguments/arg_opencl.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/command_helper.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
@@ -52,6 +53,8 @@
 #include <stan/services/sample/hmc_static_unit_e.hpp>
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -206,79 +209,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
-namespace internal {
-
-/**
- * Base of helper function for getting arguments
- * @param x A pointer to an argument in the argument pointer list
- */
-template <typename T>
-inline constexpr auto get_arg_pointer(T &&x) {
-  return x;
-}
-
-/**
- * Given a pointer to a list of argument pointers, extract the named argument
- * from the list.
- * @tparam List A pointer to a list that has a valid arg(const char*) method
- * @tparam Args A paramter pack of const char*
- * @param arg_list The list argument to access the arg from
- * @param arg1 The name of the first argument to extract
- * @param args An optional pack of named arguments to access from the first arg.
- */
-template <typename List, typename... Args>
-inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
-  return get_arg_pointer(arg_list->arg(arg1), args...);
-}
-
-}  // namespace internal
-
-/**
- * Given a list of argument pointers, extract the named argument from the list.
- * @tparam List An list argument that has a valid arg(const char*) method
- * @tparam Args A paramter pack of const char*
- * @param arg_list The list argument to access the arg from
- * @param arg1 The name of the first argument to extract
- * @param args An optional pack of named arguments to access from the first arg.
- */
-template <typename List, typename... Args>
-inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
-  return internal::get_arg_pointer(arg_list.arg(arg1), args...);
-}
-
-/**
- * Given an argument return its value. Because all of the elements in
- * our list of command line arguments is an `argument` class with no
- * `value()` method, we must give the function the type of the argument class we
- * want to access.
- * @tparam caster The type to cast the `argument` class in the list to.
- * @tparam Arg An object that inherits from `argument`.
- * @param argument holds the argument to access
- * @param arg_name The name of the argument to access.
- */
-template <typename caster, typename Arg>
-inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
-  return dynamic_cast<std::decay_t<caster> *>(argument.arg(arg_name))->value();
-}
-
-/**
- * Given a list of arguments, index into the args and return the value held
- * by the underlying element in the list. Because all of the elements in
- * our list of command line arguments is an `argument` class with no
- * `value()` method, we must give the function the type of the argument class we
- * want to access.
- * @tparam caster The type to cast the `argument` class in the list to.
- * @tparam List A pointer or object that inherits from `argument`.
- * @param arg_list holds the arguments to access
- * @param args A parameter pack of names of arguments to index into.
- */
-template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
-  return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
-      ->value();
-}
 
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
@@ -396,19 +326,24 @@ int command(int argc, const char *argv[]) {
 
   std::stringstream msg;
 
-  // Cross-check arguments
-  if (parser.arg("method")->arg("generate_quantities")) {
-    std::string fitted_sample_fname
-        = dynamic_cast<string_argument *>(parser.arg("method")
-                                              ->arg("generate_quantities")
-                                              ->arg("fitted_params"))
-              ->value();
-    std::string output_fname
-        = dynamic_cast<string_argument *>(parser.arg("output")->arg("file"))
-              ->value();
-    if (fitted_sample_fname.compare(output_fname) == 0) {
-      msg << "Filename conflict, fitted_params file " << output_fname
-          << " and output file have same name, must be different." << std::endl;
+  // check filenames to avoid clobbering input files with output file
+  std::string input_fname;
+  std::string output_fname = get_arg_val<string_argument>(parser,
+                                                          "output", "file");
+  if (user_method->arg("generate_quantities")) {
+    input_fname = get_arg_val<string_argument>(parser,
+                                               "method", "generate_quantities", "fitted_params");
+    if (input_fname.compare(output_fname) == 0) {
+      msg << "Filename conflict, fitted_params file " << input_fname
+          << " matches output filename, must be different." << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+  } else if (user_method->arg("laplace")) {
+    input_fname = get_arg_val<string_argument>(parser,
+                                               "method", "laplace", "mode");
+    if (input_fname.compare(output_fname) == 0) {
+      msg << "Filename conflict, parameter modes file " << input_fname
+          << " matches output filename, must be different." << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
@@ -475,9 +410,9 @@ int command(int argc, const char *argv[]) {
   diagnostic_writers.reserve(num_chains);
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
-  unsigned int id = dynamic_cast<int_argument *>(parser.arg("id"))->value();
-  int_argument *sig_figs_arg
-      = dynamic_cast<int_argument *>(parser.arg("output")->arg("sig_figs"));
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  auto sig_figs = get_arg_val<int_argument>(parser,
+                                            "output", "sig_figs");
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -489,8 +424,8 @@ int command(int argc, const char *argv[]) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     auto unique_fstream
         = std::make_unique<std::fstream>(output_filename, std::fstream::out);
-    if (!sig_figs_arg->is_default()) {
-      (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
+    if (sig_figs > 0) {  // user-specified precision, default -1
+      (*unique_fstream.get()) << std::setprecision(sig_figs);
     }
     sample_writers.emplace_back(std::move(unique_fstream), "# ");
     if (diagnostic_file != "") {
@@ -517,92 +452,56 @@ int command(int argc, const char *argv[]) {
     parser.print(diagnostic_writers[i]);
   }
 
-  int refresh
-      = dynamic_cast<int_argument *>(parser.arg("output")->arg("refresh"))
-            ->value();
+  int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
 
-  // Read initial parameter values or user-specified radius
-  std::string init
-      = dynamic_cast<string_argument *>(parser.arg("init"))->value();
+  // arg "init" can be filename or non-negative number (init_radius)
+  std::string init = get_arg_val<string_argument>(parser, "init");
   double init_radius = 2.0;
-  // argument "init" can be non-negative number of filename
   try {
     init_radius = boost::lexical_cast<double>(init);
     init = "";
   } catch (const boost::bad_lexical_cast &e) {
-  }
+  }  
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
   int return_code = stan::services::error_codes::CONFIG;
 
-  // ********************************************************************************
-  // invoke service method
-  // ********************************************************************************
+  //////////////////////////////////////////////////
+  //                run service method            //
+  //////////////////////////////////////////////////
   if (user_method->arg("generate_quantities")) {
-    // read sample from cmdstan csv output file
-    string_argument *fitted_params_file = dynamic_cast<string_argument *>(
-        parser.arg("method")->arg("generate_quantities")->arg("fitted_params"));
-    if (fitted_params_file->is_default()) {
+    std::string fname = get_arg_val<string_argument>(parser,
+                                                     "method",
+                                                     "generate_quantities",
+                                                     "fitted_params");
+    if (fname.empty()) {
       msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
-      throw std::invalid_argument(msg.str());
-    }
-    // read sample from cmdstan csv output file
-    std::string fname(fitted_params_file->value());
-    std::ifstream stream(fname.c_str());
-    if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-      msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+          "without fitted sample.";
       throw std::invalid_argument(msg.str());
     }
     stan::io::stan_csv fitted_params;
-    stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
-                                             &msg);
-    if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
-                                                &msg, false)) {
-      msg << "Error reading fitted param names from sample csv file \"" << fname
-          << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation,
-                                               &msg);
-    fitted_params.timing.warmup = 0;
-    fitted_params.timing.sampling = 0;
-    stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples,
-                                            fitted_params.timing, &msg);
-    stream.close();
-    std::vector<std::string> param_names;
-    model.constrained_param_names(param_names, false, false);
-    size_t meta_cols = 0;
-    for (auto col_name : fitted_params.header) {
-      if (boost::algorithm::ends_with(col_name, "__")) {
-        meta_cols++;
-      } else {
-        break;
-      }
-    }
-    size_t num_cols = param_names.size();
-    size_t num_rows = fitted_params.samples.rows();
-    // check that all parameter names are in sample, in order
-    if (num_cols + meta_cols > fitted_params.header.size()) {
-      msg << "Mismatch between model and fitted_parameters csv file \"" << fname
-          << "\"" << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-    for (size_t i = 0; i < num_cols; ++i) {
-      if (param_names[i].compare(fitted_params.header[i + meta_cols]) != 0) {
-        msg << "Mismatch between model and fitted_parameters csv file \""
-            << fname << "\"" << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
-    }
+    size_t col_offset, num_rows, num_cols;
+    get_fitted_params(fname, model, fitted_params, col_offset, num_rows, num_cols);
     return_code = stan::services::standalone_generate(
-        model, fitted_params.samples.block(0, meta_cols, num_rows, num_cols),
+        model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
-    // ********************************************************************************
   } else if (user_method->arg("laplace")) {
+    std::string fname
+        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
+    if (fname.empty()) {
+      msg << "Missing mode argument, cannot get laplace sample "
+	     "without parameter estimates theta-hat";
+      throw std::invalid_argument(msg.str());
+    }
+    bool jacobian = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
+
     // parse input file - csv file or json - into vector theta-hat
-    // get argument "jacobian"
+    // csv file - get header and first row of data
+    // json - parse as any other inits file
+
+
     // send output to sample_writer
+    return_code = return_codes::OK;
     // ********************************************************************************
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(
@@ -708,7 +607,7 @@ int command(int argc, const char *argv[]) {
     std::string grad_output_file = get_arg_val<string_argument>(
         parser, "output", "log_prob_output_file");
     std::ofstream output_stream(grad_output_file);
-    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
+    output_stream << std::setprecision(sig_figs) << "lp_,";
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
@@ -1325,8 +1224,8 @@ int command(int argc, const char *argv[]) {
               parser.arg("output")->arg("profile_file"))
               ->value();
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
-    if (!sig_figs_arg->is_default()) {
-      profile_stream << std::setprecision(sig_figs_arg->value());
+    if (sig_figs > 0) {  // user-specified precision, default -1
+      profile_stream << std::setprecision(sig_figs);
     }
     write_profiling(profile_stream, profile_data);
     profile_stream.close();
