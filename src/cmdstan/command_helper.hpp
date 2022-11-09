@@ -2,6 +2,9 @@
 #define CMDSTAN_HELPER_HPP
 
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <stan/io/dump.hpp>
+#include <stan/io/ends_with.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/model/model_base.hpp>
@@ -12,9 +15,9 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <rapidjson/document.h>
 
 namespace internal {
-
 /**
  * Base of helper function for getting arguments
  * @param x A pointer to an argument in the argument pointer list
@@ -85,6 +88,127 @@ template <typename caster, typename List, typename... Args>
 inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
       ->value();
+}
+
+
+using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
+/**
+ * Given the name of a file, return a shared pointer holding the data contents.
+ * @param file A system file to read from.
+ */
+inline shared_context_ptr get_var_context(const std::string file) {
+  std::fstream stream(file.c_str(), std::fstream::in);
+  if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
+    std::stringstream msg;
+    msg << "Can't open specified file, \"" << file << "\"" << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  if (stan::io::ends_with(".json", file)) {
+    stan::json::json_data var_context(stream);
+    return std::make_shared<stan::json::json_data>(var_context);
+  }
+  stan::io::dump var_context(stream);
+  return std::make_shared<stan::io::dump>(var_context);
+}
+
+
+using context_vector = std::vector<shared_context_ptr>;
+/**
+ * Make a vector of shared pointers to contexts.
+ * @param file The name of the file. For multi-chain we will attempt to find
+ *  {file_name}_1{file_ending} and if that fails try to use the named file as
+ *  the data for each chain.
+ * @param num_chains The number of chains to run.
+ * @return An std vector of shared pointers to var contexts
+ */
+context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
+  using stan::io::var_context;
+  if (num_chains == 1) {
+    return context_vector(1, get_var_context(file));
+  }
+  auto make_context = [](auto &&file, auto &&stream,
+                         auto &&file_ending) -> shared_context_ptr {
+    if (file_ending == ".json") {
+      using stan::json::json_data;
+      return std::make_shared<json_data>(json_data(stream));
+    } else if (file_ending == ".R") {
+      using stan::io::dump;
+      return std::make_shared<stan::io::dump>(dump(stream));
+    } else {
+      std::stringstream msg;
+      msg << "file ending of " << file_ending << " is not supported by cmdstan";
+      throw std::invalid_argument(msg.str());
+      using stan::io::dump;
+      return std::make_shared<dump>(dump(stream));
+    }
+  };
+  // use default for all chain inits
+  if (file == "") {
+    using stan::io::dump;
+    std::fstream stream(file.c_str(), std::fstream::in);
+    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
+  } else {
+    size_t file_marker_pos = file.find_last_of(".");
+    if (file_marker_pos > file.size()) {
+      std::stringstream msg;
+      msg << "Found: \"" << file
+          << "\" but user specied files must end in .json or .R";
+      throw std::invalid_argument(msg.str());
+    }
+    std::string file_name = file.substr(0, file_marker_pos);
+    std::string file_ending = file.substr(file_marker_pos, file.size());
+    if (file_ending != ".json" && file_ending != ".R") {
+      std::stringstream msg;
+      msg << "file ending of " << file_ending << " is not supported by cmdstan";
+      throw std::invalid_argument(msg.str());
+    }
+    std::string file_1
+        = std::string(file_name + "_" + std::to_string(1) + file_ending);
+    std::fstream stream_1(file_1.c_str(), std::fstream::in);
+    // Check if file_1 exists, if so then we'll assume num_chains of these
+    // exist.
+    if (stream_1.rdstate() & std::ifstream::failbit) {
+      // if that fails we will try to find a base file
+      std::fstream stream(file.c_str(), std::fstream::in);
+      if (stream.rdstate() & std::ifstream::failbit) {
+        std::string file_name_err
+            = std::string("\"" + file_1 + "\" and base file \"" + file + "\"");
+        std::stringstream msg;
+        msg << "Searching for  \"" << file_name_err << std::endl;
+        msg << "Can't open either of specified files," << file_name_err
+            << std::endl;
+        throw std::invalid_argument(msg.str());
+      } else {
+        return context_vector(num_chains,
+                              make_context(file, stream, file_ending));
+      }
+    } else {
+      // If we found file_1 then we'll assume file_{1...N} exists
+      context_vector ret;
+      ret.reserve(num_chains);
+      ret.push_back(make_context(file_1, stream_1, file_ending));
+      for (size_t i = 1; i < num_chains; ++i) {
+        std::string file_i
+            = std::string(file_name + "_" + std::to_string(i) + file_ending);
+        std::fstream stream_i(file_1.c_str(), std::fstream::in);
+        // If any stream fails at this point something went wrong with file
+        // names.
+        if (stream_i.rdstate() & std::ifstream::failbit) {
+          std::string file_name_err = std::string(
+              "\"" + file_1 + "\" but cannot open \"" + file_i + "\"");
+          std::stringstream msg;
+          msg << "Found " << file_name_err << std::endl;
+          throw std::invalid_argument(msg.str());
+        }
+        ret.push_back(make_context(file_i, stream_i, file_ending));
+      }
+      return ret;
+    }
+  }
+  // This should not happen
+  using stan::io::dump;
+  std::fstream stream(file.c_str(), std::fstream::in);
+  return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
 /**
@@ -232,12 +356,25 @@ void get_theta_hat_csv(const std::string &fname,
 void get_theta_hat_json(const std::string &fname,
                         const std::vector<std::string> &param_names,
                         Eigen::VectorXd &theta_hat) {
+  std::vector<std::string> var_names;
+  std::vector<std::string> splits;
+  std::string cur_name = "";
+  for (auto&& param_name : param_names) {
+    boost::algorithm::split(splits, param_name, boost::is_any_of("."), boost::token_compress_on);  
+    if (cur_name.compare(splits[0]) != 0)
+      var_names.push_back(splits[0]);
+    cur_name = splits[0];
+  }
 
-  std::ifstream stream = safe_open(fname);
-  // parse json
-  // iterate through param names
-  // assign json vals to theta_hat
-  stream.close();
+  std::shared_ptr<stan::io::var_context> context = get_var_context(fname);
+  Eigen::Index offset = 0;
+  for (auto&& var_name : var_names) {
+    const auto param_vec = context->vals_r(var_name);
+    for (Eigen::Index i = 0; i < param_vec.size(); ++i) {
+      theta_hat[offset] = param_vec[i];
+      ++offset;
+    }
+  }
 }
 
 

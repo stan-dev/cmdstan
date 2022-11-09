@@ -1,8 +1,9 @@
 #ifndef CMDSTAN_ARGUMENTS_ARG_LAPLACE_HPP
 #define CMDSTAN_ARGUMENTS_ARG_LAPLACE_HPP
 
-#include <cmdstan/arguments/arg_laplace_mode.hpp>
+#include <cmdstan/arguments/arg_laplace_draws.hpp>
 #include <cmdstan/arguments/arg_laplace_jacobian.hpp>
+#include <cmdstan/arguments/arg_laplace_mode.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
 
 namespace cmdstan {
@@ -15,6 +16,7 @@ class arg_laplace : public categorical_argument {
 
     _subarguments.push_back(new arg_laplace_mode());
     _subarguments.push_back(new arg_laplace_jacobian());
+    _subarguments.push_back(new arg_laplace_draws());
   }
 };
 

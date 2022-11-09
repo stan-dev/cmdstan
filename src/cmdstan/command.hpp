@@ -38,6 +38,7 @@
 #include <stan/services/experimental/advi/meanfield.hpp>
 #include <stan/services/optimize/bfgs.hpp>
 #include <stan/services/optimize/lbfgs.hpp>
+#include <stan/services/optimize/laplace_sample.hpp>
 #include <stan/services/optimize/newton.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
@@ -78,10 +79,6 @@ stan::math::profile_map &get_stan_profile_data();
 
 namespace cmdstan {
 
-struct return_codes {
-  enum { OK = 0, NOT_OK = 1 };
-};
-
 #ifdef STAN_MPI
 stan::math::mpi_cluster &get_mpi_cluster() {
   static stan::math::mpi_cluster cluster;
@@ -89,126 +86,9 @@ stan::math::mpi_cluster &get_mpi_cluster() {
 }
 #endif
 
-using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
-
-/**
- * Given the name of a file, return a shared pointer holding the data contents.
- * @param file A system file to read from.
- */
-inline shared_context_ptr get_var_context(const std::string file) {
-  std::fstream stream(file.c_str(), std::fstream::in);
-  if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-  if (stan::io::ends_with(".json", file)) {
-    stan::json::json_data var_context(stream);
-    return std::make_shared<stan::json::json_data>(var_context);
-  }
-  stan::io::dump var_context(stream);
-  return std::make_shared<stan::io::dump>(var_context);
-}
-
-using context_vector = std::vector<shared_context_ptr>;
-/**
- * Make a vector of shared pointers to contexts.
- * @param file The name of the file. For multi-chain we will attempt to find
- *  {file_name}_1{file_ending} and if that fails try to use the named file as
- *  the data for each chain.
- * @param num_chains The number of chains to run.
- * @return An std vector of shared pointers to var contexts
- */
-context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
-  using stan::io::var_context;
-  if (num_chains == 1) {
-    return context_vector(1, get_var_context(file));
-  }
-  auto make_context = [](auto &&file, auto &&stream,
-                         auto &&file_ending) -> shared_context_ptr {
-    if (file_ending == ".json") {
-      using stan::json::json_data;
-      return std::make_shared<json_data>(json_data(stream));
-    } else if (file_ending == ".R") {
-      using stan::io::dump;
-      return std::make_shared<stan::io::dump>(dump(stream));
-    } else {
-      std::stringstream msg;
-      msg << "file ending of " << file_ending << " is not supported by cmdstan";
-      throw std::invalid_argument(msg.str());
-      using stan::io::dump;
-      return std::make_shared<dump>(dump(stream));
-    }
-  };
-  // use default for all chain inits
-  if (file == "") {
-    using stan::io::dump;
-    std::fstream stream(file.c_str(), std::fstream::in);
-    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
-  } else {
-    size_t file_marker_pos = file.find_last_of(".");
-    if (file_marker_pos > file.size()) {
-      std::stringstream msg;
-      msg << "Found: \"" << file
-          << "\" but user specied files must end in .json or .R";
-      throw std::invalid_argument(msg.str());
-    }
-    std::string file_name = file.substr(0, file_marker_pos);
-    std::string file_ending = file.substr(file_marker_pos, file.size());
-    if (file_ending != ".json" && file_ending != ".R") {
-      std::stringstream msg;
-      msg << "file ending of " << file_ending << " is not supported by cmdstan";
-      throw std::invalid_argument(msg.str());
-    }
-    std::string file_1
-        = std::string(file_name + "_" + std::to_string(1) + file_ending);
-    std::fstream stream_1(file_1.c_str(), std::fstream::in);
-    // Check if file_1 exists, if so then we'll assume num_chains of these
-    // exist.
-    if (stream_1.rdstate() & std::ifstream::failbit) {
-      // if that fails we will try to find a base file
-      std::fstream stream(file.c_str(), std::fstream::in);
-      if (stream.rdstate() & std::ifstream::failbit) {
-        std::string file_name_err
-            = std::string("\"" + file_1 + "\" and base file \"" + file + "\"");
-        std::stringstream msg;
-        msg << "Searching for  \"" << file_name_err << std::endl;
-        msg << "Can't open either of specified files," << file_name_err
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      } else {
-        return context_vector(num_chains,
-                              make_context(file, stream, file_ending));
-      }
-    } else {
-      // If we found file_1 then we'll assume file_{1...N} exists
-      context_vector ret;
-      ret.reserve(num_chains);
-      ret.push_back(make_context(file_1, stream_1, file_ending));
-      for (size_t i = 1; i < num_chains; ++i) {
-        std::string file_i
-            = std::string(file_name + "_" + std::to_string(i) + file_ending);
-        std::fstream stream_i(file_1.c_str(), std::fstream::in);
-        // If any stream fails at this point something went wrong with file
-        // names.
-        if (stream_i.rdstate() & std::ifstream::failbit) {
-          std::string file_name_err = std::string(
-              "\"" + file_1 + "\" but cannot open \"" + file_i + "\"");
-          std::stringstream msg;
-          msg << "Found " << file_name_err << std::endl;
-          throw std::invalid_argument(msg.str());
-        }
-        ret.push_back(make_context(file_i, stream_i, file_ending));
-      }
-      return ret;
-    }
-  }
-  // This should not happen
-  using stan::io::dump;
-  std::fstream stream(file.c_str(), std::fstream::in);
-  return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
-}
-
+struct return_codes {
+  enum { OK = 0, NOT_OK = 1 };
+};
 
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);
@@ -466,10 +346,10 @@ int command(int argc, const char *argv[]) {
   }  
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
-  int return_code = stan::services::error_codes::CONFIG;
+  int return_code = return_codes::NOT_OK;
 
   //////////////////////////////////////////////////
-  //                run service method            //
+  //            Invoke Services                   //
   //////////////////////////////////////////////////
   if (user_method->arg("generate_quantities")) {
     std::string fname = get_arg_val<string_argument>(parser,
@@ -487,6 +367,7 @@ int command(int argc, const char *argv[]) {
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
+  //////////////////////////////////////////////////
   } else if (user_method->arg("laplace")) {
     std::string fname
         = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
@@ -495,12 +376,18 @@ int command(int argc, const char *argv[]) {
 	     "without parameter estimates theta-hat";
       throw std::invalid_argument(msg.str());
     }
-    bool jacobian = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
-
-    // send output to sample_writer
-    return_code = return_codes::OK;
-    // ********************************************************************************
+    bool jacobian = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
+    int draws = get_arg_val<int_argument>(parser, "method", "laplace", "draws");
+    int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
+      return_code = jacobian?
+                    stan::services::laplace_sample<true>(
+                        model, theta_hat, draws, random_seed, refresh,
+                        interrupt, logger, sample_writers[0]) :
+                    stan::services::laplace_sample<false>(
+                        model, theta_hat, draws, random_seed, refresh,
+                        interrupt, logger, sample_writers[0]);
+  //////////////////////////////////////////////////
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
@@ -633,12 +520,12 @@ int command(int argc, const char *argv[]) {
         output_stream << "\n";
       }
       output_stream.close();
-      return stan::services::error_codes::error_codes::OK;
+      return return_codes::OK;
     } catch (const std::exception &e) {
       output_stream.close();
-      return stan::services::error_codes::error_codes::DATAERR;
+      return return_codes::NOT_OK;
     }
-    // ********************************************************************************
+  //////////////////////////////////////////////////
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
@@ -654,7 +541,7 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
     }
-    // ********************************************************************************
+  //////////////////////////////////////////////////
   } else if (user_method->arg("optimize")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("optimize")->arg("algorithm"));
@@ -725,18 +612,17 @@ int command(int argc, const char *argv[]) {
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
           interrupt, logger, init_writers[0], sample_writers[0]);
     }
-    // ********************************************************************************
+  //////////////////////////////////////////////////
   } else if (user_method->arg("sample")) {
     auto sample_arg = parser.arg("method")->arg("sample");
     int num_warmup
-        = dynamic_cast<int_argument *>(sample_arg->arg("num_warmup"))->value();
+      = get_arg_val<int_argument>(parser, "method", "sample", "num_warmup");
     int num_samples
-        = dynamic_cast<int_argument *>(sample_arg->arg("num_samples"))->value();
+      = get_arg_val<int_argument>(parser, "method", "sample", "num_samples");
     int num_thin
-        = dynamic_cast<int_argument *>(sample_arg->arg("thin"))->value();
+      = get_arg_val<int_argument>(parser, "method", "sample", "num_thin");
     bool save_warmup
-        = dynamic_cast<bool_argument *>(sample_arg->arg("save_warmup"))
-              ->value();
+      = get_arg_val<int_argument>(parser, "method", "sample", "save_warmup");
     list_argument *algo
         = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
     categorical_argument *adapt
@@ -786,7 +672,7 @@ int command(int argc, const char *argv[]) {
         info(
             "The number of warmup samples (num_warmup) must be greater than "
             "zero if adaptation is enabled.");
-        return_code = stan::services::error_codes::CONFIG;
+        return_code = return_codes::NOT_OK;
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == false && metric_supplied == false) {
         int max_depth = dynamic_cast<int_argument *>(
@@ -1155,7 +1041,7 @@ int command(int argc, const char *argv[]) {
             logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
       }
     }
-    // ********************************************************************************
+  //////////////////////////////////////////////////
   } else if (user_method->arg("variational")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("variational")->arg("algorithm"));
@@ -1211,9 +1097,8 @@ int command(int argc, const char *argv[]) {
           logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
     }
   }
-  // ********************************************************************************
-  // end of services
-  // ********************************************************************************
+  //////////////////////////////////////////////////
+
   
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
