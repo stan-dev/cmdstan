@@ -620,9 +620,9 @@ int command(int argc, const char *argv[]) {
     int num_samples
       = get_arg_val<int_argument>(parser, "method", "sample", "num_samples");
     int num_thin
-      = get_arg_val<int_argument>(parser, "method", "sample", "num_thin");
+      = get_arg_val<int_argument>(parser, "method", "sample", "thin");
     bool save_warmup
-      = get_arg_val<int_argument>(parser, "method", "sample", "save_warmup");
+      = get_arg_val<bool_argument>(parser, "method", "sample", "save_warmup");
     list_argument *algo
         = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
     categorical_argument *adapt

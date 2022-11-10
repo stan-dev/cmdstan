@@ -21,12 +21,17 @@ class CmdStan : public testing::Test {
     default_file_path = {"src", "test", "test-models", "output.csv"};
     dev_null_path = {"/dev", "null"};
     wrong_csv = {"src", "test", "test-models", "bern_fitted_params.csv"};
+    log_jacobian_model = {"src", "test", "test-models", "log_jacobian_sigma"};
+    log_jacobian_mode_json
+        = {"src", "test", "test-models", "log_jacobian_mode.json"};
   }
+  std::vector<std::string> default_file_path;
+  std::vector<std::string> dev_null_path;
+  std::vector<std::string> log_jacobian_model;
+  std::vector<std::string> log_jacobian_mode_json;
   std::vector<std::string> multi_normal_model;
   std::vector<std::string> multi_normal_mode_csv;
   std::vector<std::string> multi_normal_mode_json;
-  std::vector<std::string> default_file_path;
-  std::vector<std::string> dev_null_path;
   std::vector<std::string> wrong_csv;
 };
 
@@ -94,3 +99,15 @@ TEST_F(CmdStan, laplace_bad_draws_arg) {
   ASSERT_TRUE(out.hasError);
   std::cout << out.output << std::endl;
 }
+
+TEST_F(CmdStan, laplace_jacobian) {
+  std::stringstream ss;
+  ss << convert_model_path(log_jacobian_model)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=laplace mode="
+     << convert_model_path(log_jacobian_mode_json)
+     << "  2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+  std::cout << out.output << std::endl;
