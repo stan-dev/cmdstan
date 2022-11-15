@@ -12,7 +12,7 @@ using cmdstan::test::run_command_output;
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
-    bern_extra_model = {"src", "test", "test-models", "bern_extra_model"};
+    bern_log_prob_model = {"src", "test", "test-models", "bern_log_prob_model"};
     bern_data = {"src", "test", "test-models", "bern.data.json"};
     bern_unconstrained_params_rdump
         = {"src", "test", "test-models", "bern_unconstrained_params.R"};
@@ -28,7 +28,7 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "bern_constrained_params_short.json"};
     dev_null_path = {"/dev", "null"};
   }
-  std::vector<std::string> bern_extra_model;
+  std::vector<std::string> bern_log_prob_model;
   std::vector<std::string> bern_data;
   std::vector<std::string> bern_unconstrained_params_rdump;
   std::vector<std::string> bern_constrained_params_rdump;
@@ -41,7 +41,7 @@ class CmdStan : public testing::Test {
 
 TEST_F(CmdStan, log_prob_good_rdump) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
@@ -55,7 +55,7 @@ TEST_F(CmdStan, log_prob_good_rdump) {
 
 TEST_F(CmdStan, log_prob_good_json) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
@@ -69,7 +69,7 @@ TEST_F(CmdStan, log_prob_good_json) {
 
 TEST_F(CmdStan, log_prob_good_rdump_json) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
@@ -83,7 +83,7 @@ TEST_F(CmdStan, log_prob_good_rdump_json) {
 
 TEST_F(CmdStan, log_prob_no_params) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob";
@@ -94,7 +94,7 @@ TEST_F(CmdStan, log_prob_no_params) {
 
 TEST_F(CmdStan, log_prob_no_data) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
      << convert_model_path(bern_unconstrained_params_rdump)
@@ -107,7 +107,7 @@ TEST_F(CmdStan, log_prob_no_data) {
 
 TEST_F(CmdStan, log_prob_constrained_length) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob constrained_params="
@@ -119,7 +119,7 @@ TEST_F(CmdStan, log_prob_constrained_length) {
 
 TEST_F(CmdStan, log_prob_unconstrained_length) {
   std::stringstream ss;
-  ss << convert_model_path(bern_extra_model)
+  ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="

@@ -8,6 +8,11 @@
 
 namespace cmdstan {
 
+/**
+ * Argument used for calling the log_prob method to calculate the log density
+ * and its gradients with respect to a user-provided set of parameter values
+ * on the constrained and/or unconstrained scale
+ */
 class arg_log_prob : public categorical_argument {
  public:
   arg_log_prob() {
