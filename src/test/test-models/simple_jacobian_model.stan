@@ -9,3 +9,4 @@ parameters {
 model {
   sigma ~ normal(3, 1);
 }
+

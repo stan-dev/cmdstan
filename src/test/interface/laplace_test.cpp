@@ -22,9 +22,9 @@ class CmdStan : public testing::Test {
     default_file_path = {"src", "test", "test-models", "output.csv"};
     dev_null_path = {"/dev", "null"};
     wrong_csv = {"src", "test", "test-models", "bern_fitted_params.csv"};
-    simple_jacobian_model = {"src", "test", "test-models", "simple_jacobian"};
+    simple_jacobian_model = {"src", "test", "test-models", "simple_jacobian_model"};
     simple_jacobian_mode_json
-        = {"src", "test", "test-models", "simple_jacobian.json"};
+        = {"src", "test", "test-models", "simple_jacobian_mode.json"};
     output1_csv =  {"src", "test", "test-models", "tmp_output1.csv"};
     output2_csv =  {"src", "test", "test-models", "tmp_output2.csv"};
   }
