@@ -208,19 +208,19 @@ int command(int argc, const char *argv[]) {
 
   // check filenames to avoid clobbering input files with output file
   std::string input_fname;
-  std::string output_fname = get_arg_val<string_argument>(parser,
-                                                          "output", "file");
+  std::string output_fname
+      = get_arg_val<string_argument>(parser, "output", "file");
   if (user_method->arg("generate_quantities")) {
-    input_fname = get_arg_val<string_argument>(parser,
-                                               "method", "generate_quantities", "fitted_params");
+    input_fname = get_arg_val<string_argument>(
+        parser, "method", "generate_quantities", "fitted_params");
     if (input_fname.compare(output_fname) == 0) {
       msg << "Filename conflict, fitted_params file " << input_fname
           << " matches output filename, must be different." << std::endl;
       throw std::invalid_argument(msg.str());
     }
   } else if (user_method->arg("laplace")) {
-    input_fname = get_arg_val<string_argument>(parser,
-                                               "method", "laplace", "mode");
+    input_fname
+        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
     if (input_fname.compare(output_fname) == 0) {
       msg << "Filename conflict, parameter modes file " << input_fname
           << " matches output filename, must be different." << std::endl;
@@ -243,7 +243,7 @@ int command(int argc, const char *argv[]) {
   // Instantiate model
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
-  
+
   std::vector<std::string> model_compile_info = model.model_compile_info();
   std::vector<std::string> model_params;
   model.constrained_param_names(model_params, false, false);
@@ -293,8 +293,7 @@ int command(int argc, const char *argv[]) {
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
   unsigned int id = get_arg_val<int_argument>(parser, "id");
-  auto sig_figs = get_arg_val<int_argument>(parser,
-                                            "output", "sig_figs");
+  auto sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -343,7 +342,7 @@ int command(int argc, const char *argv[]) {
     init_radius = boost::lexical_cast<double>(init);
     init = "";
   } catch (const boost::bad_lexical_cast &e) {
-  }  
+  }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
   int return_code = return_codes::NOT_OK;
@@ -352,42 +351,46 @@ int command(int argc, const char *argv[]) {
   //            Invoke Services                   //
   //////////////////////////////////////////////////
   if (user_method->arg("generate_quantities")) {
-    std::string fname = get_arg_val<string_argument>(parser,
-                                                     "method",
-                                                     "generate_quantities",
-                                                     "fitted_params");
+    std::string fname = get_arg_val<string_argument>(
+        parser, "method", "generate_quantities", "fitted_params");
     if (fname.empty()) {
       msg << "Missing fitted_params argument, cannot run generate_quantities "
-          "without fitted sample.";
+             "without fitted sample.";
       throw std::invalid_argument(msg.str());
     }
     stan::io::stan_csv fitted_params;
     size_t col_offset, num_rows, num_cols;
-    get_fitted_params(fname, model, fitted_params, col_offset, num_rows, num_cols);
+    get_fitted_params(fname, model, fitted_params, col_offset, num_rows,
+                      num_cols);
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
-  //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
   } else if (user_method->arg("laplace")) {
     std::string fname
         = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
     if (fname.empty()) {
       msg << "Missing mode argument, cannot get laplace sample "
-	     "without parameter estimates theta-hat";
+             "without parameter estimates theta-hat";
       throw std::invalid_argument(msg.str());
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
-    bool jacobian = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
+    bool jacobian
+        = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
     int draws = get_arg_val<int_argument>(parser, "method", "laplace", "draws");
     int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
-      return_code = jacobian?
-                    stan::services::laplace_sample<true>(
-                        model, theta_hat, draws, random_seed, refresh,
-                        interrupt, logger, sample_writers[0]) :
-                    stan::services::laplace_sample<false>(
-                        model, theta_hat, draws, random_seed, refresh,
-                        interrupt, logger, sample_writers[0]);
-  //////////////////////////////////////////////////
+    if (jacobian) {
+      std::cout << "jacobian adjust" << std::endl;
+      return_code = stan::services::laplace_sample<true>(
+          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
+          sample_writers[0]);
+    } else {
+      std::cout << "no jacobian adjust" << std::endl;
+      return_code = stan::services::laplace_sample<false>(
+          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
+          sample_writers[0]);
+    }
+    //////////////////////////////////////////////////
   } else if (user_method->arg("log_prob")) {
     string_argument *upars_file = dynamic_cast<string_argument *>(
         parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
@@ -525,7 +528,7 @@ int command(int argc, const char *argv[]) {
       output_stream.close();
       return return_codes::NOT_OK;
     }
-  //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
@@ -541,7 +544,7 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
     }
-  //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
   } else if (user_method->arg("optimize")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("optimize")->arg("algorithm"));
@@ -612,17 +615,17 @@ int command(int argc, const char *argv[]) {
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
           interrupt, logger, init_writers[0], sample_writers[0]);
     }
-  //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
   } else if (user_method->arg("sample")) {
     auto sample_arg = parser.arg("method")->arg("sample");
     int num_warmup
-      = get_arg_val<int_argument>(parser, "method", "sample", "num_warmup");
+        = get_arg_val<int_argument>(parser, "method", "sample", "num_warmup");
     int num_samples
-      = get_arg_val<int_argument>(parser, "method", "sample", "num_samples");
+        = get_arg_val<int_argument>(parser, "method", "sample", "num_samples");
     int num_thin
-      = get_arg_val<int_argument>(parser, "method", "sample", "thin");
+        = get_arg_val<int_argument>(parser, "method", "sample", "thin");
     bool save_warmup
-      = get_arg_val<bool_argument>(parser, "method", "sample", "save_warmup");
+        = get_arg_val<bool_argument>(parser, "method", "sample", "save_warmup");
     list_argument *algo
         = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
     categorical_argument *adapt
@@ -1041,7 +1044,7 @@ int command(int argc, const char *argv[]) {
             logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
       }
     }
-  //////////////////////////////////////////////////
+    //////////////////////////////////////////////////
   } else if (user_method->arg("variational")) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("variational")->arg("algorithm"));
@@ -1099,7 +1102,6 @@ int command(int argc, const char *argv[]) {
   }
   //////////////////////////////////////////////////
 
-  
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
     std::string profile_file_name

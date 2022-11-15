@@ -4,6 +4,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <stdexcept>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 
 namespace cmdstan {
@@ -217,6 +220,32 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
     equal_pos = command_output.find("=", start);
   }
   return output;
+}
+
+/**
+ * Read Stan CSV file, Eigen MatrixXd containing draws array.
+ * Expects comment line prefix '#' and header row.
+ */
+void parse_sample(const std::string &path, int rows, int cols,
+                  std::vector<double> &cells) {
+  std::ifstream in;
+  in.open(path);
+  std::string line;
+  while (in.peek() == '#')
+    std::getline(in, line);
+  std::getline(in, line);
+  size_t index = 0;
+  while (std::getline(in, line)) {
+    if (line[0] == '#')
+      continue;
+    std::stringstream lineStream(line);
+    std::string cell;
+    while (std::getline(lineStream, cell, ',')) {
+      cells[index] = std::stod(cell);
+      index++;
+    }
+  }
+  in.close();
 }
 
 }  // namespace test

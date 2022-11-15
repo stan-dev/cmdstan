@@ -223,7 +223,8 @@ void get_constrained_params(const stan::model::model_base &model,
   model.constrained_param_names(param_names, false, false);
   if (param_names.size() < 1) {
     std::stringstream msg;
-    msg << "Model " << model.model_name() << " has no parameters, nothing to estimate." << std::endl;
+    msg << "Model " << model.model_name()
+        << " has no parameters, nothing to estimate." << std::endl;
     throw std::invalid_argument(msg.str());
   }
 }
@@ -254,7 +255,6 @@ void get_fitted_params(const std::string &fname,
                        size_t &col_offset,
                        size_t &num_rows,
                        size_t &num_cols) {
-
   std::stringstream msg;
   std::vector<std::string> param_names;
   get_constrained_params(model, param_names);
@@ -319,10 +319,12 @@ void get_theta_hat_csv(const std::string &fname,
   // CSV header and optimization estimates
   std::getline(in, line);
   std::vector<std::string> names;
-  boost::algorithm::split(names, line, boost::is_any_of(","), boost::token_compress_on);
+  boost::algorithm::split(names, line,
+                          boost::is_any_of(","), boost::token_compress_on);
   std::getline(in, line);
   std::vector<std::string> values;
-  boost::algorithm::split(values, line, boost::is_any_of(","), boost::token_compress_on);
+  boost::algorithm::split(values, line,
+                          boost::is_any_of(","), boost::token_compress_on);
   in.close();
 
   size_t col_offset = 0;
@@ -341,9 +343,10 @@ void get_theta_hat_csv(const std::string &fname,
       throw std::invalid_argument(msg.str());
     }
     try {
-      theta_hat[i] = std::stof(values[i + col_offset]);
+      theta_hat[i] = std::stod(values[i + col_offset]);
     } catch (const std::exception &e) {
-      msg << "Error parsing CSV file, bad value for " << param_names[i]  << std::endl;
+      msg << "Error parsing CSV file, bad value for "
+          << param_names[i]  << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
@@ -360,7 +363,8 @@ void get_theta_hat_json(const std::string &fname,
   std::vector<std::string> splits;
   std::string cur_name = "";
   for (auto&& param_name : param_names) {
-    boost::algorithm::split(splits, param_name, boost::is_any_of("."), boost::token_compress_on);  
+    boost::algorithm::split(splits, param_name,
+                            boost::is_any_of("."), boost::token_compress_on);
     if (cur_name.compare(splits[0]) != 0)
       var_names.push_back(splits[0]);
     cur_name = splits[0];
@@ -385,11 +389,11 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   get_constrained_params(model, param_names);
   Eigen::VectorXd theta_hat(param_names.size());
   std::string f2 = boost::to_lower_copy(fname);
-  if (boost::ends_with(f2, ".csv"))
+  if (boost::ends_with(f2, ".csv")) {
     get_theta_hat_csv(fname, param_names, theta_hat);
-  else if (boost::ends_with(f2, ".json"))
+  } else if (boost::ends_with(f2, ".json")) {
     get_theta_hat_json(fname, param_names, theta_hat);
-  else {
+  } else {
     msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
     throw std::invalid_argument(msg.str());
   }
