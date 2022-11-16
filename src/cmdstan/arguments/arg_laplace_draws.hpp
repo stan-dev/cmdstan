@@ -9,8 +9,7 @@ class arg_laplace_draws : public int_argument {
  public:
   arg_laplace_draws() : int_argument() {
     _name = "draws";
-    _description
-        = "Number of draws from the laplace approximation";
+    _description = "Number of draws from the laplace approximation";
     _validity = "0 <= draws";
     _default = "1000";
     _default_value = 1000;
