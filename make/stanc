@@ -70,7 +70,7 @@ else ifneq ($(STANC_XATTR),)
     bin/stanc$(EXE) :
 	cp bin/mac-stanc bin/stanc$(EXE)
 	chmod +x bin/stanc
-	xattr -d com.apple.quarantine bin/stanc
+	-xattr -d com.apple.quarantine bin/stanc
 
 else ifneq (,$(wildcard bin/$(OS_TAG)-stanc))
 # use release stanc3 binary (Windows, Linux & MacOS releases before Catalina)

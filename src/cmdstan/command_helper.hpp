@@ -90,7 +90,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
       ->value();
 }
 
-
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
  * Given the name of a file, return a shared pointer holding the data contents.
@@ -110,7 +109,6 @@ inline shared_context_ptr get_var_context(const std::string file) {
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
 }
-
 
 using context_vector = std::vector<shared_context_ptr>;
 /**
@@ -251,10 +249,8 @@ std::ifstream safe_open(const std::string fname) {
  */
 void get_fitted_params(const std::string &fname,
                        const stan::model::model_base &model,
-                       stan::io::stan_csv &fitted_params,
-                       size_t &col_offset,
-                       size_t &num_rows,
-                       size_t &num_cols) {
+                       stan::io::stan_csv &fitted_params, size_t &col_offset,
+                       size_t &num_rows, size_t &num_cols) {
   std::stringstream msg;
   std::vector<std::string> param_names;
   get_constrained_params(model, param_names);
@@ -295,8 +291,8 @@ void get_fitted_params(const std::string &fname,
   }
   for (size_t i = 0; i < num_cols; ++i) {
     if (param_names[i].compare(fitted_params.header[i + col_offset]) != 0) {
-      msg << "Mismatch between model and fitted_parameters csv file \""
-          << fname << "\"" << std::endl;
+      msg << "Mismatch between model and fitted_parameters csv file \"" << fname
+          << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
@@ -319,12 +315,12 @@ void get_theta_hat_csv(const std::string &fname,
   // CSV header and optimization estimates
   std::getline(in, line);
   std::vector<std::string> names;
-  boost::algorithm::split(names, line,
-                          boost::is_any_of(","), boost::token_compress_on);
+  boost::algorithm::split(names, line, boost::is_any_of(","),
+                          boost::token_compress_on);
   std::getline(in, line);
   std::vector<std::string> values;
-  boost::algorithm::split(values, line,
-                          boost::is_any_of(","), boost::token_compress_on);
+  boost::algorithm::split(values, line, boost::is_any_of(","),
+                          boost::token_compress_on);
   in.close();
 
   size_t col_offset = 0;
@@ -337,21 +333,20 @@ void get_theta_hat_csv(const std::string &fname,
   }
   for (size_t i = 0; i < param_names.size(); ++i) {
     if (param_names[i].compare(names[i + col_offset]) != 0) {
-      msg << "Mismatch between model params and StanCSV file \""
-          << fname << "\",  expecting param \"" << param_names[i]
-          << "\", found \"" << names[i + col_offset] << "\"" << std::endl;
+      msg << "Mismatch between model params and StanCSV file \"" << fname
+          << "\",  expecting param \"" << param_names[i] << "\", found \""
+          << names[i + col_offset] << "\"" << std::endl;
       throw std::invalid_argument(msg.str());
     }
     try {
       theta_hat[i] = std::stod(values[i + col_offset]);
     } catch (const std::exception &e) {
-      msg << "Error parsing CSV file, bad value for "
-          << param_names[i]  << std::endl;
+      msg << "Error parsing CSV file, bad value for " << param_names[i]
+          << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
 }
-
 
 /**
  * Get vector of parameter modes from JSON file
@@ -362,9 +357,9 @@ void get_theta_hat_json(const std::string &fname,
   std::vector<std::string> var_names;
   std::vector<std::string> splits;
   std::string cur_name = "";
-  for (auto&& param_name : param_names) {
-    boost::algorithm::split(splits, param_name,
-                            boost::is_any_of("."), boost::token_compress_on);
+  for (auto &&param_name : param_names) {
+    boost::algorithm::split(splits, param_name, boost::is_any_of("."),
+                            boost::token_compress_on);
     if (cur_name.compare(splits[0]) != 0)
       var_names.push_back(splits[0]);
     cur_name = splits[0];
@@ -372,7 +367,7 @@ void get_theta_hat_json(const std::string &fname,
 
   std::shared_ptr<stan::io::var_context> context = get_var_context(fname);
   Eigen::Index offset = 0;
-  for (auto&& var_name : var_names) {
+  for (auto &&var_name : var_names) {
     const auto param_vec = context->vals_r(var_name);
     for (Eigen::Index i = 0; i < param_vec.size(); ++i) {
       theta_hat[offset] = param_vec[i];
@@ -380,7 +375,6 @@ void get_theta_hat_json(const std::string &fname,
     }
   }
 }
-
 
 Eigen::VectorXd get_laplace_mode(const std::string &fname,
                                  const stan::model::model_base &model) {
