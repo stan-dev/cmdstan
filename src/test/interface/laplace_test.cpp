@@ -112,7 +112,7 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
   std::vector<double> values1(3000);
-  parse_sample(convert_model_path(output1_csv), 1000, 3, values1);
+  parse_sample(convert_model_path(output1_csv), values1);
   double* ptr1 = &values1[0];
   Eigen::MatrixXd sample1
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr1);
@@ -128,7 +128,7 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
   std::vector<double> values2(3000);
-  parse_sample(convert_model_path(output2_csv), 1000, 3, values2);
+  parse_sample(convert_model_path(output2_csv), values2);
   double* ptr2 = &values2[0];
   Eigen::MatrixXd sample2
    = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr2);

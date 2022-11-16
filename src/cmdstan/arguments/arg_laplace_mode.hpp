@@ -11,7 +11,7 @@ class arg_laplace_mode : public string_argument {
     _name = "mode";
     _description
         = "A specification of a mode on the constrained scale "
-          "for all model parameters";
+          "for all model parameters, either in JSON or CSV format.";
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";
