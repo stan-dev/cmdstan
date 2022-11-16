@@ -229,8 +229,7 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * @param path Path to file.
  * @param cells Vector to contain CSV data
  */
-void parse_sample(const std::string &path,
-                  std::vector<double> &cells) {
+void parse_sample(const std::string &path, std::vector<double> &cells) {
   std::ifstream in;
   in.open(path);
   std::string line;
