@@ -601,7 +601,7 @@ int command(int argc, const char *argv[]) {
         parser.arg("method")->arg("log_prob")->arg("constrained_params"));
     bool jacobian_adjust
         = dynamic_cast<bool_argument *>(
-              parser.arg("method")->arg("log_prob")->arg("jacobian_adjust"))
+              parser.arg("method")->arg("log_prob")->arg("jacobian"))
               ->value();
     if (upars_file->is_default() && cpars_file->is_default()) {
       msg << "No input parameters provided, cannot calculate log probability "

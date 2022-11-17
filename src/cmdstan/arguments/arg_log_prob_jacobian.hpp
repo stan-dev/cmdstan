@@ -8,10 +8,10 @@ namespace cmdstan {
  * Argument to indicate whether calculated log-probability density should
  * include the log absolute Jacobian determinant of inverse parameter transforms
  */
-class arg_log_prob_jacobian_adjust : public bool_argument {
+class arg_log_prob_jacobian : public bool_argument {
  public:
-  arg_log_prob_jacobian_adjust() : bool_argument() {
-    _name = "jacobian_adjust";
+  arg_log_prob_jacobian() : bool_argument() {
+    _name = "jacobian";
     _description = "Apply jacobian adjustments to log-probability?";
     _validity = "[0, 1]";
     _default = "1";
