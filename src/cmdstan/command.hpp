@@ -380,12 +380,10 @@ int command(int argc, const char *argv[]) {
     int draws = get_arg_val<int_argument>(parser, "method", "laplace", "draws");
     int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
     if (jacobian) {
-      std::cout << "jacobian adjust" << std::endl;
       return_code = stan::services::laplace_sample<true>(
           model, theta_hat, draws, random_seed, refresh, interrupt, logger,
           sample_writers[0]);
     } else {
-      std::cout << "no jacobian adjust" << std::endl;
       return_code = stan::services::laplace_sample<false>(
           model, theta_hat, draws, random_seed, refresh, interrupt, logger,
           sample_writers[0]);
@@ -534,70 +532,59 @@ int command(int argc, const char *argv[]) {
     }
     //////////////////////////////////////////////////
   } else if (user_method->arg("optimize")) {
+    int num_iterations = get_arg_val<int_argument>(parser, "method", "optimize", "iter");
+    bool save_iterations = get_arg_val<bool_argument>(parser, "method", "optimize", "save_iterations");
+    bool jacobian = get_arg_val<bool_argument>(parser, "method", "optimize", "jacobian");
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("optimize")->arg("algorithm"));
-    int num_iterations = dynamic_cast<int_argument *>(
-                             parser.arg("method")->arg("optimize")->arg("iter"))
-                             ->value();
-    bool save_iterations
-        = dynamic_cast<bool_argument *>(
-              parser.arg("method")->arg("optimize")->arg("save_iterations"))
-              ->value();
-
     if (algo->value() == "newton") {
-      return_code = stan::services::optimize::newton(
-          model, *(init_contexts[0]), random_seed, id, init_radius,
-          num_iterations, save_iterations, interrupt, logger, init_writers[0],
-          sample_writers[0]);
+      if (jacobian)
+        return_code = stan::services::optimize::newton<stan::model::model_base, true>(
+            model, *(init_contexts[0]), random_seed, id, init_radius,
+            num_iterations, save_iterations, interrupt, logger, init_writers[0],
+            sample_writers[0]);
+       else
+        return_code = stan::services::optimize::newton<stan::model::model_base, false>(
+            model, *(init_contexts[0]), random_seed, id, init_radius,
+            num_iterations, save_iterations, interrupt, logger, init_writers[0],
+            sample_writers[0]);
     } else if (algo->value() == "bfgs") {
-      double init_alpha
-          = dynamic_cast<real_argument *>(algo->arg("bfgs")->arg("init_alpha"))
-                ->value();
-      double tol_obj
-          = dynamic_cast<real_argument *>(algo->arg("bfgs")->arg("tol_obj"))
-                ->value();
-      double tol_rel_obj
-          = dynamic_cast<real_argument *>(algo->arg("bfgs")->arg("tol_rel_obj"))
-                ->value();
-      double tol_grad
-          = dynamic_cast<real_argument *>(algo->arg("bfgs")->arg("tol_grad"))
-                ->value();
-      double tol_rel_grad = dynamic_cast<real_argument *>(
-                                algo->arg("bfgs")->arg("tol_rel_grad"))
-                                ->value();
-      double tol_param
-          = dynamic_cast<real_argument *>(algo->arg("bfgs")->arg("tol_param"))
-                ->value();
+      double init_alpha = get_arg_val<real_argument>(*algo, "bfgs", "init_alpha");
+      double tol_obj = get_arg_val<real_argument>(*algo, "bfgs", "tol_obj");
+      double tol_rel_obj = get_arg_val<real_argument>(*algo, "bfgs", "tol_rel_obj");
+      double tol_grad = get_arg_val<real_argument>(*algo, "bfgs", "tol_grad");
+      double tol_rel_grad = get_arg_val<real_argument>(*algo, "bfgs", "tol_rel_grad");
+      double tol_param = get_arg_val<real_argument>(*algo, "bfgs", "tol_param");
 
-      return_code = stan::services::optimize::bfgs(
+      if (jacobian)
+        return_code = stan::services::optimize::bfgs<stan::model::model_base, true>(
+          model, *(init_contexts[0]), random_seed, id, init_radius, init_alpha,
+          tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+          num_iterations, save_iterations, refresh, interrupt, logger,
+          init_writers[0], sample_writers[0]);
+      else
+        return_code = stan::services::optimize::bfgs<stan::model::model_base, false>(
           model, *(init_contexts[0]), random_seed, id, init_radius, init_alpha,
           tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           num_iterations, save_iterations, refresh, interrupt, logger,
           init_writers[0], sample_writers[0]);
     } else if (algo->value() == "lbfgs") {
-      int history_size = dynamic_cast<int_argument *>(
-                             algo->arg("lbfgs")->arg("history_size"))
-                             ->value();
-      double init_alpha
-          = dynamic_cast<real_argument *>(algo->arg("lbfgs")->arg("init_alpha"))
-                ->value();
-      double tol_obj
-          = dynamic_cast<real_argument *>(algo->arg("lbfgs")->arg("tol_obj"))
-                ->value();
-      double tol_rel_obj = dynamic_cast<real_argument *>(
-                               algo->arg("lbfgs")->arg("tol_rel_obj"))
-                               ->value();
-      double tol_grad
-          = dynamic_cast<real_argument *>(algo->arg("lbfgs")->arg("tol_grad"))
-                ->value();
-      double tol_rel_grad = dynamic_cast<real_argument *>(
-                                algo->arg("lbfgs")->arg("tol_rel_grad"))
-                                ->value();
-      double tol_param
-          = dynamic_cast<real_argument *>(algo->arg("lbfgs")->arg("tol_param"))
-                ->value();
+      int history_size = get_arg_val<int_argument>(*algo, "lbfgs", "history_size");
+      double init_alpha = get_arg_val<real_argument>(*algo, "lbfgs", "init_alpha");
+      double tol_obj = get_arg_val<real_argument>(*algo, "lbfgs", "tol_obj");
+      double tol_rel_obj = get_arg_val<real_argument>(*algo, "lbfgs", "tol_rel_obj");
+      double tol_grad = get_arg_val<real_argument>(*algo, "lbfgs", "tol_grad");
+      double tol_rel_grad = get_arg_val<real_argument>(*algo, "lbfgs", "tol_rel_grad");
+      double tol_param = get_arg_val<real_argument>(*algo, "lbfgs", "tol_param");
 
-      return_code = stan::services::optimize::lbfgs(
+      if (jacobian)
+        return_code = stan::services::optimize::lbfgs<stan::model::model_base, true>(
+          model, *(init_contexts[0]), random_seed, id, init_radius,
+          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+          tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
+          interrupt, logger, init_writers[0], sample_writers[0]);
+      else
+        return_code = stan::services::optimize::lbfgs<stan::model::model_base, false>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, num_iterations, save_iterations, refresh,
