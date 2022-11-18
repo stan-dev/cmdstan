@@ -518,18 +518,13 @@ int command(int argc, const char *argv[]) {
   } else if (user_method->arg("diagnose")) {
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
-
     if (test->value() == "gradient") {
-      double epsilon
-          = dynamic_cast<real_argument *>(test->arg("gradient")->arg("epsilon"))
-                ->value();
-      double error
-          = dynamic_cast<real_argument *>(test->arg("gradient")->arg("error"))
-                ->value();
+      double epsilon = get_arg_val<real_argument>(*test, "gradient", "epsilon");
+      double error = get_arg_val<real_argument>(*test, "gradient", "error");
       return_code = stan::services::diagnose::diagnose(
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
-    }
+    }   // no other option than "gradient" - wtf?
     //////////////////////////////////////////////////
   } else if (user_method->arg("optimize")) {
     int num_iterations = get_arg_val<int_argument>(parser, "method", "optimize", "iter");
