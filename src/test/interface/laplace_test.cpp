@@ -1,12 +1,8 @@
 #include <test/utility.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <gtest/gtest.h>
-#include <fstream>
-#include <string>
-#include <stdexcept>
 
 using cmdstan::test::convert_model_path;
-using cmdstan::test::multiple_command_separator;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
@@ -26,8 +22,8 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "simple_jacobian_model"};
     simple_jacobian_mode_json
         = {"src", "test", "test-models", "simple_jacobian_mode.json"};
-    output1_csv = {"src", "test", "test-models", "tmp_output1.csv"};
-    output2_csv = {"src", "test", "test-models", "tmp_output2.csv"};
+    output1_csv = {"test", "tmp_output1.csv"};
+    output2_csv = {"test", "tmp_output2.csv"};
   }
   std::vector<std::string> default_file_path;
   std::vector<std::string> dev_null_path;
@@ -107,8 +103,9 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  std::vector<std::string> header1;
   std::vector<double> values1(3000);
-  parse_sample(convert_model_path(output1_csv), values1);
+  parse_sample(convert_model_path(output1_csv), header1, values1);
   double* ptr1 = &values1[0];
   Eigen::MatrixXd sample1
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr1);
@@ -121,8 +118,9 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  std::vector<std::string> header2;
   std::vector<double> values2(3000);
-  parse_sample(convert_model_path(output2_csv), values2);
+  parse_sample(convert_model_path(output2_csv), header2, values2);
   double* ptr2 = &values2[0];
   Eigen::MatrixXd sample2
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr2);

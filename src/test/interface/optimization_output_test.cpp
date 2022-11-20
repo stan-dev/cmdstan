@@ -1,107 +1,175 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
+#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 
 using cmdstan::test::convert_model_path;
+using cmdstan::test::idx_first_match;
+using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
+
+// outimization_model - matrix of 4 normals
+// [[1, 10000], [100, 1000000]] - column major:
+// lp__, y.1.1, y.2.1, y.1.2, y.2.2
+// 0, 1, 100, 10000, 1e+06
 
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
-    std::vector<std::string> model_path;
-    model_path.push_back("src");
-    model_path.push_back("test");
-    model_path.push_back("test-models");
-    model_path.push_back("optimization_output");
+    optimization_model = {"src", "test", "test-models", "optimization_output"};
+    simple_jacobian_model
+        = {"src", "test", "test-models", "simple_jacobian_model"};
 
-    output_file = "test/output.csv";
-
-    base_command
-        = convert_model_path(model_path) + " output file=" + output_file;
-
-    y11 = "y[1,1]";
-    y12 = "y[1,2]";
-    y21 = "y[2,1]";
-    y22 = "y[2,2]";
+    output1_csv = {"test", "output1.csv"};
+    output2_csv = {"test", "output2.csv"};
+    algorithm = "algorithm = ";
+    jacobian = "jacobian = ";
   }
 
-  stan::mcmc::chains<> parse_output_file() {
-    std::ifstream output_stream;
-    output_stream.open(output_file.data());
-
-    stan::io::stan_csv parsed_output
-        = stan::io::stan_csv_reader::parse(output_stream, 0);
-    stan::mcmc::chains<> chains(parsed_output);
-    output_stream.close();
-    return chains;
-  }
-
-  std::string base_command;
-  std::string output_file;
-  std::string y11, y12, y21, y22;
+  std::vector<std::string> optimization_model;
+  std::vector<std::string> simple_jacobian_model;
+  std::vector<std::string> output1_csv;
+  std::vector<std::string> output2_csv;
+  std::string algorithm;
+  std::string jacobian;
 };
 
 TEST_F(CmdStan, optimize_default) {
-  run_command_output out = run_command(base_command + " optimize");
-
+  std::stringstream ss;
+  ss << convert_model_path(optimization_model)
+     << " output file=" << convert_model_path(output1_csv)
+     << " method=optimize 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
-  ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1, chains.num_samples());
+  std::vector<std::string> header;
+  std::vector<double> values(5);
+  parse_sample(convert_model_path(output1_csv), header, values);
 
-  EXPECT_FLOAT_EQ(1, chains.samples(y11)[0]);
-  EXPECT_FLOAT_EQ(100, chains.samples(y21)[0]);
-  EXPECT_FLOAT_EQ(10000, chains.samples(y12)[0]);
-  EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
+  int algo_idx = idx_first_match(header, algorithm);
+  EXPECT_NE(algo_idx, -1);
+  EXPECT_TRUE(boost::contains(header[algo_idx], "(Default)"));
+
+  int jacobian_idx = idx_first_match(header, jacobian);
+  EXPECT_NE(jacobian_idx, -1);
+  EXPECT_TRUE(boost::contains(header[jacobian_idx], "= 0 (Default)"));
+
+  ASSERT_NEAR(0, values[0], 0.00001);
+  EXPECT_FLOAT_EQ(1, values[1]);
+  EXPECT_FLOAT_EQ(100, values[2]);
+  EXPECT_FLOAT_EQ(10000, values[3]);
+  EXPECT_FLOAT_EQ(1000000, values[4]);
 }
 
 TEST_F(CmdStan, optimize_bfgs) {
-  run_command_output out
-      = run_command(base_command + " optimize algorithm=bfgs");
-
+  std::stringstream ss;
+  ss << convert_model_path(optimization_model)
+     << " output file=" << convert_model_path(output1_csv)
+     << " method=optimize algorithm=bfgs 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
-  ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1, chains.num_samples());
+  std::vector<std::string> header;
+  std::vector<double> values(5);
+  parse_sample(convert_model_path(output1_csv), header, values);
 
-  EXPECT_FLOAT_EQ(1, chains.samples(y11)[0]);
-  EXPECT_FLOAT_EQ(100, chains.samples(y21)[0]);
-  EXPECT_FLOAT_EQ(10000, chains.samples(y12)[0]);
-  EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
+  int algo_idx = idx_first_match(header, algorithm);
+  EXPECT_NE(algo_idx, -1);
+  EXPECT_TRUE(boost::contains(header[algo_idx], "bfgs"));
+  EXPECT_FALSE(boost::contains(header[algo_idx], "lbfgs"));
+
+  ASSERT_NEAR(0, values[0], 0.00001);
+  EXPECT_FLOAT_EQ(1, values[1]);
+  EXPECT_FLOAT_EQ(100, values[2]);
+  EXPECT_FLOAT_EQ(10000, values[3]);
+  EXPECT_FLOAT_EQ(1000000, values[4]);
 }
 
 TEST_F(CmdStan, optimize_lbfgs) {
-  run_command_output out
-      = run_command(base_command + " optimize algorithm=lbfgs");
-
+  std::stringstream ss;
+  ss << convert_model_path(optimization_model)
+     << " output file=" << convert_model_path(output1_csv)
+     << " method=optimize algorithm=lbfgs 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
-  ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1, chains.num_samples());
+  std::vector<std::string> header;
+  std::vector<double> values(5);
+  parse_sample(convert_model_path(output1_csv), header, values);
 
-  EXPECT_FLOAT_EQ(1, chains.samples(y11)[0]);
-  EXPECT_FLOAT_EQ(100, chains.samples(y21)[0]);
-  EXPECT_FLOAT_EQ(10000, chains.samples(y12)[0]);
-  EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
+  int algo_idx = idx_first_match(header, algorithm);
+  EXPECT_NE(algo_idx, -1);
+  EXPECT_TRUE(boost::contains(header[algo_idx], "lbfgs"));
+
+  ASSERT_NEAR(0, values[0], 0.00001);
+  EXPECT_FLOAT_EQ(1, values[1]);
+  EXPECT_FLOAT_EQ(100, values[2]);
+  EXPECT_FLOAT_EQ(10000, values[3]);
+  EXPECT_FLOAT_EQ(1000000, values[4]);
 }
 
 TEST_F(CmdStan, optimize_newton) {
-  run_command_output out
-      = run_command(base_command + " optimize algorithm=newton");
-
+  std::stringstream ss;
+  ss << convert_model_path(optimization_model)
+     << " output file=" << convert_model_path(output1_csv)
+     << " method=optimize algorithm=newton 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
-  ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1, chains.num_samples());
+  std::vector<std::string> header;
+  std::vector<double> values(5);
+  parse_sample(convert_model_path(output1_csv), header, values);
 
-  EXPECT_FLOAT_EQ(1, chains.samples(y11)[0]);
-  EXPECT_FLOAT_EQ(100, chains.samples(y21)[0]);
-  EXPECT_FLOAT_EQ(10000, chains.samples(y12)[0]);
-  EXPECT_FLOAT_EQ(1000000, chains.samples(y22)[0]);
+  int algo_idx = idx_first_match(header, algorithm);
+  EXPECT_NE(algo_idx, -1);
+  EXPECT_TRUE(boost::contains(header[algo_idx], "newton"));
+
+  ASSERT_NEAR(0, values[0], 0.00001);
+  EXPECT_FLOAT_EQ(1, values[1]);
+  EXPECT_FLOAT_EQ(100, values[2]);
+  EXPECT_FLOAT_EQ(10000, values[3]);
+  EXPECT_FLOAT_EQ(1000000, values[4]);
+}
+
+TEST_F(CmdStan, optimize_jacobian_adjust) {
+  std::stringstream ss;
+  ss << convert_model_path(simple_jacobian_model) << " random seed=1234"
+     << " output file=" << convert_model_path(output1_csv)
+     << " method=optimize 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+  std::vector<std::string> header1;
+  std::vector<double> values1(2);
+  parse_sample(convert_model_path(output1_csv), header1, values1);
+
+  int jacobian_idx = idx_first_match(header1, jacobian);
+  EXPECT_NE(jacobian_idx, -1);
+  EXPECT_TRUE(boost::contains(header1[jacobian_idx], "= 0 (Default)"));
+
+  ASSERT_NEAR(0, values1[0], 0.00001);
+  ASSERT_NEAR(3, values1[1], 0.01);
+
+  ss.str(std::string());
+  ss << convert_model_path(simple_jacobian_model) << " random seed=1234"
+     << " output file=" << convert_model_path(output2_csv)
+     << " method=optimize jacobian=1 2>&1";
+  cmd = ss.str();
+  out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+  std::vector<std::string> header2;
+  std::vector<double> values2(2);
+  parse_sample(convert_model_path(output2_csv), header2, values2);
+
+  jacobian_idx = idx_first_match(header2, jacobian);
+  EXPECT_NE(jacobian_idx, -1);
+  EXPECT_TRUE(boost::contains(header2[jacobian_idx], "= 1"));
+
+  ASSERT_NEAR(3.3, values2[1], 0.01);
 }

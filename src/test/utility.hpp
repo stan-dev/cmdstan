@@ -227,14 +227,19 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * Expects comment line prefix '#' and header row.
  *
  * @param path Path to file.
- * @param cells Vector to contain CSV data
+ * @param header Vector to append header lines to
+ * @param cells Vector to populate with CSV data
  */
-void parse_sample(const std::string &path, std::vector<double> &cells) {
+void parse_sample(const std::string &path,
+                  std::vector<std::string> &header,
+                  std::vector<double> &cells) {
   std::ifstream in;
   in.open(path);
   std::string line;
-  while (in.peek() == '#')
+  while (in.peek() == '#') {
     std::getline(in, line);
+    header.push_back(line);
+  }
   std::getline(in, line);
   size_t index = 0;
   while (std::getline(in, line)) {
@@ -248,6 +253,27 @@ void parse_sample(const std::string &path, std::vector<double> &cells) {
     }
   }
   in.close();
+}
+
+/**
+ * Given vector of strings, return index of first element
+ * which contains a specified substring.
+ *
+ * @param lines Vector of strings to check
+ * @param substring String to match on
+ *
+ * @return index of first line, or -1 if not found.
+ */
+int idx_first_match(const std::vector<std::string> &lines,
+                    std::string &substring) {
+  int idx = -1;
+  for (int n = 0; n < lines.size(); ++n) {
+    if (boost::contains(lines[n], substring)) {
+      idx = n;
+      break;
+    }
+  }
+  return idx;
 }
 
 }  // namespace test
