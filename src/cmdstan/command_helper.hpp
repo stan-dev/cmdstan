@@ -398,7 +398,6 @@ void get_theta_hat_json(const std::string &fname,
   }
 }
 
-
 /**
  * Parse contents of file containing estimate of parameter modes.
  *
