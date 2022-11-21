@@ -479,7 +479,7 @@ int command(int argc, const char *argv[]) {
     }
 
     auto &output_stream = sample_writers[0].get_stream();
-    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
+    output_stream << std::setprecision(sig_figs) << "lp_,";
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
@@ -506,10 +506,8 @@ int command(int argc, const char *argv[]) {
                   std::ostream_iterator<double>(output_stream, ","));
         output_stream << gradients.back() << "\n";
       }
-      output_stream.close();
       return return_codes::OK;
     } catch (const std::exception &e) {
-      output_stream.close();
       return return_codes::NOT_OK;
     }
     //////////////////////////////////////////////////

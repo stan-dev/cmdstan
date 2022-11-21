@@ -245,7 +245,17 @@ std::ifstream safe_open(const std::string fname) {
 }
 
 /**
- * Get params block from draws matrix
+ * Parse a StanCSV output file created by the NUTS-HMC sampler and
+ * identify the rows and columns in the data table which contain the
+ * fitted estimated for the model parameters.
+ * Throws an exception if the StanCSV parser cannot process the file.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param model instantiated model
+ * @param fitted_params struct which contains CSV header and data rows
+ * @param col_offset first column of model outputs in the data table
+ * @param num_rows total data table rows
+ * @param num_cols total data table columns with parameter variable values
  */
 void get_fitted_params(const std::string &fname,
                        const stan::model::model_base &model,
@@ -299,7 +309,13 @@ void get_fitted_params(const std::string &fname,
 }
 
 /**
- * Get vector of parameter modes from StanCSV file
+ * Parse a StanCSV output file created by the optimizer and return a vector
+ * containing the estimates of the model parameters.
+ * Throws an exception if it cannot parse the CSV file.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param param_names vector of model constrained parameter names.
+ * @param theta_hat Eigen vector for estimated parameters
  */
 void get_theta_hat_csv(const std::string &fname,
                        const std::vector<std::string> &param_names,
@@ -349,7 +365,13 @@ void get_theta_hat_csv(const std::string &fname,
 }
 
 /**
- * Get vector of parameter modes from JSON file
+ * Parse a JSON file and extract the model parameter estimates.
+ * Helper function get_var_context throws exception if cannot
+ * open or parse JSON file.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param param_names vector of model constrained parameter names.
+ * @param theta_hat Eigen vector for estimated parameters
  */
 void get_theta_hat_json(const std::string &fname,
                         const std::vector<std::string> &param_names,
@@ -376,6 +398,14 @@ void get_theta_hat_json(const std::string &fname,
   }
 }
 
+
+/**
+ * Parse contents of file containing estimate of parameter modes.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param model Stan model
+ * @return Eigen vector of parameter estimates.
+ */
 Eigen::VectorXd get_laplace_mode(const std::string &fname,
                                  const stan::model::model_base &model) {
   std::stringstream msg;
