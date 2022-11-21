@@ -396,7 +396,7 @@ int command(int argc, const char *argv[]) {
         parser.arg("method")->arg("log_prob")->arg("constrained_params"));
     bool jacobian_adjust
         = dynamic_cast<bool_argument *>(
-              parser.arg("method")->arg("log_prob")->arg("jacobian_adjust"))
+              parser.arg("method")->arg("log_prob")->arg("jacobian"))
               ->value();
     if (upars_file->is_default() && cpars_file->is_default()) {
       msg << "No input parameters provided, cannot calculate log probability "
@@ -478,10 +478,8 @@ int command(int argc, const char *argv[]) {
       params_r_ind[i] = stan::math::to_array_1d(map_r);
     }
 
-    std::string grad_output_file = get_arg_val<string_argument>(
-        parser, "output", "log_prob_output_file");
-    std::ofstream output_stream(grad_output_file);
-    output_stream << std::setprecision(sig_figs) << "lp_,";
+    auto &output_stream = sample_writers[0].get_stream();
+    output_stream << std::setprecision(sig_figs_arg->value()) << "lp_,";
 
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
