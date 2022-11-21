@@ -230,8 +230,7 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * @param header Vector to append header lines to
  * @param cells Vector to populate with CSV data
  */
-void parse_sample(const std::string &path,
-                  std::vector<std::string> &header,
+void parse_sample(const std::string &path, std::vector<std::string> &header,
                   std::vector<double> &cells) {
   std::ifstream in;
   in.open(path);
