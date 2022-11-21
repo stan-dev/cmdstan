@@ -522,7 +522,7 @@ int command(int argc, const char *argv[]) {
       return_code = stan::services::diagnose::diagnose(
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
-    }  // no other option than "gradient" - wtf?
+    }
     //////////////////////////////////////////////////
   } else if (user_method->arg("optimize")) {
     int num_iterations
