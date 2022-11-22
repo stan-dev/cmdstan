@@ -8,6 +8,7 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/model/model_base.hpp>
+#include <stan/services/sample/standalone_gqs.hpp>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <iostream>
@@ -422,5 +423,92 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   }
   return theta_hat;
 }
+
+
+/**
+ * Extract and validate one or more sets of unconstrained parameters.
+ * Input file contains single variable `params_r`, which is either
+ * a vector or array of vectors of values for the model parameters
+ * on the unconstrained scale.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param model Stan model
+ * @return Eigen vector of parameter estimates.
+ */
+std::vector<std::vector<double>> get_uparams_r(
+    const std::string &fname,
+    const stan::model::model_base &model) {
+  size_t u_params_cols = 0;
+  size_t u_params_rows = 0;
+  std::vector<double> u_params_r;
+  std::vector<size_t> dims_u_params_r;
+  std::stringstream msg;
+
+  std::shared_ptr<stan::io::var_context> upars_context
+      = get_var_context(fname);
+  u_params_r = upars_context->vals_r("params_r");
+  if (u_params_r.size() == 0) {
+    msg << "Unconstrained parameters file has no variable 'params_r' with "
+        "unconstrained parameter values!";
+    throw std::invalid_argument(msg.str());
+  }
+  // is input single vector of params or array of vectors?
+  dims_u_params_r = upars_context->dims_r("params_r");
+  u_params_rows = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
+  u_params_cols = dims_u_params_r.size() == 2 ? dims_u_params_r[1]
+                  : dims_u_params_r[0];
+  size_t num_upars = model.num_params_r();
+  if (u_params_cols != num_upars) {
+    msg << "Incorrect number of unconstrained parameters provided! "
+        "Model has "
+        << num_upars << " parameters but " << u_params_cols << " were found.";
+    throw std::invalid_argument(msg.str());
+  }
+  // reshape 
+  std::vector<std::vector<double>> params_r_ind(u_params_rows);
+  using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
+  for (size_t i = 0; i < u_params_rows; ++i) {
+    Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
+        u_params_r.data() + i, u_params_cols,
+        StrideT(1, u_params_cols));
+    params_r_ind[i] = stan::math::to_array_1d(map_r);
+  }
+  return params_r_ind;
+}
+
+/**
+ * Extract and validate constrained parameter inputs.
+ * Input file contains definitions for all modle parmeters.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @param model Stan model
+ * @return Eigen vector of parameter estimates.
+ */
+std::vector<std::vector<double>> get_cparams_r(
+    const std::string &fname,
+    const stan::model::model_base &model) {
+  std::vector<std::string> param_names;
+  std::vector<std::vector<size_t>> param_dimss;
+  stan::services::get_model_parameters(model, param_names, param_dimss);
+
+  std::vector<std::vector<double>> params_r_ind(1);
+  std::vector<int> dummy_params_i;
+  std::shared_ptr<stan::io::var_context> cpars_context
+      = get_var_context(fname);
+  std::vector<std::string> input_cpar_names;
+  cpars_context->names_r(input_cpar_names);
+  std::stringstream msg;
+  for (const std::string &m_param_name : param_names) {
+    if (!cpars_context->contains_r(m_param_name)) {
+      msg << "Constrained value(s) for parameter " << m_param_name
+          << " not found!";
+      throw std::invalid_argument(msg.str());
+    }
+  }
+  model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0],
+                          &msg);
+  return params_r_ind;
+}
+
 
 #endif

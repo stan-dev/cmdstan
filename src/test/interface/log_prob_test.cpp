@@ -45,11 +45,19 @@ TEST_F(CmdStan, log_prob_good_rdump) {
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
-     << convert_model_path(bern_unconstrained_params_rdump)
-     << " constrained_params="
-     << convert_model_path(bern_constrained_params_rdump);
+     << convert_model_path(bern_unconstrained_params_rdump);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+
+  ss.str(std::string());
+  ss << convert_model_path(bern_log_prob_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=log_prob constrained_params="
+     << convert_model_path(bern_constrained_params_rdump);
+  cmd = ss.str();
+  out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
 }
 
@@ -59,25 +67,19 @@ TEST_F(CmdStan, log_prob_good_json) {
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob unconstrained_params="
-     << convert_model_path(bern_unconstrained_params_json)
-     << " constrained_params="
-     << convert_model_path(bern_constrained_params_json);
+     << convert_model_path(bern_unconstrained_params_json);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-}
 
-TEST_F(CmdStan, log_prob_good_rdump_json) {
-  std::stringstream ss;
+  ss.str(std::string());
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
-     << " method=log_prob unconstrained_params="
-     << convert_model_path(bern_unconstrained_params_rdump)
-     << " constrained_params="
+     << " method=log_prob constrained_params="
      << convert_model_path(bern_constrained_params_json);
-  std::string cmd = ss.str();
-  run_command_output out = run_command(cmd);
+  cmd = ss.str();
+  out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
 }
 
@@ -87,19 +89,6 @@ TEST_F(CmdStan, log_prob_no_params) {
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob";
-  std::string cmd = ss.str();
-  run_command_output out = run_command(cmd);
-  ASSERT_TRUE(out.hasError);
-}
-
-TEST_F(CmdStan, log_prob_no_data) {
-  std::stringstream ss;
-  ss << convert_model_path(bern_log_prob_model)
-     << " output file=" << convert_model_path(dev_null_path)
-     << " method=log_prob unconstrained_params="
-     << convert_model_path(bern_unconstrained_params_rdump)
-     << " constrained_params="
-     << convert_model_path(bern_constrained_params_json);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);

@@ -180,22 +180,15 @@ int command(int argc, const char *argv[]) {
   unsigned int random_seed = random_arg->random_value();
 
 #ifdef STAN_OPENCL
-  int_argument *opencl_device_id
-      = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("device"));
-  int_argument *opencl_platform_id
-      = dynamic_cast<int_argument *>(parser.arg("opencl")->arg("platform"));
-
-  // Either both device and platform are set or neither in which case we default
-  // to compile-time constants
-  if ((opencl_device_id->is_default() && !opencl_platform_id->is_default())
-      || (!opencl_device_id->is_default()
-          && opencl_platform_id->is_default())) {
+  int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
+  int opencl_platform_id = get_arg_val<int_argument>(parser, "opencl", "platform");
+  if ((opencl_device_id >= 0 && open_platform_id < 0)  // default value -1
+      || (opencl_device_id < 0 && open_platform_id >= 0)) {
     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
     return return_codes::NOT_OK;
-  } else if (!opencl_device_id->is_default()
-             && !opencl_platform_id->is_default()) {
-    stan::math::opencl_context.select_device(opencl_platform_id->value(),
-                                             opencl_device_id->value());
+  } else if (opencl_device_id >= 0) {  // opencl_platform_id >= 0 by above test
+    stan::math::opencl_context.select_device(opencl_platform_id,
+                                             opencl_device_id);
   }
 #endif
 
@@ -390,118 +383,59 @@ int command(int argc, const char *argv[]) {
     }
     //////////////////////////////////////////////////
   } else if (user_method->arg("log_prob")) {
-    string_argument *upars_file = dynamic_cast<string_argument *>(
-        parser.arg("method")->arg("log_prob")->arg("unconstrained_params"));
-    string_argument *cpars_file = dynamic_cast<string_argument *>(
-        parser.arg("method")->arg("log_prob")->arg("constrained_params"));
-    bool jacobian_adjust
-        = dynamic_cast<bool_argument *>(
-              parser.arg("method")->arg("log_prob")->arg("jacobian"))
-              ->value();
-    if (upars_file->is_default() && cpars_file->is_default()) {
-      msg << "No input parameters provided, cannot calculate log probability "
-             "density";
+    std::string upars_file
+        = get_arg_val<string_argument>(parser,
+                                       "method",
+                                       "log_prob", "unconstrained_params");
+    std::string cpars_file
+        = get_arg_val<string_argument>(parser,
+                                       "method",
+                                       "log_prob", "constrained_params");
+    bool jacobian
+        = get_arg_val<bool_argument>(parser, "method", "log_prob", "jacobian");
+    if (upars_file.length() == 0 && cpars_file.length() == 0) {
+      msg << "No input parameter files provided, "
+          << "cannot calculate log probability density.";
+      throw std::invalid_argument(msg.str());
+    }
+    if (upars_file.length() > 0 && cpars_file.length() > 0) {
+      msg << "Cannot specify both input files of both "
+          << "constrained and unconstrained parameter values.";
       throw std::invalid_argument(msg.str());
     }
 
-    size_t u_params_vec_size = 0;
-    size_t u_params_size = 0;
-    std::vector<double> u_params_r;
-    std::vector<size_t> dims_u_params_r;
-    if (!(upars_file->is_default())) {
-      std::string u_fname(upars_file->value());
-      std::ifstream u_stream(u_fname.c_str());
-
-      std::shared_ptr<stan::io::var_context> upars_context
-          = get_var_context(u_fname);
-
-      u_params_r = upars_context->vals_r("params_r");
-      if (u_params_r.size() == 0) {
-        msg << "Unconstrained parameters file has no variable 'params_r' with "
-               "unconstrained parameter values!";
-        throw std::invalid_argument(msg.str());
-      }
-      dims_u_params_r = upars_context->dims_r("params_r");
-
-      // Detect whether multiple sets of parameter values have been passed
-      // and set the sizes accordingly
-      u_params_vec_size = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
-      u_params_size = dims_u_params_r.size() == 2 ? dims_u_params_r[1]
-                                                  : dims_u_params_r[0];
-    }
-
-    // Store names and dims for constructing array_var_context
-    // and unconstraining transform
-    std::vector<std::string> param_names;
-    std::vector<std::vector<size_t>> param_dimss;
-    stan::services::get_model_parameters(model, param_names, param_dimss);
-    size_t num_upars = model.num_params_r();
-    if (u_params_size > 0 && u_params_size != num_upars) {
-      msg << "Incorrect number of unconstrained parameters provided! "
-             "Model has "
-          << num_upars << " parameters but " << u_params_size << " were found.";
-      throw std::invalid_argument(msg.str());
-    }
-
-    bool has_cpars = !cpars_file->is_default();
-    // Store in single nested array to allow single loop for calc and print
-    size_t num_par_sets = u_params_vec_size + has_cpars;
-    std::vector<std::vector<double>> params_r_ind(num_par_sets);
-    std::vector<int> dummy_params_i;
-    if (!cpars_file->is_default()) {
-      std::string cpars_filename(cpars_file->value());
-
-      std::shared_ptr<stan::io::var_context> cpars_context
-          = get_var_context(cpars_filename);
-      std::vector<std::string> input_cpar_names;
-      cpars_context->names_r(input_cpar_names);
-
-      for (const std::string &m_param_name : param_names) {
-        if (!cpars_context->contains_r(m_param_name)) {
-          msg << "Constrained value(s) for parameter " << m_param_name
-              << " not found!";
-          throw std::invalid_argument(msg.str());
-        }
-      }
-      model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0],
-                            &msg);
-    }
-
-    // Use Map with inner stride to operate on all values from parameter set
-    using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
-    for (size_t i = has_cpars; i < num_par_sets; ++i) {
-      size_t iter = i - has_cpars;
-      Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-          u_params_r.data() + iter, u_params_size,
-          StrideT(1, u_params_vec_size));
-
-      params_r_ind[i] = stan::math::to_array_1d(map_r);
-    }
+    std::vector<std::vector<double>> params_r_ind;
+    if (upars_file.length() > 0)
+      params_r_ind = get_uparams_r(upars_file, model);
+    else
+      params_r_ind = get_cparams_r(cpars_file, model);
 
     auto &output_stream = sample_writers[0].get_stream();
+    // header row
     output_stream << std::setprecision(sig_figs) << "lp_,";
-
     std::vector<std::string> p_names;
     model.constrained_param_names(p_names, false, false);
-    for (size_t i = 0; i < (p_names.size() - 1); ++i) {
-      output_stream << "g_" << p_names[i] << ",";
+    for (size_t i = 0; i < p_names.size(); ++i) {
+      output_stream << "g_" << p_names[i];
+      if (i == p_names.size() - 1 )
+        output_stream << "\n";
+      else
+        output_stream << ",";
     }
-    // Output last element separately so that no trailing comma is printed
-    output_stream << p_names.back() << "\n";
+    // data row(s)
+    std::vector<int> dummy_params_i;
     try {
       double lp;
       std::vector<double> gradients;
-      for (auto &&param_set : params_r_ind) {
-        if (jacobian_adjust) {
+      for (auto &&params : params_r_ind) {
+        if (jacobian) {
           lp = stan::model::log_prob_grad<true, true>(
-              model, param_set, dummy_params_i, gradients);
+              model, params, dummy_params_i, gradients);
         } else {
           lp = stan::model::log_prob_grad<true, false>(
-              model, param_set, dummy_params_i, gradients);
+              model, params, dummy_params_i, gradients);
         }
-
         output_stream << lp << ",";
-
         std::copy(gradients.begin(), gradients.end() - 1,
                   std::ostream_iterator<double>(output_stream, ","));
         output_stream << gradients.back() << "\n";
