@@ -103,11 +103,12 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  std::vector<std::string> header1;
-  std::vector<double> values1(3000);
-  parse_sample(convert_model_path(output1_csv), header1, values1);
+  std::vector<std::string> config;
+  std::vector<std::string> header;
+  std::vector<double> values1;
+  parse_sample(convert_model_path(output1_csv), config, header, values1);
   double* ptr1 = &values1[0];
-  Eigen::MatrixXd sample1
+  Eigen::MatrixXd sample1  // 1000 draws, 1 variable == 3 outputs
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr1);
 
   ss.str(std::string());
@@ -118,9 +119,8 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  std::vector<std::string> header2;
-  std::vector<double> values2(3000);
-  parse_sample(convert_model_path(output2_csv), header2, values2);
+  std::vector<double> values2;
+  parse_sample(convert_model_path(output2_csv), config, header, values2);
   double* ptr2 = &values2[0];
   Eigen::MatrixXd sample2
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr2);

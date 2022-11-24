@@ -230,25 +230,26 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * @param header Vector to append header lines to
  * @param cells Vector to populate with CSV data
  */
-void parse_sample(const std::string &path, std::vector<std::string> &header,
+void parse_sample(const std::string &path,
+                  std::vector<std::string> &config,
+                  std::vector<std::string> &header,
                   std::vector<double> &cells) {
   std::ifstream in;
   in.open(path);
   std::string line;
   while (in.peek() == '#') {
     std::getline(in, line);
-    header.push_back(line);
+    config.push_back(line);
   }
   std::getline(in, line);
-  size_t index = 0;
+  header.push_back(line);
   while (std::getline(in, line)) {
     if (line[0] == '#')
       continue;
-    std::stringstream lineStream(line);
+    std::stringstream linestream(line);
     std::string cell;
-    while (std::getline(lineStream, cell, ',')) {
-      cells[index] = std::stod(cell);
-      index++;
+    while (std::getline(linestream, cell, ',')) {
+      cells.push_back(std::stold(cell));
     }
   }
   in.close();

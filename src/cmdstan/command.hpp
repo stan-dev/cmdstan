@@ -403,46 +403,35 @@ int command(int argc, const char *argv[]) {
           << "constrained and unconstrained parameter values.";
       throw std::invalid_argument(msg.str());
     }
+    if (upars_file.length() > 0
+        && !(ends_with_ignore_case(upars_file, ".json")
+             || ends_with_ignore_case(upars_file, ".r"))) {
+      msg << "File " << upars_file << ", unknown filetype, "
+          << "expecting json or rdump file.";
+      throw std::invalid_argument(msg.str());
+    } else if (cpars_file.length() > 0
+               && !(ends_with_ignore_case(cpars_file, ".csv")
+                    || ends_with_ignore_case(cpars_file, ".json")
+                    || ends_with_ignore_case(cpars_file, ".r"))) {
+        msg << "File " << cpars_file << ", unknown filetype, "
+            << "expecting csv, json, or rdump file.";
+        throw std::invalid_argument(msg.str());
+    }
 
     std::vector<std::vector<double>> params_r_ind;
-    if (upars_file.length() > 0)
+    if (upars_file.length() > 0) {
       params_r_ind = get_uparams_r(upars_file, model);
-    else
-      params_r_ind = get_cparams_r(cpars_file, model);
-
-    auto &output_stream = sample_writers[0].get_stream();
-    // header row
-    output_stream << std::setprecision(sig_figs) << "lp_,";
-    std::vector<std::string> p_names;
-    model.constrained_param_names(p_names, false, false);
-    for (size_t i = 0; i < p_names.size(); ++i) {
-      output_stream << "g_" << p_names[i];
-      if (i == p_names.size() - 1 )
-        output_stream << "\n";
+    } else if (cpars_file.length() > 0) {
+      if (ends_with_ignore_case(cpars_file, ".csv"))
+        params_r_ind = get_cparams_r_csv(cpars_file, model);
       else
-        output_stream << ",";
+        params_r_ind = get_cparams_r(cpars_file, model);
     }
-    // data row(s)
-    std::vector<int> dummy_params_i;
     try {
-      double lp;
-      std::vector<double> gradients;
-      for (auto &&params : params_r_ind) {
-        if (jacobian) {
-          lp = stan::model::log_prob_grad<true, true>(
-              model, params, dummy_params_i, gradients);
-        } else {
-          lp = stan::model::log_prob_grad<true, false>(
-              model, params, dummy_params_i, gradients);
-        }
-        output_stream << lp << ",";
-        std::copy(gradients.begin(), gradients.end() - 1,
-                  std::ostream_iterator<double>(output_stream, ","));
-        output_stream << gradients.back() << "\n";
-      }
-      return return_codes::OK;
+      services_log_prob_grad(model, jacobian, params_r_ind, sig_figs, sample_writers[0].get_stream());
+      return_code = return_codes::OK;
     } catch (const std::exception &e) {
-      return return_codes::NOT_OK;
+      return_code = return_codes::NOT_OK;
     }
     //////////////////////////////////////////////////
   } else if (user_method->arg("diagnose")) {

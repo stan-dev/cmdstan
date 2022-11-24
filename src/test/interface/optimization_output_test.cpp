@@ -45,17 +45,18 @@ TEST_F(CmdStan, optimize_default) {
   run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
+  std::vector<std::string> config;
   std::vector<std::string> header;
-  std::vector<double> values(5);
-  parse_sample(convert_model_path(output1_csv), header, values);
+  std::vector<double> values;
+  parse_sample(convert_model_path(output1_csv), config, header, values);
 
-  int algo_idx = idx_first_match(header, algorithm);
+  int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(header[algo_idx], "(Default)"));
+  EXPECT_TRUE(boost::contains(config[algo_idx], "(Default)"));
 
-  int jacobian_idx = idx_first_match(header, jacobian);
+  int jacobian_idx = idx_first_match(config, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(header[jacobian_idx], "= 0 (Default)"));
+  EXPECT_TRUE(boost::contains(config[jacobian_idx], "= 0 (Default)"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   EXPECT_FLOAT_EQ(1, values[1]);
@@ -73,14 +74,15 @@ TEST_F(CmdStan, optimize_bfgs) {
   run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
+  std::vector<std::string> config;
   std::vector<std::string> header;
-  std::vector<double> values(5);
-  parse_sample(convert_model_path(output1_csv), header, values);
+  std::vector<double> values;
+  parse_sample(convert_model_path(output1_csv), config, header, values);
 
-  int algo_idx = idx_first_match(header, algorithm);
+  int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(header[algo_idx], "bfgs"));
-  EXPECT_FALSE(boost::contains(header[algo_idx], "lbfgs"));
+  EXPECT_TRUE(boost::contains(config[algo_idx], "bfgs"));
+  EXPECT_FALSE(boost::contains(config[algo_idx], "lbfgs"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   EXPECT_FLOAT_EQ(1, values[1]);
@@ -98,13 +100,14 @@ TEST_F(CmdStan, optimize_lbfgs) {
   run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
+  std::vector<std::string> config;
   std::vector<std::string> header;
-  std::vector<double> values(5);
-  parse_sample(convert_model_path(output1_csv), header, values);
+  std::vector<double> values;
+  parse_sample(convert_model_path(output1_csv), config, header, values);
 
-  int algo_idx = idx_first_match(header, algorithm);
+  int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(header[algo_idx], "lbfgs"));
+  EXPECT_TRUE(boost::contains(config[algo_idx], "lbfgs"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   EXPECT_FLOAT_EQ(1, values[1]);
@@ -122,13 +125,14 @@ TEST_F(CmdStan, optimize_newton) {
   run_command_output out = run_command(cmd);
   ASSERT_EQ(0, out.err_code);
 
+  std::vector<std::string> config;
   std::vector<std::string> header;
-  std::vector<double> values(5);
-  parse_sample(convert_model_path(output1_csv), header, values);
+  std::vector<double> values;
+  parse_sample(convert_model_path(output1_csv), config, header, values);
 
-  int algo_idx = idx_first_match(header, algorithm);
+  int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(header[algo_idx], "newton"));
+  EXPECT_TRUE(boost::contains(config[algo_idx], "newton"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   EXPECT_FLOAT_EQ(1, values[1]);
@@ -145,13 +149,14 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  std::vector<std::string> header1;
-  std::vector<double> values1(2);
-  parse_sample(convert_model_path(output1_csv), header1, values1);
+  std::vector<std::string> config1;
+  std::vector<std::string> header;
+  std::vector<double> values1;
+  parse_sample(convert_model_path(output1_csv), config1, header, values1);
 
-  int jacobian_idx = idx_first_match(header1, jacobian);
+  int jacobian_idx = idx_first_match(config1, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(header1[jacobian_idx], "= 0 (Default)"));
+  EXPECT_TRUE(boost::contains(config1[jacobian_idx], "= 0 (Default)"));
 
   ASSERT_NEAR(0, values1[0], 0.00001);
   ASSERT_NEAR(3, values1[1], 0.01);
@@ -163,13 +168,13 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  std::vector<std::string> header2;
-  std::vector<double> values2(2);
-  parse_sample(convert_model_path(output2_csv), header2, values2);
+  std::vector<std::string> config2;
+  std::vector<double> values2;
+  parse_sample(convert_model_path(output2_csv), config2, header, values2);
 
-  jacobian_idx = idx_first_match(header2, jacobian);
+  jacobian_idx = idx_first_match(config2, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(header2[jacobian_idx], "= 1"));
+  EXPECT_TRUE(boost::contains(config2[jacobian_idx], "= 1"));
 
   ASSERT_NEAR(3.3, values2[1], 0.01);
 }
