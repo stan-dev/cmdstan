@@ -405,7 +405,7 @@ int command(int argc, const char *argv[]) {
     if (upars_file.length() > 0) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
-      if (suffix(cpars_file) == ".csv") 
+      if (suffix(cpars_file) == ".csv")
         params_r_ind = get_cparams_r_csv(cpars_file, model);
       else
         params_r_ind = get_cparams_r(cpars_file, model);
