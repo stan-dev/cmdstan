@@ -103,7 +103,7 @@ std::string suffix(const std::string name) {
   if (file_marker_pos > name.size())
     return std::string();
   else
-     return name.substr(file_marker_pos, name.size());
+    return name.substr(file_marker_pos, name.size());
 }
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
@@ -476,7 +476,8 @@ std::vector<std::vector<double>> get_uparams_r(
     throw std::invalid_argument(msg.str());
   }
   // brute force reshape
-  std::vector<std::vector<double>> params_r_ind(u_params_rows, std::vector<double>(u_params_cols));
+  std::vector<std::vector<double>> params_r_ind(
+      u_params_rows, std::vector<double>(u_params_cols));
   size_t idx = 0;
   for (size_t i = 0; i < u_params_rows; ++i) {
     for (size_t j = 0; j < u_params_cols; ++j) {
