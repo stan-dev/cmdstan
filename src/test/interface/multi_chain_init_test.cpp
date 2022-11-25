@@ -37,7 +37,6 @@ TEST_F(CmdStan, multi_chain_single_init_file_good) {
      << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  std::cout << out.output << std::endl;
   ASSERT_FALSE(out.hasError);
 }
 
