@@ -28,8 +28,8 @@ int count_matches(const std::string &target, const std::string &s) {
 /**
  * Gets the path separator for the OS.
  *
- * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_")) == 0);
-ws, '/' otherwise.
+ * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_"))
+== 0); ws, '/' otherwise.
  */
 char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
@@ -232,8 +232,7 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * @param header Vector for column header
  * @param cells Vector of output data, serialized by row.
  */
-void parse_sample(const std::string &path,
-                  std::vector<std::string> &config,
+void parse_sample(const std::string &path, std::vector<std::string> &config,
                   std::vector<std::string> &header,
                   std::vector<double> &cells) {
   std::ifstream in;

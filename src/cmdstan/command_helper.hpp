@@ -40,7 +40,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&...args) {
+                                      Args &&... args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -56,7 +56,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&...args) {
+                              Args &&... args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -87,11 +87,10 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into.
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
       ->value();
 }
-
 
 /**
  * Get suffix, lower case
@@ -104,10 +103,8 @@ std::string suffix(const std::string name) {
   if (file_marker_pos > name.size())
     return std::string();
   else
-     return boost::to_lower_copy(
-          name.substr(file_marker_pos, name.size()));
+    return boost::to_lower_copy(name.substr(file_marker_pos, name.size()));
 }
-
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
@@ -245,7 +242,6 @@ void get_constrained_params(const stan::model::model_base &model,
     throw std::invalid_argument(msg.str());
   }
 }
-
 
 /**
  * Opens input stream for file.
