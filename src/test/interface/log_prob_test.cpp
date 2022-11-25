@@ -47,7 +47,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> test_output;
 };
 
-TEST_F(CmdStan, log_prob_good_rdump) {
+TEST_F(CmdStan, log_prob_uparams_rdump) {
   std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
@@ -67,27 +67,29 @@ TEST_F(CmdStan, log_prob_good_rdump) {
   ASSERT_EQ(values.size() % names.size(), 0);
   ASSERT_EQ(names[0].compare(0, 2, std::string("lp")), 0);
   ASSERT_EQ(names[1].compare(0, 2, std::string("g_")), 0);
+}
 
-  ss.str(std::string());
+TEST_F(CmdStan, log_prob_cparams_rdump) {
+  std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(test_output)
      << " method=log_prob constrained_params="
      << convert_model_path(bern_constrained_params_rdump);
-  cmd = ss.str();
-  out = run_command(cmd);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  config.clear();
-  header.clear();
-  values.clear();
-  names.clear();
+  std::vector<std::string> config;
+  std::vector<std::string> header;
+  std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
+  std::vector<std::string> names;
   boost::split(names, header[0], boost::is_any_of(","),
                boost::token_compress_on);
   ASSERT_TRUE(values.size() % names.size() == 0);
 }
 
-TEST_F(CmdStan, log_prob_good_json) {
+TEST_F(CmdStan, log_prob_uparams_json) {
   std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
@@ -105,27 +107,29 @@ TEST_F(CmdStan, log_prob_good_json) {
   boost::split(names, header[0], boost::is_any_of(","),
                boost::token_compress_on);
   ASSERT_EQ(values.size() % names.size(), 0);
+}
 
-  ss.str(std::string());
+TEST_F(CmdStan, log_prob_cparams_json) {
+  std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(test_output)
      << " method=log_prob constrained_params="
      << convert_model_path(bern_constrained_params_json);
-  cmd = ss.str();
-  out = run_command(cmd);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
-  config.clear();
-  header.clear();
-  values.clear();
-  names.clear();
+  std::vector<std::string> config;
+  std::vector<std::string> header;
+  std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
+  std::vector<std::string> names;
   boost::split(names, header[0], boost::is_any_of(","),
                boost::token_compress_on);
-  ASSERT_TRUE(values.size() % names.size() == 0);
+  ASSERT_EQ(values.size() % names.size(), 0);
 }
 
-TEST_F(CmdStan, log_prob_good_csv) {
+TEST_F(CmdStan, log_prob_cparams_csv) {
   std::stringstream ss;
   ss << convert_model_path(bern_gq_model)
      << " data file=" << convert_model_path(bern_data)

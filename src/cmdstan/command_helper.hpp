@@ -94,7 +94,7 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
 
 
 /**
- * Get suffix, lower case
+ * Get suffix
  *
  * @param filename
  * @return suffix
@@ -104,8 +104,7 @@ std::string suffix(const std::string name) {
   if (file_marker_pos > name.size())
     return std::string();
   else
-     return boost::to_lower_copy(
-          name.substr(file_marker_pos, name.size()));
+     return name.substr(file_marker_pos, name.size());
 }
 
 
@@ -479,13 +478,14 @@ std::vector<std::vector<double>> get_uparams_r(
         << num_upars << " parameters but " << u_params_cols << " were found.";
     throw std::invalid_argument(msg.str());
   }
-  // reshape
-  std::vector<std::vector<double>> params_r_ind(u_params_rows);
-  using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
+  // brute force reshape
+  std::vector<std::vector<double>> params_r_ind(u_params_rows, std::vector<double>(u_params_cols));
+  size_t idx = 0;
   for (size_t i = 0; i < u_params_rows; ++i) {
-    Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-        u_params_r.data() + i, u_params_cols, StrideT(1, u_params_cols));
-    params_r_ind[i] = stan::math::to_array_1d(map_r);
+    for (size_t j = 0; j < u_params_cols; ++j) {
+      params_r_ind[i][j] = *(u_params_r.data() + idx);
+      ++idx;
+    }
   }
   return params_r_ind;
 }
