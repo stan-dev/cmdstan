@@ -40,7 +40,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -56,7 +56,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -87,10 +87,27 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into.
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
       ->value();
 }
+
+
+/**
+ * Get suffix, lower case
+ *
+ * @param filename
+ * @return suffix
+ */
+std::string suffix(const std::string name) {
+  size_t file_marker_pos = name.find_last_of(".");
+  if (file_marker_pos > name.size())
+    return std::string();
+  else
+     return boost::to_lower_copy(
+          name.substr(file_marker_pos, name.size()));
+}
+
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
@@ -104,7 +121,7 @@ inline shared_context_ptr get_var_context(const std::string &file) {
     msg << "Can't open specified file, \"" << file << "\"" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  if (stan::io::ends_with(".json", file)) {
+  if (suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
@@ -229,6 +246,7 @@ void get_constrained_params(const stan::model::model_base &model,
   }
 }
 
+
 /**
  * Opens input stream for file.
  * Throws exception if stream cannot be opened.
@@ -245,20 +263,6 @@ std::ifstream safe_open(const std::string fname) {
   }
   return stream;
 }
-
-/**
- * Check if string ends in substring.
- *
- * @param str string to check
- * @param substr suffix string
- */
-bool ends_with_ignore_case(const std::string &str, const std::string &substr) {
-  if (str.length() < substr.length()) return false;
-  std::string str_lc(boost::to_lower_copy(str));
-  std::string substr_lc(boost::to_lower_copy(substr));
-  return boost::ends_with(str_lc, substr_lc);
-}
-
 
 /**
  * Parse a StanCSV output file created by the NUTS-HMC sampler and
@@ -427,9 +431,9 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   std::vector<std::string> param_names;
   get_constrained_params(model, param_names);
   Eigen::VectorXd theta_hat(param_names.size());
-  if (ends_with_ignore_case(fname, ".csv")) {
+  if (suffix(fname) == ".csv") {
     get_theta_hat_csv(fname, param_names, theta_hat);
-  } else if (ends_with_ignore_case(fname, ".json")) {
+  } else if (suffix(fname) == ".json") {
     get_theta_hat_json(fname, param_names, theta_hat);
   } else {
     msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
@@ -437,7 +441,6 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   }
   return theta_hat;
 }
-
 
 /**
  * Extract and validate one or more sets of unconstrained parameters.
@@ -450,41 +453,38 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
  * @return Eigen vector of parameter estimates.
  */
 std::vector<std::vector<double>> get_uparams_r(
-    const std::string &fname,
-    const stan::model::model_base &model) {
+    const std::string &fname, const stan::model::model_base &model) {
   size_t u_params_cols = 0;
   size_t u_params_rows = 0;
   std::vector<double> u_params_r;
   std::vector<size_t> dims_u_params_r;
   std::stringstream msg;
 
-  std::shared_ptr<stan::io::var_context> upars_context
-      = get_var_context(fname);
+  std::shared_ptr<stan::io::var_context> upars_context = get_var_context(fname);
   u_params_r = upars_context->vals_r("params_r");
   if (u_params_r.size() == 0) {
     msg << "Unconstrained parameters file has no variable 'params_r' with "
-        "unconstrained parameter values!";
+           "unconstrained parameter values!";
     throw std::invalid_argument(msg.str());
   }
   // is input single vector of params or array of vectors?
   dims_u_params_r = upars_context->dims_r("params_r");
   u_params_rows = dims_u_params_r.size() == 2 ? dims_u_params_r[0] : 1;
-  u_params_cols = dims_u_params_r.size() == 2 ? dims_u_params_r[1]
-                  : dims_u_params_r[0];
+  u_params_cols
+      = dims_u_params_r.size() == 2 ? dims_u_params_r[1] : dims_u_params_r[0];
   size_t num_upars = model.num_params_r();
   if (u_params_cols != num_upars) {
     msg << "Incorrect number of unconstrained parameters provided! "
-        "Model has "
+           "Model has "
         << num_upars << " parameters but " << u_params_cols << " were found.";
     throw std::invalid_argument(msg.str());
   }
-  // reshape 
+  // reshape
   std::vector<std::vector<double>> params_r_ind(u_params_rows);
   using StrideT = Eigen::Stride<1, Eigen::Dynamic>;
   for (size_t i = 0; i < u_params_rows; ++i) {
     Eigen::Map<Eigen::VectorXd, 0, StrideT> map_r(
-        u_params_r.data() + i, u_params_cols,
-        StrideT(1, u_params_cols));
+        u_params_r.data() + i, u_params_cols, StrideT(1, u_params_cols));
     params_r_ind[i] = stan::math::to_array_1d(map_r);
   }
   return params_r_ind;
@@ -499,8 +499,7 @@ std::vector<std::vector<double>> get_uparams_r(
  * @return Eigen vector of parameter estimates.
  */
 std::vector<std::vector<double>> get_cparams_r(
-    const std::string &fname,
-    const stan::model::model_base &model) {
+    const std::string &fname, const stan::model::model_base &model) {
   std::vector<std::string> param_names;
   std::vector<std::vector<size_t>> param_dimss;
   stan::services::get_model_parameters(model, param_names, param_dimss);
@@ -509,8 +508,7 @@ std::vector<std::vector<double>> get_cparams_r(
   std::vector<double> params(num_upars);
   std::vector<std::vector<double>> params_r_ind = {params};
   std::vector<int> dummy_params_i;
-  std::shared_ptr<stan::io::var_context> cpars_context
-      = get_var_context(fname);
+  std::shared_ptr<stan::io::var_context> cpars_context = get_var_context(fname);
   std::vector<std::string> input_cpar_names;
   cpars_context->names_r(input_cpar_names);
   std::stringstream msg;
@@ -522,10 +520,9 @@ std::vector<std::vector<double>> get_cparams_r(
     }
   }
   model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0],
-                          &msg);
+                        &msg);
   return params_r_ind;
 }
-
 
 /**
  * Read fitted params from sample in StanCSV format.
@@ -535,8 +532,7 @@ std::vector<std::vector<double>> get_cparams_r(
  * @return Eigen vector of parameter estimates.
  */
 std::vector<std::vector<double>> get_cparams_r_csv(
-    const std::string &fname,
-    const stan::model::model_base &model) {
+    const std::string &fname, const stan::model::model_base &model) {
   stan::io::stan_csv fitted_params;
   size_t col_offset, num_rows, num_cols;
   get_fitted_params(fname, model, fitted_params, col_offset, num_rows,
@@ -548,7 +544,6 @@ std::vector<std::vector<double>> get_cparams_r_csv(
   return result;
 }
 
-
 /**
  * Given a set of parameter values, call model's log_prob_grad
  * method and send output to a CSV file.
@@ -558,17 +553,16 @@ std::vector<std::vector<double>> get_cparams_r_csv(
  * @param params_set array of unconstrained parameter values
  * @
  */
-void services_log_prob_grad(
-    const stan::model::model_base &model, bool jacobian,
-    std::vector<std::vector<double>> &params_set, int sig_figs,
-    std::ostream &output_stream) {
+void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
+                            std::vector<std::vector<double>> &params_set,
+                            int sig_figs, std::ostream &output_stream) {
   // header row
   output_stream << std::setprecision(sig_figs) << "lp_,";
   std::vector<std::string> p_names;
   model.constrained_param_names(p_names, false, false);
   for (size_t i = 0; i < p_names.size(); ++i) {
     output_stream << "g_" << p_names[i];
-    if (i == p_names.size() - 1 )
+    if (i == p_names.size() - 1)
       output_stream << "\n";
     else
       output_stream << ",";
@@ -579,11 +573,11 @@ void services_log_prob_grad(
   std::vector<double> gradients;
   for (auto &&params : params_set) {
     if (jacobian) {
-      lp = stan::model::log_prob_grad<true, true>(
-          model, params, dummy_params_i, gradients);
+      lp = stan::model::log_prob_grad<true, true>(model, params, dummy_params_i,
+                                                  gradients);
     } else {
-      lp = stan::model::log_prob_grad<true, false>(
-          model, params, dummy_params_i, gradients);
+      lp = stan::model::log_prob_grad<true, false>(model, params,
+                                                   dummy_params_i, gradients);
     }
     output_stream << lp << ",";
     std::copy(gradients.begin(), gradients.end() - 1,

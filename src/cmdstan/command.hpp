@@ -181,7 +181,8 @@ int command(int argc, const char *argv[]) {
 
 #ifdef STAN_OPENCL
   int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
-  int opencl_platform_id = get_arg_val<int_argument>(parser, "opencl", "platform");
+  int opencl_platform_id
+      = get_arg_val<int_argument>(parser, "opencl", "platform");
   if ((opencl_device_id >= 0 && open_platform_id < 0)  // default value -1
       || (opencl_device_id < 0 && open_platform_id >= 0)) {
     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
@@ -383,14 +384,10 @@ int command(int argc, const char *argv[]) {
     }
     //////////////////////////////////////////////////
   } else if (user_method->arg("log_prob")) {
-    std::string upars_file
-        = get_arg_val<string_argument>(parser,
-                                       "method",
-                                       "log_prob", "unconstrained_params");
-    std::string cpars_file
-        = get_arg_val<string_argument>(parser,
-                                       "method",
-                                       "log_prob", "constrained_params");
+    std::string upars_file = get_arg_val<string_argument>(
+        parser, "method", "log_prob", "unconstrained_params");
+    std::string cpars_file = get_arg_val<string_argument>(
+        parser, "method", "log_prob", "constrained_params");
     bool jacobian
         = get_arg_val<bool_argument>(parser, "method", "log_prob", "jacobian");
     if (upars_file.length() == 0 && cpars_file.length() == 0) {
@@ -403,32 +400,19 @@ int command(int argc, const char *argv[]) {
           << "constrained and unconstrained parameter values.";
       throw std::invalid_argument(msg.str());
     }
-    if (upars_file.length() > 0
-        && !(ends_with_ignore_case(upars_file, ".json")
-             || ends_with_ignore_case(upars_file, ".r"))) {
-      msg << "File " << upars_file << ", unknown filetype, "
-          << "expecting json or rdump file.";
-      throw std::invalid_argument(msg.str());
-    } else if (cpars_file.length() > 0
-               && !(ends_with_ignore_case(cpars_file, ".csv")
-                    || ends_with_ignore_case(cpars_file, ".json")
-                    || ends_with_ignore_case(cpars_file, ".r"))) {
-        msg << "File " << cpars_file << ", unknown filetype, "
-            << "expecting csv, json, or rdump file.";
-        throw std::invalid_argument(msg.str());
-    }
 
     std::vector<std::vector<double>> params_r_ind;
     if (upars_file.length() > 0) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
-      if (ends_with_ignore_case(cpars_file, ".csv"))
+      if (suffix(cpars_file) == ".csv") 
         params_r_ind = get_cparams_r_csv(cpars_file, model);
       else
         params_r_ind = get_cparams_r(cpars_file, model);
     }
     try {
-      services_log_prob_grad(model, jacobian, params_r_ind, sig_figs, sample_writers[0].get_stream());
+      services_log_prob_grad(model, jacobian, params_r_ind, sig_figs,
+                             sample_writers[0].get_stream());
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
       return_code = return_codes::NOT_OK;

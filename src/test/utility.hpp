@@ -28,7 +28,8 @@ int count_matches(const std::string &target, const std::string &s) {
 /**
  * Gets the path separator for the OS.
  *
- * @return '\' for Windows, '/' otherwise.
+ * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_")) == 0);
+ws, '/' otherwise.
  */
 char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
@@ -227,8 +228,9 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
  * Expects comment line prefix '#' and header row.
  *
  * @param path Path to file.
- * @param header Vector to append header lines to
- * @param cells Vector to populate with CSV data
+ * @param config Vector for initial comment lines (CmdStan config)
+ * @param header Vector for column header
+ * @param cells Vector of output data, serialized by row.
  */
 void parse_sample(const std::string &path,
                   std::vector<std::string> &config,

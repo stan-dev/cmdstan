@@ -56,6 +56,12 @@ TEST_F(CmdStan, log_prob_good_rdump) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
+  std::vector<std::string> names;
+  boost::split(names, header[0], boost::is_any_of(","),
+               boost::token_compress_on);
+  ASSERT_TRUE(values.size() % names.size() == 0);
+  ASSERT_TRUE(names[0].compare(0, 2, std::string("lp")) == 0);
+  ASSERT_TRUE(names[1].compare(0, 2, std::string("g_")) == 0);
 
   ss.str(std::string());
   ss << convert_model_path(bern_log_prob_model)
@@ -66,6 +72,14 @@ TEST_F(CmdStan, log_prob_good_rdump) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  config.clear();
+  header.clear();
+  values.clear();
+  names.clear();
+  parse_sample(convert_model_path(test_output), config, header, values);
+  boost::split(names, header[0], boost::is_any_of(","),
+               boost::token_compress_on);
+  ASSERT_TRUE(values.size() % names.size() == 0);
 }
 
 TEST_F(CmdStan, log_prob_good_json) {
@@ -78,6 +92,14 @@ TEST_F(CmdStan, log_prob_good_json) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  std::vector<std::string> config;
+  std::vector<std::string> header;
+  std::vector<double> values;
+  parse_sample(convert_model_path(test_output), config, header, values);
+  std::vector<std::string> names;
+  boost::split(names, header[0], boost::is_any_of(","),
+               boost::token_compress_on);
+  ASSERT_TRUE(values.size() % names.size() == 0);
 
   ss.str(std::string());
   ss << convert_model_path(bern_log_prob_model)
@@ -88,6 +110,14 @@ TEST_F(CmdStan, log_prob_good_json) {
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  config.clear();
+  header.clear();
+  values.clear();
+  names.clear();
+  parse_sample(convert_model_path(test_output), config, header, values);
+  boost::split(names, header[0], boost::is_any_of(","),
+               boost::token_compress_on);
+  ASSERT_TRUE(values.size() % names.size() == 0);
 }
 
 TEST_F(CmdStan, log_prob_no_params) {
