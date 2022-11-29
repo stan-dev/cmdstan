@@ -148,7 +148,7 @@ int command(int argc, const char *argv[]) {
   if (user_method->arg("sample")) {
     num_chains
         = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-    auto sample_arg = parser.arg("method")->arg("sample");
+    auto sample_arg = user_method->arg("sample");
     list_argument *algo
         = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
     categorical_argument *adapt
@@ -289,7 +289,6 @@ int command(int argc, const char *argv[]) {
   unsigned int id = get_arg_val<int_argument>(parser, "id");
   int_argument *sig_figs_arg
       = dynamic_cast<int_argument *>(get_arg(parser, "output", "sig_figs"));
-  std::cout << "sig_figs:" << sig_figs_arg->value() << std::endl;
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
