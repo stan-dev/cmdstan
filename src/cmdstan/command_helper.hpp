@@ -19,6 +19,7 @@
 #include <vector>
 #include <rapidjson/document.h>
 
+namespace cmdstan {
 namespace internal {
 /**
  * Base of helper function for getting arguments
@@ -40,7 +41,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -56,7 +57,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -87,7 +88,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into.
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   return dynamic_cast<std::decay_t<caster> *>(get_arg(arg_list, args...))
       ->value();
 }
@@ -555,7 +556,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
                             std::vector<std::vector<double>> &params_set,
                             int sig_figs, std::ostream &output_stream) {
   // header row
-  output_stream << std::setprecision(sig_figs) << "lp_,";
+  output_stream << std::setprecision(sig_figs) << "lp__,";
   std::vector<std::string> p_names;
   model.constrained_param_names(p_names, false, false);
   for (size_t i = 0; i < p_names.size(); ++i) {
@@ -583,5 +584,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
     output_stream << gradients.back() << "\n";
   }
 }
+
+}  // namespace cmdstan
 
 #endif

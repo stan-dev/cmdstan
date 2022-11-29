@@ -15,10 +15,10 @@ class arg_optimize : public categorical_argument {
     _name = "optimize";
     _description = "Point estimation";
 
-    _subarguments.emplace_back(std::move(new arg_optimize_algo()));
-    _subarguments.emplace_back(std::move(new arg_jacobian_false()));
-    _subarguments.emplace_back(std::move(new arg_iter()));
-    _subarguments.emplace_back(std::move(new arg_save_iterations()));
+    _subarguments.push_back(new arg_optimize_algo());
+    _subarguments.push_back(new arg_jacobian_false());
+    _subarguments.push_back(new arg_iter());
+    _subarguments.push_back(new arg_save_iterations());
   }
 };
 

@@ -14,9 +14,9 @@ class arg_laplace : public categorical_argument {
     _name = "laplace";
     _description = "Sample from a Laplace approximation";
 
-    _subarguments.emplace_back(std::move(new arg_laplace_mode()));
-    _subarguments.emplace_back(std::move(new arg_jacobian()));
-    _subarguments.emplace_back(std::move(new arg_laplace_draws()));
+    _subarguments.push_back(new arg_laplace_mode());
+    _subarguments.push_back(new arg_jacobian());
+    _subarguments.push_back(new arg_laplace_draws());
   }
 };
 

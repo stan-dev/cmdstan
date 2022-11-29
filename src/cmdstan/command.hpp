@@ -163,7 +163,7 @@ int command(int argc, const char *argv[]) {
         list_argument *metric
             = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
         if (engine->value() != "nuts"
-            && (metric->value() != "dense_e" || metric->value() == "diag_e")) {
+            && !(metric->value() == "dense_e" || metric->value() == "diag_e")) {
           throw std::invalid_argument(
               "Argument 'num_chains' can currently only be used for NUTS with "
               "adaptation and dense_e or diag_e metric");
@@ -209,7 +209,8 @@ int command(int argc, const char *argv[]) {
         parser, "method", "generate_quantities", "fitted_params");
     if (input_fname.compare(output_fname) == 0) {
       msg << "Filename conflict, fitted_params file " << input_fname
-          << " matches output filename, must be different." << std::endl;
+          << " and output file names are identical, must be different."
+          << std::endl;
       throw std::invalid_argument(msg.str());
     }
   } else if (user_method->arg("laplace")) {
@@ -217,7 +218,8 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
     if (input_fname.compare(output_fname) == 0) {
       msg << "Filename conflict, parameter modes file " << input_fname
-          << " matches output filename, must be different." << std::endl;
+          << " and output file names are identical, must be different."
+          << std::endl;
       throw std::invalid_argument(msg.str());
     }
   }
@@ -239,8 +241,6 @@ int command(int argc, const char *argv[]) {
       = new_model(*var_context, random_seed, &std::cout);
 
   std::vector<std::string> model_compile_info = model.model_compile_info();
-  std::vector<std::string> model_params;
-  model.constrained_param_names(model_params, false, false);
 
   //////////////////////////////////////////////////
   //                Initialize Writers            //
@@ -287,7 +287,9 @@ int command(int argc, const char *argv[]) {
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
   unsigned int id = get_arg_val<int_argument>(parser, "id");
-  auto sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+  int_argument *sig_figs_arg
+      = dynamic_cast<int_argument *>(get_arg(parser, "output", "sig_figs"));
+  std::cout << "sig_figs:" << sig_figs_arg->value() << std::endl;
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -299,8 +301,8 @@ int command(int argc, const char *argv[]) {
     auto output_filename = output_name + name_iterator(i) + output_ending;
     auto unique_fstream
         = std::make_unique<std::fstream>(output_filename, std::fstream::out);
-    if (sig_figs > 0) {  // user-specified precision, default -1
-      (*unique_fstream.get()) << std::setprecision(sig_figs);
+    if (!sig_figs_arg->is_default()) {
+      (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
     }
     sample_writers.emplace_back(std::move(unique_fstream), "# ");
     if (diagnostic_file != "") {
@@ -345,8 +347,9 @@ int command(int argc, const char *argv[]) {
   //            Invoke Services                   //
   //////////////////////////////////////////////////
   if (user_method->arg("generate_quantities")) {
-    std::string fname = get_arg_val<string_argument>(
-        parser, "method", "generate_quantities", "fitted_params");
+    // ---- generate_quantities start ---- //
+    auto gq_arg = parser.arg("method")->arg("generate_quantities");
+    std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
       msg << "Missing fitted_params argument, cannot run generate_quantities "
              "without fitted sample.";
@@ -359,20 +362,19 @@ int command(int argc, const char *argv[]) {
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
-    //////////////////////////////////////////////////
+    // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
-    std::string fname
-        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
+    // ---- laplace start ---- //
+    auto laplace_arg = parser.arg("method")->arg("laplace");
+    std::string fname = get_arg_val<string_argument>(*laplace_arg, "mode");
     if (fname.empty()) {
       msg << "Missing mode argument, cannot get laplace sample "
              "without parameter estimates theta-hat";
       throw std::invalid_argument(msg.str());
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
-    bool jacobian
-        = get_arg_val<bool_argument>(parser, "method", "laplace", "jacobian");
-    int draws = get_arg_val<int_argument>(parser, "method", "laplace", "draws");
-    int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
+    bool jacobian = get_arg_val<bool_argument>(*laplace_arg, "jacobian");
+    int draws = get_arg_val<int_argument>(*laplace_arg, "draws");
     if (jacobian) {
       return_code = stan::services::laplace_sample<true>(
           model, theta_hat, draws, random_seed, refresh, interrupt, logger,
@@ -382,14 +384,15 @@ int command(int argc, const char *argv[]) {
           model, theta_hat, draws, random_seed, refresh, interrupt, logger,
           sample_writers[0]);
     }
-    //////////////////////////////////////////////////
+    // ---- laplace end ---- //
   } else if (user_method->arg("log_prob")) {
-    std::string upars_file = get_arg_val<string_argument>(
-        parser, "method", "log_prob", "unconstrained_params");
-    std::string cpars_file = get_arg_val<string_argument>(
-        parser, "method", "log_prob", "constrained_params");
-    bool jacobian
-        = get_arg_val<bool_argument>(parser, "method", "log_prob", "jacobian");
+    // ---- log_prob start ---- //
+    auto log_prob_arg = parser.arg("method")->arg("log_prob");
+    std::string upars_file
+        = get_arg_val<string_argument>(*log_prob_arg, "unconstrained_params");
+    std::string cpars_file
+        = get_arg_val<string_argument>(*log_prob_arg, "constrained_params");
+    bool jacobian = get_arg_val<bool_argument>(*log_prob_arg, "jacobian");
     if (upars_file.length() == 0 && cpars_file.length() == 0) {
       msg << "No input parameter files provided, "
           << "cannot calculate log probability density.";
@@ -400,7 +403,6 @@ int command(int argc, const char *argv[]) {
           << "constrained and unconstrained parameter values.";
       throw std::invalid_argument(msg.str());
     }
-
     std::vector<std::vector<double>> params_r_ind;
     if (upars_file.length() > 0) {
       params_r_ind = get_uparams_r(upars_file, model);
@@ -411,14 +413,16 @@ int command(int argc, const char *argv[]) {
         params_r_ind = get_cparams_r(cpars_file, model);
     }
     try {
-      services_log_prob_grad(model, jacobian, params_r_ind, sig_figs,
+      services_log_prob_grad(model, jacobian, params_r_ind,
+                             sig_figs_arg->value(),
                              sample_writers[0].get_stream());
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
       return_code = return_codes::NOT_OK;
     }
-    //////////////////////////////////////////////////
+    // ---- log_prob end ---- //
   } else if (user_method->arg("diagnose")) {
+    // ---- diagnose start ---- //
     list_argument *test = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("diagnose")->arg("test"));
     if (test->value() == "gradient") {
@@ -428,8 +432,9 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius, epsilon,
           error, interrupt, logger, init_writers[0], sample_writers[0]);
     }
-    //////////////////////////////////////////////////
+    // ---- diagnose end ---- //
   } else if (user_method->arg("optimize")) {
+    // ---- optimize start ---- //
     int num_iterations
         = get_arg_val<int_argument>(parser, "method", "optimize", "iter");
     bool save_iterations = get_arg_val<bool_argument>(
@@ -439,18 +444,19 @@ int command(int argc, const char *argv[]) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("optimize")->arg("algorithm"));
     if (algo->value() == "newton") {
-      if (jacobian)
+      if (jacobian) {
         return_code
             = stan::services::optimize::newton<stan::model::model_base, true>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 num_iterations, save_iterations, interrupt, logger,
                 init_writers[0], sample_writers[0]);
-      else
+      } else {
         return_code
             = stan::services::optimize::newton<stan::model::model_base, false>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 num_iterations, save_iterations, interrupt, logger,
                 init_writers[0], sample_writers[0]);
+      }
     } else if (algo->value() == "bfgs") {
       double init_alpha
           = get_arg_val<real_argument>(*algo, "bfgs", "init_alpha");
@@ -462,20 +468,21 @@ int command(int argc, const char *argv[]) {
           = get_arg_val<real_argument>(*algo, "bfgs", "tol_rel_grad");
       double tol_param = get_arg_val<real_argument>(*algo, "bfgs", "tol_param");
 
-      if (jacobian)
+      if (jacobian) {
         return_code
             = stan::services::optimize::bfgs<stan::model::model_base, true>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad,
                 tol_param, num_iterations, save_iterations, refresh, interrupt,
                 logger, init_writers[0], sample_writers[0]);
-      else
+      } else {
         return_code
             = stan::services::optimize::bfgs<stan::model::model_base, false>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad,
                 tol_param, num_iterations, save_iterations, refresh, interrupt,
                 logger, init_writers[0], sample_writers[0]);
+      }
     } else if (algo->value() == "lbfgs") {
       int history_size
           = get_arg_val<int_argument>(*algo, "lbfgs", "history_size");
@@ -490,23 +497,25 @@ int command(int argc, const char *argv[]) {
       double tol_param
           = get_arg_val<real_argument>(*algo, "lbfgs", "tol_param");
 
-      if (jacobian)
+      if (jacobian) {
         return_code
             = stan::services::optimize::lbfgs<stan::model::model_base, true>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                 tol_rel_grad, tol_param, num_iterations, save_iterations,
                 refresh, interrupt, logger, init_writers[0], sample_writers[0]);
-      else
+      } else {
         return_code
             = stan::services::optimize::lbfgs<stan::model::model_base, false>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
                 history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                 tol_rel_grad, tol_param, num_iterations, save_iterations,
                 refresh, interrupt, logger, init_writers[0], sample_writers[0]);
+      }
     }
-    //////////////////////////////////////////////////
+    // ---- optimize end ---- //
   } else if (user_method->arg("sample")) {
+    // ---- sample start ---- //
     auto sample_arg = parser.arg("method")->arg("sample");
     int num_warmup
         = get_arg_val<int_argument>(parser, "method", "sample", "num_warmup");
@@ -934,8 +943,9 @@ int command(int argc, const char *argv[]) {
             logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
       }
     }
-    //////////////////////////////////////////////////
+    // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
+    // ---- variational start ---- //
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("variational")->arg("algorithm"));
     int grad_samples
@@ -989,6 +999,7 @@ int command(int argc, const char *argv[]) {
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
           logger, init_writers[0], sample_writers[0], diagnostic_writers[0]);
     }
+    // ---- variational end ---- //
   }
   //////////////////////////////////////////////////
 
@@ -999,8 +1010,8 @@ int command(int argc, const char *argv[]) {
               parser.arg("output")->arg("profile_file"))
               ->value();
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
-    if (sig_figs > 0) {  // user-specified precision, default -1
-      profile_stream << std::setprecision(sig_figs);
+    if (!sig_figs_arg->is_default()) {
+      profile_stream << std::setprecision(sig_figs_arg->value());
     }
     write_profiling(profile_stream, profile_data);
     profile_stream.close();

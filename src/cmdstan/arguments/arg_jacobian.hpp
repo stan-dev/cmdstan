@@ -4,7 +4,10 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
 
 namespace cmdstan {
-
+/**
+ * Argument to indicate whether calculated log-probability density should
+ * include the log absolute Jacobian determinant of inverse parameter transforms
+ */
 class arg_jacobian : public bool_argument {
  public:
   arg_jacobian() : bool_argument() {
