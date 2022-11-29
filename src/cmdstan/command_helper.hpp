@@ -262,9 +262,8 @@ std::ifstream safe_open(const std::string fname) {
 }
 
 /**
- * Parse a StanCSV output file created by the NUTS-HMC sampler and
- * identify the rows and columns in the data table which contain the
- * fitted estimated for the model parameters.
+ * Parse a StanCSV output file and identify the rows and columns in the
+ * data table which contain the fitted estimates of the model parameters.
  * Throws an exception if the StanCSV parser cannot process the file.
  *
  * @param fname name of file which exists and has read perms.
