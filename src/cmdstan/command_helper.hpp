@@ -101,33 +101,32 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
  * @param config sample argument
  */
 void validate_multi_chain_config(argument *config) {
-    auto sample_arg = config->arg("sample");
-    categorical_argument *adapt
-        = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
-    bool adapt_engaged
-        = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-    list_argument *algo
-        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-    bool is_hmc = algo->value() != "fixed_param";
-    bool is_engine_nuts = false;
-    bool is_metric_d = false;
-    if (is_hmc) {
-      list_argument *engine
-          = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-      if (engine->value() == "nuts")
-        is_engine_nuts = true;
-      list_argument *metric
-          = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-      if (!(metric->value() == "unit_e"))
-        is_metric_d = true;
-    }
-    if (!(adapt_engaged && is_engine_nuts && is_metric_d)) {
-          throw std::invalid_argument(
-              "Argument 'num_chains' can currently only be used for NUTS with "
-              "adaptation and dense_e or diag_e metric");
-    }
+  auto sample_arg = config->arg("sample");
+  categorical_argument *adapt
+      = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
+  bool adapt_engaged
+      = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
+  list_argument *algo
+      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
+  bool is_hmc = algo->value() != "fixed_param";
+  bool is_engine_nuts = false;
+  bool is_metric_d = false;
+  if (is_hmc) {
+    list_argument *engine
+        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
+    if (engine->value() == "nuts")
+      is_engine_nuts = true;
+    list_argument *metric
+        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
+    if (!(metric->value() == "unit_e"))
+      is_metric_d = true;
+  }
+  if (!(adapt_engaged && is_engine_nuts && is_metric_d)) {
+    throw std::invalid_argument(
+        "Argument 'num_chains' can currently only be used for NUTS with "
+        "adaptation and dense_e or diag_e metric");
+  }
 }
-
 
 /**
  * Get suffix
