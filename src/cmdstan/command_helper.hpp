@@ -102,10 +102,8 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
  */
 void validate_multi_chain_config(argument *config) {
   auto sample_arg = config->arg("sample");
-  categorical_argument *adapt
-      = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
   bool adapt_engaged
-      = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
+      = get_arg_val<bool_argument>(*config, "sample", "adapt", "engaged");
   list_argument *algo
       = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
   bool is_hmc = algo->value() != "fixed_param";
