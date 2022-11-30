@@ -144,36 +144,11 @@ int command(int argc, const char *argv[]) {
 
   unsigned int num_chains = 1;
   auto user_method = parser.arg("method");
-  // num_chains > 1 is only supported in diag_e and dense_e of hmc
   if (user_method->arg("sample")) {
     num_chains
         = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-    auto sample_arg = user_method->arg("sample");
-    list_argument *algo
-        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-    categorical_argument *adapt
-        = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
-    const bool adapt_engaged
-        = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-    const bool is_hmc = algo->value() == "hmc";
-    if (num_chains > 1) {
-      if (is_hmc && adapt_engaged) {
-        list_argument *engine
-            = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-        list_argument *metric
-            = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-        if (engine->value() != "nuts"
-            && !(metric->value() == "dense_e" || metric->value() == "diag_e")) {
-          throw std::invalid_argument(
-              "Argument 'num_chains' can currently only be used for NUTS with "
-              "adaptation and dense_e or diag_e metric");
-        }
-      } else {
-        throw std::invalid_argument(
-            "Argument 'num_chains' can currently only be used for HMC with "
-            "adaptation engaged");
-      }
-    }
+    if (num_chains > 1)
+      validate_multi_chain_config(parser.arg("method"));
   }
   arg_seed *random_arg
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
