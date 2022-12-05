@@ -13,6 +13,12 @@ class CmdStan : public testing::Test {
     multi_normal_model = {"src", "test", "test-models", "multi_normal_model"};
     multi_normal_mode_csv
         = {"src", "test", "test-models", "multi_normal_mode.csv"};
+    multi_normal_mode_csv_bad_config
+        = {"src", "test", "test-models", "multi_normal_mode_bad_config.csv"};
+    multi_normal_mode_csv_bad_names
+        = {"src", "test", "test-models", "multi_normal_mode_bad_names.csv"};
+    multi_normal_mode_csv_bad_values
+        = {"src", "test", "test-models", "multi_normal_mode_bad_values.csv"};
     multi_normal_mode_json
         = {"src", "test", "test-models", "multi_normal_mode.json"};
     default_file_path = {"src", "test", "test-models", "output.csv"};
@@ -35,6 +41,9 @@ class CmdStan : public testing::Test {
   std::vector<std::string> output1_csv;
   std::vector<std::string> output2_csv;
   std::vector<std::string> wrong_csv;
+  std::vector<std::string> multi_normal_mode_csv_bad_config;
+  std::vector<std::string> multi_normal_mode_csv_bad_names;
+  std::vector<std::string> multi_normal_mode_csv_bad_values;
 };
 
 TEST_F(CmdStan, laplace_good) {
@@ -92,6 +101,35 @@ TEST_F(CmdStan, laplace_bad_draws_arg) {
      << " draws=0 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+}
+
+TEST_F(CmdStan, laplace_bad_csv_file) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_config)
+     << " draws=10 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+
+  ss.str(std::string());
+  ss << convert_model_path(multi_normal_model)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_names)
+     << " draws=10 2>&1";
+  cmd = ss.str();
+  out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+
+  ss.str(std::string());
+  ss << convert_model_path(multi_normal_model)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_values)
+     << " draws=10 2>&1";
+  cmd = ss.str();
+  out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
 }
 
