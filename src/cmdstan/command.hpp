@@ -332,7 +332,7 @@ int command(int argc, const char *argv[]) {
     stan::io::stan_csv fitted_params;
     size_t col_offset, num_rows, num_cols;
     get_fitted_params(fname, model, fitted_params, col_offset, num_rows,
-                       num_cols);
+                      num_cols);
 
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
@@ -386,12 +386,12 @@ int command(int argc, const char *argv[]) {
         // encapsulate as helper?
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
-        get_fitted_params(cpars_file, model, fitted_params, col_offset, num_rows,
-                          num_cols);
-        params_r_ind.resize(num_rows); 
+        get_fitted_params(cpars_file, model, fitted_params, col_offset,
+                          num_rows, num_cols);
+        params_r_ind.resize(num_rows);
         for (size_t i = 0; i < num_rows; ++i) {
-          params_r_ind[i] = 
-              stan::math::to_array_1d(fitted_params.samples.block(i, 0, 1, num_cols));
+          params_r_ind[i] = stan::math::to_array_1d(
+              fitted_params.samples.block(i, 0, 1, num_cols));
         }
       } else {
         params_r_ind = get_cparams_r(cpars_file, model);
