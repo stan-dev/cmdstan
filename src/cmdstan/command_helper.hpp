@@ -108,8 +108,9 @@ void validate_multi_chain_config(argument *config) {
   auto sample_arg = config->arg("sample");
   bool adapt_engaged
       = get_arg_val<bool_argument>(*config, "sample", "adapt", "engaged");
-  std::string metric
-      = get_arg_val<string_argument>(*config, "sample" "algorithm", "hmc", "metric");
+  // induce segfault - then debug
+  //  std::string metric
+  //      = get_arg_val<string_argument>(*config, "sample" "algorithm", "hmc", "metric");
   list_argument *algo
       = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
   bool is_hmc = algo->value() != "fixed_param";
