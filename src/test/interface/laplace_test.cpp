@@ -30,6 +30,10 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "simple_jacobian_mode.json"};
     output1_csv = {"test", "tmp_output1.csv"};
     output2_csv = {"test", "tmp_output2.csv"};
+    simplex_model = {"src", "test", "test-models", "simplex_model"};
+    simplex_mode_csv = {"src", "test", "test-models", "simplex_mode.csv"};
+    simplex_mode_bad_csv
+        = {"src", "test", "test-models", "simplex_mode_bad.csv"};
   }
   std::vector<std::string> default_file_path;
   std::vector<std::string> dev_null_path;
@@ -44,6 +48,9 @@ class CmdStan : public testing::Test {
   std::vector<std::string> multi_normal_mode_csv_bad_config;
   std::vector<std::string> multi_normal_mode_csv_bad_names;
   std::vector<std::string> multi_normal_mode_csv_bad_values;
+  std::vector<std::string> simplex_model;
+  std::vector<std::string> simplex_mode_csv;
+  std::vector<std::string> simplex_mode_bad_csv;
 };
 
 TEST_F(CmdStan, laplace_good) {
@@ -176,4 +183,22 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
     ASSERT_NE(sample1.coeff(n, 1), sample2.coeff(n, 1));
     ASSERT_EQ(sample1.coeff(n, 2), sample2.coeff(n, 2));
   }
+}
+
+TEST_F(CmdStan, laplace_unconstrain) {
+  std::stringstream ss;
+  ss << convert_model_path(simplex_model) << " random seed=1234"
+     << " method=laplace mode=" << convert_model_path(simplex_mode_csv)
+     << " 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+
+  ss.str(std::string());
+  ss << convert_model_path(simplex_model) << " random seed=1234"
+     << " method=laplace mode=" << convert_model_path(simplex_mode_bad_csv)
+     << " 2>&1";
+  cmd = ss.str();
+  out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
 }

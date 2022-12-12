@@ -32,6 +32,9 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "bern_constrained_params_short.json"};
     dev_null_path = {"/dev", "null"};
     test_output = {"test", "output.csv"};
+    simplex_model = {"src", "test", "test-models", "simplex_model"};
+    simplex_constrained_bad_csv
+        = {"src", "test", "test-models", "simplex_mode_bad.csv"};
   }
   std::vector<std::string> bern_log_prob_model;
   std::vector<std::string> bern_gq_model;
@@ -45,6 +48,8 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_constrained_params_short;
   std::vector<std::string> dev_null_path;
   std::vector<std::string> test_output;
+  std::vector<std::string> simplex_model;
+  std::vector<std::string> simplex_constrained_bad_csv;
 };
 
 TEST_F(CmdStan, log_prob_uparams_rdump) {
@@ -170,6 +175,17 @@ TEST_F(CmdStan, log_prob_constrained_bad_input) {
      << " output file=" << convert_model_path(dev_null_path)
      << " method=log_prob constrained_params="
      << convert_model_path(bern_constrained_params_short);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+}
+
+TEST_F(CmdStan, log_prob_constrained_bad_simplex) {
+  std::stringstream ss;
+  ss << convert_model_path(simplex_model)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=log_prob constrained_params="
+     << convert_model_path(simplex_constrained_bad_csv);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);

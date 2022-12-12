@@ -88,7 +88,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
