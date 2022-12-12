@@ -35,6 +35,8 @@ class CmdStan : public testing::Test {
     simplex_model = {"src", "test", "test-models", "simplex_model"};
     simplex_constrained_bad_csv
         = {"src", "test", "test-models", "simplex_mode_bad.csv"};
+    simplex_constrained_csv
+        = {"src", "test", "test-models", "simplex_mode.csv"};
   }
   std::vector<std::string> bern_log_prob_model;
   std::vector<std::string> bern_gq_model;
@@ -49,6 +51,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> dev_null_path;
   std::vector<std::string> test_output;
   std::vector<std::string> simplex_model;
+  std::vector<std::string> simplex_constrained_csv;
   std::vector<std::string> simplex_constrained_bad_csv;
 };
 
@@ -144,6 +147,8 @@ TEST_F(CmdStan, log_prob_cparams_csv) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
+  // check that output CSV file has correct header row
+  
   std::vector<std::string> config;
   std::vector<std::string> header;
   std::vector<double> values;
@@ -178,6 +183,27 @@ TEST_F(CmdStan, log_prob_constrained_bad_input) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
+}
+
+TEST_F(CmdStan, log_prob_constrained_simplex) {
+  std::stringstream ss;
+  ss << convert_model_path(simplex_model)
+     << " output file=" << convert_model_path(test_output)
+     << " method=log_prob constrained_params="
+     << convert_model_path(simplex_constrained_csv);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+  std::vector<std::string> config;
+  std::vector<std::string> header;
+  std::vector<double> values;
+  parse_sample(convert_model_path(test_output), config, header, values);
+  std::vector<std::string> names;
+  boost::split(names, header[0], boost::is_any_of(","),
+               boost::token_compress_on);
+  // param is 3-array of 3-simplex, unconstrained params size == 6 + lp__
+  ASSERT_EQ(names.size(), 7);
+  ASSERT_EQ(values.size() % names.size(), 0);
 }
 
 TEST_F(CmdStan, log_prob_constrained_bad_simplex) {

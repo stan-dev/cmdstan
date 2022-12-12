@@ -658,7 +658,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
   // header row
   output_stream << std::setprecision(sig_figs) << "lp__,";
   std::vector<std::string> p_names;
-  model.constrained_param_names(p_names, false, false);
+  model.unconstrained_param_names(p_names, false, false);
   for (size_t i = 0; i < p_names.size(); ++i) {
     output_stream << "g_" << p_names[i];
     if (i == p_names.size() - 1)
