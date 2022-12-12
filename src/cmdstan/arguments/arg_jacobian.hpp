@@ -14,7 +14,7 @@ class arg_jacobian : public bool_argument {
     _name = "jacobian";
     _description
         = "When true, include change-of-variables adjustment"
-          "for constraining parameter transforms";
+          " for constraining parameter transforms";
     _validity = "[0, 1]";
     _default = "1";
     _default_value = true;
