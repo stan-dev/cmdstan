@@ -1,0 +1,8 @@
+# stan_version_major = 2
+# stan_version_minor = 30
+# stan_version_patch = 0
+# model = multi_normal_model_model
+# start_datetime = 2022-11-06 16:27:14 UTC
+# method = sample
+lp__,y.1,y.2
+-2.03346e-13,2,3
