@@ -329,11 +329,11 @@ int command(int argc, const char *argv[]) {
              "without fitted sample.";
       throw std::invalid_argument(msg.str());
     }
+    std::vector<std::string> param_names = get_constrained_param_names(model);
     stan::io::stan_csv fitted_params;
     size_t col_offset, num_rows, num_cols;
-    get_fitted_params(fname, model, fitted_params, col_offset, num_rows,
-                       num_cols);
-
+    parse_stan_csv(fname, model, param_names, fitted_params, col_offset,
+                   num_rows, num_cols);
     return_code = stan::services::standalone_generate(
         model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
         random_seed, interrupt, logger, sample_writers[0]);
@@ -382,17 +382,14 @@ int command(int argc, const char *argv[]) {
     if (upars_file.length() > 0) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
+      std::vector<std::string> param_names = get_constrained_param_names(model);
       if (suffix(cpars_file) == ".csv") {
-        // encapsulate as helper?
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
-        get_fitted_params(cpars_file, model, fitted_params, col_offset, num_rows,
-                          num_cols);
-        params_r_ind.resize(num_rows); 
-        for (size_t i = 0; i < num_rows; ++i) {
-          params_r_ind[i] = 
-              stan::math::to_array_1d(fitted_params.samples.block(i, 0, 1, num_cols));
-        }
+        parse_stan_csv(cpars_file, model, param_names, fitted_params,
+                       col_offset, num_rows, num_cols);
+        params_r_ind = unconstrain_params_csv(model, fitted_params, col_offset,
+                                              num_rows, num_cols);
       } else {
         params_r_ind = get_cparams_r(cpars_file, model);
       }

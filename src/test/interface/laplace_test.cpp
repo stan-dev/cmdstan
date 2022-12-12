@@ -108,7 +108,8 @@ TEST_F(CmdStan, laplace_bad_csv_file) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
      << " output file=" << convert_model_path(dev_null_path)
-     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_config)
+     << " method=laplace mode="
+     << convert_model_path(multi_normal_mode_csv_bad_config)
      << " draws=10 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
@@ -117,8 +118,8 @@ TEST_F(CmdStan, laplace_bad_csv_file) {
   ss.str(std::string());
   ss << convert_model_path(multi_normal_model)
      << " output file=" << convert_model_path(dev_null_path)
-     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_names)
-     << " draws=10 2>&1";
+     << " method=laplace mode="
+     << convert_model_path(multi_normal_mode_csv_bad_names) << " draws=10 2>&1";
   cmd = ss.str();
   out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
@@ -126,7 +127,8 @@ TEST_F(CmdStan, laplace_bad_csv_file) {
   ss.str(std::string());
   ss << convert_model_path(multi_normal_model)
      << " output file=" << convert_model_path(dev_null_path)
-     << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv_bad_values)
+     << " method=laplace mode="
+     << convert_model_path(multi_normal_mode_csv_bad_values)
      << " draws=10 2>&1";
   cmd = ss.str();
   out = run_command(cmd);
