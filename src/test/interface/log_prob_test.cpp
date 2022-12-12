@@ -148,7 +148,7 @@ TEST_F(CmdStan, log_prob_cparams_csv) {
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
   // check that output CSV file has correct header row
-  
+
   std::vector<std::string> config;
   std::vector<std::string> header;
   std::vector<double> values;
