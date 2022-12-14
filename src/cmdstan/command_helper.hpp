@@ -453,13 +453,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
     msg << "CSV file is not output from Stan optimization" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  // optimization output has col for "lp__" + model variables
-  if (names.size() < cparam_names.size()
-      || values.size() < cparam_names.size()) {
-    msg << "CSV file is incomplete, expecting at least "
-        << (cparam_names.size() + 1) << " columns." << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
+  // columns: algorithm outputs ending in "__", params, xparms, and gq vars
   size_t col_offset = 0;
   for (auto name : names) {
     if (boost::algorithm::ends_with(name, "__")) {
@@ -468,7 +462,13 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
       break;
     }
   }
-
+  if (names.size() - col_offset < cparam_names.size()
+      || values.size() - col_offset < cparam_names.size()
+      || names.size() != values.size()) {
+    msg << "CSV file is incomplete, expecting at least "
+        << (cparam_names.size() + 1) << " values." << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
   // extract constrained parameter values
   std::vector<double> cparams(cparam_names.size());
   for (size_t i = 0; i < cparam_names.size(); ++i) {
