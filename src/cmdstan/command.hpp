@@ -12,6 +12,7 @@
 #include <cmdstan/arguments/arg_profile_file.hpp>
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/command_helper.hpp>
+#include <cmdstan/return_codes.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>
 #include <cmdstan/write_model_compile_info.hpp>
@@ -85,10 +86,6 @@ stan::math::mpi_cluster &get_mpi_cluster() {
   return cluster;
 }
 #endif
-
-struct return_codes {
-  enum { OK = 0, NOT_OK = 1 };
-};
 
 int command(int argc, const char *argv[]) {
   stan::callbacks::stream_writer info(std::cout);

@@ -404,7 +404,6 @@ std::vector<double> unconstrain_params(const stan::model::model_base &model,
 std::vector<std::vector<double>> unconstrain_params_csv(
     const stan::model::model_base &model, stan::io::stan_csv &fitted_params,
     size_t &col_offset, size_t &num_rows, size_t &num_cols) {
-  std::stringstream msg;
   std::vector<std::vector<double>> result;
   for (size_t i = 0; i < num_rows; ++i) {
     std::vector<double> uparams = unconstrain_params(
@@ -487,7 +486,11 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
     }
   }
   std::vector<double> uparams = unconstrain_params(model, cparams);
-  return Eigen::Map<Eigen::VectorXd>(&uparams[0], uparams.size());
+  Eigen::VectorXd result(uparams.size());
+  for (size_t i = 0; i < uparams.size(); ++i) {
+    result(i) = uparams[i];
+  }
+  return result;
 }
 
 /**
@@ -519,7 +522,11 @@ Eigen::VectorXd get_laplace_mode_json(const std::string &fname,
     }
   }
   std::vector<double> uparams = unconstrain_params(model, cparams);
-  return Eigen::Map<Eigen::VectorXd>(&uparams[0], uparams.size());
+  Eigen::VectorXd result(uparams.size());
+  for (size_t i = 0; i < uparams.size(); ++i) {
+    result(i) = uparams[i];
+  }
+  return result;
 }
 
 /**

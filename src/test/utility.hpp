@@ -156,10 +156,15 @@ run_command_output run_command(std::string command) {
 
   // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
   int err_code = pclose(in);
-  // on Windows, err code is the return code.
   if (err_code != 0 && (err_code >> 8) > 0)
     err_code >>= 8;
-
+  if (err_code > 127) {  // covers stan_services and CLI11 - not segfault
+    std::string err_msg;
+    err_msg = "Command threw unexpected error: \"";
+    err_msg += command;
+    err_msg += "\"";
+    throw std::runtime_error(err_msg.c_str());
+  }
   return run_command_output(
       command, output, (time_end - time_start).total_milliseconds(), err_code);
 }
