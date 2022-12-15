@@ -465,7 +465,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
       || values.size() - col_offset < cparam_names.size()
       || names.size() != values.size()) {
     msg << "CSV file is incomplete, expecting at least "
-        << (cparam_names.size() + 1) << " values." << std::endl;
+        << (cparam_names.size() + 1) << " columns." << std::endl;
     throw std::invalid_argument(msg.str());
   }
   // extract constrained parameter values
