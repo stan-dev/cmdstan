@@ -1,0 +1,36 @@
+# stan_version_major = 2
+# stan_version_minor = 31
+# stan_version_patch = 0
+# model = simple_jacobian_model_model
+# start_datetime = 2022-12-05 20:31:10 UTC
+# method = optimize
+#   optimize
+#     algorithm = lbfgs (Default)
+#       lbfgs
+#         init_alpha = 0.001 (Default)
+#         tol_obj = 9.9999999999999998e-13 (Default)
+#         tol_rel_obj = 10000 (Default)
+#         tol_grad = 1e-08 (Default)
+#         tol_rel_grad = 10000000 (Default)
+#         tol_param = 1e-08 (Default)
+#         history_size = 5 (Default)
+#     jacobian = 0 (Default)
+#     iter = 2000 (Default)
+#     save_iterations = 0 (Default)
+# id = 1 (Default)
+# data
+#   file =  (Default)
+# init = 2 (Default)
+# random
+#   seed = 3945124075 (Default)
+# output
+#   file = output.csv (Default)
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
+#   sig_figs = -1 (Default)
+#   profile_file = profile.csv (Default)
+# num_threads = 1 (Default)
+# stanc_version = stanc3 v2.31.0-rc1-2-g116c8bc3
+# stancflags = 
+lp__,sigma
+-5.90968e-10,3.00003

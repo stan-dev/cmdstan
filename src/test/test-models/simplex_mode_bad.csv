@@ -1,0 +1,34 @@
+# stan_version_major = 2
+# stan_version_minor = 31
+# stan_version_patch = 0
+# model = hmm_model
+# start_datetime = 2022-12-08 02:57:57 UTC
+# method = optimize
+#   optimize
+#     algorithm = lbfgs (Default)
+#       lbfgs
+#         init_alpha = 0.001 (Default)
+#         tol_obj = 9.9999999999999998e-13 (Default)
+#         tol_rel_obj = 10000 (Default)
+#         tol_grad = 1e-08 (Default)
+#         tol_rel_grad = 10000000 (Default)
+#         tol_param = 1e-08 (Default)
+#         history_size = 5 (Default)
+#     jacobian = 0 (Default)
+#     iter = 2000 (Default)
+#     save_iterations = 0 (Default)
+# id = 1 (Default)
+# init = 2 (Default)
+# random
+#   seed = 4141130534 (Default)
+# output
+#   file = output.csv (Default)
+#   diagnostic_file =  (Default)
+#   refresh = 100 (Default)
+#   sig_figs = 1
+#   profile_file = profile.csv (Default)
+# num_threads = 1 (Default)
+# stanc_version = stanc3 v2.31.0-2-ge7d5dc38
+# stancflags = 
+lp__,theta.1.1,theta.2.1,theta.3.1,theta.1.2,theta.2.2,theta.3.2,theta.1.3,theta.2.3,theta.3.3
+3e+02,0.03,0.4,0.1,0.07,0.4,0.1,0.9,0.2,0.9

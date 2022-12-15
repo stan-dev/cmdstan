@@ -1,3 +1,4 @@
+#include <cmdstan/return_codes.hpp>
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/mcmc/chains.hpp>
 #include <stan/io/ends_with.hpp>
@@ -10,6 +11,8 @@
 #include <boost/algorithm/string.hpp>
 #include <CLI11/CLI11.hpp>
 
+using cmdstan::return_codes;
+
 /**
  * Compute summary statistics over HMC sampler output
  * read in from stan_csv files.
@@ -18,7 +21,7 @@
  * @param argc Number of arguments
  * @param argv Arguments
  *
- * @return 0 for success,
+ * @return OK for success,
  *         non-zero otherwise
  */
 int main(int argc, const char *argv[]) {
@@ -38,7 +41,7 @@ Options:
 )";
   if (argc < 2) {
     std::cout << usage << std::endl;
-    return -1;
+    return return_codes::NOT_OK;
   }
 
   // Command-line arguments
@@ -75,7 +78,7 @@ Options:
   if (app.count("--autocorr") && autocorr_idx > filenames.size()) {
     std::cout << "Option --autocorr: " << autocorr_idx
               << " not a valid chain id." << std::endl;
-    return -1;
+    return return_codes::NOT_OK;
   }
   std::vector<std::string> percentiles;
   boost::algorithm::trim(percentiles_spec);
@@ -87,7 +90,7 @@ Options:
   } catch (const std::invalid_argument &e) {
     std::cout << "Option --percentiles " << percentiles_spec << ": " << e.what()
               << std::endl;
-    return -1;
+    return return_codes::NOT_OK;
   }
   if (app.count("--csv_filename")) {
     if (FILE *file = fopen(csv_filename.c_str(), "w")) {
@@ -95,7 +98,7 @@ Options:
     } else {
       std::cout << "Cannot save to csv_filename: " << csv_filename << "."
                 << std::endl;
-      return -1;
+      return return_codes::NOT_OK;
     }
   }
   for (int i = 0; i < filenames.size(); ++i) {
@@ -106,7 +109,7 @@ Options:
     } else {
       std::cout << "Cannot read input csv file: " << filenames[i] << "."
                 << std::endl;
-      return -1;
+      return return_codes::NOT_OK;
     }
   }
 
@@ -209,8 +212,8 @@ Options:
     }
   } catch (const std::invalid_argument &e) {
     std::cout << "Error during processing. " << e.what() << std::endl;
-    return -1;
+    return return_codes::NOT_OK;
   }
 
-  return 0;
+  return return_codes::OK;
 }

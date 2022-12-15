@@ -4,6 +4,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <stdexcept>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 
 namespace cmdstan {
@@ -25,7 +28,8 @@ int count_matches(const std::string &target, const std::string &s) {
 /**
  * Gets the path separator for the OS.
  *
- * @return '\' for Windows, '/' otherwise.
+ * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_"))
+== 0); ws, '/' otherwise.
  */
 char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
@@ -152,10 +156,15 @@ run_command_output run_command(std::string command) {
 
   // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
   int err_code = pclose(in);
-  // on Windows, err code is the return code.
   if (err_code != 0 && (err_code >> 8) > 0)
     err_code >>= 8;
-
+  if (err_code > 127) {  // covers stan_services and CLI11 - not segfault
+    std::string err_msg;
+    err_msg = "Command threw unexpected error: \"";
+    err_msg += command;
+    err_msg += "\"";
+    throw std::runtime_error(err_msg.c_str());
+  }
   return run_command_output(
       command, output, (time_end - time_start).total_milliseconds(), err_code);
 }
@@ -217,6 +226,60 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
     equal_pos = command_output.find("=", start);
   }
   return output;
+}
+
+/**
+ * Read Stan CSV file into vector of doubles.
+ * Expects comment line prefix '#' and header row.
+ *
+ * @param path Path to file.
+ * @param config Vector for initial comment lines (CmdStan config)
+ * @param header Vector for column header
+ * @param cells Vector of output data, serialized by row.
+ */
+void parse_sample(const std::string &path, std::vector<std::string> &config,
+                  std::vector<std::string> &header,
+                  std::vector<double> &cells) {
+  std::ifstream in;
+  in.open(path);
+  std::string line;
+  while (in.peek() == '#') {
+    std::getline(in, line);
+    config.push_back(line);
+  }
+  std::getline(in, line);
+  header.push_back(line);
+  while (std::getline(in, line)) {
+    if (line[0] == '#')
+      continue;
+    std::stringstream linestream(line);
+    std::string cell;
+    while (std::getline(linestream, cell, ',')) {
+      cells.push_back(std::stold(cell));
+    }
+  }
+  in.close();
+}
+
+/**
+ * Given vector of strings, return index of first element
+ * which contains a specified substring.
+ *
+ * @param lines Vector of strings to check
+ * @param substring String to match on
+ *
+ * @return index of first line, or -1 if not found.
+ */
+int idx_first_match(const std::vector<std::string> &lines,
+                    std::string &substring) {
+  int idx = -1;
+  for (int n = 0; n < lines.size(); ++n) {
+    if (boost::contains(lines[n], substring)) {
+      idx = n;
+      break;
+    }
+  }
+  return idx;
 }
 
 }  // namespace test
