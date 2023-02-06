@@ -155,8 +155,8 @@ int command(int argc, const char *argv[]) {
   int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
   int opencl_platform_id
       = get_arg_val<int_argument>(parser, "opencl", "platform");
-  if ((opencl_device_id >= 0 && open_platform_id < 0)  // default value -1
-      || (opencl_device_id < 0 && open_platform_id >= 0)) {
+  if ((opencl_device_id >= 0 && opencl_platform_id < 0)  // default value -1
+      || (opencl_device_id < 0 && opencl_platform_id >= 0)) {
     std::cerr << "Please set both device and platform OpenCL IDs." << std::endl;
     return return_codes::NOT_OK;
   } else if (opencl_device_id >= 0) {  // opencl_platform_id >= 0 by above test
