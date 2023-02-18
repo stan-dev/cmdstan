@@ -236,7 +236,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent { label 'osx' }
+                    agent { label 'osx && !m1' }
                     steps {
                         setupCXX(MAC_CXX)
                         sh runTests("./")
