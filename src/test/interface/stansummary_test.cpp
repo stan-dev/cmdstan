@@ -5,6 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
+#include <iostream>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;
@@ -393,6 +394,8 @@ TEST(CommandStansummary, check_console_output) {
                          + path_separator + "bernoulli_chain_1.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
+
+  std::cout << out.output << std::endl;
   EXPECT_TRUE(boost::algorithm::contains(out.output, lp));
   EXPECT_TRUE(boost::algorithm::contains(out.output, theta));
   EXPECT_TRUE(boost::algorithm::contains(out.output, accept_stat));
