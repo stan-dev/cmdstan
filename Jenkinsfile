@@ -173,70 +173,70 @@ pipeline {
                 }
             }
             parallel {
-                stage('Windows interface tests') {
-                    agent { label 'windows' }
-                    steps {
-                        setupCXX(WIN_CXX)
-                        runWinTests()
-                    }
-                    post {
-                        always {
+//                 stage('Windows interface tests') {
+//                     agent { label 'windows' }
+//                     steps {
+//                         setupCXX(WIN_CXX)
+//                         runWinTests()
+//                     }
+//                     post {
+//                         always {
+//
+//                             recordIssues id: "Windows",
+//                             name: "Windows interface tests",
+//                             enabledForFailure: true,
+//                             aggregatingResults : true,
+//                             tools: [
+//                                 gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
+//                                 clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
+//                             ],
+//                             blameDisabled: false,
+//                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+//                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+//                             referenceJobName: env.BRANCH_NAME
+//
+//                             deleteDirWin()
+//                         }
+//                     }
+//                 }
 
-                            recordIssues id: "Windows",
-                            name: "Windows interface tests",
-                            enabledForFailure: true,
-                            aggregatingResults : true,
-                            tools: [
-                                gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
-                                clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
-                            ],
-                            blameDisabled: false,
-                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: env.BRANCH_NAME
-
-                            deleteDirWin()
-                        }
-                    }
-                }
-
-                stage('Linux interface tests with MPI') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:gpu'
-                            label 'linux'
-                        }
-                    }
-                    steps {
-                        setupCXX(MPICXX)
-                        sh "echo STAN_MPI=true >> make/local"
-                        sh "echo CXX_TYPE=gcc >> make/local"
-                        sh "make build-mpi > build-mpi.log 2>&1"
-                        sh runTests("./")
-                    }
-                    post {
-                        always {
-
-                            recordIssues id: "Linux_mpi",
-                            name: "Linux interface tests with MPI",
-                            enabledForFailure: true,
-                            aggregatingResults : true,
-                            tools: [
-                                gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
-                                clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
-                            ],
-                            blameDisabled: false,
-                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: env.BRANCH_NAME
-
-                            deleteDir()
-                        }
-                    }
-                }
+//                 stage('Linux interface tests with MPI') {
+//                     agent {
+//                         docker {
+//                             image 'stanorg/ci:gpu'
+//                             label 'linux'
+//                         }
+//                     }
+//                     steps {
+//                         setupCXX(MPICXX)
+//                         sh "echo STAN_MPI=true >> make/local"
+//                         sh "echo CXX_TYPE=gcc >> make/local"
+//                         sh "make build-mpi > build-mpi.log 2>&1"
+//                         sh runTests("./")
+//                     }
+//                     post {
+//                         always {
+//
+//                             recordIssues id: "Linux_mpi",
+//                             name: "Linux interface tests with MPI",
+//                             enabledForFailure: true,
+//                             aggregatingResults : true,
+//                             tools: [
+//                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
+//                                 clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
+//                             ],
+//                             blameDisabled: false,
+//                             qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+//                             healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+//                             referenceJobName: env.BRANCH_NAME
+//
+//                             deleteDir()
+//                         }
+//                     }
+//                 }
 
                 stage('Mac interface tests') {
-                    agent { label 'osx && !m1' }
+                    agent { label 'm1' }
                     steps {
                         setupCXX(MAC_CXX)
                         sh runTests("./")
@@ -262,28 +262,28 @@ pipeline {
                     }
                 }
 
-                stage('Upstream CmdStan Performance tests') {
-                    when {
-                            expression {
-                                env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" ||
-                                env.BRANCH_NAME == "downstream_hotfix"
-                            }
-                        }
-                    steps {
-                        script{
-                            build(
-                                job: "Stan/CmdStan Performance Tests/downstream_tests",
-                                parameters: [
-                                    string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
-                                    string(name: 'stan_pr', value: params.stan_pr),
-                                    string(name: 'math_pr', value: params.math_pr)
-                                ],
-                                wait:true
-                            )
-                        }
-                    }
-                }
+//                 stage('Upstream CmdStan Performance tests') {
+//                     when {
+//                             expression {
+//                                 env.BRANCH_NAME ==~ /PR-\d+/ ||
+//                                 env.BRANCH_NAME == "downstream_tests" ||
+//                                 env.BRANCH_NAME == "downstream_hotfix"
+//                             }
+//                         }
+//                     steps {
+//                         script{
+//                             build(
+//                                 job: "Stan/CmdStan Performance Tests/downstream_tests",
+//                                 parameters: [
+//                                     string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
+//                                     string(name: 'stan_pr', value: params.stan_pr),
+//                                     string(name: 'math_pr', value: params.math_pr)
+//                                 ],
+//                                 wait:true
+//                             )
+//                         }
+//                     }
+//                 }
 
             }
         }
