@@ -13,7 +13,7 @@ def setupCXX(CXX = env.CXX) {
 
 def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
-      ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+      python3 ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
 }
 
