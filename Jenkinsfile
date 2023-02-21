@@ -13,7 +13,7 @@ def setupCXX(CXX = env.CXX) {
 
 def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
-      python3 ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+        ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
 }
 
@@ -239,7 +239,8 @@ pipeline {
                     agent { label 'm1' }
                     steps {
                         setupCXX(MAC_CXX)
-                        sh runTests("./")
+                        sh "clang++ --version"
+                        sh runTests("python3 ./")
                     }
                     post {
                         always {
