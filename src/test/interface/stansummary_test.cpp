@@ -2,6 +2,7 @@
 #include <test/utility.hpp>
 #include <stan/io/ends_with.hpp>
 #include <fstream>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
@@ -394,13 +395,37 @@ TEST(CommandStansummary, check_console_output) {
                          + path_separator + "bernoulli_chain_1.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-
-  std::cout << out.output << std::endl;
-  EXPECT_TRUE(boost::algorithm::contains(out.output, lp));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, theta));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, accept_stat));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, energy));
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::istringstream target_stream(out.output);
+  std::string line;
+
+  // skip header
+  std::getline(target_stream, line);  // model name
+  std::getline(target_stream, line);  // chain info
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // warmup time
+  std::getline(target_stream, line);  // sample time
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // header
+  std::getline(target_stream, line);  // blank
+
+  std::getline(target_stream, line);  // lp
+  EXPECT_EQ(lp, line);
+  std::getline(target_stream, line);  // accept stat
+  EXPECT_EQ(accept_stat, line);
+  std::getline(target_stream, line);  // stepsize
+  std::getline(target_stream, line);  // treedepth
+  std::getline(target_stream, line);  // n_leapfrog
+  std::getline(target_stream, line);  // divergent
+
+  std::getline(target_stream, line);  // energy
+  EXPECT_EQ(energy, line);
+
+  std::getline(target_stream, line);  // blank
+
+  std::getline(target_stream, line);  // theta
+  EXPECT_EQ(theta, line);
 }
 
 TEST(CommandStansummary, check_csv_output) {
