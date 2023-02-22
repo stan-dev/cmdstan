@@ -249,6 +249,9 @@ pipeline {
                             name: "Mac interface tests",
                             enabledForFailure: true,
                             aggregatingResults : true,
+                            filters: [
+                                excludeFile('/lib/.*')
+                            ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
                                 clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
