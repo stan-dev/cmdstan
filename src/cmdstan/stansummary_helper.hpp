@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iomanip>
 #include <ios>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -28,6 +29,9 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
   if (value == 0) {
     width = sig_figs;
     precision = sig_figs;
+  } else if (std::isnan(value)) {
+    width = 3;
+    precision = sig_figs;
   } else if (abs_value >= 1) {
     int int_part = static_cast<int>(std::ceil(log10(abs_value) + 1e-6));
     width = int_part >= sig_figs ? int_part : sig_figs + 1;
@@ -38,7 +42,8 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
     precision = frac_part + sig_figs - 1;
   }
 
-  if (value < 0)
+  // account for negative numbers
+  if (std::signbit(value))
     ++width;
 }
 
@@ -96,10 +101,8 @@ int column_width(const Eigen::VectorXd &x, const std::string &name,
 
   for (int i = 0; i < x.size(); ++i) {
     size_t width = compute_width(x[i], sig_figs);
-    std::cerr << x[i] << " (" << width << ") ";
     max_fixed_width = width > max_fixed_width ? width : max_fixed_width;
   }
-  std::cerr << std::endl;
 
   if (max_fixed_width + padding < fixed_threshold) {
     format = std::ios_base::fixed;

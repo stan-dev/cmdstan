@@ -375,17 +375,17 @@ TEST(CommandStansummary, bad_percentiles_arg) {
 
 TEST(CommandStansummary, check_console_output) {
   std::string lp
-      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8      443    "
-        "19275      1.0";
+      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8    443    "
+        "19275    1.0";
   std::string theta
-      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47      384    "
-        "16683     1.00";
+      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47    384    "
+        "16683   1.00";
   std::string accept_stat
-      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0  1.0e+03  "
-        "4.5e+04  1.0e+00";
+      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0   1026    "
+        "44597   1.00";
   std::string energy
-      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9  4.1e+02  "
-        "1.8e+04  1.0e+00";
+      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9    411    "
+        "17865    1.0";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
