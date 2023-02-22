@@ -163,14 +163,12 @@ Options:
     model_widths = calculate_column_widths(model_params, header, sig_figs,
                                            model_formats);
 
-
     Eigen::VectorXi column_widths(header.size());
     for (size_t i = 0; i < header.size(); ++i)
       column_widths[i] = sampler_widths[i] > model_widths[i] ? sampler_widths[i]
                                                              : model_widths[i];
 
     std::cerr << column_widths << std::endl;
-
 
     // Print to console
     write_timing(chains, metadata, warmup_times, sampling_times, thin, "",
