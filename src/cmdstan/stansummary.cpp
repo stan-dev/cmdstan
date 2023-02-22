@@ -168,7 +168,9 @@ Options:
       column_widths[i] = sampler_widths[i] > model_widths[i] ? sampler_widths[i]
                                                              : model_widths[i];
 
-    std::cerr << column_widths << std::endl;
+    std::cerr << "sampler" << std::endl << sampler_widths << std::endl;
+    std::cerr << "model" << std::endl << model_widths << std::endl;
+    std::cerr << "columns" << std::endl << column_widths << std::endl;
 
     // Print to console
     write_timing(chains, metadata, warmup_times, sampling_times, thin, "",
