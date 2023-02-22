@@ -29,11 +29,11 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
     width = sig_figs;
     precision = sig_figs;
   } else if (abs_value >= 1) {
-    int int_part = std::ceil(log10(abs_value) + 1e-6);
+    int int_part = static_cast<int>(std::ceil(log10(abs_value) + 1e-6));
     width = int_part >= sig_figs ? int_part : sig_figs + 1;
     precision = int_part >= sig_figs ? 0 : sig_figs - int_part;
   } else {
-    int frac_part = std::fabs(std::floor(log10(abs_value)));
+    int frac_part = static_cast<int>(std::fabs(std::floor(log10(abs_value))));
     width = 1 + frac_part + sig_figs;
     precision = frac_part + sig_figs - 1;
   }
@@ -51,8 +51,8 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
  * @return display width
  */
 int compute_width(double value, int sig_figs) {
-  int width;
-  int precision;
+  int width = sig_figs;
+  int precision = sig_figs;
   compute_width_and_precision(value, sig_figs, width, precision);
   return width;
 }
@@ -96,8 +96,10 @@ int column_width(const Eigen::VectorXd &x, const std::string &name,
 
   for (int i = 0; i < x.size(); ++i) {
     size_t width = compute_width(x[i], sig_figs);
+    std::cerr << x[i] << " (" << width << ") ";
     max_fixed_width = width > max_fixed_width ? width : max_fixed_width;
   }
+  std::cerr << std::endl;
 
   if (max_fixed_width + padding < fixed_threshold) {
     format = std::ios_base::fixed;
