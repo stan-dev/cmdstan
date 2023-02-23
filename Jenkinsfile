@@ -186,6 +186,9 @@ pipeline {
                             name: "Windows interface tests",
                             enabledForFailure: true,
                             aggregatingResults : true,
+                            filters: [
+                                excludeFile('/lib/.*'),
+                            ],
                             tools: [
                                 gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
                                 clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
@@ -221,6 +224,9 @@ pipeline {
                             name: "Linux interface tests with MPI",
                             enabledForFailure: true,
                             aggregatingResults : true,
+                            filters: [
+                                excludeFile('/lib/.*'),
+                            ],
                             tools: [
                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
                                 clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
@@ -250,7 +256,6 @@ pipeline {
                             aggregatingResults : true,
                             filters: [
                                 excludeFile('/lib/.*'),
-                                excludeFile('.*src/stan/.*'),
                             ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
