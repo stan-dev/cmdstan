@@ -185,7 +185,7 @@ pipeline {
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
                             ],
@@ -223,7 +223,7 @@ pipeline {
                             recordIssues id: "Linux_mpi",
                             name: "Linux interface tests with MPI",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
                             ],
@@ -242,7 +242,7 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent { label 'm1' }
+                    agent { label 'osx' }
                     steps {
                         setupCXX(MAC_CXX)
                         sh runTests("python3 ./")
@@ -253,7 +253,7 @@ pipeline {
                             recordIssues id: "Mac",
                             name: "Mac interface tests",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
                             ],
