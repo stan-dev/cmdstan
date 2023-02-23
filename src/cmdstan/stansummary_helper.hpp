@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iomanip>
 #include <ios>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -28,17 +29,21 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
   if (value == 0) {
     width = sig_figs;
     precision = sig_figs;
+  } else if (std::isnan(value)) {
+    width = 3;
+    precision = sig_figs;
   } else if (abs_value >= 1) {
-    int int_part = std::ceil(log10(abs_value) + 1e-6);
+    int int_part = static_cast<int>(std::ceil(log10(abs_value) + 1e-6));
     width = int_part >= sig_figs ? int_part : sig_figs + 1;
     precision = int_part >= sig_figs ? 0 : sig_figs - int_part;
   } else {
-    int frac_part = std::fabs(std::floor(log10(abs_value)));
+    int frac_part = static_cast<int>(std::fabs(std::floor(log10(abs_value))));
     width = 1 + frac_part + sig_figs;
     precision = frac_part + sig_figs - 1;
   }
 
-  if (value < 0)
+  // account for negative numbers
+  if (std::signbit(value))
     ++width;
 }
 
@@ -487,7 +492,7 @@ void write_params(const stan::mcmc::chains<> &chains,
              << chains.param_name(i_chains);
         *out << std::right;
         for (int j = 0; j < params.cols(); j++) {
-          std::cout.setf(col_formats(j), std::ios::floatfield);
+          out->setf(col_formats(j), std::ios::floatfield);
           *out << std::setprecision(
               compute_precision(params(i, j), sig_figs,
                                 col_formats(j) == std::ios_base::scientific))
@@ -519,7 +524,7 @@ void write_params(const stan::mcmc::chains<> &chains,
                << chains.param_name(row_maj_index_chains);
           *out << std::right;
           for (int j = 0; j < params.cols(); j++) {
-            std::cout.setf(col_formats(j), std::ios::floatfield);
+            out->setf(col_formats(j), std::ios::floatfield);
             *out << std::setprecision(
                 compute_precision(params(row_maj_index, j), sig_figs,
                                   col_formats(j) == std::ios_base::scientific))

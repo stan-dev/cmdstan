@@ -2,6 +2,7 @@
 #include <test/utility.hpp>
 #include <stan/io/ends_with.hpp>
 #include <fstream>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
@@ -373,17 +374,17 @@ TEST(CommandStansummary, bad_percentiles_arg) {
 
 TEST(CommandStansummary, check_console_output) {
   std::string lp
-      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8      443    "
-        "19275      1.0";
+      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8    443    "
+        "19275    1.0";
   std::string theta
-      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47      384    "
-        "16683     1.00";
+      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47    384    "
+        "16683   1.00";
   std::string accept_stat
-      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0  1.0e+03  "
-        "4.5e+04  1.0e+00";
+      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0   1026    "
+        "44597   1.00";
   std::string energy
-      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9  4.1e+02  "
-        "1.8e+04  1.0e+00";
+      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9    411    "
+        "17865    1.0";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -393,11 +394,37 @@ TEST(CommandStansummary, check_console_output) {
                          + path_separator + "bernoulli_chain_1.csv";
 
   run_command_output out = run_command(command + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, lp));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, theta));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, accept_stat));
-  EXPECT_TRUE(boost::algorithm::contains(out.output, energy));
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::istringstream target_stream(out.output);
+  std::string line;
+
+  // skip header
+  std::getline(target_stream, line);  // model name
+  std::getline(target_stream, line);  // chain info
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // warmup time
+  std::getline(target_stream, line);  // sample time
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // header
+  std::getline(target_stream, line);  // blank
+
+  std::getline(target_stream, line);  // lp
+  EXPECT_EQ(lp, line);
+  std::getline(target_stream, line);  // accept stat
+  EXPECT_EQ(accept_stat, line);
+  std::getline(target_stream, line);  // stepsize
+  std::getline(target_stream, line);  // treedepth
+  std::getline(target_stream, line);  // n_leapfrog
+  std::getline(target_stream, line);  // divergent
+
+  std::getline(target_stream, line);  // energy
+  EXPECT_EQ(energy, line);
+
+  std::getline(target_stream, line);  // blank
+
+  std::getline(target_stream, line);  // theta
+  EXPECT_EQ(theta, line);
 }
 
 TEST(CommandStansummary, check_csv_output) {

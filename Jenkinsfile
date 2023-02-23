@@ -13,7 +13,7 @@ def setupCXX(CXX = env.CXX) {
 
 def runTests(String prefix = "") {
     """ make -j${env.PARALLEL} build
-      ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
+        ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
     """
 }
 
@@ -185,7 +185,10 @@ pipeline {
                             recordIssues id: "Windows",
                             name: "Windows interface tests",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
+                            filters: [
+                                excludeFile('/lib/.*'),
+                            ],
                             tools: [
                                 gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
                                 clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
@@ -220,7 +223,10 @@ pipeline {
                             recordIssues id: "Linux_mpi",
                             name: "Linux interface tests with MPI",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
+                            filters: [
+                                excludeFile('/lib/.*'),
+                            ],
                             tools: [
                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
                                 clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
@@ -236,10 +242,10 @@ pipeline {
                 }
 
                 stage('Mac interface tests') {
-                    agent { label 'osx && !m1' }
+                    agent { label 'osx' }
                     steps {
                         setupCXX(MAC_CXX)
-                        sh runTests("./")
+                        sh runTests("python3 ./")
                     }
                     post {
                         always {
@@ -247,7 +253,10 @@ pipeline {
                             recordIssues id: "Mac",
                             name: "Mac interface tests",
                             enabledForFailure: true,
-                            aggregatingResults : true,
+                            aggregatingResults : false,
+                            filters: [
+                                excludeFile('/lib/.*'),
+                            ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
                                 clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
@@ -288,7 +297,6 @@ pipeline {
             }
         }
     }
-    // Below lines are commented to avoid spamming emails during migration/debug
     post {
         success {
            script {
