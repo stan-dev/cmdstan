@@ -56,8 +56,8 @@ void compute_width_and_precision(double value, int sig_figs, int &width,
  * @return display width
  */
 int compute_width(double value, int sig_figs) {
-  int width = sig_figs;
-  int precision = sig_figs;
+  int width;
+  int precision;
   compute_width_and_precision(value, sig_figs, width, precision);
   return width;
 }
