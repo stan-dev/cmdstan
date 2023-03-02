@@ -286,7 +286,8 @@ pipeline {
                                 parameters: [
                                     string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
                                     string(name: 'stan_pr', value: params.stan_pr),
-                                    string(name: 'math_pr', value: params.math_pr)
+                                    string(name: 'math_pr', value: params.math_pr),
+                                    string(name: 'stanc3_bin_url', value: params.stanc3_bin_url)
                                 ],
                                 wait:true
                             )
