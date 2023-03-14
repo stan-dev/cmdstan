@@ -1,6 +1,6 @@
 data {
   int<lower=0> N;
-  int<lower=0,upper=1> y[N];
+  array[N] int<lower=0,upper=1> y;
 }
 parameters {
   real<lower=0,upper=1> theta;
@@ -22,7 +22,7 @@ model {
 }
 generated quantities {
   real theta_copy = theta;
-  int y_rep[N];
+  array[N] int y_rep;
   for (n in 1:N)
     y_rep[n] = bernoulli_rng(theta);
 }
