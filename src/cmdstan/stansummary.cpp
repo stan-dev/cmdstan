@@ -69,7 +69,9 @@ Options:
   app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
                  true);
   app.add_option("--include_param,-i", requested_params_vec,
-                 "Include the named parameter in the output. By default all are included.", true)
+                 "Include the named parameter in the output. By default all "
+                 "are included.",
+                 true)
       ->transform([](auto str) {
         // allow both 'theta.1' and 'theta[1]' style.
         std::string token(str);
