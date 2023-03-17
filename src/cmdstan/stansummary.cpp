@@ -38,6 +38,10 @@ Options:
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
+  -i, --include_param [name]  Include the named parameter in the summary output.
+                              By default, all parameters in the file are summarized,
+                              passing this argument one or more times will filter
+                              the output down to just the requested arguments.
 )";
   if (argc < 2) {
     std::cout << usage << std::endl;
@@ -64,8 +68,8 @@ Options:
       ->check(CLI::NonexistentPath);
   app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
                  true);
-  app.add_option("--model_param", requested_params_vec,
-                 "Which model parameters to summarize.", true)
+  app.add_option("--include_param,-i", requested_params_vec,
+                 "Include the named parameter in the output. By default all are included.", true)
       ->transform([](auto str) {
         // allow both 'theta.1' and 'theta[1]' style.
         std::string token(str);
@@ -172,7 +176,7 @@ Options:
       }
       // some params were requested but not found by above loop
       if (requested_params.size() > 0) {
-        std::cout << "--model_param: Unrecognized parameter(s): ";
+        std::cout << "--include_param: Unrecognized parameter(s): ";
         for (auto param : requested_params) {
           std::cout << "'" << param << "' ";
         }

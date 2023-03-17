@@ -375,19 +375,19 @@ TEST(CommandStansummary, bad_percentiles_arg) {
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
 
-TEST(CommandStansummary, bad_model_param_args) {
+TEST(CommandStansummary, bad_include_param_args) {
   std::string expected_message
-      = "--model_param: Unrecognized parameter(s): 'psi' ";
+      = "--include_param: Unrecognized parameter(s): 'psi' ";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
-  std::string arg_model_param = "--model_param psi";
+  std::string arg_include_param = "-i psi";
 
   run_command_output out
-      = run_command(command + " " + arg_model_param + " " + csv_file);
+      = run_command(command + " " + arg_include_param + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
@@ -551,7 +551,7 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
     FAIL();
 }
 
-TEST(CommandStansummary, check_csv_output_model_param) {
+TEST(CommandStansummary, check_csv_output_include_param) {
   std::string csv_header
       = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
   std::string lp
@@ -584,10 +584,10 @@ TEST(CommandStansummary, check_csv_output_model_param) {
   std::string arg_csv_file = "--csv_filename=" + target_csv_file;
 
   // both styles of name supported
-  std::string arg_model_param = "--model_param theta.6 --model_param theta[7]";
+  std::string arg_include_param = "--include_param theta.6 -i theta[7]";
 
   run_command_output out = run_command(command + " " + arg_csv_file + " "
-                                       + arg_model_param + " " + csv_file);
+                                       + arg_include_param + " " + csv_file);
 
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
