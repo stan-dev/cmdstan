@@ -706,7 +706,8 @@ void write_sample_header(argument_parser& parser,
     parser.print(writer);
     write_parallel_info(writer);
     write_opencl_device(writer);
-    writer(model.model_compile_info());
+    std::vector<std::string> model_compile_info = model.model_compile_info();
+    write_compile_info(writer, model_compile_info);
 }  
 
 /**
