@@ -2,6 +2,18 @@
 #define CMDSTAN_HELPER_HPP
 
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/write_chain.hpp>
+#include <cmdstan/write_datetime.hpp>
+#include <cmdstan/write_model_compile_info.hpp>
+#include <cmdstan/write_model.hpp>
+#include <cmdstan/write_opencl_device.hpp>
+#include <cmdstan/write_parallel_info.hpp>
+#include <cmdstan/write_profiling.hpp>
+#include <cmdstan/write_stan.hpp>
+#include <cmdstan/write_stan_flags.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
@@ -97,38 +109,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
-/**
- * Check that sampler config is valid for multi-chain processing,
- * which is only implemented for adaptive NUTS-HMC.
- * If config is not adaptive NUTS-HMC, throws error.
- *
- * @param config sample argument
- */
-void validate_multi_chain_config(argument *config) {
-  auto sample_arg = config->arg("sample");
-  bool adapt_engaged
-      = get_arg_val<bool_argument>(*config, "sample", "adapt", "engaged");
-  list_argument *algo
-      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-  bool is_hmc = algo->value() != "fixed_param";
-  bool is_engine_nuts = false;
-  bool is_metric_d = false;
-  if (is_hmc) {
-    list_argument *engine
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-    if (engine->value() == "nuts")
-      is_engine_nuts = true;
-    list_argument *metric
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-    if (!(metric->value() == "unit_e"))
-      is_metric_d = true;
-  }
-  if (!(adapt_engaged && is_engine_nuts && is_metric_d)) {
-    throw std::invalid_argument(
-        "Argument 'num_chains' can currently only be used for NUTS with "
-        "adaptation and dense_e or diag_e metric");
-  }
-}
 
 /**
  * Get suffix
@@ -136,12 +116,29 @@ void validate_multi_chain_config(argument *config) {
  * @param filename
  * @return suffix
  */
-std::string suffix(const std::string name) {
+std::string get_suffix(const std::string& name) {
   size_t file_marker_pos = name.find_last_of(".");
   if (file_marker_pos > name.size())
     return std::string();
   else
     return name.substr(file_marker_pos, name.size());
+}
+
+/**
+ * Split name on last ".", if any.
+ *
+ * @param filename - name to split
+ * @param base - basename
+ * @param suffix - suffix (if any)
+ */
+void get_basename_suffix(const std::string& name,
+                std::string& base, std::string& suffix) {
+  suffix = get_suffix(name);
+  if (suffix.size() > 0) {
+    base = name.substr(0, name.size() - suffix.size());
+  } else {
+    base = name;
+  }
 }
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
@@ -156,7 +153,7 @@ inline shared_context_ptr get_var_context(const std::string &file) {
     msg << "Can't open specified file, \"" << file << "\"" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  if (suffix(file) == ".json") {
+  if (get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
@@ -540,9 +537,9 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
                                  const stan::model::model_base &model) {
   std::stringstream msg;
   Eigen::VectorXd theta_hat;
-  if (suffix(fname) == ".csv") {
+  if (get_suffix(fname) == ".csv") {
     theta_hat = get_laplace_mode_csv(fname, model);
-  } else if (suffix(fname) == ".json") {
+  } else if (get_suffix(fname) == ".json") {
     theta_hat = get_laplace_mode_json(fname, model);
   } else {
     msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
@@ -692,6 +689,122 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
   }
 }
 
-}  // namespace cmdstan
 
+/**
+ * Send user config, model info to output file.
+ *
+ * @param parser user config
+ * @param model instantiated model
+ * @param writer writer callback
+ */
+void write_sample_header(argument_parser& parser,
+                         const stan::model::model_base& model,
+                         stan::callbacks::writer& writer) {
+    write_stan(writer);
+    write_model(writer, model.model_name());
+    write_datetime(writer);
+    parser.print(writer);
+    write_parallel_info(writer);
+    write_opencl_device(writer);
+    writer(model.model_compile_info());
+}  
+
+/**
+ * Send model info to diagnostic file.
+ *
+ * @param parser user config
+ * @param model instantiated model
+ * @param writer writer callback
+ */
+void write_diagnostic_header(argument_parser& parser,
+                         const stan::model::model_base& model,
+                         stan::callbacks::writer& writer) {
+    write_stan(writer);
+    write_model(writer, model.model_name());
+    parser.print(writer);
+}  
+
+/**
+ * Instantiate callback writer, write header.
+ * Safely construct null writer if no output file specified.
+ *
+ * @param sig_figs floating point precision
+ * @param is_sample - true when file is sample output file
+ * @param filename output filename
+ * @param parser user config
+ * @param model instantiated model
+ * @return stream writer
+ */
+stan::callbacks::unique_stream_writer<std::fstream>
+initialize_writer(
+    int sig_figs, bool is_sample, const std::string& filename,
+    argument_parser& parser, const stan::model::model_base& model) {
+  if (filename.empty()) {
+    return stan::callbacks::unique_stream_writer<std::fstream>(nullptr, "");
+  }
+  auto unique_fstream
+      = std::make_unique<std::fstream>(filename.c_str(), std::fstream::out);
+  if (sig_figs > 0)
+    (*unique_fstream.get()) << std::setprecision(sig_figs);
+  stan::callbacks::unique_stream_writer<std::fstream>writer(std::move(unique_fstream), "# ");
+  if (is_sample)
+    write_sample_header(parser, model, writer);
+  else
+    write_diagnostic_header(parser, model, writer);
+  return writer;
+}
+
+/**
+ * Instantiate vector of callback writers, write header.
+ * Uses num_chains and id to create unique filenames.
+ * Safely construct null writer if no output file specified.
+ *
+ * @param num_chains number of output writers to create
+ * @param id user-specified id
+ * @param sig_figs floating point precision
+ * @param is_sample - true when file is sample output file
+ * @param filename output filename
+ * @param parser user config
+ * @param model instantiated model
+ * @return vector of unique stream writers
+ */
+std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
+initialize_writers(
+    int num_chains, int id, int sig_figs, bool is_sample,
+    const std::string& filename, argument_parser& parser,
+    const stan::model::model_base& model) {
+  std::vector<stan::callbacks::unique_stream_writer<std::fstream>> writers;
+  writers.reserve(num_chains);
+  if (filename.empty()) {
+    for (int i = 0; i < num_chains; ++i) {
+      writers.emplace_back(nullptr, "");
+    }
+    return writers;
+  }
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  std::string name;
+  std::string suffix;
+  get_basename_suffix(filename, name, suffix);
+  for (int i = 0; i < num_chains; ++i) {
+    auto unique_filename = name + name_iterator(i) + suffix;
+    auto unique_fstream
+        = std::make_unique<std::fstream>(unique_filename, std::fstream::out);
+    if (sig_figs > 0)
+      (*unique_fstream.get()) << std::setprecision(sig_figs);
+    writers.emplace_back(std::move(unique_fstream), "# ");
+    if (is_sample)
+      write_sample_header(parser, model, writers[i]);
+    else
+      write_diagnostic_header(parser, model, writers[i]);
+  }
+  return writers;
+}
+
+}  // namespace cmdstan
 #endif
