@@ -162,7 +162,6 @@ int command(int argc, const char *argv[]) {
     throw std::invalid_argument(
         "Argument 'num_chains' can currently only be used for NUTS with "
         "adaptation and dense_e or diag_e metric");
-    
 
 #ifdef STAN_OPENCL
   int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
@@ -234,7 +233,7 @@ int command(int argc, const char *argv[]) {
       = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
   unsigned int random_seed = random_arg->random_value();
   std::cout << "random seed" << random_seed << std::endl;
-  
+
   std::string data_file = get_arg_val<string_argument>(parser, "data", "file");
   std::shared_ptr<stan::io::var_context> var_context
       = get_var_context(data_file);
@@ -243,7 +242,6 @@ int command(int argc, const char *argv[]) {
 
   std::vector<std::string> model_compile_info = model.model_compile_info();
   info(model_compile_info);
-
 
   std::cout << "compiled model" << model_compile_info[0] << std::endl;
 
@@ -259,22 +257,24 @@ int command(int argc, const char *argv[]) {
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
 
-  std::vector<stan::callbacks::unique_stream_writer<std::fstream>> sample_writers;
-  std::vector<stan::callbacks::unique_stream_writer<std::fstream>> diagnostic_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
+      sample_writers;
+  std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
+      diagnostic_writers;
   stan::callbacks::unique_stream_writer<std::fstream> sample_writer;
   stan::callbacks::unique_stream_writer<std::fstream> diagnostic_writer;
   if (is_multichain) {
     sample_writers = initialize_writers(num_chains, id, sig_figs, true,
                                         sample_file, parser, model);
     diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
-                                              diagnostic_file, parser, model);
+                                            diagnostic_file, parser, model);
   } else if (user_method->arg("pathfinder")) {
-    sample_writer = initialize_writer(sig_figs, true,
-                                      sample_file, parser, model);
-    diagnostic_writer = initialize_writer(sig_figs, false,
-                                          diagnostic_file, parser, model);
-    int num_paths
-        = get_arg_val<int_argument>(parser, "method", "pathfinder", "num_paths");
+    sample_writer
+        = initialize_writer(sig_figs, true, sample_file, parser, model);
+    diagnostic_writer
+        = initialize_writer(sig_figs, false, diagnostic_file, parser, model);
+    int num_paths = get_arg_val<int_argument>(parser, "method", "pathfinder",
+                                              "num_paths");
     if (num_paths > 1) {
       sample_writers = initialize_writers(num_paths, id, sig_figs, true,
                                           sample_file, parser, model);
@@ -282,17 +282,17 @@ int command(int argc, const char *argv[]) {
                                               diagnostic_file, parser, model);
     }
   } else {
-    sample_writer = initialize_writer(sig_figs, true,
-                                      sample_file, parser, model);
-    diagnostic_writer = initialize_writer(sig_figs, false,
-                                          diagnostic_file, parser, model);
+    sample_writer
+        = initialize_writer(sig_figs, true, sample_file, parser, model);
+    diagnostic_writer
+        = initialize_writer(sig_figs, false, diagnostic_file, parser, model);
   }
   std::cout << " i/o initialized, num_chains == " << num_chains << std::endl;
 
   //////////////////////////////////////////////////
   //            Invoke Services                   //
   //////////////////////////////////////////////////
-  int return_code = return_codes::NOT_OK;   // reset by service method
+  int return_code = return_codes::NOT_OK;  // reset by service method
 
   if (user_method->arg("generate_quantities")) {
     // ---- generate_quantities start ---- //
@@ -403,14 +403,14 @@ int command(int argc, const char *argv[]) {
         return_code
             = stan::services::optimize::newton<stan::model::model_base, true>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
-                num_iterations, save_iterations, interrupt, logger,
-                init_writer, sample_writer);
+                num_iterations, save_iterations, interrupt, logger, init_writer,
+                sample_writer);
       } else {
         return_code
             = stan::services::optimize::newton<stan::model::model_base, false>(
                 model, *(init_contexts[0]), random_seed, id, init_radius,
-                num_iterations, save_iterations, interrupt, logger,
-                init_writer, sample_writer);
+                num_iterations, save_iterations, interrupt, logger, init_writer,
+                sample_writer);
       }
     } else if (algo->value() == "bfgs") {
       double init_alpha
@@ -482,38 +482,33 @@ int command(int argc, const char *argv[]) {
     double tol_grad = get_arg_val<real_argument>(*pathfinder_arg, "tol_grad");
     double tol_rel_grad
         = get_arg_val<real_argument>(*pathfinder_arg, "tol_rel_grad");
-    double tol_param
-        = get_arg_val<real_argument>(*pathfinder_arg, "tol_param");
+    double tol_param = get_arg_val<real_argument>(*pathfinder_arg, "tol_param");
     int max_lbfgs_iters
         = get_arg_val<int_argument>(*pathfinder_arg, "max_lbfgs_iters");
     bool save_iterations
         = get_arg_val<bool_argument>(*pathfinder_arg, "save_iterations");
     int num_elbo_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_elbo_draws");
-    int num_draws
-        = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
+    int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
-    int num_paths
-        = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
-    if (num_paths  == 1) {
-        return_code
-            = stan::services::pathfinder::pathfinder_lbfgs_single<false, stan::model::model_base>(
-                model, *(init_contexts[0]), random_seed, id, init_radius,
-                history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
-                tol_rel_grad, tol_param, max_lbfgs_iters, false,
-                refresh, interrupt, num_elbo_draws, num_draws,
-                logger, init_writer, sample_writer, diagnostic_writer);
+    int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
+    if (num_paths == 1) {
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
+          false, stan::model::model_base>(
+          model, *(init_contexts[0]), random_seed, id, init_radius,
+          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+          tol_rel_grad, tol_param, max_lbfgs_iters, false, refresh, interrupt,
+          num_elbo_draws, num_draws, logger, init_writer, sample_writer,
+          diagnostic_writer);
     } else {
-        return_code
-            = stan::services::pathfinder::pathfinder_lbfgs_multi<stan::model::model_base>(
-                model, init_contexts, random_seed, id, init_radius,
-                history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
-                tol_rel_grad, tol_param, max_lbfgs_iters, true,
-                refresh, interrupt, num_elbo_draws, num_draws,
-                num_psis_draws, num_paths, logger, init_writers,
-                sample_writers, diagnostic_writers,
-                sample_writer, diagnostic_writer);
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
+          stan::model::model_base>(
+          model, init_contexts, random_seed, id, init_radius, history_size,
+          init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+          max_lbfgs_iters, true, refresh, interrupt, num_elbo_draws, num_draws,
+          num_psis_draws, num_paths, logger, init_writers, sample_writers,
+          diagnostic_writers, sample_writer, diagnostic_writer);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("sample")) {
@@ -553,8 +548,8 @@ int command(int argc, const char *argv[]) {
       }
       return_code = stan::services::sample::fixed_param(
           model, *(init_contexts[0]), random_seed, id, init_radius, num_samples,
-          num_thin, refresh, interrupt, logger, init_writer,
-          sample_writer, diagnostic_writer);
+          num_thin, refresh, interrupt, logger, init_writer, sample_writer,
+          diagnostic_writer);
     } else if (algo->value() == "hmc") {
       list_argument *engine
           = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
@@ -813,8 +808,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, int_time, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writer,
-            sample_writer, diagnostic_writer);
+            term_buffer, window, interrupt, logger, init_writer, sample_writer,
+            diagnostic_writer);
       } else if (engine->value() == "static" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -889,8 +884,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, int_time, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writer,
-            sample_writer, diagnostic_writer);
+            term_buffer, window, interrupt, logger, init_writer, sample_writer,
+            diagnostic_writer);
       } else if (engine->value() == "static" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(

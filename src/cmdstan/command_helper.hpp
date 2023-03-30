@@ -53,7 +53,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -69,7 +69,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -100,7 +100,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -109,14 +109,13 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
-
 /**
  * Get suffix
  *
  * @param filename
  * @return suffix
  */
-std::string get_suffix(const std::string& name) {
+std::string get_suffix(const std::string &name) {
   size_t file_marker_pos = name.find_last_of(".");
   if (file_marker_pos > name.size())
     return std::string();
@@ -131,8 +130,8 @@ std::string get_suffix(const std::string& name) {
  * @param base - basename
  * @param suffix - suffix (if any)
  */
-void get_basename_suffix(const std::string& name,
-                std::string& base, std::string& suffix) {
+void get_basename_suffix(const std::string &name, std::string &base,
+                         std::string &suffix) {
   suffix = get_suffix(name);
   if (suffix.size() > 0) {
     base = name.substr(0, name.size() - suffix.size());
@@ -689,7 +688,6 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
   }
 }
 
-
 /**
  * Send user config, model info to output file.
  *
@@ -697,18 +695,18 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
  * @param model instantiated model
  * @param writer writer callback
  */
-void write_sample_header(argument_parser& parser,
-                         const stan::model::model_base& model,
-                         stan::callbacks::writer& writer) {
-    write_stan(writer);
-    write_model(writer, model.model_name());
-    write_datetime(writer);
-    parser.print(writer);
-    write_parallel_info(writer);
-    write_opencl_device(writer);
-    std::vector<std::string> model_compile_info = model.model_compile_info();
-    write_compile_info(writer, model_compile_info);
-}  
+void write_sample_header(argument_parser &parser,
+                         const stan::model::model_base &model,
+                         stan::callbacks::writer &writer) {
+  write_stan(writer);
+  write_model(writer, model.model_name());
+  write_datetime(writer);
+  parser.print(writer);
+  write_parallel_info(writer);
+  write_opencl_device(writer);
+  std::vector<std::string> model_compile_info = model.model_compile_info();
+  write_compile_info(writer, model_compile_info);
+}
 
 /**
  * Send model info to diagnostic file.
@@ -717,13 +715,13 @@ void write_sample_header(argument_parser& parser,
  * @param model instantiated model
  * @param writer writer callback
  */
-void write_diagnostic_header(argument_parser& parser,
-                         const stan::model::model_base& model,
-                         stan::callbacks::writer& writer) {
-    write_stan(writer);
-    write_model(writer, model.model_name());
-    parser.print(writer);
-}  
+void write_diagnostic_header(argument_parser &parser,
+                             const stan::model::model_base &model,
+                             stan::callbacks::writer &writer) {
+  write_stan(writer);
+  write_model(writer, model.model_name());
+  parser.print(writer);
+}
 
 /**
  * Instantiate callback writer, write header.
@@ -736,10 +734,9 @@ void write_diagnostic_header(argument_parser& parser,
  * @param model instantiated model
  * @return stream writer
  */
-stan::callbacks::unique_stream_writer<std::fstream>
-initialize_writer(
-    int sig_figs, bool is_sample, const std::string& filename,
-    argument_parser& parser, const stan::model::model_base& model) {
+stan::callbacks::unique_stream_writer<std::fstream> initialize_writer(
+    int sig_figs, bool is_sample, const std::string &filename,
+    argument_parser &parser, const stan::model::model_base &model) {
   if (filename.empty()) {
     return stan::callbacks::unique_stream_writer<std::fstream>(nullptr, "");
   }
@@ -747,7 +744,8 @@ initialize_writer(
       = std::make_unique<std::fstream>(filename.c_str(), std::fstream::out);
   if (sig_figs > 0)
     (*unique_fstream.get()) << std::setprecision(sig_figs);
-  stan::callbacks::unique_stream_writer<std::fstream>writer(std::move(unique_fstream), "# ");
+  stan::callbacks::unique_stream_writer<std::fstream> writer(
+      std::move(unique_fstream), "# ");
   if (is_sample)
     write_sample_header(parser, model, writer);
   else
@@ -770,10 +768,9 @@ initialize_writer(
  * @return vector of unique stream writers
  */
 std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
-initialize_writers(
-    int num_chains, int id, int sig_figs, bool is_sample,
-    const std::string& filename, argument_parser& parser,
-    const stan::model::model_base& model) {
+initialize_writers(int num_chains, int id, int sig_figs, bool is_sample,
+                   const std::string &filename, argument_parser &parser,
+                   const stan::model::model_base &model) {
   std::vector<stan::callbacks::unique_stream_writer<std::fstream>> writers;
   writers.reserve(num_chains);
   if (filename.empty()) {
