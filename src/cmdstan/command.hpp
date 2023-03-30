@@ -32,6 +32,8 @@
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/laplace_sample.hpp>
 #include <stan/services/optimize/newton.hpp>
+#include <stan/services/pathfinder/multi.hpp>
+#include <stan/services/pathfinder/single.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
@@ -266,14 +268,25 @@ int command(int argc, const char *argv[]) {
                                         sample_file, parser, model);
     diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
                                               diagnostic_file, parser, model);
+  } else if (user_method->arg("pathfinder")) {
+    sample_writer = initialize_writer(sig_figs, true,
+                                      sample_file, parser, model);
+    diagnostic_writer = initialize_writer(sig_figs, false,
+                                          diagnostic_file, parser, model);
+    int num_paths
+        = get_arg_val<int_argument>(parser, "method", "pathfinder", "num_paths");
+    if (num_paths > 1) {
+      sample_writers = initialize_writers(num_paths, id, sig_figs, true,
+                                          sample_file, parser, model);
+      diagnostic_writers = initialize_writers(num_paths, id, sig_figs, false,
+                                              diagnostic_file, parser, model);
+    }
   } else {
     sample_writer = initialize_writer(sig_figs, true,
                                       sample_file, parser, model);
     diagnostic_writer = initialize_writer(sig_figs, false,
                                           diagnostic_file, parser, model);
   }
-  
-
   std::cout << " i/o initialized, num_chains == " << num_chains << std::endl;
 
   //////////////////////////////////////////////////
@@ -456,6 +469,53 @@ int command(int argc, const char *argv[]) {
       }
     }
     // ---- optimize end ---- //
+  } else if (user_method->arg("pathfinder")) {
+    // ---- pathfinder start ---- //
+    auto pathfinder_arg = parser.arg("method")->arg("pathfinder");
+    int history_size
+        = get_arg_val<int_argument>(*pathfinder_arg, "history_size");
+    double init_alpha
+        = get_arg_val<real_argument>(*pathfinder_arg, "init_alpha");
+    double tol_obj = get_arg_val<real_argument>(*pathfinder_arg, "tol_obj");
+    double tol_rel_obj
+        = get_arg_val<real_argument>(*pathfinder_arg, "tol_rel_obj");
+    double tol_grad = get_arg_val<real_argument>(*pathfinder_arg, "tol_grad");
+    double tol_rel_grad
+        = get_arg_val<real_argument>(*pathfinder_arg, "tol_rel_grad");
+    double tol_param
+        = get_arg_val<real_argument>(*pathfinder_arg, "tol_param");
+    int max_lbfgs_iters
+        = get_arg_val<int_argument>(*pathfinder_arg, "max_lbfgs_iters");
+    bool save_iterations
+        = get_arg_val<bool_argument>(*pathfinder_arg, "save_iterations");
+    int num_elbo_draws
+        = get_arg_val<int_argument>(*pathfinder_arg, "num_elbo_draws");
+    int num_draws
+        = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
+    int num_psis_draws
+        = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
+    int num_paths
+        = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
+    if (num_paths  == 1) {
+        return_code
+            = stan::services::pathfinder::pathfinder_lbfgs_single<false, stan::model::model_base>(
+                model, *(init_contexts[0]), random_seed, id, init_radius,
+                history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+                tol_rel_grad, tol_param, max_lbfgs_iters, false,
+                refresh, interrupt, num_elbo_draws, num_draws,
+                logger, init_writer, sample_writer, diagnostic_writer);
+    } else {
+        return_code
+            = stan::services::pathfinder::pathfinder_lbfgs_multi<stan::model::model_base>(
+                model, init_contexts, random_seed, id, init_radius,
+                history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+                tol_rel_grad, tol_param, max_lbfgs_iters, true,
+                refresh, interrupt, num_elbo_draws, num_draws,
+                num_psis_draws, num_paths, logger, init_writers,
+                sample_writers, diagnostic_writers,
+                sample_writer, diagnostic_writer);
+    }
+    // ---- pathfinder end ---- //
   } else if (user_method->arg("sample")) {
     // ---- sample start ---- //
     auto sample_arg = parser.arg("method")->arg("sample");
