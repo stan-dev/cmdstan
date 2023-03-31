@@ -182,7 +182,31 @@ int command(int argc, const char *argv[]) {
   write_opencl_device(info);
   info();
 
-  //  common config
+  //////////////////////////////////////////////////
+  //            Instantiate model                 //
+  //////////////////////////////////////////////////
+  arg_seed *random_arg
+      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
+  unsigned int random_seed = random_arg->random_value();
+  std::cout << "random seed" << random_seed << std::endl;
+
+  std::string data_file = get_arg_val<string_argument>(parser, "data", "file");
+  std::shared_ptr<stan::io::var_context> var_context
+      = get_var_context(data_file);
+  stan::model::model_base &model
+      = new_model(*var_context, random_seed, &std::cout);
+
+  std::vector<std::string> model_compile_info = model.model_compile_info();
+  info(model_compile_info);
+
+  //////////////////////////////////////////////////
+  //            I/O config                        //
+  //////////////////////////////////////////////////
+  if (user_method->arg("pathfinder")) {
+    int num_paths = get_arg_val<int_argument>(parser, "method", "pathfinder",
+                                              "num_paths");
+    num_chains = num_paths;
+  }
   std::string init = get_arg_val<string_argument>(parser, "init");
   double init_radius = 2.0;
   try {
@@ -226,26 +250,6 @@ int command(int argc, const char *argv[]) {
     }
   }
 
-  //////////////////////////////////////////////////
-  //            Instantiate model                 //
-  //////////////////////////////////////////////////
-  arg_seed *random_arg
-      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
-  unsigned int random_seed = random_arg->random_value();
-  std::cout << "random seed" << random_seed << std::endl;
-
-  std::string data_file = get_arg_val<string_argument>(parser, "data", "file");
-  std::shared_ptr<stan::io::var_context> var_context
-      = get_var_context(data_file);
-  stan::model::model_base &model
-      = new_model(*var_context, random_seed, &std::cout);
-
-  std::vector<std::string> model_compile_info = model.model_compile_info();
-  info(model_compile_info);
-
-  std::cout << "compiled model" << model_compile_info[0] << std::endl;
-
-  // callbacks
   stan::callbacks::interrupt interrupt;
   stan::callbacks::writer init_writer;  // output never exposed by CmdStan
   std::vector<stan::callbacks::writer> init_writers{num_chains,
@@ -273,12 +277,10 @@ int command(int argc, const char *argv[]) {
         = initialize_writer(sig_figs, true, sample_file, parser, model);
     diagnostic_writer
         = initialize_writer(sig_figs, false, diagnostic_file, parser, model);
-    int num_paths = get_arg_val<int_argument>(parser, "method", "pathfinder",
-                                              "num_paths");
-    if (num_paths > 1) {
-      sample_writers = initialize_writers(num_paths, id, sig_figs, true,
+    if (num_chains > 1) {
+      sample_writers = initialize_writers(num_chains, id, sig_figs, true,
                                           sample_file, parser, model);
-      diagnostic_writers = initialize_writers(num_paths, id, sig_figs, false,
+      diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
                                               diagnostic_file, parser, model);
     }
   } else {
@@ -287,7 +289,6 @@ int command(int argc, const char *argv[]) {
     diagnostic_writer
         = initialize_writer(sig_figs, false, diagnostic_file, parser, model);
   }
-  std::cout << " i/o initialized, num_chains == " << num_chains << std::endl;
 
   //////////////////////////////////////////////////
   //            Invoke Services                   //
@@ -498,16 +499,16 @@ int command(int argc, const char *argv[]) {
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
-          tol_rel_grad, tol_param, max_lbfgs_iters, false, refresh, interrupt,
-          num_elbo_draws, num_draws, logger, init_writer, sample_writer,
+          tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
+          false, refresh, interrupt, logger, init_writer, sample_writer,
           diagnostic_writer);
     } else {
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
           stan::model::model_base>(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-          max_lbfgs_iters, true, refresh, interrupt, num_elbo_draws, num_draws,
-          num_psis_draws, num_paths, logger, init_writers, sample_writers,
+          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
+          true, refresh, interrupt, logger, init_writers, sample_writers,
           diagnostic_writers, sample_writer, diagnostic_writer);
     }
     // ---- pathfinder end ---- //
