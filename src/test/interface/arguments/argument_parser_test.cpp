@@ -98,8 +98,8 @@ TEST_F(CmdStanArgumentsArgumentParser, find_args) {
   std::string out;
   std::getline(err_stream,
                out);  // skip "tol_grad=1e-20 is either mistyped or misplaced."
-  std::getline(err_stream, out);  // skip "Perhaps you meant one of the following valid
-                         // configurations?"
+  std::getline(err_stream, out);  // skip "Perhaps you meant one of the
+                                  // following valid configurations?"
 
   std::getline(err_stream, out);  // first suggestion
   check_suggestion(out);
