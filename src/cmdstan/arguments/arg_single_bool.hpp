@@ -11,7 +11,8 @@ namespace cmdstan {
 
 class arg_single_bool : public bool_argument {
  public:
-  arg_single_bool(const char* name, const char* desc, bool def) : bool_argument() {
+  arg_single_bool(const char* name, const char* desc, bool def)
+      : bool_argument() {
     _name = name;
     _description = desc;
     _validity = "[0, 1]";

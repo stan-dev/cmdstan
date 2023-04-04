@@ -11,7 +11,8 @@ namespace cmdstan {
 
 class arg_single_int_pos : public int_argument {
  public:
-  arg_single_int_pos(const char* name, const char* desc, int def) : int_argument() {
+  arg_single_int_pos(const char* name, const char* desc, int def)
+      : int_argument() {
     _name = name;
     _description = desc;
     _validity = std::string("0 < ").append(name);

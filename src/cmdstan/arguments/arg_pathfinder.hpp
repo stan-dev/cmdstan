@@ -14,30 +14,19 @@ class arg_pathfinder : public arg_lbfgs {
     _name = "pathfinder";
     _description = "Pathfinder algorithm";
 
+    _subarguments.push_back(new arg_single_int_pos(
+        "num_psis_draws", "Number of draws from PSIS sample", 2000));
     _subarguments.push_back(
-        new arg_single_int_pos("num_psis_draws",
-                         "Number of draws from PSIS sample",
-                         2000));
-    _subarguments.push_back(
-        new arg_single_int_pos("num_paths",
-                         "Number of single pathfinders",
-                         4));
-    _subarguments.push_back(
-        new arg_single_int_pos("max_lbfgs_iters",
-                         "Maximum number of LBFGS iterations",
-                         2000));
-    _subarguments.push_back(
-        new arg_single_int_pos("num_draws",
-                         "Number of approximate posterior draws",
-                         2000));
-    _subarguments.push_back(
-        new arg_single_int_pos("num_elbo_draws",
-                         "Number of Monte Carlo draws to evaluate ELBO",
-                         25));
-    _subarguments.push_back(
-        new arg_single_bool("save_iterations",
-                            "Save per-path pathfinder iterations to separate files?",
-                         false));
+        new arg_single_int_pos("num_paths", "Number of single pathfinders", 4));
+    _subarguments.push_back(new arg_single_int_pos(
+        "max_lbfgs_iters", "Maximum number of LBFGS iterations", 2000));
+    _subarguments.push_back(new arg_single_int_pos(
+        "num_draws", "Number of approximate posterior draws", 2000));
+    _subarguments.push_back(new arg_single_int_pos(
+        "num_elbo_draws", "Number of Monte Carlo draws to evaluate ELBO", 25));
+    _subarguments.push_back(new arg_single_bool(
+        "save_iterations",
+        "Save per-path pathfinder iterations to separate files?", false));
   }
 };
 
