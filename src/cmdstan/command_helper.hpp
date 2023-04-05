@@ -830,8 +830,7 @@ bool allow_multichain(argument_parser &parser) {
         = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
     list_argument *metric
         = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-    if (adapt_engaged && engine->value() == "nuts"
-        && metric->value() != "unit")
+    if (adapt_engaged && engine->value() == "nuts" && metric->value() != "unit")
       return true;
   }
   return false;
@@ -857,12 +856,11 @@ unsigned int get_num_chains(argument_parser &parser) {
   unsigned int num_chains
       = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
   if (num_chains > 1 && !allow_multichain(parser))
-      throw std::invalid_argument(
-          "Argument 'num_chains' can currently only be used for NUTS with "
-          "adaptation and dense_e or diag_e metric");
+    throw std::invalid_argument(
+        "Argument 'num_chains' can currently only be used for NUTS with "
+        "adaptation and dense_e or diag_e metric");
   return num_chains;
 }
-
 
 /**
  * Check possible name conflicts between input and output files where both
@@ -870,7 +868,7 @@ unsigned int get_num_chains(argument_parser &parser) {
  *
  * @param parser user config
  */
-void check_file_config(argument_parser & parser) {
+void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
   std::string input_file;
