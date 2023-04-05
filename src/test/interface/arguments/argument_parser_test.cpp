@@ -38,13 +38,22 @@ class CmdStanArgumentsArgumentParser : public testing::Test {
     delete (parser);
   }
 
+  /**
+   * Given a sugestion from the parser, massage it into
+   * a form that looks like a command line input `argv`
+   * and then parse it and assert suggestion is accepted.
+   *
+   * Currently, this only replaces the `"<type>"` field
+   * which can occur in a suggestion with a value for
+   * double arguments, but it could be easily extended.
+   */
   void check_suggestion(std::string suggestion) {
     boost::trim(suggestion);
     boost::replace_first(suggestion, "<double>",
                          "1e-20");  // replace type with value
     std::vector<std::string> args;
     boost::split(args, suggestion, boost::is_any_of(" "));
-    args.insert(args.begin(), "foo");  // add model name
+    args.insert(args.begin(), "mymodel");  // add model name
 
     // convert to char** for parse_args
     char const **argv_sug = new const char *[args.size()];
