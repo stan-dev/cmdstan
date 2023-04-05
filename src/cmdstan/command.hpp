@@ -119,50 +119,9 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  std::stringstream msg;
-  int num_threads = get_arg_val<int_argument>(parser, "num_threads");
-  // Need to make sure these two ways to set thread # match.
-  int env_threads = stan::math::internal::get_num_threads();
-  if (env_threads != num_threads) {
-    if (env_threads != 1) {
-      msg << "STAN_NUM_THREADS= " << env_threads
-          << " but argument num_threads= " << num_threads
-          << ". Please either only set one or make sure they are equal.";
-      throw std::invalid_argument(msg.str());
-    }
-  }
-  stan::math::init_threadpool_tbb(num_threads);
-
-  bool is_multichain = false;  // true if nuts_hmc, adaptation diag/dense metric
-  unsigned int num_chains = 1;
-  auto user_method = parser.arg("method");
-  if (user_method->arg("sample")) {
-    num_chains
-        = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-    auto sample_arg = parser.arg("method")->arg("sample");
-    categorical_argument *adapt
-        = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
-    bool adapt_engaged
-        = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-    list_argument *algo
-        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-    if (algo->value() == "hmc") {
-      list_argument *engine
-          = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-      list_argument *metric
-          = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-      // only run multichain for nuts_hmc, adapt_engaged, diag or dense metric
-      if (adapt_engaged && engine->value() == "nuts"
-          && metric->value() != "unit") {
-        is_multichain = true;
-      }
-    }
-  }
-  if (!is_multichain && num_chains > 1)
-    throw std::invalid_argument(
-        "Argument 'num_chains' can currently only be used for NUTS with "
-        "adaptation and dense_e or diag_e metric");
-
+  //////////////////////////////////////////////////
+  // Config checks
+  //////////////////////////////////////////////////
 #ifdef STAN_OPENCL
   int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
   int opencl_platform_id
@@ -177,36 +136,22 @@ int command(int argc, const char *argv[]) {
   }
 #endif
 
-  parser.print(info);
-  write_parallel_info(info);
-  write_opencl_device(info);
-  info();
-
-  //////////////////////////////////////////////////
-  //            Instantiate model                 //
-  //////////////////////////////////////////////////
-  arg_seed *random_arg
-      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
-  unsigned int random_seed = random_arg->random_value();
-  std::cout << "random seed" << random_seed << std::endl;
-
-  std::string data_file = get_arg_val<string_argument>(parser, "data", "file");
-  std::shared_ptr<stan::io::var_context> var_context
-      = get_var_context(data_file);
-  stan::model::model_base &model
-      = new_model(*var_context, random_seed, &std::cout);
-
-  std::vector<std::string> model_compile_info = model.model_compile_info();
-  info(model_compile_info);
-
-  //////////////////////////////////////////////////
-  //            I/O config                        //
-  //////////////////////////////////////////////////
-  if (user_method->arg("pathfinder")) {
-    int num_paths = get_arg_val<int_argument>(parser, "method", "pathfinder",
-                                              "num_paths");
-    num_chains = num_paths;
+  int num_threads = get_arg_val<int_argument>(parser, "num_threads");
+  // Need to make sure these two ways to set thread # match.
+  int env_threads = stan::math::internal::get_num_threads();
+  if (env_threads != num_threads) {
+    if (env_threads != 1) {
+      std::stringstream msg;
+      msg << "STAN_NUM_THREADS= " << env_threads
+          << " but argument num_threads= " << num_threads
+          << ". Please either only set one or make sure they are equal.";
+      throw std::invalid_argument(msg.str());
+    }
   }
+  stan::math::init_threadpool_tbb(num_threads);
+
+  check_file_config(parser);
+  unsigned int num_chains = get_num_chains(parser);
   std::string init = get_arg_val<string_argument>(parser, "init");
   double init_radius = 2.0;
   try {
@@ -216,63 +161,43 @@ int command(int argc, const char *argv[]) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
+  
+  //////////////////////////////////////////////////
+  // Instantiate model given data
+  //////////////////////////////////////////////////
+  arg_seed *random_arg
+      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
+  unsigned int random_seed = random_arg->random_value();
+  std::string data_file = get_arg_val<string_argument>(parser, "data", "file");
+  std::shared_ptr<stan::io::var_context> var_context
+      = get_var_context(data_file);
+  stan::model::model_base &model
+      = new_model(*var_context, random_seed, &std::cout);
 
+  //////////////////////////////////////////////////
+  // Configure callbacks
+  //////////////////////////////////////////////////
+  int id = get_arg_val<int_argument>(parser, "id");
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
-  std::string input_file;
-  if (user_method->arg("generate_quantities")) {
-    input_file = get_arg_val<string_argument>(
-        parser, "method", "generate_quantities", "fitted_params");
-    if (input_file.empty()) {
-      throw std::invalid_argument(
-          std::string("Argument fitted_params file - found empty string, "
-                      "expecting filename."));
-      if (input_file.compare(sample_file) == 0) {
-        msg << "Filename conflict, fitted_params file " << input_file
-            << " and output file names are identical, must be different."
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
-    }
-  } else if (user_method->arg("laplace")) {
-    input_file
-        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
-    if (input_file.empty()) {
-      throw std::invalid_argument(
-          std::string("Argument mode file - found empty string, "
-                      "expecting filename."));
-      if (input_file.compare(sample_file) == 0) {
-        msg << "Filename conflict, parameter modes file " << input_file
-            << " and output file names are identical, must be different."
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
-    }
-  }
-
-  stan::callbacks::interrupt interrupt;
-  stan::callbacks::writer init_writer;  // output never exposed by CmdStan
-  std::vector<stan::callbacks::writer> init_writers{num_chains,
-                                                    stan::callbacks::writer{}};
-
-  int id = get_arg_val<int_argument>(parser, "id");
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
 
+  stan::callbacks::interrupt interrupt;
+  stan::callbacks::writer init_writer;
+  std::vector<stan::callbacks::writer> init_writers{num_chains,
+        stan::callbacks::writer{}};
+  stan::callbacks::unique_stream_writer<std::fstream> sample_writer;
   std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
       sample_writers;
+  stan::callbacks::unique_stream_writer<std::fstream> diagnostic_writer;
   std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
       diagnostic_writers;
-  stan::callbacks::unique_stream_writer<std::fstream> sample_writer;
-  stan::callbacks::unique_stream_writer<std::fstream> diagnostic_writer;
-  if (is_multichain) {
-    sample_writers = initialize_writers(num_chains, id, sig_figs, true,
-                                        sample_file, parser, model);
-    diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
-                                            diagnostic_file, parser, model);
-  } else if (user_method->arg("pathfinder")) {
+
+  auto user_method = parser.arg("method");
+  if (user_method->arg("pathfinder")) {
     sample_writer
         = initialize_writer(sig_figs, true, sample_file, parser, model);
     diagnostic_writer
@@ -283,12 +208,24 @@ int command(int argc, const char *argv[]) {
       diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
                                               diagnostic_file, parser, model);
     }
+  } else if (allow_multichain(parser)) {
+    sample_writers = initialize_writers(num_chains, id, sig_figs, true,
+                                        sample_file, parser, model);
+    diagnostic_writers = initialize_writers(num_chains, id, sig_figs, false,
+                                            diagnostic_file, parser, model);
   } else {
     sample_writer
         = initialize_writer(sig_figs, true, sample_file, parser, model);
     diagnostic_writer
         = initialize_writer(sig_figs, false, diagnostic_file, parser, model);
   }
+
+  parser.print(info);
+  write_parallel_info(info);
+  write_opencl_device(info);
+  std::vector<std::string> model_compile_info = model.model_compile_info();
+  info(model_compile_info);
+  info();
 
   //////////////////////////////////////////////////
   //            Invoke Services                   //
@@ -300,8 +237,9 @@ int command(int argc, const char *argv[]) {
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
+      std::stringstream msg;
       msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
+          "without fitted sample.";
       throw std::invalid_argument(msg.str());
     }
     std::vector<std::string> param_names = get_constrained_param_names(model);
@@ -318,8 +256,9 @@ int command(int argc, const char *argv[]) {
     auto laplace_arg = parser.arg("method")->arg("laplace");
     std::string fname = get_arg_val<string_argument>(*laplace_arg, "mode");
     if (fname.empty()) {
+      std::stringstream msg;
       msg << "Missing mode argument, cannot get laplace sample "
-             "without parameter estimates theta-hat";
+          "without parameter estimates theta-hat";
       throw std::invalid_argument(msg.str());
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
@@ -344,11 +283,13 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<string_argument>(*log_prob_arg, "constrained_params");
     bool jacobian = get_arg_val<bool_argument>(*log_prob_arg, "jacobian");
     if (upars_file.length() == 0 && cpars_file.length() == 0) {
+      std::stringstream msg;
       msg << "No input parameter files provided, "
           << "cannot calculate log probability density.";
       throw std::invalid_argument(msg.str());
     }
     if (upars_file.length() > 0 && cpars_file.length() > 0) {
+      std::stringstream msg;
       msg << "Cannot specify both input files of both "
           << "constrained and unconstrained parameter values.";
       throw std::invalid_argument(msg.str());
@@ -496,24 +437,26 @@ int command(int argc, const char *argv[]) {
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
     if (num_paths == 1) {
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
-          false, stan::model::model_base>(
-          model, *(init_contexts[0]), random_seed, id, init_radius,
-          history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
-          tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
-          false, refresh, interrupt, logger, init_writer, sample_writer,
-          diagnostic_writer);
+        false, stan::model::model_base>(
+            model, *(init_contexts[0]), random_seed, id, init_radius,
+            history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+            tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
+            false, refresh, interrupt, logger, init_writer, sample_writer,
+            diagnostic_writer);
     } else {
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
-          stan::model::model_base>(
-          model, init_contexts, random_seed, id, init_radius, history_size,
-          init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
-          true, refresh, interrupt, logger, init_writers, sample_writers,
-          diagnostic_writers, sample_writer, diagnostic_writer);
+        stan::model::model_base>(
+            model, init_contexts, random_seed, id, init_radius, history_size,
+            init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+            max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
+            true, refresh, interrupt, logger, init_writers, sample_writers,
+            diagnostic_writers, sample_writer, diagnostic_writer);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("sample")) {
     // ---- sample start ---- //
+    parser.print(info);
+    
     auto sample_arg = parser.arg("method")->arg("sample");
     int num_warmup
         = get_arg_val<int_argument>(parser, "method", "sample", "num_warmup");
@@ -561,7 +504,7 @@ int command(int argc, const char *argv[]) {
       bool metric_supplied = !metric_file->is_default();
       std::string metric_filename(
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
-              ->value());
+          ->value());
       context_vector metric_contexts
           = get_vec_var_context(metric_filename, num_chains);
       categorical_argument *adapt
@@ -580,10 +523,10 @@ int command(int argc, const char *argv[]) {
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == false && metric_supplied == false) {
         int max_depth = dynamic_cast<int_argument *>(
-                            dynamic_cast<categorical_argument *>(
-                                algo->arg("hmc")->arg("engine")->arg("nuts"))
-                                ->arg("max_depth"))
-                            ->value();
+            dynamic_cast<categorical_argument *>(
+                algo->arg("hmc")->arg("engine")->arg("nuts"))
+            ->arg("max_depth"))
+                        ->value();
         return_code = stan::services::sample::hmc_nuts_dense_e(
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
@@ -592,10 +535,10 @@ int command(int argc, const char *argv[]) {
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == false && metric_supplied == true) {
         int max_depth = dynamic_cast<int_argument *>(
-                            dynamic_cast<categorical_argument *>(
-                                algo->arg("hmc")->arg("engine")->arg("nuts"))
-                                ->arg("max_depth"))
-                            ->value();
+            dynamic_cast<categorical_argument *>(
+                algo->arg("hmc")->arg("engine")->arg("nuts"))
+            ->arg("max_depth"))
+                        ->value();
         return_code = stan::services::sample::hmc_nuts_dense_e(
             model, *(init_contexts[0]), *(metric_contexts[0]), random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
@@ -604,10 +547,10 @@ int command(int argc, const char *argv[]) {
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == false) {
         int max_depth = dynamic_cast<int_argument *>(
-                            dynamic_cast<categorical_argument *>(
-                                algo->arg("hmc")->arg("engine")->arg("nuts"))
-                                ->arg("max_depth"))
-                            ->value();
+            dynamic_cast<categorical_argument *>(
+                algo->arg("hmc")->arg("engine")->arg("nuts"))
+            ->arg("max_depth"))
+                        ->value();
         double delta
             = dynamic_cast<real_argument *>(adapt->arg("delta"))->value();
         double gamma
@@ -617,10 +560,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
@@ -632,10 +575,10 @@ int command(int argc, const char *argv[]) {
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == true) {
         int max_depth = dynamic_cast<int_argument *>(
-                            dynamic_cast<categorical_argument *>(
-                                algo->arg("hmc")->arg("engine")->arg("nuts"))
-                                ->arg("max_depth"))
-                            ->value();
+            dynamic_cast<categorical_argument *>(
+                algo->arg("hmc")->arg("engine")->arg("nuts"))
+            ->arg("max_depth"))
+                        ->value();
         double delta
             = dynamic_cast<real_argument *>(adapt->arg("delta"))->value();
         double gamma
@@ -645,10 +588,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
@@ -694,10 +637,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
@@ -721,10 +664,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
@@ -799,10 +742,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_static_dense_e_adapt(
@@ -826,10 +769,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_static_dense_e_adapt(
@@ -875,10 +818,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_static_diag_e_adapt(
@@ -902,10 +845,10 @@ int command(int argc, const char *argv[]) {
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         unsigned int init_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("init_buffer"))
-                  ->value();
+            ->value();
         unsigned int term_buffer
             = dynamic_cast<u_int_argument *>(adapt->arg("term_buffer"))
-                  ->value();
+            ->value();
         unsigned int window
             = dynamic_cast<u_int_argument *>(adapt->arg("window"))->value();
         return_code = stan::services::sample::hmc_static_diag_e_adapt(
@@ -952,41 +895,41 @@ int command(int argc, const char *argv[]) {
         parser.arg("method")->arg("variational")->arg("algorithm"));
     int grad_samples
         = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("grad_samples"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("grad_samples"))
+        ->value();
     int elbo_samples
         = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("elbo_samples"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("elbo_samples"))
+        ->value();
     int max_iterations
         = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("iter"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("iter"))
+        ->value();
     double tol_rel_obj
         = dynamic_cast<real_argument *>(
-              parser.arg("method")->arg("variational")->arg("tol_rel_obj"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("tol_rel_obj"))
+        ->value();
     double eta = dynamic_cast<real_argument *>(
-                     parser.arg("method")->arg("variational")->arg("eta"))
-                     ->value();
+        parser.arg("method")->arg("variational")->arg("eta"))
+                 ->value();
     bool adapt_engaged = dynamic_cast<bool_argument *>(parser.arg("method")
-                                                           ->arg("variational")
-                                                           ->arg("adapt")
-                                                           ->arg("engaged"))
-                             ->value();
+                                                       ->arg("variational")
+                                                       ->arg("adapt")
+                                                       ->arg("engaged"))
+                         ->value();
     int adapt_iterations = dynamic_cast<int_argument *>(parser.arg("method")
-                                                            ->arg("variational")
-                                                            ->arg("adapt")
-                                                            ->arg("iter"))
-                               ->value();
+                                                        ->arg("variational")
+                                                        ->arg("adapt")
+                                                        ->arg("iter"))
+                           ->value();
     int eval_elbo
         = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("eval_elbo"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("eval_elbo"))
+        ->value();
     int output_samples
         = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("output_samples"))
-              ->value();
+            parser.arg("method")->arg("variational")->arg("output_samples"))
+        ->value();
     if (algo->value() == "fullrank") {
       return_code = stan::services::experimental::advi::fullrank(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -1008,10 +951,11 @@ int command(int argc, const char *argv[]) {
   if (profile_data.size() > 0) {
     std::string profile_file_name
         = dynamic_cast<string_argument *>(
-              parser.arg("output")->arg("profile_file"))
-              ->value();
+            parser.arg("output")->arg("profile_file"))
+        ->value();
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
-    profile_stream << std::setprecision(sig_figs);
+    if (sig_figs > 0)
+      profile_stream << std::setprecision(sig_figs);
     write_profiling(profile_stream, profile_data);
     profile_stream.close();
   }
