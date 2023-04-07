@@ -658,18 +658,17 @@ std::vector<std::vector<double>> get_cparams_r(
  */
 void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
                             std::vector<std::vector<double>> &params_set,
-                            int sig_figs, std::ostream &output_stream) {
+                            int sig_figs, stan::callbacks::writer &writer) {
   // header row
-  output_stream << std::setprecision(sig_figs) << "lp__,";
   std::vector<std::string> p_names;
   model.unconstrained_param_names(p_names, false, false);
-  for (size_t i = 0; i < p_names.size(); ++i) {
-    output_stream << "g_" << p_names[i];
-    if (i == p_names.size() - 1)
-      output_stream << "\n";
-    else
-      output_stream << ",";
-  }
+  std::vector<std::string> g_names;
+  g_names.emplace_back("lp__");
+  for (size_t i = 0; i < p_names.size(); ++i)
+    g_names.emplace_back(std::string("g_").append(p_names[i]));
+  writer(g_names);
+
+
   // data row(s)
   std::vector<int> dummy_params_i;
   double lp;
@@ -682,10 +681,8 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
       lp = stan::model::log_prob_grad<true, false>(model, params,
                                                    dummy_params_i, gradients);
     }
-    output_stream << lp << ",";
-    std::copy(gradients.begin(), gradients.end() - 1,
-              std::ostream_iterator<double>(output_stream, ","));
-    output_stream << gradients.back() << "\n";
+    gradients.insert(gradients.begin(), lp);
+    writer(gradients);
   }
 }
 

@@ -312,7 +312,7 @@ int command(int argc, const char *argv[]) {
     }
     try {
       services_log_prob_grad(model, jacobian, params_r_ind, sig_figs,
-                             sample_writer.get_stream());
+                             sample_writer);
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
       return_code = return_codes::NOT_OK;
