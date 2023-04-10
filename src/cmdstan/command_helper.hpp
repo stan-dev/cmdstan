@@ -722,84 +722,17 @@ void write_diagnostic_header(argument_parser &parser,
 }
 
 /**
- * Instantiate callback writer, write header.
- * Safely construct null writer if no output file specified.
+ * Instantiate unique_ptr to output stream, set precision as needed.
  *
  * @param sig_figs floating point precision
- * @param is_sample - true when file is sample output file
  * @param filename output filename
- * @param parser user config
- * @param model instantiated model
- * @return stream writer
  */
-stan::callbacks::unique_stream_writer<std::fstream> initialize_writer(
-    int sig_figs, bool is_sample, const std::string &filename,
-    argument_parser &parser, const stan::model::model_base &model) {
-  if (filename.empty()) {
-    return stan::callbacks::unique_stream_writer<std::fstream>(nullptr, "");
-  }
-  auto unique_fstream
-      = std::make_unique<std::fstream>(filename.c_str(), std::fstream::out);
+std::unique_ptr<std::fstream>
+get_unique_ptr(int sig_figs, const std::string &filename) {
+  std::unique_ptr<std::fstream> fstream(new std::fstream(filename, std::fstream::out));
   if (sig_figs > 0)
-    (*unique_fstream.get()) << std::setprecision(sig_figs);
-  stan::callbacks::unique_stream_writer<std::fstream> writer(
-      std::move(unique_fstream), "# ");
-  if (is_sample)
-    write_sample_header(parser, model, writer);
-  else
-    write_diagnostic_header(parser, model, writer);
-  return writer;
-}
-
-/**
- * Instantiate vector of callback writers, write header.
- * Uses num_chains and id to create unique filenames.
- * Safely construct null writer if no output file specified.
- *
- * @param num_chains number of output writers to create
- * @param id user-specified id
- * @param sig_figs floating point precision
- * @param is_sample - true when file is sample output file
- * @param filename output filename
- * @param parser user config
- * @param model instantiated model
- * @return vector of unique stream writers
- */
-std::vector<stan::callbacks::unique_stream_writer<std::fstream>>
-initialize_writers(int num_chains, int id, int sig_figs, bool is_sample,
-                   const std::string &filename, argument_parser &parser,
-                   const stan::model::model_base &model) {
-  std::vector<stan::callbacks::unique_stream_writer<std::fstream>> writers;
-  writers.reserve(num_chains);
-  if (filename.empty()) {
-    for (int i = 0; i < num_chains; ++i) {
-      writers.emplace_back(nullptr, "");
-    }
-    return writers;
-  }
-  auto name_iterator = [num_chains, id](auto i) {
-    if (num_chains == 1) {
-      return std::string("");
-    } else {
-      return std::string("_" + std::to_string(i + id));
-    }
-  };
-  std::string name;
-  std::string suffix;
-  get_basename_suffix(filename, name, suffix);
-  for (int i = 0; i < num_chains; ++i) {
-    auto unique_filename = name + name_iterator(i) + suffix;
-    auto unique_fstream
-        = std::make_unique<std::fstream>(unique_filename, std::fstream::out);
-    if (sig_figs > 0)
-      (*unique_fstream.get()) << std::setprecision(sig_figs);
-    writers.emplace_back(std::move(unique_fstream), "# ");
-    if (is_sample)
-      write_sample_header(parser, model, writers[i]);
-    else
-      write_diagnostic_header(parser, model, writers[i]);
-  }
-  return writers;
+    (*fstream.get()) << std::setprecision(sig_figs);
+  return fstream;
 }
 
 /**
@@ -858,7 +791,7 @@ unsigned int get_num_chains(argument_parser &parser) {
         "adaptation and dense_e or diag_e metric");
   return num_chains;
 }
-
+ 
 /**
  * Check possible name conflicts between input and output files where both
  * are in Stan CSV format; if conflicts detected, quit with an error message.
