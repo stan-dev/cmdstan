@@ -726,9 +726,10 @@ void write_diagnostic_header(argument_parser &parser,
  * @param sig_figs floating point precision
  * @param filename output filename
  */
-std::unique_ptr<std::fstream>
-get_unique_ptr(int sig_figs, const std::string &filename) {
-  std::unique_ptr<std::fstream> fstream(new std::fstream(filename, std::fstream::out));
+std::unique_ptr<std::fstream> get_unique_ptr(int sig_figs,
+                                             const std::string &filename) {
+  std::unique_ptr<std::fstream> fstream(
+      new std::fstream(filename, std::fstream::out));
   if (sig_figs > 0)
     (*fstream.get()) << std::setprecision(sig_figs);
   return fstream;
@@ -790,7 +791,7 @@ unsigned int get_num_chains(argument_parser &parser) {
         "adaptation and dense_e or diag_e metric");
   return num_chains;
 }
- 
+
 /**
  * Check possible name conflicts between input and output files where both
  * are in Stan CSV format; if conflicts detected, quit with an error message.
