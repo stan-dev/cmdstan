@@ -668,7 +668,6 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
     g_names.emplace_back(std::string("g_").append(p_names[i]));
   writer(g_names);
 
-
   // data row(s)
   std::vector<int> dummy_params_i;
   double lp;
