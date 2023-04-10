@@ -216,7 +216,8 @@ int command(int argc, const char *argv[]) {
                                 "# ");
     write_sample_header(parser, model, sample_writers[i]);
   }
-  if (num_chains == 1) sample_writer = sample_writers[0];
+  if (num_chains == 1)
+    sample_writer = sample_writers[0];
   if (!diagnostic_file.empty()) {
     diagnostic_writers.reserve(num_chains);
     get_basename_suffix(diagnostic_file, name, suffix);
@@ -226,7 +227,8 @@ int command(int argc, const char *argv[]) {
                                       "# ");
       write_diagnostic_header(parser, model, diagnostic_writers[i]);
     }
-    if (num_chains == 1) diagnostic_writer = diagnostic_writers[0];
+    if (num_chains == 1)
+      diagnostic_writer = diagnostic_writers[0];
   }
 
   parser.print(info);
@@ -464,21 +466,22 @@ int command(int argc, const char *argv[]) {
       write_sample_header(parser, model, pathfinder_writer);
       if (diagnostic_file.empty())
         return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
-          stan::model::model_base>(
-              model, init_contexts, random_seed, id, init_radius, history_size,
-              init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-              max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
-              true, refresh, interrupt, logger, init_writers, sample_writers,
-              noop_writers, pathfinder_writer, noop_writers[0]);
+            stan::model::model_base>(
+            model, init_contexts, random_seed, id, init_radius, history_size,
+            init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+            max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
+            num_paths, true, refresh, interrupt, logger, init_writers,
+            sample_writers, noop_writers, pathfinder_writer, noop_writers[0]);
       else
         // instantiate us some better diagnostic writers
         return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
-          stan::model::model_base>(
-              model, init_contexts, random_seed, id, init_radius, history_size,
-              init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-              max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
-              true, refresh, interrupt, logger, init_writers, sample_writers,
-              diagnostic_writers, pathfinder_writer, noop_writers[0]);
+            stan::model::model_base>(
+            model, init_contexts, random_seed, id, init_radius, history_size,
+            init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+            max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
+            num_paths, true, refresh, interrupt, logger, init_writers,
+            sample_writers, diagnostic_writers, pathfinder_writer,
+            noop_writers[0]);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("sample")) {
@@ -804,8 +807,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, int_time, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writer,
-            sample_writer, diagnostic_writer);
+            term_buffer, window, interrupt, logger, init_writer, sample_writer,
+            diagnostic_writer);
       } else if (engine->value() == "static" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -880,8 +883,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, int_time, delta, gamma, kappa, t0, init_buffer,
-            term_buffer, window, interrupt, logger, init_writer,
-            sample_writer, diagnostic_writer);
+            term_buffer, window, interrupt, logger, init_writer, sample_writer,
+            diagnostic_writer);
       } else if (engine->value() == "static" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
