@@ -117,7 +117,7 @@ class list_argument : public valued_argument {
 
     for (std::vector<argument *>::iterator it = _values.begin();
          it != _values.end(); ++it) {
-      std::string value_prefix = prefix + _name + "=" + (*it)->name() + " ";
+      std::string value_prefix = prefix + _name + "=";
       (*it)->find_arg(name, value_prefix, valid_paths);
     }
   }
