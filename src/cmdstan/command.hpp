@@ -23,10 +23,11 @@
 #include <cmdstan/write_stan.hpp>
 #include <cmdstan/write_stan_flags.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/ends_with.hpp>
@@ -41,6 +42,8 @@
 #include <stan/services/optimize/lbfgs.hpp>
 #include <stan/services/optimize/laplace_sample.hpp>
 #include <stan/services/optimize/newton.hpp>
+#include <stan/services/pathfinder/multi.hpp>
+#include <stan/services/pathfinder/single.hpp>
 #include <stan/services/sample/fixed_param.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e.hpp>
 #include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
@@ -125,31 +128,6 @@ int command(int argc, const char *argv[]) {
   if (parser.help_printed())
     return return_codes::OK;
 
-  int num_threads = get_arg_val<int_argument>(parser, "num_threads");
-  // Need to make sure these two ways to set thread # match.
-  int env_threads = stan::math::internal::get_num_threads();
-  if (env_threads != num_threads) {
-    if (env_threads != 1) {
-      std::stringstream thread_msg;
-      thread_msg << "STAN_NUM_THREADS= " << env_threads
-                 << " but argument num_threads= " << num_threads
-                 << ". Please either only set one or make sure they are equal.";
-      throw std::invalid_argument(thread_msg.str());
-    }
-  }
-  stan::math::init_threadpool_tbb(num_threads);
-
-  unsigned int num_chains = 1;
-  auto user_method = parser.arg("method");
-  if (user_method->arg("sample")) {
-    num_chains
-        = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-    if (num_chains > 1)
-      validate_multi_chain_config(parser.arg("method"));
-  }
-  arg_seed *random_arg
-      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
-  unsigned int random_seed = random_arg->random_value();
 
 #ifdef STAN_OPENCL
   int opencl_device_id = get_arg_val<int_argument>(parser, "opencl", "device");
@@ -165,90 +143,51 @@ int command(int argc, const char *argv[]) {
   }
 #endif
 
+  int num_threads = get_arg_val<int_argument>(parser, "num_threads");
+  // Need to make sure these two ways to set thread # match.
+  int env_threads = stan::math::internal::get_num_threads();
+  if (env_threads != num_threads) {
+    if (env_threads != 1) {
+      std::stringstream thread_msg;
+      thread_msg << "STAN_NUM_THREADS= " << env_threads
+                 << " but argument num_threads= " << num_threads
+                 << ". Please either only set one or make sure they are equal.";
+      throw std::invalid_argument(thread_msg.str());
+    }
+  }
+  stan::math::init_threadpool_tbb(num_threads);
+
+  unsigned int num_chains = get_num_chains(parser);
+  check_file_config(parser);
+
   parser.print(info);
   write_parallel_info(info);
   write_opencl_device(info);
   info();
-
-  std::stringstream msg;
-
-  // check filenames to avoid clobbering input files with output file
-  std::string input_fname;
-  std::string output_fname
-      = get_arg_val<string_argument>(parser, "output", "file");
-  if (user_method->arg("generate_quantities")) {
-    input_fname = get_arg_val<string_argument>(
-        parser, "method", "generate_quantities", "fitted_params");
-    if (input_fname.compare(output_fname) == 0) {
-      msg << "Filename conflict, fitted_params file " << input_fname
-          << " and output file names are identical, must be different."
-          << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-  } else if (user_method->arg("laplace")) {
-    input_fname
-        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
-    if (input_fname.compare(output_fname) == 0) {
-      msg << "Filename conflict, parameter modes file " << input_fname
-          << " and output file names are identical, must be different."
-          << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
-  }
-
-  // Open output streams
-  stan::callbacks::writer init_writer;
-  stan::callbacks::interrupt interrupt;
-
   //////////////////////////////////////////////////
   //                Initialize Model              //
   //////////////////////////////////////////////////
+  arg_seed *random_arg
+      = dynamic_cast<arg_seed *>(parser.arg("random")->arg("seed"));
+  unsigned int random_seed = random_arg->random_value();
+
+
   std::string filename = get_arg_val<string_argument>(parser, "data", "file");
 
   std::shared_ptr<stan::io::var_context> var_context
       = get_var_context(filename);
 
-  // Instantiate model
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
-  std::vector<std::string> model_compile_info = model.model_compile_info();
-
   //////////////////////////////////////////////////
-  //                Initialize Writers            //
+  //                Initialize Callbacks          //
   //////////////////////////////////////////////////
+  stan::callbacks::interrupt interrupt;
 
-  std::string output_file
-      = get_arg_val<string_argument>(parser, "output", "file");
-  if (output_file == "") {
-    throw std::invalid_argument(
-        std::string("File output name must not be blank"));
-  }
-  std::string output_name;
-  std::string output_ending;
-  size_t output_marker_pos = output_file.find_last_of(".");
-  if (output_marker_pos > output_file.size()) {
-    output_name = output_file;
-    output_ending = "";
-  } else {
-    output_name = output_file.substr(0, output_marker_pos);
-    output_ending = output_file.substr(output_marker_pos, output_file.size());
-  }
-
-  std::string diagnostic_file
-      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  size_t diagnostic_marker_pos = diagnostic_file.find_last_of(".");
-  std::string diagnostic_name;
-  std::string diagnostic_ending;
-  // no . seperator found.
-  if (diagnostic_marker_pos > diagnostic_file.size()) {
-    diagnostic_name = diagnostic_file;
-    diagnostic_ending = "";
-  } else {
-    diagnostic_name = diagnostic_file.substr(0, diagnostic_marker_pos);
-    diagnostic_ending
-        = diagnostic_file.substr(diagnostic_marker_pos, diagnostic_file.size());
-  }
+  stan::callbacks::writer init_writer;  // always no-op writer
+  std::vector<stan::callbacks::writer> init_writers{num_chains,
+                                                    stan::callbacks::writer{}};
 
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
       sample_writers;
@@ -256,11 +195,9 @@ int command(int argc, const char *argv[]) {
   std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
       diagnostic_writers;
   diagnostic_writers.reserve(num_chains);
-  std::vector<stan::callbacks::writer> init_writers{num_chains,
-                                                    stan::callbacks::writer{}};
+
   unsigned int id = get_arg_val<int_argument>(parser, "id");
-  int_argument *sig_figs_arg
-      = dynamic_cast<int_argument *>(get_arg(parser, "output", "sig_figs"));
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -268,25 +205,43 @@ int command(int argc, const char *argv[]) {
       return std::string("_" + std::to_string(i + id));
     }
   };
+
+  std::string output_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  std::string output_base;
+  std::string output_sfx;
+  get_basename_suffix(output_file, output_base, output_sfx);
   for (int i = 0; i < num_chains; ++i) {
-    auto output_filename = output_name + name_iterator(i) + output_ending;
+    auto output_filename = output_base + name_iterator(i) + output_sfx;
     auto unique_fstream
         = std::make_unique<std::fstream>(output_filename, std::fstream::out);
-    if (!sig_figs_arg->is_default()) {
-      (*unique_fstream.get()) << std::setprecision(sig_figs_arg->value());
-    }
+    if (sig_figs > -1)
+      (*unique_fstream.get()) << std::setprecision(sig_figs);
     sample_writers.emplace_back(std::move(unique_fstream), "# ");
-    if (diagnostic_file != "") {
+  }
+
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  if (!diagnostic_file.empty()) {
+    std::string diagnostic_base;
+    std::string diagnostic_sfx;
+    get_basename_suffix(diagnostic_file, diagnostic_base, diagnostic_sfx);
+    for (int i = 0; i < num_chains; ++i) {
       auto diagnostic_filename
-          = diagnostic_name + name_iterator(i) + diagnostic_ending;
-      diagnostic_writers.emplace_back(
-          std::make_unique<std::fstream>(diagnostic_filename,
-                                         std::fstream::out),
-          "# ");
-    } else {
+          = diagnostic_base + name_iterator(i) + diagnostic_sfx;
+      auto unique_fstream
+          = std::make_unique<std::fstream>(diagnostic_filename, std::fstream::out);
+      if (sig_figs > -1)
+        (*unique_fstream.get()) << std::setprecision(sig_figs);
+      diagnostic_writers.emplace_back(std::move(unique_fstream), "# ");
+    }
+  } else {
+    for (int i = 0; i < num_chains; ++i) {
       diagnostic_writers.emplace_back(nullptr, "# ");
     }
   }
+
+  std::vector<std::string> model_compile_info = model.model_compile_info();
   for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
@@ -312,12 +267,90 @@ int command(int argc, const char *argv[]) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
-  int return_code = return_codes::NOT_OK;
-
   //////////////////////////////////////////////////
   //            Invoke Services                   //
   //////////////////////////////////////////////////
-  if (user_method->arg("generate_quantities")) {
+  int return_code = return_codes::NOT_OK;
+  std::stringstream msg;
+  auto user_method = parser.arg("method");
+  if (user_method->arg("pathfinder")) {
+    // ---- pathfinder start ---- //
+    auto pathfinder_arg = parser.arg("method")->arg("pathfinder");
+     int history_size
+         = get_arg_val<int_argument>(*pathfinder_arg, "history_size");
+     double init_alpha
+         = get_arg_val<real_argument>(*pathfinder_arg, "init_alpha");
+     double tol_obj = get_arg_val<real_argument>(*pathfinder_arg, "tol_obj");
+     double tol_rel_obj
+         = get_arg_val<real_argument>(*pathfinder_arg, "tol_rel_obj");
+     double tol_grad = get_arg_val<real_argument>(*pathfinder_arg, "tol_grad");
+     double tol_rel_grad
+         = get_arg_val<real_argument>(*pathfinder_arg, "tol_rel_grad");
+     double tol_param = get_arg_val<real_argument>(*pathfinder_arg, "tol_param");
+     int max_lbfgs_iters
+         = get_arg_val<int_argument>(*pathfinder_arg, "max_lbfgs_iters");
+     bool save_iterations
+         = get_arg_val<bool_argument>(*pathfinder_arg, "save_iterations");
+     int num_elbo_draws
+         = get_arg_val<int_argument>(*pathfinder_arg, "num_elbo_draws");
+     int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
+     int num_psis_draws
+         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
+     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
+     if (num_paths == 1) {
+       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
+         false, stan::model::model_base>(
+           model, *(init_contexts[0]), random_seed, id, init_radius,
+           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
+           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
+           false, refresh, interrupt, logger, init_writer, sample_writers[0],
+           diagnostic_writers[0]);
+     } else {
+       std::string pf_name;
+       std::string pf_suffix;
+       get_basename_suffix(output_file, pf_name, pf_suffix);
+       auto pf_sample_file = pf_name + "_pathfinder" + pf_suffix;
+       auto unique_fstream
+           = std::make_unique<std::fstream>(pf_sample_file, std::fstream::out);
+       if (sig_figs > -1)
+         (*unique_fstream.get()) << std::setprecision(sig_figs);
+       stan::callbacks::unique_stream_writer<std::iostream> pathfinder_writer(
+           std::move(unique_fstream), "# ");
+       write_stan(pathfinder_writer);
+       write_model(pathfinder_writer, model.model_name());
+       write_datetime(pathfinder_writer);
+       parser.print(pathfinder_writer);
+
+       std::vector<stan::callbacks::json_writer<std::ostream>> pf_diagnostic_writers;
+       pf_diagnostic_writers.reserve(num_paths);
+       if (!diagnostic_file.empty()) {
+         std::string diagnostic_base;
+         std::string diagnostic_sfx;
+         get_basename_suffix(diagnostic_file, diagnostic_base, diagnostic_sfx);
+         for (int i = 0; i < num_paths; ++i) {
+           auto diagnostic_filename
+               = diagnostic_base + name_iterator(i) + diagnostic_sfx;
+           auto unique_fstream
+               = std::make_unique<std::ofstream>(diagnostic_filename, std::ofstream::out);
+           if (sig_figs > -1)
+             (*unique_fstream.get()) << std::setprecision(sig_figs);
+           pf_diagnostic_writers.emplace_back(std::move(unique_fstream));
+         }
+       } else {
+         pf_diagnostic_writers.emplace_back(nullptr, "");
+       }
+
+       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
+         stan::model::model_base>(
+             model, init_contexts, random_seed, id, init_radius, history_size,
+             init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
+             max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
+             num_paths, true, refresh, interrupt, logger, init_writers,
+             sample_writers, pf_diagnostic_writers, pathfinder_writer,
+             diagnostic_writers[0]);
+     }
+     // ---- pathfinder end ---- //
+  } else if (user_method->arg("generate_quantities")) {
     // ---- generate_quantities start ---- //
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
@@ -380,7 +413,7 @@ int command(int argc, const char *argv[]) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
       std::vector<std::string> param_names = get_constrained_param_names(model);
-      if (suffix(cpars_file) == ".csv") {
+      if (get_suffix(cpars_file) == ".csv") {
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
         parse_stan_csv(cpars_file, model, param_names, fitted_params,
@@ -393,7 +426,7 @@ int command(int argc, const char *argv[]) {
     }
     try {
       services_log_prob_grad(model, jacobian, params_r_ind,
-                             sig_figs_arg->value(),
+                             sig_figs,
                              sample_writers[0].get_stream());
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
@@ -989,8 +1022,8 @@ int command(int argc, const char *argv[]) {
               parser.arg("output")->arg("profile_file"))
               ->value();
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
-    if (!sig_figs_arg->is_default()) {
-      profile_stream << std::setprecision(sig_figs_arg->value());
+    if (sig_figs > -1) {
+      profile_stream << std::setprecision(sig_figs);
     }
     write_profiling(profile_stream, profile_data);
     profile_stream.close();
