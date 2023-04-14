@@ -150,9 +150,9 @@ void validate_multi_chain_config(argument *config) {
  * @param filename
  * @return suffix
  */
-std::string get_suffix(const std::string& name) {
-   if (name.empty())
-     return "";
+std::string get_suffix(const std::string &name) {
+  if (name.empty())
+    return "";
   size_t file_marker_pos = name.find_last_of(".");
   if (file_marker_pos > name.size())
     return std::string();
@@ -161,23 +161,23 @@ std::string get_suffix(const std::string& name) {
 }
 
 /**
-  * Split name on last ".", if any.
-  *
-  * @param filename - name to split
-  * @param base - basename
-  * @param suffix - suffix (if any)
-  */
- void get_basename_suffix(const std::string &name, std::string &base,
-                      std::string &suffix) {
-   if (name.empty())
-     return;
-   suffix = get_suffix(name);
-   if (suffix.size() > 0) {
-     base = name.substr(0, name.size() - suffix.size());
-   } else {
-     base = name;
-   }
- }
+ * Split name on last ".", if any.
+ *
+ * @param filename - name to split
+ * @param base - basename
+ * @param suffix - suffix (if any)
+ */
+void get_basename_suffix(const std::string &name, std::string &base,
+                         std::string &suffix) {
+  if (name.empty())
+    return;
+  suffix = get_suffix(name);
+  if (suffix.size() > 0) {
+    base = name.substr(0, name.size() - suffix.size());
+  } else {
+    base = name;
+  }
+}
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
@@ -727,119 +727,105 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
   }
 }
 /**
-  * Return true if sampler config is adaptive NUTS-HMC with non-unit metric
-  * otherwise false.
-  *
-  * @param sample_arg user config
-  * @return int num chains or paths
-  */
- bool allow_multichain(argument_parser &parser) {
-   auto user_method = parser.arg("method");
-   if (user_method->arg("pathfinder"))
-     return true;
-   if (!user_method->arg("sample"))
-     return false;
-   auto sample_arg = parser.arg("method")->arg("sample");
-   categorical_argument *adapt
-       = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
-   bool adapt_engaged
-       = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-   list_argument *algo
-       = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-   if (algo->value() == "hmc") {
-     list_argument *engine
-         = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-     list_argument *metric
-         = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-     if (adapt_engaged && engine->value() == "nuts" && metric->value() != "unit")
-       return true;
-   }
-   return false;
- }
+ * Return true if sampler config is adaptive NUTS-HMC with non-unit metric
+ * otherwise false.
+ *
+ * @param sample_arg user config
+ * @return int num chains or paths
+ */
+bool allow_multichain(argument_parser &parser) {
+  auto user_method = parser.arg("method");
+  if (user_method->arg("pathfinder"))
+    return true;
+  if (!user_method->arg("sample"))
+    return false;
+  auto sample_arg = parser.arg("method")->arg("sample");
+  categorical_argument *adapt
+      = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
+  bool adapt_engaged
+      = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
+  list_argument *algo
+      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
+  if (algo->value() == "hmc") {
+    list_argument *engine
+        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
+    list_argument *metric
+        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
+    if (adapt_engaged && engine->value() == "nuts" && metric->value() != "unit")
+      return true;
+  }
+  return false;
+}
 
 /**
-  * For sample and pathfinder methods, return number of
-  * chains or pathfinders to run, otherwise return 1.
-  * For the sampler, only adaptive NUTS-HMC with non-unit metric
-  * supports multi-chain parallelization; if sampler config is invalid,
-  * this will throw an error.
-  *
-  * @param parser user config
-  * @return int num chains or paths
-  */
- unsigned int get_num_chains(argument_parser &parser) {
-   auto user_method = parser.arg("method");
-   if (user_method->arg("pathfinder"))
-     return get_arg_val<int_argument>(parser, "method", "pathfinder",
-                                      "num_paths");
-   if (!user_method->arg("sample"))
-     return 1;
-   unsigned int num_chains
-       = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-   if (num_chains > 1 && !allow_multichain(parser))
-     throw std::invalid_argument(
-         "Argument 'num_chains' can currently only be used for NUTS with "
-         "adaptation and dense_e or diag_e metric");
-   return num_chains;
- }
+ * For sample and pathfinder methods, return number of
+ * chains or pathfinders to run, otherwise return 1.
+ * For the sampler, only adaptive NUTS-HMC with non-unit metric
+ * supports multi-chain parallelization; if sampler config is invalid,
+ * this will throw an error.
+ *
+ * @param parser user config
+ * @return int num chains or paths
+ */
+unsigned int get_num_chains(argument_parser &parser) {
+  auto user_method = parser.arg("method");
+  if (user_method->arg("pathfinder"))
+    return get_arg_val<int_argument>(parser, "method", "pathfinder",
+                                     "num_paths");
+  if (!user_method->arg("sample"))
+    return 1;
+  unsigned int num_chains
+      = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
+  if (num_chains > 1 && !allow_multichain(parser))
+    throw std::invalid_argument(
+        "Argument 'num_chains' can currently only be used for NUTS with "
+        "adaptation and dense_e or diag_e metric");
+  return num_chains;
+}
 
-
-
-
-
- /**
-  * Check possible name conflicts between input and output files where both
-  * are in Stan CSV format; if conflicts detected, quit with an error message.
-  *
-  * @param parser user config
-  */
- void check_file_config(argument_parser &parser) {
-   std::string sample_file
-       = get_arg_val<string_argument>(parser, "output", "file");
-   std::string input_file;
-   auto user_method = parser.arg("method");
-   if (user_method->arg("generate_quantities")) {
-     input_file = get_arg_val<string_argument>(
-         parser, "method", "generate_quantities", "fitted_params");
-     if (input_file.empty()) {
-       throw std::invalid_argument(
-           std::string("Argument fitted_params file - found empty string, "
-                       "expecting filename."));
-       if (input_file.compare(sample_file) == 0) {
-         std::stringstream msg;
-         msg << "Filename conflict, fitted_params file " << input_file
-             << " and output file names are identical, must be different."
-             << std::endl;
-         throw std::invalid_argument(msg.str());
-       }
-     }
-   } else if (user_method->arg("laplace")) {
-     input_file
-         = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
-     if (input_file.empty()) {
-       throw std::invalid_argument(
-           std::string("Argument mode file - found empty string, "
-                       "expecting filename."));
-       if (input_file.compare(sample_file) == 0) {
-         std::stringstream msg;
-         msg << "Filename conflict, parameter modes file " << input_file
-             << " and output file names are identical, must be different."
-             << std::endl;
-         throw std::invalid_argument(msg.str());
-       }
-     }
-   }
- }
-
-
-
-
-
-
-
-
-
-
+/**
+ * Check possible name conflicts between input and output files where both
+ * are in Stan CSV format; if conflicts detected, quit with an error message.
+ *
+ * @param parser user config
+ */
+void check_file_config(argument_parser &parser) {
+  std::string sample_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  std::string input_file;
+  auto user_method = parser.arg("method");
+  if (user_method->arg("generate_quantities")) {
+    input_file = get_arg_val<string_argument>(
+        parser, "method", "generate_quantities", "fitted_params");
+    if (input_file.empty()) {
+      throw std::invalid_argument(
+          std::string("Argument fitted_params file - found empty string, "
+                      "expecting filename."));
+      if (input_file.compare(sample_file) == 0) {
+        std::stringstream msg;
+        msg << "Filename conflict, fitted_params file " << input_file
+            << " and output file names are identical, must be different."
+            << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+    }
+  } else if (user_method->arg("laplace")) {
+    input_file
+        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
+    if (input_file.empty()) {
+      throw std::invalid_argument(
+          std::string("Argument mode file - found empty string, "
+                      "expecting filename."));
+      if (input_file.compare(sample_file) == 0) {
+        std::stringstream msg;
+        msg << "Filename conflict, parameter modes file " << input_file
+            << " and output file names are identical, must be different."
+            << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+    }
+  }
+}
 
 }  // namespace cmdstan
 
