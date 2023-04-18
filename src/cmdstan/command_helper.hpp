@@ -359,7 +359,7 @@ void parse_stan_csv(const std::string &fname,
 }
 
 /**
- * Apply model's "transform_init" method to a vector of fitted parameters,
+ * Apply model's "unconstrain_array" method to a vector of fitted parameters,
  * return correspondung unconstrained params.
  * Throws an exception if the unconstraining transform fails.
  *
@@ -370,15 +370,10 @@ void parse_stan_csv(const std::string &fname,
 std::vector<double> unconstrain_params(const stan::model::model_base &model,
                                        const std::vector<double> &cparams) {
   std::stringstream msg;
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  stan::services::get_model_parameters(model, param_names, param_dimss);
   size_t num_uparams = model.num_params_r();
   std::vector<double> uparams(num_uparams);
-  std::vector<int> dummy_params_i;
   try {
-    stan::io::array_var_context context(param_names, cparams, param_dimss);
-    model.transform_inits(context, dummy_params_i, uparams, &msg);
+    model.unconstrain_array(cparams, uparams, &msg);
   } catch (const std::exception &e) {
     std::stringstream msg2;
     msg2 << e.what() << std::endl;
@@ -393,7 +388,7 @@ std::vector<double> unconstrain_params(const stan::model::model_base &model,
 
 /**
  * Given an instantiated model and parsed StanCSV output file,
- * apply model's "transform_init" to the fitted parameters.
+ * apply model's "unconstrain_array" to the fitted parameters.
  * Returns a vector of vectors of parameters on the unconstrained scale.
  * Throws an exception if the unconstraining transform failes.
  *
@@ -614,23 +609,6 @@ std::vector<std::vector<double>> get_cparams_r(
     const std::string &fname, const stan::model::model_base &model) {
   std::stringstream msg;
   std::shared_ptr<stan::io::var_context> cpars_context = get_var_context(fname);
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  // validate context
-  stan::services::get_model_parameters(model, param_names, param_dimss);
-  for (size_t i = 0; i < param_names.size(); ++i) {
-    if (!cpars_context->contains_r(param_names[i])) {
-      msg << "Value(s) for parameter " << param_names[i] << " not found!";
-      throw std::invalid_argument(msg.str());
-    }
-    std::vector<size_t> dims = cpars_context->dims_r(param_names[i]);
-    for (size_t j = 0; j < dims.size(); ++j) {
-      if (dims[j] != param_dimss[i][j]) {
-        msg << "Missing value(s) for parameter " << param_names[i];
-        throw std::invalid_argument(msg.str());
-      }
-    }
-  }
   size_t num_upars = model.num_params_r();
   std::vector<double> params(num_upars);
   std::vector<std::vector<double>> params_r_ind = {params};
