@@ -172,15 +172,15 @@ TEST_F(CmdStan, laplace_jacobian_adjust) {
   Eigen::MatrixXd sample2
       = Eigen::Map<Eigen::Matrix<double, 1000, 3, Eigen::RowMajor>>(ptr2);
 
-  double sigma_est1 = (sample1.col(0).array() / sample1.rows()).sum();
+  double sigma_est1 = (sample1.col(2).array() / sample1.rows()).sum();
   ASSERT_NEAR(3.1, sigma_est1, 0.1);
 
-  double sigma_est2 = (sample2.col(0).array() / sample2.rows()).sum();
+  double sigma_est2 = (sample2.col(2).array() / sample2.rows()).sum();
   ASSERT_NEAR(3.1, sigma_est2, 0.1);
 
   for (int n = 0; n < 1000; ++n) {
-    ASSERT_EQ(sample1.coeff(n, 0), sample2.coeff(n, 0));
-    ASSERT_NE(sample1.coeff(n, 1), sample2.coeff(n, 1));
+    ASSERT_NE(sample1.coeff(n, 0), sample2.coeff(n, 0));
+    ASSERT_EQ(sample1.coeff(n, 1), sample2.coeff(n, 1));
     ASSERT_EQ(sample1.coeff(n, 2), sample2.coeff(n, 2));
   }
 }
