@@ -75,12 +75,7 @@ Options:
       ->transform([](auto str) {
         // allow both 'theta.1' and 'theta[1]' style.
         std::string token(str);
-        int pos = token.find('.');
-        if (pos > 0) {
-          token.replace(pos, 1, "[");
-          std::replace(token.begin(), token.end(), '.', ',');
-          token += "]";
-        }
+        stan::io::prettify_stan_csv_name(token);
         return token;
       })
       ->take_all();
