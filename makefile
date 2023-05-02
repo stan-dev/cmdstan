@@ -149,7 +149,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.32.0
+CMDSTAN_VERSION := 2.32.1
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
