@@ -41,7 +41,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&...args) {
+                                      Args &&... args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -57,7 +57,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&...args) {
+                              Args &&... args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -88,7 +88,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -534,7 +534,8 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   } else if (suffix(fname) == ".json") {
     std::vector<double> unc_params
         = unconstrain_params_var_context(fname, model);
-    theta_hat = Eigen::Map<Eigen::VectorXd>(unc_params.data(), unc_params.size());
+    theta_hat
+        = Eigen::Map<Eigen::VectorXd>(unc_params.data(), unc_params.size());
   } else {
     msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
     throw std::invalid_argument(msg.str());
