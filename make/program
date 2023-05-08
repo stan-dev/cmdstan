@@ -52,11 +52,11 @@ endif
 %.d: %.hpp
 
 .PRECIOUS: %.hpp
-%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(PRECOMPILED_MODEL_HEADER)
+%$(EXE) : %.hpp $(CMDSTAN_MAIN_O) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(PRECOMPILED_MODEL_HEADER)
 	@echo ''
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
-	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
+	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
 	$(RM) $(subst  \,/,$*).o
 ifeq ($(OS),Windows_NT)
 ifeq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
