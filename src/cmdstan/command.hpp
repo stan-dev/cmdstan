@@ -388,7 +388,7 @@ int command(int argc, const char *argv[]) {
         params_r_ind = unconstrain_params_csv(model, fitted_params, col_offset,
                                               num_rows, num_cols);
       } else {
-        params_r_ind = get_cparams_r(cpars_file, model);
+        params_r_ind = {unconstrain_params_var_context(cpars_file, model)};
       }
     }
     try {
