@@ -163,6 +163,7 @@ int command(int argc, const char *argv[]) {
   write_parallel_info(info);
   write_opencl_device(info);
   info();
+  auto user_method = parser.arg("method");
   //////////////////////////////////////////////////
   //                Initialize Model              //
   //////////////////////////////////////////////////
@@ -187,15 +188,19 @@ int command(int argc, const char *argv[]) {
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
 
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+  std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
       sample_writers;
   sample_writers.reserve(num_chains);
-  std::vector<stan::callbacks::unique_stream_writer<std::ostream>>
+  std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
       diagnostic_writers;
   diagnostic_writers.reserve(num_chains);
+  std::vector<stan::callbacks::json_writer<std::ofstream>>
+      pf_diagnostic_writers;
+  pf_diagnostic_writers.reserve(num_chains);
 
+  std::cout << "reserved callbacks" << std::endl;
+  
   unsigned int id = get_arg_val<int_argument>(parser, "id");
-  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -203,7 +208,7 @@ int command(int argc, const char *argv[]) {
       return std::string("_" + std::to_string(i + id));
     }
   };
-
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   std::string output_file
       = get_arg_val<string_argument>(parser, "output", "file");
   std::string output_base;
@@ -211,13 +216,13 @@ int command(int argc, const char *argv[]) {
   get_basename_suffix(output_file, output_base, output_sfx);
   for (int i = 0; i < num_chains; ++i) {
     auto output_filename = output_base + name_iterator(i) + output_sfx;
-    auto unique_fstream
-        = std::make_unique<std::fstream>(output_filename, std::fstream::out);
+    auto ofs = std::make_unique<std::ofstream>(output_filename);
     if (sig_figs > -1)
-      (*unique_fstream.get()) << std::setprecision(sig_figs);
-    sample_writers.emplace_back(std::move(unique_fstream), "# ");
+      ofs->precision(sig_figs);
+    sample_writers.emplace_back(std::move(ofs), "# ");
   }
 
+  std::cout << "initializing diagnostic files" << std::endl;
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   if (!diagnostic_file.empty()) {
@@ -225,17 +230,23 @@ int command(int argc, const char *argv[]) {
     std::string diagnostic_sfx;
     get_basename_suffix(diagnostic_file, diagnostic_base, diagnostic_sfx);
     for (int i = 0; i < num_chains; ++i) {
-      auto diagnostic_filename
-          = diagnostic_base + name_iterator(i) + diagnostic_sfx;
-      auto unique_fstream = std::make_unique<std::fstream>(diagnostic_filename,
-                                                           std::fstream::out);
+      auto diagnostic_filename = output_base + name_iterator(i) + output_sfx;
+      std::unique_ptr<std::ofstream> ofs = std::make_unique<std::ofstream>(diagnostic_filename);
       if (sig_figs > -1)
-        (*unique_fstream.get()) << std::setprecision(sig_figs);
-      diagnostic_writers.emplace_back(std::move(unique_fstream), "# ");
+        ofs->precision(sig_figs);
+      if (user_method->arg("pathfinder")) {
+        stan::callbacks::json_writer<std::ofstream> jwriter(std::move(ofs));
+        pf_diagnostic_writers.emplace_back(std::move(jwriter));
+      } else {
+        diagnostic_writers.emplace_back(std::move(ofs), "# ");
+      }
     }
   } else {
     for (int i = 0; i < num_chains; ++i) {
-      diagnostic_writers.emplace_back(nullptr, "# ");
+      if (user_method->arg("pathfinder"))
+        pf_diagnostic_writers.emplace_back(stan::callbacks::json_writer<std::ofstream>());
+      else
+        diagnostic_writers.emplace_back(nullptr, "# ");
     }
   }
 
@@ -248,9 +259,9 @@ int command(int argc, const char *argv[]) {
     write_parallel_info(sample_writers[i]);
     write_opencl_device(sample_writers[i]);
     write_compile_info(sample_writers[i], model_compile_info);
-    write_stan(diagnostic_writers[i]);
-    write_model(diagnostic_writers[i], model.model_name());
-    parser.print(diagnostic_writers[i]);
+    //    write_stan(diagnostic_writers[i]);
+    //    write_model(diagnostic_writers[i], model.model_name());
+    //    parser.print(diagnostic_writers[i]);
   }
 
   int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
@@ -270,7 +281,6 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
   int return_code = return_codes::NOT_OK;
   std::stringstream msg;
-  auto user_method = parser.arg("method");
   if (user_method->arg("pathfinder")) {
     // ---- pathfinder start ---- //
     auto pathfinder_arg = parser.arg("method")->arg("pathfinder");
@@ -296,14 +306,16 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
     if (num_paths == 1) {
+      std::cout << "single path pathfinder" << std::endl;
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
           false, refresh, interrupt, logger, init_writer, sample_writers[0],
-          diagnostic_writers[0]);
+          pf_diagnostic_writers[0]);
     } else {
+      std::cout << "multi-path pathfinder" << std::endl;
       std::string pf_name;
       std::string pf_suffix;
       get_basename_suffix(output_file, pf_name, pf_suffix);
@@ -318,34 +330,13 @@ int command(int argc, const char *argv[]) {
       write_model(pathfinder_writer, model.model_name());
       write_datetime(pathfinder_writer);
       parser.print(pathfinder_writer);
-
-      std::vector<stan::callbacks::json_writer<std::ostream>>
-          pf_diagnostic_writers;
-      pf_diagnostic_writers.reserve(num_paths);
-      if (!diagnostic_file.empty()) {
-        std::string diagnostic_base;
-        std::string diagnostic_sfx;
-        get_basename_suffix(diagnostic_file, diagnostic_base, diagnostic_sfx);
-        for (int i = 0; i < num_paths; ++i) {
-          auto diagnostic_filename
-              = diagnostic_base + name_iterator(i) + diagnostic_sfx;
-          auto unique_fstream = std::make_unique<std::ofstream>(
-              diagnostic_filename, std::ofstream::out);
-          if (sig_figs > -1)
-            (*unique_fstream.get()) << std::setprecision(sig_figs);
-          pf_diagnostic_writers.emplace_back(std::move(unique_fstream));
-        }
-      } else {
-        pf_diagnostic_writers.emplace_back(nullptr, "");
-      }
-
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
           stan::model::model_base>(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
           true, refresh, interrupt, logger, init_writers, sample_writers,
-          pf_diagnostic_writers, pathfinder_writer, diagnostic_writers[0]);
+          pf_diagnostic_writers, pathfinder_writer, pf_diagnostic_writers[0]);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
