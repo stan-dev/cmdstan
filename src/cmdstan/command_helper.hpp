@@ -15,6 +15,7 @@
 #include <cmdstan/write_stan_flags.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/ends_with.hpp>
@@ -826,6 +827,99 @@ void check_file_config(argument_parser &parser) {
     }
   }
 }
+
+void make_filenames(const std::string &filename,
+                    const std::string &type,
+                    unsigned int num_chains,
+                    unsigned int id,
+                    std::vector<std::string> &names) {
+  names.reserve(num_chains);
+  std::string base;
+  std::string sfx;
+  get_basename_suffix(filename, base, sfx);
+  if (sfx.empty()) {
+    sfx = type;
+  } else if (!boost::algorithm::iequals(type, sfx)) {
+    std::stringstream msg;
+    msg << "Output file " << filename << " has suffix " << sfx <<
+        ", expecting \"" << type << "\"." << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  for (int i = 0; i < num_chains; ++i) {
+    names.emplace_back(base + name_iterator(i) + sfx);
+  }
+}
+
+void init_callbacks(
+    argument_parser &parser,
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>> &sample_writers,
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>> &diag_csv_writers,
+    std::vector<stan::callbacks::json_writer<std::ofstream>> &diag_json_writers) {
+  auto user_method = parser.arg("method");
+  unsigned int num_chains = get_num_chains(parser);
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+
+  sample_writers.reserve(num_chains);
+  std::vector<std::string> output_filenames;
+  make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                 ".csv", num_chains, id, output_filenames);
+  for (int i = 0; i < num_chains; ++i) {
+    auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
+    if (sig_figs > -1)
+      ofs->precision(sig_figs);
+    sample_writers.emplace_back(std::move(ofs), "# ");
+  }
+  std::cout << "got sample_writers, next diagnostic writers" << std::endl;
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  std::cout << "diagnostic file |" << diagnostic_file << "|" << std::endl << std::flush;
+  if (user_method->arg("pathfinder")) {
+    diag_json_writers.reserve(num_chains);
+    std::cout << "reserved json writers" << std::endl << std::flush;
+    if (diagnostic_file.empty()) {
+      for (int i = 0; i < num_chains; ++i) {
+        diag_json_writers.emplace_back(
+            stan::callbacks::json_writer<std::ofstream>());
+      }
+    } else {
+      std::vector<std::string> diag_filenames;
+      make_filenames(diagnostic_file, ".json",
+                     num_chains, id, diag_filenames);
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
+        if (sig_figs > -1)
+          ofs->precision(sig_figs);
+        stan::callbacks::json_writer<std::ofstream> jwriter(std::move(ofs));
+        diag_json_writers.emplace_back(std::move(jwriter));
+      }
+    }
+  } else {
+    diag_csv_writers.reserve(num_chains);
+    if (diagnostic_file.empty()) {
+      for (int i = 0; i < num_chains; ++i) {
+        diag_csv_writers.emplace_back(nullptr, "# ");
+      }
+    } else {
+      std::vector<std::string> diag_filenames;
+      make_filenames(diagnostic_file, ".csv",
+                     num_chains, id, diag_filenames);
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
+        if (sig_figs > -1)
+          ofs->precision(sig_figs);
+        diag_csv_writers.emplace_back(std::move(ofs), "# ");
+      }
+    }
+  }
+}    
 
 }  // namespace cmdstan
 
