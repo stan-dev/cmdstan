@@ -310,6 +310,7 @@ pipeline {
                 //         docker {
                 //             image 'ellerbrock/alpine-bash-git'
                 //             label 'linux'
+                //             args '--entrypoint='
                 //         }
                 //     }
                 //     when {
@@ -351,7 +352,13 @@ pipeline {
                     // }
                     steps {
                         script {
-                            retry(3) { checkout scm }
+                            retry(3) { 
+                                checkout([
+                                    $class: 'GitSCM',
+                                    branches: [[name: '*/develop'], [name: '*/downstream_tests']],
+                                    userRemoteConfigs: scm.userRemoteConfigs
+                                ])
+                             }
                             withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
                                 usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                                 sh """#!/bin/bash
