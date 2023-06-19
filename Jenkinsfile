@@ -342,6 +342,7 @@ pipeline {
                         docker {
                             image 'alpine/git'
                             label 'linux'
+                            args '--entrypoint='
                         }
                     }
                     // when {
@@ -358,6 +359,7 @@ pipeline {
 
                                     git checkout downstream_tests
                                     git reset --hard develop
+                                    git status
                                     # git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
                                 """
                             }
