@@ -308,7 +308,7 @@ pipeline {
                 stage('Update downstream_hotfix - master') {
                     agent {
                         docker {
-                            image 'stanorg/ci:gpu'
+                            image 'alpine/git'
                             label 'linux'
                         }
                     }
@@ -319,11 +319,16 @@ pipeline {
                     steps {
                         script {
                             retry(3) { checkout scm }
-                            sh """
-                                git checkout downstream_hotfix
-                                git reset --hard master
-                                git push origin downstream_hotfix
-                            """
+                            withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                                sh """#!/bin/bash
+                                    set -x
+
+                                    git checkout downstream_hotfix
+                                    git reset --hard master
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                """
+                            }
                         }
                     }
                     post {
@@ -335,7 +340,7 @@ pipeline {
                 stage('Update downstream_tests - develop') {
                     agent {
                         docker {
-                            image 'stanorg/ci:gpu'
+                            image 'alpine/git'
                             label 'linux'
                         }
                     }
@@ -346,11 +351,16 @@ pipeline {
                     steps {
                         script {
                             retry(3) { checkout scm }
-                            sh """
-                                git checkout downstream_tests
-                                git reset --hard develop
-                                git push origin downstream_tests
-                            """
+                            withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                                sh """#!/bin/bash
+                                    set -x
+
+                                    git checkout downstream_hotfix
+                                    git reset --hard master
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                """
+                            }
                         }
                     }
                     post {
