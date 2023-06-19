@@ -367,7 +367,7 @@ pipeline {
                                     git checkout downstream_tests
                                     git reset --hard origin/develop
                                     git status
-                                    # git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
                                 """
                             }
                         }
