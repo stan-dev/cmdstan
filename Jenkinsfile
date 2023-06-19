@@ -356,9 +356,9 @@ pipeline {
                                 sh """#!/bin/bash
                                     set -x
 
-                                    git checkout downstream_hotfix
-                                    git reset --hard master
-                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                    git checkout downstream_tests
+                                    git reset --hard develop
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
                                 """
                             }
                         }
