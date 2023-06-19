@@ -305,38 +305,38 @@ pipeline {
         // }
         stage('Update downstream branches') {
             parallel {
-                stage('Update downstream_hotfix - master') {
-                    agent {
-                        docker {
-                            image 'alpine/git'
-                            label 'linux'
-                        }
-                    }
-                    when {
-                        beforeAgent true
-                        branch 'master'
-                    }
-                    steps {
-                        script {
-                            retry(3) { checkout scm }
-                            withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
-                                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
-                                sh """#!/bin/bash
-                                    set -x
+                // stage('Update downstream_hotfix - master') {
+                //     agent {
+                //         docker {
+                //             image 'alpine/git'
+                //             label 'linux'
+                //         }
+                //     }
+                //     when {
+                //         beforeAgent true
+                //         branch 'master'
+                //     }
+                //     steps {
+                //         script {
+                //             retry(3) { checkout scm }
+                //             withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                //                 usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                //                 sh """#!/bin/bash
+                //                     set -x
 
-                                    git checkout downstream_hotfix
-                                    git reset --hard master
-                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
-                                """
-                            }
-                        }
-                    }
-                    post {
-                        always {
-                            deleteDir()
-                        }
-                    }
-                }
+                //                     git checkout downstream_hotfix
+                //                     git reset --hard master
+                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                //                 """
+                //             }
+                //         }
+                //     }
+                //     post {
+                //         always {
+                //             deleteDir()
+                //         }
+                //     }
+                // }
                 stage('Update downstream_tests - develop') {
                     agent {
                         docker {
@@ -344,10 +344,10 @@ pipeline {
                             label 'linux'
                         }
                     }
-                    when {
-                        beforeAgent true
-                        branch 'develop'
-                    }
+                    // when {
+                    //     beforeAgent true
+                    //     branch 'develop'
+                    // }
                     steps {
                         script {
                             retry(3) { checkout scm }
@@ -358,7 +358,7 @@ pipeline {
 
                                     git checkout downstream_tests
                                     git reset --hard develop
-                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
+                                    # git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
                                 """
                             }
                         }
