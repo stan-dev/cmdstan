@@ -308,7 +308,7 @@ pipeline {
                 // stage('Update downstream_hotfix - master') {
                 //     agent {
                 //         docker {
-                //             image 'alpine/git'
+                //             image 'ellerbrock/alpine-bash-git'
                 //             label 'linux'
                 //         }
                 //     }
@@ -340,7 +340,7 @@ pipeline {
                 stage('Update downstream_tests - develop') {
                     agent {
                         docker {
-                            image 'alpine/git'
+                            image 'ellerbrock/alpine-bash-git'
                             label 'linux'
                             args '--entrypoint='
                         }
