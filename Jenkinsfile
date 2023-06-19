@@ -303,6 +303,64 @@ pipeline {
 
             }
         }
+        stage('Update downstream branches') {
+            parallel {
+                stage('Update downstream_hotfix - master') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:gpu'
+                            label 'linux'
+                        }
+                    }
+                    when {
+                        beforeAgent true
+                        branch 'master'
+                    }
+                    steps {
+                        script {
+                            retry(3) { checkout scm }
+                            sh """
+                                git checkout downstream_hotfix
+                                git reset --hard master
+                                git push origin downstream_hotfix
+                            """
+                        }
+                    }
+                    post {
+                        always {
+                            deleteDir()
+                        }
+                    }
+                }
+                stage('Update downstream_tests - develop') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:gpu'
+                            label 'linux'
+                        }
+                    }
+                    when {
+                        beforeAgent true
+                        branch 'develop'
+                    }
+                    steps {
+                        script {
+                            retry(3) { checkout scm }
+                            sh """
+                                git checkout downstream_tests
+                                git reset --hard develop
+                                git push origin downstream_tests
+                            """
+                        }
+                    }
+                    post {
+                        always {
+                            deleteDir()
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
         success {
