@@ -93,7 +93,7 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
   } else {
-    throw std::invalid_argument("encoutered nullptr");
+    throw std::invalid_argument("encountered nullptr");
   }
 }
 
@@ -359,8 +359,8 @@ void parse_stan_csv(const std::string &fname,
 }
 
 /**
- * Apply model's "transform_init" method to a vector of fitted parameters,
- * return correspondung unconstrained params.
+ * Apply model's "unconstrain_array" method to a vector of fitted parameters,
+ * return corresponding unconstrained params.
  * Throws an exception if the unconstraining transform fails.
  *
  * @param model instantiated model
@@ -370,15 +370,10 @@ void parse_stan_csv(const std::string &fname,
 std::vector<double> unconstrain_params(const stan::model::model_base &model,
                                        const std::vector<double> &cparams) {
   std::stringstream msg;
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  stan::services::get_model_parameters(model, param_names, param_dimss);
   size_t num_uparams = model.num_params_r();
   std::vector<double> uparams(num_uparams);
-  std::vector<int> dummy_params_i;
   try {
-    stan::io::array_var_context context(param_names, cparams, param_dimss);
-    model.transform_inits(context, dummy_params_i, uparams, &msg);
+    model.unconstrain_array(cparams, uparams, &msg);
   } catch (const std::exception &e) {
     std::stringstream msg2;
     msg2 << e.what() << std::endl;
@@ -393,9 +388,9 @@ std::vector<double> unconstrain_params(const stan::model::model_base &model,
 
 /**
  * Given an instantiated model and parsed StanCSV output file,
- * apply model's "transform_init" to the fitted parameters.
+ * apply model's "unconstrain_array" to the fitted parameters.
  * Returns a vector of vectors of parameters on the unconstrained scale.
- * Throws an exception if the unconstraining transform failes.
+ * Throws an exception if the unconstraining transform fails.
  *
  * @param model instantiated model
  * @param cparams vector of constrained param values
@@ -412,6 +407,36 @@ std::vector<std::vector<double>> unconstrain_params_csv(
     result.emplace_back(std::move(uparams));
   }
   return result;
+}
+
+/**
+ * Get constrained parameter values from JSON or Rdump file and
+ * return corresponding unconstrained params.
+ * Throws an exception if the unconstraining transform fails.
+ *
+ * @param fname name of file which exists and has read perms
+ * @param model Stan model
+ * @return vector of vectors of parameter estimates
+ */
+std::vector<double> unconstrain_params_var_context(
+    const std::string &fname, const stan::model::model_base &model) {
+  std::stringstream msg;
+  std::shared_ptr<stan::io::var_context> cpars_context = get_var_context(fname);
+  size_t num_upars = model.num_params_r();
+  std::vector<double> params(num_upars);
+  std::vector<int> dummy_params_i;
+  try {
+    model.transform_inits((*cpars_context), dummy_params_i, params, &msg);
+  } catch (const std::exception &e) {
+    std::stringstream msg2;
+    msg2 << e.what() << std::endl;
+    msg2 << "Bad or missing parameter values, cannot unconstrain.";
+    if (msg.str().length() > 0)
+      msg2 << "\n\t" << msg.str();
+    msg2 << std::endl;
+    throw std::invalid_argument(msg2.str());
+  }
+  return params;
 }
 
 /**
@@ -452,7 +477,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
     msg << "CSV file is not output from Stan optimization" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  // columns: algorithm outputs ending in "__", params, xparms, and gq vars
+  // columns: algorithm outputs ending in "__", params, txparms, and gq vars
   size_t col_offset = 0;
   for (auto name : names) {
     if (boost::algorithm::ends_with(name, "__")) {
@@ -494,42 +519,6 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
 }
 
 /**
- * Parse a JSON file of a set of parameter estimates on the
- * constrained scale and unconstrain them.
- * Helper function get_var_context throws exception if cannot
- * open or parse JSON file.
- *
- * @param fname name of file which exists and has read perms
- * @param model Stan model
- * @return Eigen vector of unconstrained parameter estimates
- */
-Eigen::VectorXd get_laplace_mode_json(const std::string &fname,
-                                      const stan::model::model_base &model) {
-  std::stringstream msg;
-  std::vector<std::string> param_names;
-  model.get_param_names(param_names);
-  std::vector<std::string> cparam_names;
-  model.constrained_param_names(cparam_names);
-  std::vector<double> cparams(cparam_names.size());
-
-  std::shared_ptr<stan::io::var_context> context = get_var_context(fname);
-  Eigen::Index offset = 0;
-  for (auto &&param_name : param_names) {
-    const auto param_vec = context->vals_r(param_name);
-    for (size_t i = 0; i < param_vec.size(); ++i) {
-      cparams[offset] = param_vec[i];
-      ++offset;
-    }
-  }
-  std::vector<double> uparams = unconstrain_params(model, cparams);
-  Eigen::VectorXd result(uparams.size());
-  for (size_t i = 0; i < uparams.size(); ++i) {
-    result(i) = uparams[i];
-  }
-  return result;
-}
-
-/**
  * Parse contents of file containing estimate of parameter modes.
  *
  * @param fname name of file which exists and has read perms
@@ -543,7 +532,10 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   if (suffix(fname) == ".csv") {
     theta_hat = get_laplace_mode_csv(fname, model);
   } else if (suffix(fname) == ".json") {
-    theta_hat = get_laplace_mode_json(fname, model);
+    std::vector<double> unc_params
+        = unconstrain_params_var_context(fname, model);
+    theta_hat
+        = Eigen::Map<Eigen::VectorXd>(unc_params.data(), unc_params.size());
   } else {
     msg << "Mode file must be CSV or JSON, found " << fname << std::endl;
     throw std::invalid_argument(msg.str());
@@ -597,55 +589,6 @@ std::vector<std::vector<double>> get_uparams_r(
       params_r_ind[i][j] = *(u_params_r.data() + idx);
       ++idx;
     }
-  }
-  return params_r_ind;
-}
-
-/**
- * Get constrained parameter values from JSON or Rdump file and
- * return correspondung unconstrained params.
- * Throws an exception if the unconstraining transform fails.
- *
- * @param fname name of file which exists and has read perms
- * @param model Stan model
- * @return vector of vectors of parameter estimates
- */
-std::vector<std::vector<double>> get_cparams_r(
-    const std::string &fname, const stan::model::model_base &model) {
-  std::stringstream msg;
-  std::shared_ptr<stan::io::var_context> cpars_context = get_var_context(fname);
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  // validate context
-  stan::services::get_model_parameters(model, param_names, param_dimss);
-  for (size_t i = 0; i < param_names.size(); ++i) {
-    if (!cpars_context->contains_r(param_names[i])) {
-      msg << "Value(s) for parameter " << param_names[i] << " not found!";
-      throw std::invalid_argument(msg.str());
-    }
-    std::vector<size_t> dims = cpars_context->dims_r(param_names[i]);
-    for (size_t j = 0; j < dims.size(); ++j) {
-      if (dims[j] != param_dimss[i][j]) {
-        msg << "Missing value(s) for parameter " << param_names[i];
-        throw std::invalid_argument(msg.str());
-      }
-    }
-  }
-  size_t num_upars = model.num_params_r();
-  std::vector<double> params(num_upars);
-  std::vector<std::vector<double>> params_r_ind = {params};
-  std::vector<int> dummy_params_i;
-  try {
-    model.transform_inits((*cpars_context), dummy_params_i, params_r_ind[0],
-                          &msg);
-  } catch (const std::exception &e) {
-    std::stringstream msg2;
-    msg2 << e.what() << std::endl;
-    msg2 << "Bad or missing parameter values, cannot unconstrain.";
-    if (msg.str().length() > 0)
-      msg2 << "\n\t" << msg.str();
-    msg2 << std::endl;
-    throw std::invalid_argument(msg2.str());
   }
   return params_r_ind;
 }
