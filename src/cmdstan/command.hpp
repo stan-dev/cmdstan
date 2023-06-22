@@ -255,9 +255,7 @@ int command(int argc, const char *argv[]) {
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
-    std::cout << "num paths: " << num_paths << std::endl << std::flush;
     if (num_paths == 1) {
-      std::cout << "single path pathfinder" << std::endl;
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -266,7 +264,6 @@ int command(int argc, const char *argv[]) {
           false, refresh, interrupt, logger, init_writer, sample_writers[0],
           diagnostic_json_writers[0]);
     } else {
-      std::cout << "multi-path pathfinder" << std::endl;
       std::string output_file
           = get_arg_val<string_argument>(parser, "output", "file");
       std::string pf_name;
