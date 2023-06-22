@@ -877,13 +877,10 @@ void init_callbacks(
       ofs->precision(sig_figs);
     sample_writers.emplace_back(std::move(ofs), "# ");
   }
-  std::cout << "got sample_writers, next diagnostic writers" << std::endl;
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  std::cout << "diagnostic file |" << diagnostic_file << "|" << std::endl << std::flush;
   if (user_method->arg("pathfinder")) {
     diag_json_writers.reserve(num_chains);
-    std::cout << "reserved json writers" << std::endl << std::flush;
     if (diagnostic_file.empty()) {
       for (int i = 0; i < num_chains; ++i) {
         diag_json_writers.emplace_back(
