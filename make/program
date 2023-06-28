@@ -44,6 +44,11 @@ ifdef STAN_OPENCL
 STANCFLAGS+= --use-opencl
 endif
 
+ifeq (clang,$(CXX_TYPE))
+CXXFLAGS += -Wno-deprecated-declarations
+CXXFLAGS_WARNINGS += -Wno-unused-command-line-argument
+endif
+
 %.hpp : %.stan bin/stanc$(EXE)
 	@echo ''
 	@echo '--- Translating Stan model to C++ code ---'
@@ -57,7 +62,7 @@ endif
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
 	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
-	$(RM) $(subst  \,/,$*).o
+#	$(RM) $(subst  \,/,$*).o
 ifeq ($(OS),Windows_NT)
 ifeq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
 	@echo 'Intel TBB is not in PATH.'
