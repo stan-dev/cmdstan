@@ -192,7 +192,6 @@ int command(int argc, const char *argv[]) {
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
                  diagnostic_json_writers);
 
-
   // Setup initial parameter values - arg "init"
   // arg is either filename or init radius value
   std::string init = get_arg_val<string_argument>(parser, "init");
@@ -215,9 +214,9 @@ int command(int argc, const char *argv[]) {
     write_opencl_device(sample_writers[i]);
     write_compile_info(sample_writers[i], model_compile_info);
     if (!diagnostic_csv_writers.empty()) {
-       write_stan(diagnostic_csv_writers[i]);
-       write_model(diagnostic_csv_writers[i], model.model_name());
-       parser.print(diagnostic_csv_writers[i]);
+      write_stan(diagnostic_csv_writers[i]);
+      write_model(diagnostic_csv_writers[i], model.model_name());
+      parser.print(diagnostic_csv_writers[i]);
     }
   }
 
@@ -269,7 +268,8 @@ int command(int argc, const char *argv[]) {
       std::string pf_name;
       std::string pf_suffix;
       get_basename_suffix(output_file, pf_name, pf_suffix);
-      auto ofs = std::make_unique<std::ofstream>(pf_name + "_pathfinder" + pf_suffix);
+      auto ofs = std::make_unique<std::ofstream>(pf_name + "_pathfinder"
+                                                 + pf_suffix);
       if (sig_figs > -1)
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
@@ -284,7 +284,8 @@ int command(int argc, const char *argv[]) {
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
           true, refresh, interrupt, logger, init_writers, sample_writers,
-          diagnostic_json_writers, pathfinder_writer, diagnostic_json_writers[0]);
+          diagnostic_json_writers, pathfinder_writer,
+          diagnostic_json_writers[0]);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
@@ -707,7 +708,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, interrupt,
-            logger, init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+            logger, init_writers[0], sample_writers[0],
+            diagnostic_csv_writers[0]);
       } else if (engine->value() == "static" && metric->value() == "dense_e"
                  && adapt_engaged == false && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -888,7 +890,8 @@ int command(int argc, const char *argv[]) {
             model, *(init_contexts[0]), random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, int_time, delta, gamma, kappa, t0, interrupt,
-            logger, init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+            logger, init_writers[0], sample_writers[0],
+            diagnostic_csv_writers[0]);
       }
     }
     // ---- sample end ---- //
@@ -939,13 +942,15 @@ int command(int argc, const char *argv[]) {
           model, *(init_contexts[0]), random_seed, id, init_radius,
           grad_samples, elbo_samples, max_iterations, tol_rel_obj, eta,
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
-          logger, init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+          logger, init_writers[0], sample_writers[0],
+          diagnostic_csv_writers[0]);
     } else if (algo->value() == "meanfield") {
       return_code = stan::services::experimental::advi::meanfield(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           grad_samples, elbo_samples, max_iterations, tol_rel_obj, eta,
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
-          logger, init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+          logger, init_writers[0], sample_writers[0],
+          diagnostic_csv_writers[0]);
     }
     // ---- variational end ---- //
   }
