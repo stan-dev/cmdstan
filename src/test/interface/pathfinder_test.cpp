@@ -33,14 +33,30 @@ TEST_F(CmdStan, pathfinder_good) {
      << " output file=" << convert_model_path(test_tmp_out_csv)
      << " method=pathfinder";
   run_command_output out = run_command(ss.str());
+  // check individual path csv files
+  // check pathfinder csv file
   ASSERT_FALSE(out.hasError);
 }
 
 TEST_F(CmdStan, pathfinder_single_good) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model)
+     << " output file=" << convert_model_path(test_tmp_out_csv)
+     << " method=pathfinder"
+     << " num_paths=1";
+  run_command_output out = run_command(ss.str());
+  ASSERT_FALSE(out.hasError);
 }
 
-// TEST_F(CmdStan, pathfinder_multi_good) {
-// }
+TEST_F(CmdStan, pathfinder_multi_good) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model)
+     << " output file=" << convert_model_path(test_tmp_out_csv)
+     << " method=pathfinder"
+     << " num_paths=8";
+  run_command_output out = run_command(ss.str());
+  ASSERT_FALSE(out.hasError);
+}
 
 // TEST_F(CmdStan, pathfinder_diagnostic_json) {
 // }
