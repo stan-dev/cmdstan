@@ -16,7 +16,6 @@ class CmdStan : public testing::Test {
     test_tmp_out_csv = {"test", "tmp_pf.csv"};
     test_tmp_out_json = {"test", "tmp_pf.json"};
     simplex_model = {"src", "test", "test-models", "simplex_model"};
-
   }
   std::vector<std::string> default_file_path;
   std::vector<std::string> dev_null_path;
@@ -60,4 +59,3 @@ TEST_F(CmdStan, pathfinder_multi_good) {
 
 // TEST_F(CmdStan, pathfinder_diagnostic_json) {
 // }
-

@@ -771,10 +771,8 @@ void check_file_config(argument_parser &parser) {
   }
 }
 
-void make_filenames(const std::string &filename,
-                    const std::string &type,
-                    unsigned int num_chains,
-                    unsigned int id,
+void make_filenames(const std::string &filename, const std::string &type,
+                    unsigned int num_chains, unsigned int id,
                     std::vector<std::string> &names) {
   names.reserve(num_chains);
   std::string base;
@@ -784,8 +782,8 @@ void make_filenames(const std::string &filename,
     sfx = type;
   } else if (!boost::algorithm::iequals(type, sfx)) {
     std::stringstream msg;
-    msg << "Output file " << filename << " has suffix " << sfx <<
-        ", expecting \"" << type << "\"." << std::endl;
+    msg << "Output file " << filename << " has suffix " << sfx
+        << ", expecting \"" << type << "\"." << std::endl;
     throw std::invalid_argument(msg.str());
   }
   auto name_iterator = [num_chains, id](auto i) {
@@ -802,9 +800,12 @@ void make_filenames(const std::string &filename,
 
 void init_callbacks(
     argument_parser &parser,
-    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>> &sample_writers,
-    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>> &diag_csv_writers,
-    std::vector<stan::callbacks::json_writer<std::ofstream>> &diag_json_writers) {
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
+        &sample_writers,
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
+        &diag_csv_writers,
+    std::vector<stan::callbacks::json_writer<std::ofstream>>
+        &diag_json_writers) {
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
@@ -812,8 +813,8 @@ void init_callbacks(
 
   sample_writers.reserve(num_chains);
   std::vector<std::string> output_filenames;
-  make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                 ".csv", num_chains, id, output_filenames);
+  make_filenames(get_arg_val<string_argument>(parser, "output", "file"), ".csv",
+                 num_chains, id, output_filenames);
   for (int i = 0; i < num_chains; ++i) {
     auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
     if (sig_figs > -1)
@@ -831,8 +832,7 @@ void init_callbacks(
       }
     } else {
       std::vector<std::string> diag_filenames;
-      make_filenames(diagnostic_file, ".json",
-                     num_chains, id, diag_filenames);
+      make_filenames(diagnostic_file, ".json", num_chains, id, diag_filenames);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -849,8 +849,7 @@ void init_callbacks(
       }
     } else {
       std::vector<std::string> diag_filenames;
-      make_filenames(diagnostic_file, ".csv",
-                     num_chains, id, diag_filenames);
+      make_filenames(diagnostic_file, ".csv", num_chains, id, diag_filenames);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -859,7 +858,7 @@ void init_callbacks(
       }
     }
   }
-}    
+}
 
 }  // namespace cmdstan
 
