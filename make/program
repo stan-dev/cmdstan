@@ -62,7 +62,7 @@ endif
 	@echo '--- Compiling, linking C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
 	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
-#	$(RM) $(subst  \,/,$*).o
+	$(RM) $(subst  \,/,$*).o
 ifeq ($(OS),Windows_NT)
 ifeq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
 	@echo 'Intel TBB is not in PATH.'
