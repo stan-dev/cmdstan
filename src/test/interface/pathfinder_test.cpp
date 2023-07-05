@@ -13,8 +13,8 @@ class CmdStan : public testing::Test {
   void SetUp() {
     dev_null_path = {"/dev", "null"};
     multi_normal_model = {"src", "test", "test-models", "multi_normal_model"};
-    test_arg_output = {"test", "tmp_pf.csv"};
-    test_arg_diags = {"test", "tmp_pf.json"};
+    test_arg_output = {"test", "tmp_pf"};
+    test_arg_diags = {"test", "tmp_pf"};
     test_result_csv = {"test", "tmp_pf_pathfinder.csv"};
     test_result_single = {"test", "tmp_pf_1.csv"};
     test_result_diags = {"test", "tmp_pf_1.json"};
@@ -106,7 +106,7 @@ TEST_F(CmdStan, pathfinder_diagnostic_json) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string output = result_sstream.str();
-  ASSERT_TRUE(output.size() > 0);
+  ASSERT_FALSE(output.empty());
   rapidjson::Document document;
   ASSERT_FALSE(document.Parse<0>(output.c_str()).HasParseError());
 }

@@ -268,6 +268,8 @@ int command(int argc, const char *argv[]) {
       std::string pf_name;
       std::string pf_suffix;
       get_basename_suffix(output_file, pf_name, pf_suffix);
+      if (pf_suffix.empty())
+        pf_suffix = ".csv";
       auto ofs = std::make_unique<std::ofstream>(pf_name + "_pathfinder"
                                                  + pf_suffix);
       if (sig_figs > -1)
