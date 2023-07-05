@@ -2,10 +2,10 @@
 #include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
-using cmdstan::test::count_matches;
 
 class CmdStan : public testing::Test {
  public:
@@ -64,8 +64,6 @@ TEST_F(CmdStan, pathfinder_single_good) {
   ASSERT_FALSE(out.hasError);
 
   std::fstream output_csv_stream("test/output.csv");
-
-
 }
 
 TEST_F(CmdStan, pathfinder_multi_good) {
