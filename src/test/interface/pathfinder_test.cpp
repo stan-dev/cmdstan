@@ -3,10 +3,10 @@
 #include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
-using cmdstan::test::count_matches;
 
 class CmdStan : public testing::Test {
  public:
@@ -72,7 +72,6 @@ TEST_F(CmdStan, pathfinder_single_good) {
   std::string output = result_sstream.str();
   EXPECT_EQ(1, count_matches("# Elapsed Time:", output));
   EXPECT_EQ(1, count_matches(" seconds (Pathfinder)", output));
-
 }
 
 TEST_F(CmdStan, pathfinder_multi_good) {
