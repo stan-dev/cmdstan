@@ -1,4 +1,5 @@
 #include <test/utility.hpp>
+#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
@@ -44,8 +45,8 @@ TEST_F(CmdStan, pathfinder_good) {
   EXPECT_EQ(1, count_matches(" seconds (Pathfinders)", output));
   EXPECT_EQ(1, count_matches(" seconds (PSIS)", output));
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
-  result_sstream.str(std::string());
 
+  result_sstream.str(std::string());
   std::fstream single_stream(convert_model_path(test_result_single));
   result_sstream << single_stream.rdbuf();
   single_stream.close();
@@ -63,8 +64,14 @@ TEST_F(CmdStan, pathfinder_single_good) {
   run_command_output out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
 
-  std::fstream output_csv_stream("test/output.csv");
-
+  std::vector<std::string> test_result_1path = {"test", "tmp_pf.csv"};
+  std::fstream result_stream(convert_model_path(test_result_1path));
+  std::stringstream result_sstream;
+  result_sstream << result_stream.rdbuf();
+  result_stream.close();
+  std::string output = result_sstream.str();
+  EXPECT_EQ(1, count_matches("# Elapsed Time:", output));
+  EXPECT_EQ(1, count_matches(" seconds (Pathfinder)", output));
 
 }
 
@@ -76,7 +83,31 @@ TEST_F(CmdStan, pathfinder_multi_good) {
      << " num_paths=8";
   run_command_output out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
+  std::vector<std::string> test_result_8path = {"test", "tmp_pf_8.csv"};
+  std::fstream result_stream(convert_model_path(test_result_8path));
+  std::stringstream result_sstream;
+  result_sstream << result_stream.rdbuf();
+  result_stream.close();
+  std::string output = result_sstream.str();
+  EXPECT_EQ(1, count_matches("# Elapsed Time:", output));
+  EXPECT_EQ(1, count_matches(" seconds (Pathfinder)", output));
 }
 
-// TEST_F(CmdStan, pathfinder_diagnostic_json) {
-// }
+TEST_F(CmdStan, pathfinder_diagnostic_json) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model)
+     << " output refresh=0 file=" << convert_model_path(test_arg_output)
+     << " diagnostic_file=" << convert_model_path(test_arg_diags)
+     << " method=pathfinder";
+  run_command_output out = run_command(ss.str());
+  ASSERT_FALSE(out.hasError);
+
+  std::fstream result_stream(convert_model_path(test_result_diags));
+  std::stringstream result_sstream;
+  result_sstream << result_stream.rdbuf();
+  result_stream.close();
+  std::string output = result_sstream.str();
+  ASSERT_TRUE(output.size() > 0);
+  rapidjson::Document document;
+  ASSERT_FALSE(document.Parse<0>(output.c_str()).HasParseError());
+}
