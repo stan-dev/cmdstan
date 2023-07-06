@@ -780,11 +780,6 @@ void make_filenames(const std::string &filename, const std::string &type,
   get_basename_suffix(filename, base, sfx);
   if (sfx.empty()) {
     sfx = type;
-  } else if (!boost::algorithm::iequals(type, sfx)) {
-    std::stringstream msg;
-    msg << "Output file " << filename << " has suffix " << sfx
-        << ", expecting \"" << type << "\"." << std::endl;
-    throw std::invalid_argument(msg.str());
   }
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
