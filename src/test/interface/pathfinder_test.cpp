@@ -32,7 +32,7 @@ TEST_F(CmdStan, pathfinder_good) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
      << " output refresh=0 file=" << convert_model_path(test_arg_output)
-     << " method=pathfinder";
+     << " method=pathfinder num_psis_draws=40"
   run_command_output out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
 
@@ -45,6 +45,8 @@ TEST_F(CmdStan, pathfinder_good) {
   EXPECT_EQ(1, count_matches(" seconds (Pathfinders)", output));
   EXPECT_EQ(1, count_matches(" seconds (PSIS)", output));
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
+  EXPECT_EQ(1, count_matches(" seconds (Total)", output));
+  EXPECT_EQ(1, count_matches("num_psis_draws = 40", output));
 
   result_sstream.str(std::string());
   std::fstream single_stream(convert_model_path(test_result_single));
