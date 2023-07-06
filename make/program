@@ -16,19 +16,19 @@ $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 ##
 # Precompiled model header
 ##
-$(STAN)src/stan/model/model_header$(STAN_FLAGS).d : $(STAN)src/stan/model/model_header.hpp
+$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).d : $(STAN)src/stan/model/model_header.hpp
 	$(COMPILE.cpp) $(DEPFLAGS) $<
 
 ifneq ($(PRECOMPILED_MODEL_HEADER),)
-$(STAN)src/stan/model/model_header$(STAN_FLAGS).d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
-$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch : $(STAN)src/stan/model/model_header.hpp
+$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).d : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
+$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
 	@echo '--- Compiling pre-compiled header. This might take a few seconds. ---'
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
 ifeq ($(CXX_TYPE),clang)
-CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
-$(STAN_TARGETS) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
+CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
+$(STAN_TARGETS) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
 endif
 endif
 
@@ -80,6 +80,6 @@ $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EX
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 -include $(patsubst %.cpp,%$(STAN_FLAGS).d,$(CMDSTAN_MAIN))
 ifeq ($(PRECOMPILED_HEADERS),true)
--include $(STAN)src/stan/model/model_header$(STAN_FLAGS).d
+-include $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).d
 endif
 endif
