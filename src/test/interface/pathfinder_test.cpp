@@ -32,8 +32,8 @@ TEST_F(CmdStan, pathfinder_good) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
      << " output refresh=0 file=" << convert_model_path(test_arg_output)
-     << " method=pathfinder num_psis_draws=40"
-  run_command_output out = run_command(ss.str());
+     << " method=pathfinder num_psis_draws=40" run_command_output out
+      = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
 
   std::fstream result_stream(convert_model_path(test_result_csv));
