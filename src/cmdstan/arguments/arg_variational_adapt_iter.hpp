@@ -3,7 +3,7 @@
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/services/experimental/advi/defaults.hpp>
-#include <string>
+#include <boost/lexical_cast.hpp>
 
 namespace cmdstan {
 
@@ -15,7 +15,8 @@ class arg_variational_adapt_iter : public int_argument {
     _name = "iter";
     _description = adapt_iterations::description();
     _validity = "0 < iter";
-    _default = std::to_string(adapt_iterations::default_value());
+    _default
+        = boost::lexical_cast<std::string>(adapt_iterations::default_value());
     _default_value = adapt_iterations::default_value();
     _constrained = true;
     _good_value = adapt_iterations::default_value();

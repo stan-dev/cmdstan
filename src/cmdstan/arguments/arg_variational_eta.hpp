@@ -3,7 +3,7 @@
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/services/experimental/advi/defaults.hpp>
-#include <string>
+#include <boost/lexical_cast.hpp>
 
 namespace cmdstan {
 
@@ -15,7 +15,7 @@ class arg_variational_eta : public real_argument {
     _name = "eta";
     _description = eta::description();
     _validity = "0 < eta";
-    _default = std::to_string(eta::default_value());
+    _default = boost::lexical_cast<std::string>(eta::default_value());
     _default_value = eta::default_value();
     _constrained = true;
     _good_value = eta::default_value();

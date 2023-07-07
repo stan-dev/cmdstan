@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_VARIATIONAL_NUM_SAMPLES_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
 
 namespace cmdstan {
@@ -13,7 +14,7 @@ class arg_variational_num_samples : public int_argument {
     _name = name;
     _description = desc;
     _validity = "0 < num_samples";
-    _default = std::to_string(def);
+    _default = boost::lexical_cast<std::string>(def);
     _default_value = def;
     _constrained = true;
     _good_value = 100.0;
