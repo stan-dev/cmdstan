@@ -2,7 +2,6 @@
 #define CMDSTAN_ARGUMENTS_ARG_SINGLE_INT_POS_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
-#include <boost/lexical_cast.hpp>
 #include <string>
 
 /** Generic positive int value argument */
@@ -16,7 +15,7 @@ class arg_single_int_pos : public int_argument {
     _name = name;
     _description = desc;
     _validity = std::string("0 < ").append(name);
-    _default = boost::lexical_cast<std::string>(def);
+    _default = std::to_string(def);
     _default_value = def;
     _constrained = true;
     _good_value = 2.0;
