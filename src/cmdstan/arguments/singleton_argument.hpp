@@ -73,7 +73,6 @@ class singleton_argument : public valued_argument {
       args.pop_back();
 
       try {
-        // how can we work around this? does _value_type help?
         T proposed_value = boost::lexical_cast<T>(value);
         if (set_value(proposed_value)) {
           return true;
