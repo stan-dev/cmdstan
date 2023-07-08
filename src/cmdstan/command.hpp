@@ -154,11 +154,22 @@ int command(int argc, const char *argv[]) {
   }
   stan::math::init_threadpool_tbb(num_threads);
 
+  unsigned int num_chains = get_num_chains(parser);
+  auto user_method = parser.arg("method");
+  if (user_method->arg("sample") && num_chains > 1)
+    validate_multi_chain_config(parser.arg("method"));
+
   check_file_config(parser);
+
   parser.print(info);
   write_parallel_info(info);
   write_opencl_device(info);
   info();
+
+  // General config for all methods
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+  int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
 
   //////////////////////////////////////////////////
   //                Initialize Model              //
@@ -176,7 +187,6 @@ int command(int argc, const char *argv[]) {
       = new_model(*var_context, random_seed, &std::cout);
 
   // Setup callbacks
-  unsigned int num_chains = get_num_chains(parser);
   stan::callbacks::interrupt interrupt;
   stan::callbacks::writer init_writer;  // always no-op writer
   std::vector<stan::callbacks::writer> init_writers{num_chains,
@@ -222,12 +232,8 @@ int command(int argc, const char *argv[]) {
   //            Invoke Services                   //
   //////////////////////////////////////////////////
   int return_code = return_codes::NOT_OK;
-  unsigned int id = get_arg_val<int_argument>(parser, "id");
-  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
-  int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
   std::stringstream msg;
 
-  auto user_method = parser.arg("method");
   if (user_method->arg("pathfinder")) {
     // ---- pathfinder start ---- //
     auto pathfinder_arg = parser.arg("method")->arg("pathfinder");
