@@ -188,6 +188,7 @@ int command(int argc, const char *argv[]) {
 
   // Setup callbacks
   stan::callbacks::interrupt interrupt;
+  stan::callbacks::writer dummy_writer;
   stan::callbacks::writer init_writer;  // always no-op writer
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
@@ -290,8 +291,7 @@ int command(int argc, const char *argv[]) {
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
           true, refresh, interrupt, logger, init_writers, sample_writers,
-          diagnostic_json_writers, pathfinder_writer,
-          diagnostic_json_writers[0]);
+          diagnostic_json_writers, pathfinder_writer, dummy_writer);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
