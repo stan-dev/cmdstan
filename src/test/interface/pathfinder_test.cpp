@@ -14,7 +14,8 @@ class CmdStan : public testing::Test {
     dev_null_path = {"/dev", "null"};
     multi_normal_model = {"src", "test", "test-models", "multi_normal_model"};
     eight_schools_model = {"src", "test", "test-models", "eight_schools"};
-    eight_schools_data = {"src", "test", "test-models", "eight_schools.data.json"};
+    eight_schools_data
+        = {"src", "test", "test-models", "eight_schools.data.json"};
     test_arg_output = {"test", "tmp_pf"};
     test_arg_diags = {"test", "tmp_pf"};
     test_result_draws = {"test", "tmp_pf_pathfinder.csv"};
@@ -157,4 +158,3 @@ TEST_F(CmdStan, pathfinder_num_paths_draws) {
   EXPECT_EQ(1, count_matches("num_paths = 2", output));
   EXPECT_EQ(1, count_matches("num_draws = 10", output));
 }
-
