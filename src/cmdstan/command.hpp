@@ -254,15 +254,17 @@ int command(int argc, const char *argv[]) {
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
-    bool save_iterations = !get_arg_val<string_argument>(parser, "output", "diagnostic_file").empty();
+    bool save_iterations
+        = !get_arg_val<string_argument>(parser, "output", "diagnostic_file")
+               .empty();
     if (num_paths == 1) {
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
-          save_iterations, refresh, interrupt, logger, init_writer, sample_writers[0],
-          diagnostic_json_writers[0]);
+          save_iterations, refresh, interrupt, logger, init_writer,
+          sample_writers[0], diagnostic_json_writers[0]);
     } else {
       std::string output_file
           = get_arg_val<string_argument>(parser, "output", "file");
@@ -286,8 +288,9 @@ int command(int argc, const char *argv[]) {
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
-          save_iterations, refresh, interrupt, logger, init_writers, sample_writers,
-          diagnostic_json_writers, pathfinder_writer, dummy_json_writer);
+          save_iterations, refresh, interrupt, logger, init_writers,
+          sample_writers, diagnostic_json_writers, pathfinder_writer,
+          dummy_json_writer);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
