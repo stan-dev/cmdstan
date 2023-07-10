@@ -122,9 +122,10 @@ TEST_F(CmdStan, pathfinder_lbfgs_iterations) {
   std::stringstream ss;
   ss << convert_model_path(eight_schools_model)
      << " data file=" << convert_model_path(eight_schools_data)
+     << " random seed=12345"
      << " output refresh=0 file=" << convert_model_path(test_arg_output)
      << " diagnostic_file=" << convert_model_path(test_arg_diags)
-     << " method=pathfinder max_lbfgs_iters=10";
+     << " method=pathfinder max_lbfgs_iters=3";
   run_command_output out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
 
@@ -136,8 +137,8 @@ TEST_F(CmdStan, pathfinder_lbfgs_iterations) {
   ASSERT_FALSE(output.empty());
   rapidjson::Document document;
   ASSERT_FALSE(document.Parse<0>(output.c_str()).HasParseError());
-  EXPECT_EQ(1, count_matches("\"10\" : {\"iter\" : 10", output));
-  EXPECT_EQ(0, count_matches("\"11\" : {\"iter\" : 11", output));
+  EXPECT_EQ(1, count_matches("\"3\" : {\"iter\" : 3,", output));
+  EXPECT_EQ(0, count_matches("\"4\" : {\"iter\" : 4,", output));
 }
 
 TEST_F(CmdStan, pathfinder_num_paths_draws) {
