@@ -116,6 +116,7 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
  * Check that sampler config is valid for multi-chain processing,
  * which is only implemented for adaptive NUTS-HMC.
  * If config is not adaptive NUTS-HMC, throws error.
+ * Assumes that config is for sampler method.
  *
  * @param config sample argument
  */
@@ -670,36 +671,6 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
     output_stream << gradients.back() << "\n";
   }
 }
-/**
- * Return true if sampler config is adaptive NUTS-HMC with non-unit metric
- * otherwise false.
- *
- * @param sample_arg user config
- * @return int num chains or paths
- */
-bool allow_multichain(argument_parser &parser) {
-  auto user_method = parser.arg("method");
-  if (user_method->arg("pathfinder"))
-    return true;
-  if (!user_method->arg("sample"))
-    return false;
-  auto sample_arg = parser.arg("method")->arg("sample");
-  categorical_argument *adapt
-      = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
-  bool adapt_engaged
-      = dynamic_cast<bool_argument *>(adapt->arg("engaged"))->value();
-  list_argument *algo
-      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-  if (algo->value() == "hmc") {
-    list_argument *engine
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-    list_argument *metric
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-    if (adapt_engaged && engine->value() == "nuts" && metric->value() != "unit")
-      return true;
-  }
-  return false;
-}
 
 /**
  * For sample and pathfinder methods, return number of
@@ -720,10 +691,8 @@ unsigned int get_num_chains(argument_parser &parser) {
     return 1;
   unsigned int num_chains
       = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-  if (num_chains > 1 && !allow_multichain(parser))
-    throw std::invalid_argument(
-        "Argument 'num_chains' can currently only be used for NUTS with "
-        "adaptation and dense_e or diag_e metric");
+  if (num_chains > 1)
+    validate_multi_chain_config(user_method);
   return num_chains;
 }
 

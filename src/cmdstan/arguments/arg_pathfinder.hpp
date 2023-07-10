@@ -24,9 +24,6 @@ class arg_pathfinder : public arg_lbfgs {
         "num_draws", "Number of approximate posterior draws", 2000));
     _subarguments.push_back(new arg_single_int_pos(
         "num_elbo_draws", "Number of Monte Carlo draws to evaluate ELBO", 25));
-    _subarguments.push_back(new arg_single_bool(
-        "save_iterations",
-        "Save per-path pathfinder iterations to separate files?", false));
   }
 };
 
