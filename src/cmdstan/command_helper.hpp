@@ -765,11 +765,11 @@ void make_filenames(const std::string &filename, const std::string &type,
 void init_callbacks(
     argument_parser &parser,
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
-    &sample_writers,
+        &sample_writers,
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
-    &diag_csv_writers,
+        &diag_csv_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
-    &diag_json_writers) {
+        &diag_json_writers) {
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
