@@ -218,11 +218,9 @@ int command(int argc, const char *argv[]) {
     write_parallel_info(sample_writers[i]);
     write_opencl_device(sample_writers[i]);
     write_compile_info(sample_writers[i], model_compile_info);
-    if (!diagnostic_csv_writers.empty()) {
-      write_stan(diagnostic_csv_writers[i]);
-      write_model(diagnostic_csv_writers[i], model.model_name());
-      parser.print(diagnostic_csv_writers[i]);
-    }
+    write_stan(diagnostic_csv_writers[i]);
+    write_model(diagnostic_csv_writers[i], model.model_name());
+    parser.print(diagnostic_csv_writers[i]);
   }
 
   //////////////////////////////////////////////////
