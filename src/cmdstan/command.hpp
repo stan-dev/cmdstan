@@ -208,7 +208,6 @@ int command(int argc, const char *argv[]) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
-
   std::vector<std::string> model_compile_info = model.model_compile_info();
   for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
@@ -218,9 +217,9 @@ int command(int argc, const char *argv[]) {
     write_parallel_info(sample_writers[i]);
     write_opencl_device(sample_writers[i]);
     write_compile_info(sample_writers[i], model_compile_info);
-    write_stan(diagnostic_csv_writers[i]);
-    write_model(diagnostic_csv_writers[i], model.model_name());
-    parser.print(diagnostic_csv_writers[i]);
+    //    write_stan(diagnostic_csv_writers[i]);
+    //    write_model(diagnostic_csv_writers[i], model.model_name());
+    //    parser.print(diagnostic_csv_writers[i]);
   }
 
   //////////////////////////////////////////////////
