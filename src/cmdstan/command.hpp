@@ -204,7 +204,7 @@ int command(int argc, const char *argv[]) {
   try {
     init_radius = std::stod(init);
     init = "";
-  } catch (const std::exception &e) {
+  } catch (const std::logic_error &e) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
