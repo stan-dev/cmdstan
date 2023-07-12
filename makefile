@@ -133,7 +133,7 @@ PRECOMPILED_HEADERS ?= true
 endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
