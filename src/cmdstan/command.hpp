@@ -56,7 +56,6 @@
 #include <stan/services/sample/hmc_static_unit_e_adapt.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -306,9 +305,9 @@ int command(int argc, const char *argv[]) {
   std::string init = get_arg_val<string_argument>(parser, "init");
   double init_radius = 2.0;
   try {
-    init_radius = boost::lexical_cast<double>(init);
+    init_radius = std::stod(init);
     init = "";
-  } catch (const boost::bad_lexical_cast &e) {
+  } catch (const std::logic_error &e) {
   }
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
