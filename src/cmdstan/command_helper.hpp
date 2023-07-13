@@ -802,7 +802,7 @@ void init_callbacks(
   if (!diagnostic_file.empty()) {
     std::vector<std::string> diag_filenames;
     if (user_method->arg("pathfinder")) {
-      diag_json_writers.resize(0);
+      diag_json_writers.clear();
       make_filenames(diagnostic_file, ".json", num_chains, id, diag_filenames);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
@@ -812,7 +812,7 @@ void init_callbacks(
         diag_json_writers.emplace_back(std::move(jwriter));
       }
     } else {
-      diag_csv_writers.resize(0);
+      diag_csv_writers.clear();
       make_filenames(diagnostic_file, ".csv", num_chains, id, diag_filenames);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
