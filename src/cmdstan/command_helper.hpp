@@ -708,10 +708,9 @@ unsigned int get_num_chains(argument_parser &parser) {
 void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
-  std::string input_file;
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
-    input_file = get_arg_val<string_argument>(
+    std::string input_file = get_arg_val<string_argument>(
         parser, "method", "generate_quantities", "fitted_params");
     if (input_file.empty()) {
       throw std::invalid_argument(
@@ -726,8 +725,8 @@ void check_file_config(argument_parser &parser) {
       }
     }
   } else if (user_method->arg("laplace")) {
-    input_file
-        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
+    std::string input_file = get_arg_val<string_argument>(
+        parser, "method", "laplace", "mode");
     if (input_file.empty()) {
       throw std::invalid_argument(
           std::string("Argument mode file - found empty string, "
