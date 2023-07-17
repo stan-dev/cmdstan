@@ -725,8 +725,8 @@ void check_file_config(argument_parser &parser) {
       }
     }
   } else if (user_method->arg("laplace")) {
-    std::string input_file = get_arg_val<string_argument>(
-        parser, "method", "laplace", "mode");
+    std::string input_file
+        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
     if (input_file.empty()) {
       throw std::invalid_argument(
           std::string("Argument mode file - found empty string, "
