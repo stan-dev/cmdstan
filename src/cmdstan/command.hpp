@@ -197,7 +197,7 @@ int command(int argc, const char *argv[]) {
       diagnostic_json_writers;
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
                  diagnostic_json_writers);
-                 
+
   // Setup initial parameter values - arg "init"
   // arg is either filename or init radius value
   std::string init = get_arg_val<string_argument>(parser, "init");
