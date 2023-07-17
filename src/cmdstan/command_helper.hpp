@@ -687,7 +687,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
  */
 unsigned int get_num_chains(argument_parser &parser) {
   auto user_method = parser.arg("method");
-  if (user_method->arg("pathfinder")) 
+  if (user_method->arg("pathfinder"))
     return get_arg_val<int_argument>(parser, "method", "pathfinder",
                                      "num_paths");
   if (!user_method->arg("sample"))
@@ -742,8 +742,10 @@ void check_file_config(argument_parser &parser) {
   }
 }
 
-std::vector<std::string> make_filenames(const std::string &filename, const std::string &type,
-                                        unsigned int num_chains, unsigned int id) {
+std::vector<std::string> make_filenames(const std::string &filename,
+                                        const std::string &type,
+                                        unsigned int num_chains,
+                                        unsigned int id) {
   std::vector<std::string> names(num_chains);
   auto base_sfx = get_basename_suffix(filename);
   if (base_sfx.second.empty()) {
@@ -757,7 +759,7 @@ std::vector<std::string> make_filenames(const std::string &filename, const std::
     }
   };
   for (int i = 0; i < num_chains; ++i) {
-    names[i] =  base_sfx.first + name_iterator(i) + base_sfx.second;
+    names[i] = base_sfx.first + name_iterator(i) + base_sfx.second;
   }
   return names;
 }
@@ -776,9 +778,9 @@ void init_callbacks(
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
 
   sample_writers.reserve(num_chains);
-  std::vector<std::string> output_filenames = make_filenames(
-      get_arg_val<string_argument>(parser, "output", "file"), ".csv",
-      num_chains, id);
+  std::vector<std::string> output_filenames
+      = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                       ".csv", num_chains, id);
   for (int i = 0; i < num_chains; ++i) {
     auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
     if (sig_figs > -1)
