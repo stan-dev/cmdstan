@@ -31,6 +31,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <rapidjson/document.h>
 
@@ -166,19 +167,21 @@ std::string get_suffix(const std::string &name) {
  * Split name on last ".", if any.
  *
  * @param filename - name to split
- * @param base - basename
- * @param suffix - suffix (if any)
+ * @return pair of strings {base, suffix}
  */
-void get_basename_suffix(const std::string &name, std::string &base,
-                         std::string &suffix) {
-  if (name.empty())
-    return;
-  suffix = get_suffix(name);
-  if (suffix.size() > 0) {
-    base = name.substr(0, name.size() - suffix.size());
-  } else {
-    base = name;
+std::pair<std::string, std::string> get_basename_suffix(
+    const std::string &name) {
+  std::string base;
+  std::string suffix;
+  if (!name.empty()) {
+    suffix = get_suffix(name);
+    if (suffix.size() > 0) {
+      base = name.substr(0, name.size() - suffix.size());
+    } else {
+      base = name;
+    }
   }
+  return {base, suffix};
 }
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
@@ -684,7 +687,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
  */
 unsigned int get_num_chains(argument_parser &parser) {
   auto user_method = parser.arg("method");
-  if (user_method->arg("pathfinder"))
+  if (user_method->arg("pathfinder")) 
     return get_arg_val<int_argument>(parser, "method", "pathfinder",
                                      "num_paths");
   if (!user_method->arg("sample"))
@@ -740,15 +743,12 @@ void check_file_config(argument_parser &parser) {
   }
 }
 
-void make_filenames(const std::string &filename, const std::string &type,
-                    unsigned int num_chains, unsigned int id,
-                    std::vector<std::string> &names) {
-  names.reserve(num_chains);
-  std::string base;
-  std::string sfx;
-  get_basename_suffix(filename, base, sfx);
-  if (sfx.empty()) {
-    sfx = type;
+std::vector<std::string> make_filenames(const std::string &filename, const std::string &type,
+                                        unsigned int num_chains, unsigned int id) {
+  std::vector<std::string> names(num_chains);
+  auto base_sfx = get_basename_suffix(filename);
+  if (base_sfx.second.empty()) {
+    base_sfx.second = type;
   }
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
@@ -758,8 +758,9 @@ void make_filenames(const std::string &filename, const std::string &type,
     }
   };
   for (int i = 0; i < num_chains; ++i) {
-    names.emplace_back(base + name_iterator(i) + sfx);
+    names[i] =  base_sfx.first + name_iterator(i) + base_sfx.second;
   }
+  return names;
 }
 
 void init_callbacks(
@@ -776,9 +777,9 @@ void init_callbacks(
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
 
   sample_writers.reserve(num_chains);
-  std::vector<std::string> output_filenames;
-  make_filenames(get_arg_val<string_argument>(parser, "output", "file"), ".csv",
-                 num_chains, id, output_filenames);
+  std::vector<std::string> output_filenames = make_filenames(
+      get_arg_val<string_argument>(parser, "output", "file"), ".csv",
+      num_chains, id);
   for (int i = 0; i < num_chains; ++i) {
     auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
     if (sig_figs > -1)
@@ -803,7 +804,7 @@ void init_callbacks(
     std::vector<std::string> diag_filenames;
     if (user_method->arg("pathfinder")) {
       diag_json_writers.clear();
-      make_filenames(diagnostic_file, ".json", num_chains, id, diag_filenames);
+      diag_filenames = make_filenames(diagnostic_file, ".json", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -813,7 +814,7 @@ void init_callbacks(
       }
     } else {
       diag_csv_writers.clear();
-      make_filenames(diagnostic_file, ".csv", num_chains, id, diag_filenames);
+      diag_filenames = make_filenames(diagnostic_file, ".csv", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)

@@ -64,6 +64,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
@@ -196,7 +197,7 @@ int command(int argc, const char *argv[]) {
       diagnostic_json_writers;
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
                  diagnostic_json_writers);
-
+                 
   // Setup initial parameter values - arg "init"
   // arg is either filename or init radius value
   std::string init = get_arg_val<string_argument>(parser, "init");
@@ -265,15 +266,14 @@ int command(int argc, const char *argv[]) {
     } else {
       std::string output_file
           = get_arg_val<string_argument>(parser, "output", "file");
-      std::string pf_name;
-      std::string pf_suffix;
-      get_basename_suffix(output_file, pf_name, pf_suffix);
-      if (pf_suffix.empty())
-        pf_suffix = ".csv";
-      auto ofs = std::make_unique<std::ofstream>(pf_name + "_pathfinder"
-                                                 + pf_suffix);
-      if (sig_figs > -1)
+      auto base_sfx = get_basename_suffix(output_file);
+      if (base_sfx.second.empty())
+        base_sfx.second = ".csv";
+      auto ofs = std::make_unique<std::ofstream>(base_sfx.first + "_pathfinder"
+                                                 + base_sfx.second);
+      if (sig_figs > -1) {
         ofs->precision(sig_figs);
+      }
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_stan(pathfinder_writer);
