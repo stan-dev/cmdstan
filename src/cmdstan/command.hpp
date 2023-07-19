@@ -239,7 +239,7 @@ int command(int argc, const char *argv[]) {
   size_t diagnostic_marker_pos = diagnostic_file.find_last_of(".");
   std::string diagnostic_name;
   std::string diagnostic_ending;
-  // no . seperator found.
+  // no . separator found.
   if (diagnostic_marker_pos > diagnostic_file.size()) {
     diagnostic_name = diagnostic_file;
     diagnostic_ending = "";

@@ -9,7 +9,7 @@ class arg_refresh : public int_argument {
  public:
   arg_refresh() : int_argument() {
     _name = "refresh";
-    _description = "Number of interations between screen updates";
+    _description = "Number of iterations between screen updates";
     _validity = "0 <= refresh";
     _default = "100";
     _default_value = 100;
