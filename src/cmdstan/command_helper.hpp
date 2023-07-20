@@ -50,7 +50,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  * Given a pointer to a list of argument pointers, extract the named argument
  * from the list.
  * @tparam List A pointer to a list that has a valid arg(const char*) method
- * @tparam Args A paramter pack of const char*
+ * @tparam Args A parameter pack of const char*
  * @param arg_list The list argument to access the arg from
  * @param arg1 The name of the first argument to extract
  * @param args An optional pack of named arguments to access from the first arg
@@ -66,7 +66,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
 /**
  * Given a list of argument pointers, extract the named argument from the list.
  * @tparam List An list argument that has a valid arg(const char*) method
- * @tparam Args A paramter pack of const char*
+ * @tparam Args A parameter pack of const char*
  * @param arg_list The list argument to access the arg from
  * @param arg1 The name of the first argument to extract
  * @param args An optional pack of named arguments to access from the first arg
@@ -244,7 +244,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     if (file_marker_pos > file.size()) {
       std::stringstream msg;
       msg << "Found: \"" << file
-          << "\" but user specied files must end in .json or .R";
+          << "\" but user specified files must end in .json or .R";
       throw std::invalid_argument(msg.str());
     }
     std::string file_name = file.substr(0, file_marker_pos);
