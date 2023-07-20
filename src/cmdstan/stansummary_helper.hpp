@@ -318,7 +318,7 @@ Eigen::VectorXd percentiles_to_probs(
  * Assemble set of Stan csv files into a stan::mcmc::chains object
  *
  * @param in vector of filenames of stan csv files
- * @param in out  metatdata
+ * @param in out  metadata
  * @param in out  warmup times for each chain
  * @param in out  sampling times for each chain
  * @param in out  thinning for each chain
@@ -545,7 +545,7 @@ void write_params(const stan::mcmc::chains<> &chains,
  * Output timing statistics for all chains
  *
  * @param in set of samples from one or more chains
- * @param in metatdata
+ * @param in metadata
  * @param in warmup times for each chain
  * @param in sampling times for each chain
  * @param in thinning for each chain
@@ -644,7 +644,7 @@ void write_timing(const stan::mcmc::chains<> &chains,
 /**
  * Output sampler information
  *
- * @param in metatdata
+ * @param in metadata
  * @param in prefix string - used to output as comments in csv file
  * @param out output stream
  */
@@ -672,7 +672,7 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
  * size < 100, lag 1, size < 1000, lag 2, size < 10000 lag 3, etc.
 
  * @param in set of samples from one or more chains
- * @param in metatdata
+ * @param in metadata
  * @param in 1-based index of stan csv input file
  * @param in size of longest sampler param name
  */

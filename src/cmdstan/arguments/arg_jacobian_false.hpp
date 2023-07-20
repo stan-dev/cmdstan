@@ -5,7 +5,7 @@
 
 namespace cmdstan {
 /**
- * Default for optimization is jacobian=false (legacy behavoir).
+ * Default for optimization is jacobian=false (legacy behavior).
  */
 class arg_jacobian_false : public arg_jacobian {
  public:

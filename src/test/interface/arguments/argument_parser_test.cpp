@@ -39,7 +39,7 @@ class CmdStanArgumentsArgumentParser : public testing::Test {
   }
 
   /**
-   * Given a sugestion from the parser, massage it into
+   * Given a suggestion from the parser, massage it into
    * a form that looks like a command line input `argv`
    * and then parse it and assert suggestion is accepted.
    *
