@@ -2,6 +2,21 @@
 #define CMDSTAN_HELPER_HPP
 
 #include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/arguments/argument_parser.hpp>
+#include <cmdstan/arguments/arg_sample.hpp>
+#include <cmdstan/write_chain.hpp>
+#include <cmdstan/write_datetime.hpp>
+#include <cmdstan/write_model_compile_info.hpp>
+#include <cmdstan/write_model.hpp>
+#include <cmdstan/write_opencl_device.hpp>
+#include <cmdstan/write_parallel_info.hpp>
+#include <cmdstan/write_profiling.hpp>
+#include <cmdstan/write_stan.hpp>
+#include <cmdstan/write_stan_flags.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
@@ -16,6 +31,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <vector>
 #include <rapidjson/document.h>
 
@@ -101,6 +117,7 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
  * Check that sampler config is valid for multi-chain processing,
  * which is only implemented for adaptive NUTS-HMC.
  * If config is not adaptive NUTS-HMC, throws error.
+ * Assumes that config is for sampler method.
  *
  * @param config sample argument
  */
@@ -136,12 +153,35 @@ void validate_multi_chain_config(argument *config) {
  * @param filename
  * @return suffix
  */
-std::string suffix(const std::string name) {
+std::string get_suffix(const std::string &name) {
+  if (name.empty())
+    return "";
   size_t file_marker_pos = name.find_last_of(".");
   if (file_marker_pos > name.size())
     return std::string();
   else
     return name.substr(file_marker_pos, name.size());
+}
+
+/**
+ * Split name on last ".", if any.
+ *
+ * @param filename - name to split
+ * @return pair of strings {base, suffix}
+ */
+std::pair<std::string, std::string> get_basename_suffix(
+    const std::string &name) {
+  std::string base;
+  std::string suffix;
+  if (!name.empty()) {
+    suffix = get_suffix(name);
+    if (suffix.size() > 0) {
+      base = name.substr(0, name.size() - suffix.size());
+    } else {
+      base = name;
+    }
+  }
+  return {base, suffix};
 }
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
@@ -156,7 +196,7 @@ inline shared_context_ptr get_var_context(const std::string &file) {
     msg << "Can't open specified file, \"" << file << "\"" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  if (suffix(file) == ".json") {
+  if (get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
@@ -529,9 +569,9 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
                                  const stan::model::model_base &model) {
   std::stringstream msg;
   Eigen::VectorXd theta_hat;
-  if (suffix(fname) == ".csv") {
+  if (get_suffix(fname) == ".csv") {
     theta_hat = get_laplace_mode_csv(fname, model);
-  } else if (suffix(fname) == ".json") {
+  } else if (get_suffix(fname) == ".json") {
     std::vector<double> unc_params
         = unconstrain_params_var_context(fname, model);
     theta_hat
@@ -632,6 +672,157 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
     std::copy(gradients.begin(), gradients.end() - 1,
               std::ostream_iterator<double>(output_stream, ","));
     output_stream << gradients.back() << "\n";
+  }
+}
+
+/**
+ * For sample and pathfinder methods, return number of
+ * chains or pathfinders to run, otherwise return 1.
+ * For the sampler, only adaptive NUTS-HMC with non-unit metric
+ * supports multi-chain parallelization; if sampler config is invalid,
+ * this will throw an error.
+ *
+ * @param parser user config
+ * @return int num chains or paths
+ */
+unsigned int get_num_chains(argument_parser &parser) {
+  auto user_method = parser.arg("method");
+  if (user_method->arg("pathfinder"))
+    return get_arg_val<int_argument>(parser, "method", "pathfinder",
+                                     "num_paths");
+  if (!user_method->arg("sample"))
+    return 1;
+  unsigned int num_chains
+      = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
+  if (num_chains > 1)
+    validate_multi_chain_config(user_method);
+  return num_chains;
+}
+
+/**
+ * Check possible name conflicts between input and output files where both
+ * are in Stan CSV format; if conflicts detected, quit with an error message.
+ *
+ * @param parser user config
+ */
+void check_file_config(argument_parser &parser) {
+  std::string sample_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  auto user_method = parser.arg("method");
+  if (user_method->arg("generate_quantities")) {
+    std::string input_file = get_arg_val<string_argument>(
+        parser, "method", "generate_quantities", "fitted_params");
+    if (input_file.empty()) {
+      throw std::invalid_argument(
+          std::string("Argument fitted_params file - found empty string, "
+                      "expecting filename."));
+      if (input_file.compare(sample_file) == 0) {
+        std::stringstream msg;
+        msg << "Filename conflict, fitted_params file " << input_file
+            << " and output file names are identical, must be different."
+            << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+    }
+  } else if (user_method->arg("laplace")) {
+    std::string input_file
+        = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
+    if (input_file.empty()) {
+      throw std::invalid_argument(
+          std::string("Argument mode file - found empty string, "
+                      "expecting filename."));
+      if (input_file.compare(sample_file) == 0) {
+        std::stringstream msg;
+        msg << "Filename conflict, parameter modes file " << input_file
+            << " and output file names are identical, must be different."
+            << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+    }
+  }
+}
+
+std::vector<std::string> make_filenames(const std::string &filename,
+                                        const std::string &type,
+                                        unsigned int num_chains,
+                                        unsigned int id) {
+  std::vector<std::string> names(num_chains);
+  auto base_sfx = get_basename_suffix(filename);
+  if (base_sfx.second.empty()) {
+    base_sfx.second = type;
+  }
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  for (int i = 0; i < num_chains; ++i) {
+    names[i] = base_sfx.first + name_iterator(i) + base_sfx.second;
+  }
+  return names;
+}
+
+void init_callbacks(
+    argument_parser &parser,
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
+        &sample_writers,
+    std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
+        &diag_csv_writers,
+    std::vector<stan::callbacks::json_writer<std::ofstream>>
+        &diag_json_writers) {
+  auto user_method = parser.arg("method");
+  unsigned int num_chains = get_num_chains(parser);
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+
+  sample_writers.reserve(num_chains);
+  std::vector<std::string> output_filenames
+      = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                       ".csv", num_chains, id);
+  for (int i = 0; i < num_chains; ++i) {
+    auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
+    if (sig_figs > -1)
+      ofs->precision(sig_figs);
+    sample_writers.emplace_back(std::move(ofs), "# ");
+  }
+
+  diag_json_writers.reserve(num_chains);
+  diag_csv_writers.reserve(num_chains);
+  // create no-op writers by default
+  for (int i = 0; i < num_chains; ++i) {
+    diag_json_writers.emplace_back(
+        stan::callbacks::json_writer<std::ofstream>());
+  }
+  for (int i = 0; i < num_chains; ++i) {
+    diag_csv_writers.emplace_back(nullptr, "# ");
+  }
+  // create json, csv writers as needed.
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  if (!diagnostic_file.empty()) {
+    std::vector<std::string> diag_filenames;
+    if (user_method->arg("pathfinder")) {
+      diag_json_writers.clear();
+      diag_filenames = make_filenames(diagnostic_file, ".json", num_chains, id);
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
+        if (sig_figs > -1)
+          ofs->precision(sig_figs);
+        stan::callbacks::json_writer<std::ofstream> jwriter(std::move(ofs));
+        diag_json_writers.emplace_back(std::move(jwriter));
+      }
+    } else {
+      diag_csv_writers.clear();
+      diag_filenames = make_filenames(diagnostic_file, ".csv", num_chains, id);
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
+        if (sig_figs > -1)
+          ofs->precision(sig_figs);
+        diag_csv_writers.emplace_back(std::move(ofs), "# ");
+      }
+    }
   }
 }
 
