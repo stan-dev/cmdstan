@@ -114,40 +114,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
 }
 
 /**
- * Check that sampler config is valid for multi-chain processing,
- * which is only implemented for adaptive NUTS-HMC.
- * If config is not adaptive NUTS-HMC, throws error.
- * Assumes that config is for sampler method.
- *
- * @param config sample argument
- */
-void validate_multi_chain_config(argument *config) {
-  auto sample_arg = config->arg("sample");
-  bool adapt_engaged
-      = get_arg_val<bool_argument>(*config, "sample", "adapt", "engaged");
-  list_argument *algo
-      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-  bool is_hmc = algo->value() != "fixed_param";
-  bool is_engine_nuts = false;
-  bool is_metric_d = false;
-  if (is_hmc) {
-    list_argument *engine
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-    if (engine->value() == "nuts")
-      is_engine_nuts = true;
-    list_argument *metric
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-    if (!(metric->value() == "unit_e"))
-      is_metric_d = true;
-  }
-  if (!(adapt_engaged && is_engine_nuts && is_metric_d)) {
-    throw std::invalid_argument(
-        "Argument 'num_chains' can currently only be used for NUTS with "
-        "adaptation and dense_e or diag_e metric");
-  }
-}
-
-/**
  * Get suffix
  *
  * @param filename
@@ -690,12 +656,23 @@ unsigned int get_num_chains(argument_parser &parser) {
   if (user_method->arg("pathfinder"))
     return get_arg_val<int_argument>(parser, "method", "pathfinder",
                                      "num_paths");
-  if (!user_method->arg("sample"))
+
+  auto sample_arg = user_method->arg("sample");
+  if (!sample_arg)  // TODO parallel GQ now possible, consider
     return 1;
+
   unsigned int num_chains
-      = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-  if (num_chains > 1)
-    validate_multi_chain_config(user_method);
+      = get_arg_val<int_argument>(*sample_arg, "num_chains");
+
+  if (num_chains > 1) {
+    list_argument *algo
+        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
+    if (algo->value() != "fixed_param"
+        && get_arg_val<list_argument>(*algo, "hmc", "engine") == "static") {
+      throw std::invalid_argument(
+          "Argument 'num_chains' is unavailable for the 'static' HMC engine.");
+    }
+  }
   return num_chains;
 }
 
