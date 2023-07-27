@@ -188,7 +188,8 @@ pipeline {
                             aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
-                                excludeFile('tbb/*')
+                                excludeFile('tbb/*'),
+                                excludeFile('stan/lib/stan_math/lib/*')
                             ],
                             tools: [
                                 gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
@@ -227,7 +228,8 @@ pipeline {
                             aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
-                                excludeFile('tbb/*')
+                                excludeFile('tbb/*'),
+                                excludeFile('stan/lib/stan_math/lib/*')
                             ],
                             tools: [
                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
@@ -258,7 +260,8 @@ pipeline {
                             aggregatingResults : false,
                             filters: [
                                 excludeFile('/lib/.*'),
-                                excludeFile('tbb/*')
+                                excludeFile('tbb/*'),
+                                excludeFile('stan/lib/stan_math/lib/*')
                             ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
@@ -298,6 +301,90 @@ pipeline {
                     }
                 }
 
+            }
+        }
+        stage('Update downstream branches') {
+            parallel {
+                stage('Update downstream_hotfix - master') {
+                    agent {
+                        docker {
+                            image 'ellerbrock/alpine-bash-git'
+                            label 'linux'
+                            args '--entrypoint='
+                        }
+                    }
+                    when {
+                        beforeAgent true
+                        branch 'master'
+                    }
+                    steps {
+                        script {
+                            retry(3) { 
+                                checkout([
+                                    $class: 'GitSCM',
+                                    branches: [[name: '*/master'], [name: '*/downstream_hotfix']],
+                                    userRemoteConfigs: scm.userRemoteConfigs
+                                ])
+                             }
+                            withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                                sh """#!/bin/bash
+                                    set -x
+
+                                    git checkout downstream_hotfix
+                                    git reset --hard origin/master
+                                    git status
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                """
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            deleteDir()
+                        }
+                    }
+                }
+                stage('Update downstream_tests - develop') {
+                    agent {
+                        docker {
+                            image 'ellerbrock/alpine-bash-git'
+                            label 'linux'
+                            args '--entrypoint='
+                        }
+                    }
+                    when {
+                        beforeAgent true
+                        branch 'develop'
+                    }
+                    steps {
+                        script {
+                            retry(3) { 
+                                checkout([
+                                    $class: 'GitSCM',
+                                    branches: [[name: '*/develop'], [name: '*/downstream_tests']],
+                                    userRemoteConfigs: scm.userRemoteConfigs
+                                ])
+                             }
+                            withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                                usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                                sh """#!/bin/bash
+                                    set -x
+
+                                    git checkout downstream_tests
+                                    git reset --hard origin/develop
+                                    git status
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_tests
+                                """
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            deleteDir()
+                        }
+                    }
+                }
             }
         }
     }

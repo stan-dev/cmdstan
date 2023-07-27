@@ -28,8 +28,7 @@ int count_matches(const std::string &target, const std::string &s) {
 /**
  * Gets the path separator for the OS.
  *
- * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_"))
-== 0); ws, '/' otherwise.
+ * @return '\' for Windows, '/' otherwise.
  */
 char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
