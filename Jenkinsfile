@@ -189,7 +189,8 @@ pipeline {
                             filters: [
                                 excludeFile('/lib/.*'),
                                 excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*')
+                                excludeFile('stan/lib/stan_math/lib/*'),
+                                excludeMessage("*'sprintf' is deprecated*")
                             ],
                             tools: [
                                 gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
@@ -229,7 +230,8 @@ pipeline {
                             filters: [
                                 excludeFile('/lib/.*'),
                                 excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*')
+                                excludeFile('stan/lib/stan_math/lib/*'),
+                                excludeMessage("*'sprintf' is deprecated*")
                             ],
                             tools: [
                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
@@ -261,7 +263,8 @@ pipeline {
                             filters: [
                                 excludeFile('/lib/.*'),
                                 excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*')
+                                excludeFile('stan/lib/stan_math/lib/*'),
+                                excludeMessage("*'sprintf' is deprecated*")
                             ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
