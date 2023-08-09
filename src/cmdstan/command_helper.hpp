@@ -57,7 +57,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -73,7 +73,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -104,7 +104,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -166,6 +166,12 @@ inline shared_context_ptr get_var_context(const std::string &file) {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
 }
@@ -220,6 +226,14 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
     }
+    if (file_ending != ".json") {
+      std::cerr
+          << "Warning: file '" << file
+          << "' is being read as an 'RDump' file.\n"
+             "\tThis format is deprecated and will not receive new features.\n"
+             "\tConsider saving your data in JSON format instead."
+          << std::endl;
+    }
     std::string file_1
         = std::string(file_name + "_" + std::to_string(1) + file_ending);
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
@@ -262,6 +276,12 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   }
   // This should not happen
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
