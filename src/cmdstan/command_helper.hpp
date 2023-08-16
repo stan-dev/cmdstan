@@ -740,6 +740,7 @@ void check_file_config(argument_parser &parser) {
 }
 
 std::vector<std::string> make_filenames(const std::string &filename,
+                                        const std::string &tag,
                                         const std::string &type,
                                         unsigned int num_chains,
                                         unsigned int id) {
@@ -756,7 +757,7 @@ std::vector<std::string> make_filenames(const std::string &filename,
     }
   };
   for (int i = 0; i < num_chains; ++i) {
-    names[i] = base_sfx.first + name_iterator(i) + base_sfx.second;
+    names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
   }
   return names;
 }
@@ -768,23 +769,39 @@ void init_callbacks(
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
         &diag_csv_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
-        &diag_json_writers) {
+    &diag_json_writers,
+    stan::callbacks::unique_stream_writer<std::ofstream> &pathfinder_writer) {
+  // bookkeeping
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+  bool is_pathfinder = user_method->arg("pathfinder");
+  bool save_single_paths = is_pathfinder && num_chains > 1
+    && get_arg_val<bool_argument>(parser, "method", "pathfinder", "save_single_paths");
 
+  // output.csv files for all chains and single-path-pathfinder csv files
   sample_writers.reserve(num_chains);
-  std::vector<std::string> output_filenames
+  if (!is_pathfinder || save_single_paths || num_chains == 1) {
+    std::vector<std::string> output_filenames
       = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       ".csv", num_chains, id);
-  for (int i = 0; i < num_chains; ++i) {
-    auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
-    if (sig_figs > -1)
-      ofs->precision(sig_figs);
-    sample_writers.emplace_back(std::move(ofs), "# ");
+                       "", ".csv", num_chains, id);
+    if (save_single_paths) {
+      output_filenames = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                       "_pathfinder", ".csv", num_chains, id);
+    }
+    for (int i = 0; i < num_chains; ++i) {
+      auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
+      if (sig_figs > -1)
+        ofs->precision(sig_figs);
+      sample_writers.emplace_back(std::move(ofs), "# ");
+    }
+  } else if (is_pathfinder && !save_single_paths) {
+    for (int i = 0; i < num_chains; ++i) {
+      sample_writers.emplace_back(nullptr, "# ");
+    }
   }
-
+  // diagnostic files for sampler (csv) and pathfinder (json)
   diag_json_writers.reserve(num_chains);
   diag_csv_writers.reserve(num_chains);
   // create no-op writers by default
@@ -802,7 +819,7 @@ void init_callbacks(
     std::vector<std::string> diag_filenames;
     if (user_method->arg("pathfinder")) {
       diag_json_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, ".json", num_chains, id);
+      diag_filenames = make_filenames(diagnostic_file, "", ".json", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -812,7 +829,7 @@ void init_callbacks(
       }
     } else {
       diag_csv_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, ".csv", num_chains, id);
+      diag_filenames = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -821,6 +838,17 @@ void init_callbacks(
       }
     }
   }
+  // CSV file for pathfinder PSIS sample
+  if (is_pathfinder && num_chains > 1) {
+    std::vector<std::string> output_filenames =
+      make_filenames(get_arg_val<string_argument>(parser, "output", "file"), "", ".csv", 1, id);
+    auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
+    if (sig_figs > -1)
+      ofs->precision(sig_figs);
+    stan::callbacks::unique_stream_writer<std::ofstream> tmp(std::move(ofs), "# ");
+    pathfinder_writer = std::move(tmp);
+  }
+
 }
 
 }  // namespace cmdstan

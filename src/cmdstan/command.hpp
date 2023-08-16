@@ -195,8 +195,10 @@ int command(int argc, const char *argv[]) {
       diagnostic_csv_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>>
       diagnostic_json_writers;
+  stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer;
+
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
-                 diagnostic_json_writers);
+                 diagnostic_json_writers, pathfinder_writer);
 
   // Setup initial parameter values - arg "init"
   // arg is either filename or init radius value
@@ -264,18 +266,6 @@ int command(int argc, const char *argv[]) {
           save_iterations, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      std::string output_file
-          = get_arg_val<string_argument>(parser, "output", "file");
-      auto base_sfx = get_basename_suffix(output_file);
-      if (base_sfx.second.empty())
-        base_sfx.second = ".csv";
-      auto ofs = std::make_unique<std::ofstream>(base_sfx.first + "_pathfinder"
-                                                 + base_sfx.second);
-      if (sig_figs > -1) {
-        ofs->precision(sig_figs);
-      }
-      stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
-          std::move(ofs), "# ");
       write_stan(pathfinder_writer);
       write_model(pathfinder_writer, model.model_name());
       write_datetime(pathfinder_writer);
