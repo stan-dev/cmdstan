@@ -488,17 +488,11 @@ int command(int argc, const char *argv[]) {
         info(
             "Model contains no parameters, running fixed_param sampler, "
             "no updates to Markov chain");
-        if (num_chains > 1) {
-          throw std::invalid_argument(
-              "Argument 'num_chains' can currently only be used for HMC with "
-              "adaptation engaged. This model has no parameters, which "
-              "currently means only the fixed_param algorithm can be used");
-        }
       }
       return_code = stan::services::sample::fixed_param(
-          model, *(init_contexts[0]), random_seed, id, init_radius, num_samples,
-          num_thin, refresh, interrupt, logger, init_writers[0],
-          sample_writers[0], diagnostic_csv_writers[0]);
+          model, num_chains, init_contexts, random_seed, id, init_radius,
+          num_samples, num_thin, refresh, interrupt, logger, init_writers,
+          sample_writers, diagnostic_csv_writers);
     } else if (algo->value() == "hmc") {
       list_argument *engine
           = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
@@ -546,10 +540,10 @@ int command(int argc, const char *argv[]) {
                                 ->arg("max_depth"))
                             ->value();
         return_code = stan::services::sample::hmc_nuts_dense_e(
-            model, *(init_contexts[0]), *(metric_contexts[0]), random_seed, id,
+            model, num_chains, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, interrupt, logger,
-            init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+            init_writers, sample_writers, diagnostic_csv_writers);
       } else if (engine->value() == "nuts" && metric->value() == "dense_e"
                  && adapt_engaged == true && metric_supplied == false) {
         int max_depth = dynamic_cast<int_argument *>(
@@ -613,10 +607,10 @@ int command(int argc, const char *argv[]) {
         int max_depth
             = dynamic_cast<int_argument *>(base->arg("max_depth"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e(
-            model, *(init_contexts[0]), random_seed, id, init_radius,
+            model, num_chains, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-            stepsize_jitter, max_depth, interrupt, logger, init_writers[0],
-            sample_writers[0], diagnostic_csv_writers[0]);
+            stepsize_jitter, max_depth, interrupt, logger, init_writers,
+            sample_writers, diagnostic_csv_writers);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == false && metric_supplied == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -624,10 +618,10 @@ int command(int argc, const char *argv[]) {
         int max_depth
             = dynamic_cast<int_argument *>(base->arg("max_depth"))->value();
         return_code = stan::services::sample::hmc_nuts_diag_e(
-            model, *(init_contexts[0]), *(metric_contexts[0]), random_seed, id,
+            model, num_chains, init_contexts, metric_contexts, random_seed, id,
             init_radius, num_warmup, num_samples, num_thin, save_warmup,
             refresh, stepsize, stepsize_jitter, max_depth, interrupt, logger,
-            init_writers[0], sample_writers[0], diagnostic_csv_writers[0]);
+            init_writers, sample_writers, diagnostic_csv_writers);
       } else if (engine->value() == "nuts" && metric->value() == "diag_e"
                  && adapt_engaged == true && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -689,10 +683,10 @@ int command(int argc, const char *argv[]) {
         int max_depth
             = dynamic_cast<int_argument *>(base->arg("max_depth"))->value();
         return_code = stan::services::sample::hmc_nuts_unit_e(
-            model, *(init_contexts[0]), random_seed, id, init_radius,
+            model, num_chains, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-            stepsize_jitter, max_depth, interrupt, logger, init_writers[0],
-            sample_writers[0], diagnostic_csv_writers[0]);
+            stepsize_jitter, max_depth, interrupt, logger, init_writers,
+            sample_writers, diagnostic_csv_writers);
       } else if (engine->value() == "nuts" && metric->value() == "unit_e"
                  && adapt_engaged == true) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(
@@ -707,11 +701,10 @@ int command(int argc, const char *argv[]) {
             = dynamic_cast<real_argument *>(adapt->arg("kappa"))->value();
         double t0 = dynamic_cast<real_argument *>(adapt->arg("t0"))->value();
         return_code = stan::services::sample::hmc_nuts_unit_e_adapt(
-            model, *(init_contexts[0]), random_seed, id, init_radius,
+            model, num_chains, init_contexts, random_seed, id, init_radius,
             num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
             stepsize_jitter, max_depth, delta, gamma, kappa, t0, interrupt,
-            logger, init_writers[0], sample_writers[0],
-            diagnostic_csv_writers[0]);
+            logger, init_writers, sample_writers, diagnostic_csv_writers);
       } else if (engine->value() == "static" && metric->value() == "dense_e"
                  && adapt_engaged == false && metric_supplied == false) {
         categorical_argument *base = dynamic_cast<categorical_argument *>(

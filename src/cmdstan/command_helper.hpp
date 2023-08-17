@@ -18,6 +18,7 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -114,40 +115,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
 }
 
 /**
- * Check that sampler config is valid for multi-chain processing,
- * which is only implemented for adaptive NUTS-HMC.
- * If config is not adaptive NUTS-HMC, throws error.
- * Assumes that config is for sampler method.
- *
- * @param config sample argument
- */
-void validate_multi_chain_config(argument *config) {
-  auto sample_arg = config->arg("sample");
-  bool adapt_engaged
-      = get_arg_val<bool_argument>(*config, "sample", "adapt", "engaged");
-  list_argument *algo
-      = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
-  bool is_hmc = algo->value() != "fixed_param";
-  bool is_engine_nuts = false;
-  bool is_metric_d = false;
-  if (is_hmc) {
-    list_argument *engine
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
-    if (engine->value() == "nuts")
-      is_engine_nuts = true;
-    list_argument *metric
-        = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("metric"));
-    if (!(metric->value() == "unit_e"))
-      is_metric_d = true;
-  }
-  if (!(adapt_engaged && is_engine_nuts && is_metric_d)) {
-    throw std::invalid_argument(
-        "Argument 'num_chains' can currently only be used for NUTS with "
-        "adaptation and dense_e or diag_e metric");
-  }
-}
-
-/**
  * Get suffix
  *
  * @param filename
@@ -184,22 +151,43 @@ std::pair<std::string, std::string> get_basename_suffix(
   return {base, suffix};
 }
 
+/**
+ * Opens input stream for file.
+ * Throws exception if stream cannot be opened.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @return input stream
+ */
+std::ifstream safe_open(const std::string fname) {
+  std::ifstream stream(fname.c_str());
+  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+    std::stringstream msg;
+    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  return stream;
+}
+
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
  * Given the name of a file, return a shared pointer holding the data contents.
  * @param file A system file to read from
  */
 inline shared_context_ptr get_var_context(const std::string &file) {
-  std::fstream stream(file.c_str(), std::fstream::in);
-  if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
+  if (file.empty()) {
+    return std::make_shared<stan::io::empty_var_context>();
   }
+  std::ifstream stream = safe_open(file);
   if (get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
 }
@@ -235,10 +223,9 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   };
   // use default for all chain inits
-  if (file == "") {
-    using stan::io::dump;
-    std::fstream stream(file.c_str(), std::fstream::in);
-    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
+  if (file.empty()) {
+    return context_vector(num_chains,
+                          std::make_shared<stan::io::empty_var_context>());
   } else {
     size_t file_marker_pos = file.find_last_of(".");
     if (file_marker_pos > file.size()) {
@@ -253,6 +240,14 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       std::stringstream msg;
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
+    }
+    if (file_ending != ".json") {
+      std::cerr
+          << "Warning: file '" << file
+          << "' is being read as an 'RDump' file.\n"
+             "\tThis format is deprecated and will not receive new features.\n"
+             "\tConsider saving your data in JSON format instead."
+          << std::endl;
     }
     std::string file_1
         = std::string(file_name + "_" + std::to_string(1) + file_ending);
@@ -296,26 +291,15 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   }
   // This should not happen
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
-}
-
-/**
- * Opens input stream for file.
- * Throws exception if stream cannot be opened.
- *
- * @param fname name of file which exists and has read perms.
- * @return input stream
- */
-std::ifstream safe_open(const std::string fname) {
-  std::ifstream stream(fname.c_str());
-  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-  return stream;
 }
 
 /**
@@ -690,12 +674,23 @@ unsigned int get_num_chains(argument_parser &parser) {
   if (user_method->arg("pathfinder"))
     return get_arg_val<int_argument>(parser, "method", "pathfinder",
                                      "num_paths");
-  if (!user_method->arg("sample"))
+
+  auto sample_arg = user_method->arg("sample");
+  if (!sample_arg)  // TODO parallel GQ now possible, consider
     return 1;
+
   unsigned int num_chains
-      = get_arg_val<int_argument>(parser, "method", "sample", "num_chains");
-  if (num_chains > 1)
-    validate_multi_chain_config(user_method);
+      = get_arg_val<int_argument>(*sample_arg, "num_chains");
+
+  if (num_chains > 1) {
+    list_argument *algo
+        = dynamic_cast<list_argument *>(sample_arg->arg("algorithm"));
+    if (algo->value() != "fixed_param"
+        && get_arg_val<list_argument>(*algo, "hmc", "engine") == "static") {
+      throw std::invalid_argument(
+          "Argument 'num_chains' is unavailable for the 'static' HMC engine.");
+    }
+  }
   return num_chains;
 }
 
