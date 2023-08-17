@@ -265,12 +265,14 @@ int command(int argc, const char *argv[]) {
           save_iterations, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      std::vector<std::string> output_filenames =
-        make_filenames(get_arg_val<string_argument>(parser, "output", "file"), "", ".csv", 1, id);
+      std::vector<std::string> output_filenames = make_filenames(
+          get_arg_val<string_argument>(parser, "output", "file"), "", ".csv", 1,
+          id);
       auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
       if (sig_figs > -1)
         ofs->precision(sig_figs);
-      stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(std::move(ofs), "# ");
+      stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
+          std::move(ofs), "# ");
       write_stan(pathfinder_writer);
       write_model(pathfinder_writer, model.model_name());
       write_datetime(pathfinder_writer);
