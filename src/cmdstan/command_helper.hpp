@@ -769,8 +769,7 @@ void init_callbacks(
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
         &diag_csv_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
-    &diag_json_writers,
-    stan::callbacks::unique_stream_writer<std::ofstream> &pathfinder_writer) {
+    &diag_json_writers) {
   // bookkeeping
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
@@ -788,7 +787,7 @@ void init_callbacks(
                        "", ".csv", num_chains, id);
     if (save_single_paths) {
       output_filenames = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       "_pathfinder", ".csv", num_chains, id);
+                       "_path", ".csv", num_chains, id);
     }
     for (int i = 0; i < num_chains; ++i) {
       auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
@@ -838,17 +837,6 @@ void init_callbacks(
       }
     }
   }
-  // CSV file for pathfinder PSIS sample
-  if (is_pathfinder && num_chains > 1) {
-    std::vector<std::string> output_filenames =
-      make_filenames(get_arg_val<string_argument>(parser, "output", "file"), "", ".csv", 1, id);
-    auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
-    if (sig_figs > -1)
-      ofs->precision(sig_figs);
-    stan::callbacks::unique_stream_writer<std::ofstream> tmp(std::move(ofs), "# ");
-    pathfinder_writer = std::move(tmp);
-  }
-
 }
 
 }  // namespace cmdstan
