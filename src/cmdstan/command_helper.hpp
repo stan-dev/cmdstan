@@ -18,6 +18,7 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -150,18 +151,33 @@ std::pair<std::string, std::string> get_basename_suffix(
   return {base, suffix};
 }
 
+/**
+ * Opens input stream for file.
+ * Throws exception if stream cannot be opened.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @return input stream
+ */
+std::ifstream safe_open(const std::string fname) {
+  std::ifstream stream(fname.c_str());
+  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+    std::stringstream msg;
+    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  return stream;
+}
+
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
  * Given the name of a file, return a shared pointer holding the data contents.
  * @param file A system file to read from
  */
 inline shared_context_ptr get_var_context(const std::string &file) {
-  std::fstream stream(file.c_str(), std::fstream::in);
-  if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
+  if (file.empty()) {
+    return std::make_shared<stan::io::empty_var_context>();
   }
+  std::ifstream stream = safe_open(file);
   if (get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
@@ -207,10 +223,9 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   };
   // use default for all chain inits
-  if (file == "") {
-    using stan::io::dump;
-    std::fstream stream(file.c_str(), std::fstream::in);
-    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
+  if (file.empty()) {
+    return context_vector(num_chains,
+                          std::make_shared<stan::io::empty_var_context>());
   } else {
     size_t file_marker_pos = file.find_last_of(".");
     if (file_marker_pos > file.size()) {
@@ -285,23 +300,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
-}
-
-/**
- * Opens input stream for file.
- * Throws exception if stream cannot be opened.
- *
- * @param fname name of file which exists and has read perms.
- * @return input stream
- */
-std::ifstream safe_open(const std::string fname) {
-  std::ifstream stream(fname.c_str());
-  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-  return stream;
 }
 
 /**
@@ -769,25 +767,28 @@ void init_callbacks(
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
         &diag_csv_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
-    &diag_json_writers) {
+        &diag_json_writers) {
   // bookkeeping
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   bool is_pathfinder = user_method->arg("pathfinder");
-  bool save_single_paths = is_pathfinder && num_chains > 1
-    && get_arg_val<bool_argument>(parser, "method", "pathfinder", "save_single_paths");
+  bool save_single_paths
+      = is_pathfinder && num_chains > 1
+        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                      "save_single_paths");
 
   // output.csv files for all chains and single-path-pathfinder csv files
   sample_writers.reserve(num_chains);
   if (!is_pathfinder || save_single_paths || num_chains == 1) {
     std::vector<std::string> output_filenames
-      = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       "", ".csv", num_chains, id);
+        = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                         "", ".csv", num_chains, id);
     if (save_single_paths) {
-      output_filenames = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       "_path", ".csv", num_chains, id);
+      output_filenames = make_filenames(
+          get_arg_val<string_argument>(parser, "output", "file"), "_path",
+          ".csv", num_chains, id);
     }
     for (int i = 0; i < num_chains; ++i) {
       auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
@@ -818,7 +819,8 @@ void init_callbacks(
     std::vector<std::string> diag_filenames;
     if (user_method->arg("pathfinder")) {
       diag_json_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, "", ".json", num_chains, id);
+      diag_filenames
+          = make_filenames(diagnostic_file, "", ".json", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
@@ -828,7 +830,8 @@ void init_callbacks(
       }
     } else {
       diag_csv_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
+      diag_filenames
+          = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
         if (sig_figs > -1)
