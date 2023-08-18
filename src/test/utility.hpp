@@ -11,7 +11,6 @@
 
 #include <sys/stat.h>
 
-
 namespace cmdstan {
 namespace test {
 
@@ -284,11 +283,10 @@ int idx_first_match(const std::vector<std::string> &lines,
   return idx;
 }
 
-bool file_exists(const std::string& filename) {
-    struct stat buffer;
-    return (stat(filename.c_str(), &buffer) == 0);
+bool file_exists(const std::string &filename) {
+  struct stat buffer;
+  return (stat(filename.c_str(), &buffer) == 0);
 }
-
 
 }  // namespace test
 }  // namespace cmdstan
