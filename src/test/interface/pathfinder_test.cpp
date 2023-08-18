@@ -24,7 +24,6 @@ class CmdStan : public testing::Test {
     output_save_single = {"test", "output_path_1.csv"};
     output_save_single_diag = {"test", "output_path_1.json"};
     output_save_single_diag_1 = {"test", "output.json"};
-
   }
 
   void TearDown() {
@@ -176,7 +175,6 @@ TEST_F(CmdStan, pathfinder_num_paths_8) {
 //   rapidjson::Document document;
 //   ASSERT_FALSE(document.Parse<0>(output.c_str()).HasParseError());
 // }
-
 
 // TEST_F(CmdStan, pathfinder_lbfgs_iterations) {
 //   std::stringstream ss;

@@ -279,7 +279,7 @@ int command(int argc, const char *argv[]) {
       pathfinder_writer("# test");
       for (int i = 0; i < num_paths; ++i) {
         diagnostic_json_writers[i].write("test", "test");
-      }      
+      }
       write_stan(pathfinder_writer);
       write_model(pathfinder_writer, model.model_name());
       write_datetime(pathfinder_writer);
