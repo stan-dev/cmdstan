@@ -208,9 +208,11 @@ int command(int argc, const char *argv[]) {
     init = "";
   } catch (const std::logic_error &e) {
   }
+
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains);
   std::vector<std::string> model_compile_info = model.model_compile_info();
+
   for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
@@ -254,8 +256,8 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
     bool save_iterations
-        = !get_arg_val<string_argument>(parser, "output", "diagnostic_file")
-               .empty();
+        = get_arg_val<bool_argument>(*pathfinder_arg, "save_single_paths");
+
     if (num_paths == 1) {
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
@@ -265,14 +267,19 @@ int command(int argc, const char *argv[]) {
           save_iterations, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      std::vector<std::string> output_filenames = make_filenames(
+      std::vector<std::string> pf_names = make_filenames(
           get_arg_val<string_argument>(parser, "output", "file"), "", ".csv", 1,
           id);
-      auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
+      auto ofs = std::make_unique<std::ofstream>(pf_names[0]);
       if (sig_figs > -1)
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
+      std::cout << "L 280" << std::endl;
+      pathfinder_writer("# test");
+      for (int i = 0; i < num_paths; ++i) {
+        diagnostic_json_writers[i].write("test", "test");
+      }
       write_stan(pathfinder_writer);
       write_model(pathfinder_writer, model.model_name());
       write_datetime(pathfinder_writer);
