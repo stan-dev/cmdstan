@@ -109,7 +109,6 @@ TEST_F(CmdStan, pathfinder_single) {
   EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
 }
 
-
 TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
@@ -141,7 +140,6 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   ASSERT_FALSE(document.Parse<0>(single_json.c_str()).HasParseError());
   EXPECT_EQ(1, count_matches("\"1\" : {\"iter\" : 1,", single_json));
 }
-
 
 // TEST_F(CmdStan, pathfinder_single_good_plus) {
 //   std::stringstream ss;

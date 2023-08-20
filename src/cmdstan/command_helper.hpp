@@ -770,10 +770,12 @@ void init_callbacks(
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
-  bool save_single_paths = user_method->arg("pathfinder")
-    && get_arg_val<bool_argument>(parser, "method", "pathfinder", "save_single_paths");
+  bool save_single_paths
+      = user_method->arg("pathfinder")
+        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                      "save_single_paths");
   std::string diagnostic_file
-    = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   std::vector<std::string> output_filenames;
   std::vector<std::string> diagnostic_filenames;
 
@@ -784,37 +786,36 @@ void init_callbacks(
   // default - no diagnostics
   for (int i = 0; i < num_chains; ++i) {
     diag_csv_writers.emplace_back(nullptr, "# ");
-    diag_json_writers.emplace_back(stan::callbacks::json_writer<std::ofstream>());
+    diag_json_writers.emplace_back(
+        stan::callbacks::json_writer<std::ofstream>());
   }
-  
+
   if (user_method->arg("pathfinder")) {
     bool inst_writers = true;
     bool inst_diags = true;
     // make filenames
     if (num_chains == 1) {
-      output_filenames
-        = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                         "", ".csv", num_chains, id);
+      output_filenames = make_filenames(
+          get_arg_val<string_argument>(parser, "output", "file"), "", ".csv",
+          num_chains, id);
       if (!diagnostic_file.empty()) {
-        diagnostic_filenames
-          = make_filenames(get_arg_val<string_argument>(parser, "output",
-                                                        "diagnostic_file"),
-                           "", ".json", num_chains, id);
+        diagnostic_filenames = make_filenames(
+            get_arg_val<string_argument>(parser, "output", "diagnostic_file"),
+            "", ".json", num_chains, id);
       } else if (save_single_paths) {
-        diagnostic_filenames
-          = make_filenames(get_arg_val<string_argument>(parser, "output",
-                                                        "file"),
-                           "", ".json", num_chains, id);
+        diagnostic_filenames = make_filenames(
+            get_arg_val<string_argument>(parser, "output", "file"), "", ".json",
+            num_chains, id);
       } else {
         inst_diags = false;
       }
     } else if (save_single_paths) {  // filenames for single-path outputs
       output_filenames = make_filenames(
-                                        get_arg_val<string_argument>(parser, "output", "file"), "_path",
-                                        ".csv", num_chains, id);
+          get_arg_val<string_argument>(parser, "output", "file"), "_path",
+          ".csv", num_chains, id);
       diagnostic_filenames = make_filenames(
-                                            get_arg_val<string_argument>(parser, "output", "file"), "_path",
-                                            ".json", num_chains, id);
+          get_arg_val<string_argument>(parser, "output", "file"), "_path",
+          ".json", num_chains, id);
     } else {  // multi-path default: don't save single-path outputs
       inst_writers = false;
       inst_diags = false;
@@ -835,18 +836,20 @@ void init_callbacks(
     if (inst_diags) {
       diag_json_writers.clear();
       for (int i = 0; i < num_chains; ++i) {
-        auto ofs_diag = std::make_unique<std::ofstream>(diagnostic_filenames[i]);
+        auto ofs_diag
+            = std::make_unique<std::ofstream>(diagnostic_filenames[i]);
         if (sig_figs > -1) {
           ofs_diag->precision(sig_figs);
         }
-        stan::callbacks::json_writer<std::ofstream> jwriter(std::move(ofs_diag));
+        stan::callbacks::json_writer<std::ofstream> jwriter(
+            std::move(ofs_diag));
         diag_json_writers.emplace_back(std::move(jwriter));
       }
-    }  
+    }
   } else {  // not pathfinder
     output_filenames
-      = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       "", ".csv", num_chains, id);
+        = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                         "", ".csv", num_chains, id);
     for (int i = 0; i < num_chains; ++i) {
       auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
       if (sig_figs > -1)
@@ -856,7 +859,7 @@ void init_callbacks(
     if (!diagnostic_file.empty()) {
       diag_csv_writers.clear();
       diagnostic_filenames
-        = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
+          = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
         auto ofs = std::make_unique<std::ofstream>(diagnostic_filenames[i]);
         if (sig_figs > -1)
