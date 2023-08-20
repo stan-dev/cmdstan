@@ -16,11 +16,11 @@ class arg_pathfinder : public arg_lbfgs {
 
     _subarguments.push_back(new arg_single_int_pos(
         "num_psis_draws", "Number of draws from PSIS sample", 1000));
+    _subarguments.push_back(
+        new arg_single_int_pos("num_paths", "Number of single pathfinders", 4));
     _subarguments.push_back(new arg_single_bool(
         "save_single_paths", "Output single-path pathfinder draws as CSV",
         false));
-    _subarguments.push_back(
-        new arg_single_int_pos("num_paths", "Number of single pathfinders", 4));
     _subarguments.push_back(new arg_single_int_pos(
         "max_lbfgs_iters", "Maximum number of LBFGS iterations", 1000));
     _subarguments.push_back(new arg_single_int_pos(
