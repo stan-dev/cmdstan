@@ -744,7 +744,9 @@ std::vector<std::string> make_filenames(const std::string &filename,
                                         unsigned int id) {
   std::vector<std::string> names(num_chains);
   auto base_sfx = get_basename_suffix(filename);
-  base_sfx.second = type;
+  if (base_sfx.second.empty()) {
+    base_sfx.second = type;
+  }
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
       return std::string("");
@@ -774,11 +776,12 @@ void init_callbacks(
       = user_method->arg("pathfinder")
         && get_arg_val<bool_argument>(parser, "method", "pathfinder",
                                       "save_single_paths");
+  std::string output_file
+      = get_arg_val<string_argument>(parser, "output", "file");
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   std::vector<std::string> output_filenames;
   std::vector<std::string> diagnostic_filenames;
-
   sample_writers.reserve(num_chains);
   diag_csv_writers.reserve(num_chains);
   diag_json_writers.reserve(num_chains);
@@ -791,31 +794,24 @@ void init_callbacks(
   }
 
   if (user_method->arg("pathfinder")) {
+    std::string basename = get_basename_suffix(output_file).first;
+    std::string diag_basename = get_basename_suffix(diagnostic_file).first;
     bool inst_writers = true;
     bool inst_diags = true;
-    // make filenames
     if (num_chains == 1) {
-      output_filenames = make_filenames(
-          get_arg_val<string_argument>(parser, "output", "file"), "", ".csv",
-          num_chains, id);
-      if (!diagnostic_file.empty()) {
-        diagnostic_filenames = make_filenames(
-            get_arg_val<string_argument>(parser, "output", "diagnostic_file"),
-            "", ".json", num_chains, id);
+      output_filenames.emplace_back(basename + ".csv");
+      if (!diag_basename.empty()) {
+        diagnostic_filenames.emplace_back(diag_basename + ".json");
       } else if (save_single_paths) {
-        diagnostic_filenames = make_filenames(
-            get_arg_val<string_argument>(parser, "output", "file"), "", ".json",
-            num_chains, id);
+        diagnostic_filenames.emplace_back(basename + ".json");
       } else {
         inst_diags = false;
       }
     } else if (save_single_paths) {  // filenames for single-path outputs
-      output_filenames = make_filenames(
-          get_arg_val<string_argument>(parser, "output", "file"), "_path",
-          ".csv", num_chains, id);
-      diagnostic_filenames = make_filenames(
-          get_arg_val<string_argument>(parser, "output", "file"), "_path",
-          ".json", num_chains, id);
+      output_filenames
+          = make_filenames(basename, "_path", ".csv", num_chains, id);
+      diagnostic_filenames
+          = make_filenames(basename, "_path", ".json", num_chains, id);
     } else {  // multi-path default: don't save single-path outputs
       inst_writers = false;
       inst_diags = false;
