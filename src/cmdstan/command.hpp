@@ -267,11 +267,11 @@ int command(int argc, const char *argv[]) {
           save_iterations, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      auto ofs
-          = std::make_unique<std::ofstream>(
-              get_basename_suffix(
-                  get_arg_val<string_argument>(parser, "output", "file")).first
-              + ".csv");
+      auto ofs = std::make_unique<std::ofstream>(
+          get_basename_suffix(
+              get_arg_val<string_argument>(parser, "output", "file"))
+              .first
+          + ".csv");
       if (sig_figs > -1)
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
