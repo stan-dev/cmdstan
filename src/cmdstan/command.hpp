@@ -259,8 +259,8 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<bool_argument>(*pathfinder_arg, "save_single_paths");
 
     if (num_paths == 1) {
-      if (!get_arg_val<string_argument>(
-              parser, "output", "diagnostic_file").empty()) {
+      if (!get_arg_val<string_argument>(parser, "output", "diagnostic_file")
+               .empty()) {
         save_iterations = true;
       }
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
