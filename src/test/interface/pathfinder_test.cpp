@@ -175,6 +175,22 @@ TEST_F(CmdStan, pathfinder_save_single_num_paths_1_diag_file_arg) {
   ASSERT_FALSE(file_exists(convert_model_path(output_single_json)));
 }
 
+TEST_F(CmdStan, pathfinder_save_single_num_paths_0_diag_file_arg) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model)
+     << " output refresh=0 file=" << convert_model_path(arg_output)
+     << " diagnostic_file=" << convert_model_path(arg_diags)
+     << " method=pathfinder"
+     << " num_paths=1 save_single_paths=0";
+  run_command_output out = run_command(ss.str());
+  ASSERT_FALSE(out.hasError);
+  ASSERT_TRUE(file_exists(convert_model_path(output_csv)));
+  ASSERT_TRUE(file_exists(convert_model_path(output_diags)));
+  ASSERT_FALSE(file_exists(convert_model_path(output_json)));
+  ASSERT_FALSE(file_exists(convert_model_path(output_single_csv)));
+  ASSERT_FALSE(file_exists(convert_model_path(output_single_json)));
+}
+
 TEST_F(CmdStan, pathfinder_num_paths_8) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
