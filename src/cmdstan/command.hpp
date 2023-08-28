@@ -210,7 +210,7 @@ int command(int argc, const char *argv[]) {
   }
 
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
-      = get_vec_var_context(init, num_chains);
+      = get_vec_var_context(init, num_chains, id);
   std::vector<std::string> model_compile_info = model.model_compile_info();
 
   for (int i = 0; i < num_chains; ++i) {
@@ -510,7 +510,7 @@ int command(int argc, const char *argv[]) {
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
               ->value());
       context_vector metric_contexts
-          = get_vec_var_context(metric_filename, num_chains);
+          = get_vec_var_context(metric_filename, num_chains, id);
       categorical_argument *adapt
           = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
       categorical_argument *hmc

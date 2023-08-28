@@ -192,6 +192,29 @@ inline shared_context_ptr get_var_context(const std::string &file) {
   return std::make_shared<stan::io::dump>(var_context);
 }
 
+std::vector<std::string> make_filenames(const std::string &filename,
+                                        const std::string &tag,
+                                        const std::string &type,
+                                        unsigned int num_chains,
+                                        unsigned int id) {
+  std::vector<std::string> names(num_chains);
+  auto base_sfx = get_basename_suffix(filename);
+  if (base_sfx.second.empty()) {
+    base_sfx.second = type;
+  }
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  for (int i = 0; i < num_chains; ++i) {
+    names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
+  }
+  return names;
+}
+
 using context_vector = std::vector<shared_context_ptr>;
 /**
  * Make a vector of shared pointers to contexts.
@@ -201,7 +224,8 @@ using context_vector = std::vector<shared_context_ptr>;
  * @param num_chains The number of chains to run
  * @return a std vector of shared pointers to var contexts
  */
-context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
+context_vector get_vec_var_context(const std::string &file, size_t num_chains,
+                                   unsigned int id) {
   using stan::io::var_context;
   if (num_chains == 1) {
     return context_vector(1, get_var_context(file));
@@ -249,8 +273,9 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
              "\tConsider saving your data in JSON format instead."
           << std::endl;
     }
-    std::string file_1
-        = std::string(file_name + "_" + std::to_string(1) + file_ending);
+
+    auto filenames = make_filenames(file_name, "", file_ending, num_chains, id);
+    auto &file_1 = filenames[0];
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
     // if file_1 exists we'll assume num_chains of these files exist
     if (stream_1.rdstate() & std::ifstream::failbit) {
@@ -274,9 +299,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       ret.reserve(num_chains);
       ret.push_back(make_context(file_1, stream_1, file_ending));
       for (size_t i = 1; i < num_chains; ++i) {
-        std::string file_i
-            = std::string(file_name + "_" + std::to_string(i) + file_ending);
-        std::fstream stream_i(file_1.c_str(), std::fstream::in);
+        auto &file_i = filenames[i];
+        std::fstream stream_i(file_i.c_str(), std::fstream::in);
         // If any stream fails here something went wrong with file names
         if (stream_i.rdstate() & std::ifstream::failbit) {
           std::string file_name_err = std::string(
@@ -735,29 +759,6 @@ void check_file_config(argument_parser &parser) {
       }
     }
   }
-}
-
-std::vector<std::string> make_filenames(const std::string &filename,
-                                        const std::string &tag,
-                                        const std::string &type,
-                                        unsigned int num_chains,
-                                        unsigned int id) {
-  std::vector<std::string> names(num_chains);
-  auto base_sfx = get_basename_suffix(filename);
-  if (base_sfx.second.empty()) {
-    base_sfx.second = type;
-  }
-  auto name_iterator = [num_chains, id](auto i) {
-    if (num_chains == 1) {
-      return std::string("");
-    } else {
-      return std::string("_" + std::to_string(i + id));
-    }
-  };
-  for (int i = 0; i < num_chains; ++i) {
-    names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
-  }
-  return names;
 }
 
 void init_callbacks(
