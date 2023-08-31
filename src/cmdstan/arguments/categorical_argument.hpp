@@ -28,6 +28,14 @@ class categorical_argument : public argument {
       (*it)->print(w, depth + 1, prefix);
   }
 
+  void print_json(json_ostream_writer &j) {
+    j.begin_record(_name);
+    for (std::vector<argument *>::iterator it = _subarguments.begin();
+         it != _subarguments.end(); ++it)
+      (*it)->print_json(j);
+    j.end_record();
+  }
+
   void print_help(stan::callbacks::writer &w, const int depth,
                   const bool recurse) {
     std::string indent(indent_width * depth, ' ');

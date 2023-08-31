@@ -140,6 +140,12 @@ class argument_parser {
     }
   }
 
+  void print_json(json_ostream_writer &j) {
+    for (size_t i = 0; i < _arguments.size(); ++i) {
+      _arguments.at(i)->print_json(j);
+    }
+  }
+
   void print_help(stan::callbacks::writer &w, bool recurse) {
     for (size_t i = 0; i < _arguments.size(); ++i) {
       _arguments.at(i)->print_help(w, 1, recurse);

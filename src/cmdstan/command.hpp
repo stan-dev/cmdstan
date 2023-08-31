@@ -212,6 +212,29 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
   std::vector<std::string> model_compile_info = model.model_compile_info();
 
+  // experimental JSON output
+  auto ofs_args = std::make_unique<std::ofstream>("args.json");
+  if (sig_figs > -1) {
+    ofs_args->precision(sig_figs);
+  }
+
+  json_ostream_writer json_args(std::move(ofs_args));
+
+  json_args.begin_record();
+  json_args.write("stan_major_version", stan::MAJOR_VERSION);
+  json_args.write("stan_minor_version", stan::MINOR_VERSION);
+  json_args.write("stan_patch_version", stan::PATCH_VERSION);
+  json_args.write("model_name", model.model_name());
+  json_args.write("start_datetime", current_datetime());
+  parser.print_json(json_args);
+#ifdef STAN_MPI
+  json_args.write("mpi_enabled", true);
+#else
+  json_args.write("mpi_enabled", false);
+#endif
+  // todo OpenCL, model compile info
+  json_args.end_record();
+
   for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
@@ -220,6 +243,7 @@ int command(int argc, const char *argv[]) {
     write_parallel_info(sample_writers[i]);
     write_opencl_device(sample_writers[i]);
     write_compile_info(sample_writers[i], model_compile_info);
+
     write_stan(diagnostic_csv_writers[i]);
     write_model(diagnostic_csv_writers[i], model.model_name());
     parser.print(diagnostic_csv_writers[i]);

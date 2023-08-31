@@ -2,12 +2,20 @@
 #define CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace cmdstan {
+
+class json_ostream_writer : public stan::callbacks::json_writer<std::ostream> {
+ public:
+  json_ostream_writer(std::unique_ptr<std::ostream> output)
+      : json_writer(std::move(output)) {}
+};
 
 class argument {
  public:
@@ -25,6 +33,8 @@ class argument {
   virtual void print(stan::callbacks::writer &w, const int depth,
                      const std::string &prefix)
       = 0;
+
+  virtual void print_json(json_ostream_writer &j) = 0;
 
   virtual void print_help(stan::callbacks::writer &w, const int depth,
                           const bool recurse)
