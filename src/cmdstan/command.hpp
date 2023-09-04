@@ -703,61 +703,46 @@ int command(int argc, const char *argv[]) {
     }    // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
     // ---- variational start ---- //
-    list_argument *algo = dynamic_cast<list_argument *>(
-        parser.arg("method")->arg("variational")->arg("algorithm"));
-    int grad_samples
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("grad_samples"))
-              ->value();
-    int elbo_samples
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("elbo_samples"))
-              ->value();
-    int max_iterations
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("iter"))
-              ->value();
-    double tol_rel_obj
-        = dynamic_cast<real_argument *>(
-              parser.arg("method")->arg("variational")->arg("tol_rel_obj"))
-              ->value();
-    double eta = dynamic_cast<real_argument *>(
-                     parser.arg("method")->arg("variational")->arg("eta"))
-                     ->value();
-    bool adapt_engaged = dynamic_cast<bool_argument *>(parser.arg("method")
-                                                           ->arg("variational")
-                                                           ->arg("adapt")
-                                                           ->arg("engaged"))
-                             ->value();
-    int adapt_iterations = dynamic_cast<int_argument *>(parser.arg("method")
-                                                            ->arg("variational")
-                                                            ->arg("adapt")
-                                                            ->arg("iter"))
-                               ->value();
-    int eval_elbo
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("eval_elbo"))
-              ->value();
-    int output_samples
-        = dynamic_cast<int_argument *>(
-              parser.arg("method")->arg("variational")->arg("output_samples"))
-              ->value();
-
-    if (algo->value() == "fullrank") {
+    std::string algorithm = get_arg_val<string_argument>(
+        parser, "method", "variational", "algorithm");
+    int grad_samples = get_arg_val<int_argument>(
+        parser, "method", "variational", "grad_samples");
+    int elbo_samples = get_arg_val<int_argument>(
+        parser, "method", "variational", "elbo_samples");
+    int max_iterations = get_arg_val<int_argument>(
+        parser, "method", "variational", "iter");
+    double tol_rel_obj =  get_arg_val<real_argument>(
+        parser, "method", "variational", "tol_rel_obj");
+    double eta = get_arg_val<real_argument>(
+        parser, "method", "variational", "eta");
+    bool adapt_engaged = get_arg_val<bool_argument>(
+        parser, "method", "variational", "adapt", "engaged");
+    int adapt_iterations = get_arg_val<int_argument>(
+        parser, "method", "variational", "adapt", "iter");
+    int eval_elbo = get_arg_val<int_argument>(
+        parser, "method", "variational", "eval_elbo");
+    int output_samples = get_arg_val<int_argument>(
+        parser, "method", "variational", "output_samples");
+    if (algorithm == "fullrank") {
       return_code = stan::services::experimental::advi::fullrank(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           grad_samples, elbo_samples, max_iterations, tol_rel_obj, eta,
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
           logger, init_writers[0], sample_writers[0],
           diagnostic_csv_writers[0]);
-    } else if (algo->value() == "meanfield") {
+    } else if (algorithm == "meanfield") {
       return_code = stan::services::experimental::advi::meanfield(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           grad_samples, elbo_samples, max_iterations, tol_rel_obj, eta,
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
           logger, init_writers[0], sample_writers[0],
           diagnostic_csv_writers[0]);
+    } else {
+      msg << "Variational algorithm must be either \"fullrank\" or "
+            << "\"meanfield\", found: " << algorithm << std::endl;
+      throw std::invalid_argument(msg.str());
     }
+
     // ---- variational end ---- //
   }
   //////////////////////////////////////////////////
