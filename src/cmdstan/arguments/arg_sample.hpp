@@ -21,12 +21,12 @@ class arg_sample : public categorical_argument {
         "num_warmup", "Number of warmup iterations", 1000));
     _subarguments.push_back(new arg_single_bool(
         "save_warmup", "Stream warmup samples to output?", false));
-    _subarguments.push_back(new arg_single_int_pos(
-        "thin", "Period between saved samples", 1));
+    _subarguments.push_back(
+        new arg_single_int_pos("thin", "Period between saved samples", 1));
     _subarguments.push_back(new arg_adapt());
     _subarguments.push_back(new arg_sample_algo());
-    _subarguments.push_back(new arg_single_int_pos(
-        "num_chains", "Number of chains", 1));
+    _subarguments.push_back(
+        new arg_single_int_pos("num_chains", "Number of chains", 1));
   }
 };
 

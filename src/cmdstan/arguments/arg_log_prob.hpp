@@ -23,9 +23,11 @@ class arg_log_prob : public categorical_argument {
 
     _subarguments.push_back(new arg_log_prob_unconstrained_params());
     _subarguments.push_back(new arg_log_prob_constrained_params());
-    _subarguments.push_back(new arg_single_bool(
-        "jacobian", "When true, include change-of-variables adjustment"
-        " for constraining parameter transforms", true));
+    _subarguments.push_back(
+        new arg_single_bool("jacobian",
+                            "When true, include change-of-variables adjustment"
+                            " for constraining parameter transforms",
+                            true));
   }
 };
 

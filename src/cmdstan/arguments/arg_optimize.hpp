@@ -16,9 +16,11 @@ class arg_optimize : public categorical_argument {
     _description = "Point estimation";
 
     _subarguments.push_back(new arg_optimize_algo());
-    _subarguments.push_back(new arg_single_bool(
-        "jacobian", "When true, include change-of-variables adjustment"
-        " for constraining parameter transforms", false));
+    _subarguments.push_back(
+        new arg_single_bool("jacobian",
+                            "When true, include change-of-variables adjustment"
+                            " for constraining parameter transforms",
+                            false));
     _subarguments.push_back(new arg_iter());
     _subarguments.push_back(new arg_save_iterations());
   }

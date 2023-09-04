@@ -12,8 +12,8 @@ class arg_nuts : public categorical_argument {
     _name = "nuts";
     _description = "The No-U-Turn Sampler";
 
-    _subarguments.push_back(new arg_single_int_pos(
-        "max_depth", "Maximum tree depth", 10));
+    _subarguments.push_back(
+        new arg_single_int_pos("max_depth", "Maximum tree depth", 10));
   }
 };
 

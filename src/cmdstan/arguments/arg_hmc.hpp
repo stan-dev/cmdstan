@@ -16,8 +16,8 @@ class arg_hmc : public categorical_argument {
     _description = "Hamiltonian Monte Carlo";
 
     _subarguments.push_back(new arg_engine());
-    _subarguments.push_back(new arg_single_string(
-        "metric", "Geometry of base manifold", "diag_e"));
+    _subarguments.push_back(
+        new arg_single_string("metric", "Geometry of base manifold", "diag_e"));
     _subarguments.push_back(new arg_single_string(
         "metric_file", "Input file with precomputed Euclidean metric", ""));
     _subarguments.push_back(new arg_single_real_pos(
