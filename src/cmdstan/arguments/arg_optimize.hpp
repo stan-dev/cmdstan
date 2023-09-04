@@ -4,7 +4,7 @@
 #include <cmdstan/arguments/arg_iter.hpp>
 #include <cmdstan/arguments/arg_optimize_algo.hpp>
 #include <cmdstan/arguments/arg_save_iterations.hpp>
-#include <cmdstan/arguments/arg_jacobian_false.hpp>
+#include <cmdstan/arguments/arg_single_bool.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
 
 namespace cmdstan {
@@ -16,7 +16,9 @@ class arg_optimize : public categorical_argument {
     _description = "Point estimation";
 
     _subarguments.push_back(new arg_optimize_algo());
-    _subarguments.push_back(new arg_jacobian_false());
+    _subarguments.push_back(new arg_single_bool(
+        "jacobian", "When true, include change-of-variables adjustment"
+        " for constraining parameter transforms", false));
     _subarguments.push_back(new arg_iter());
     _subarguments.push_back(new arg_save_iterations());
   }
