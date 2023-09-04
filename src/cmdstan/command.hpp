@@ -705,22 +705,22 @@ int command(int argc, const char *argv[]) {
     // ---- variational start ---- //
     std::string algorithm = get_arg_val<string_argument>(
         parser, "method", "variational", "algorithm");
-    int grad_samples = get_arg_val<int_argument>(
-        parser, "method", "variational", "grad_samples");
-    int elbo_samples = get_arg_val<int_argument>(
-        parser, "method", "variational", "elbo_samples");
-    int max_iterations = get_arg_val<int_argument>(
-        parser, "method", "variational", "iter");
-    double tol_rel_obj =  get_arg_val<real_argument>(
+    int grad_samples = get_arg_val<int_argument>(parser, "method",
+                                                 "variational", "grad_samples");
+    int elbo_samples = get_arg_val<int_argument>(parser, "method",
+                                                 "variational", "elbo_samples");
+    int max_iterations
+        = get_arg_val<int_argument>(parser, "method", "variational", "iter");
+    double tol_rel_obj = get_arg_val<real_argument>(
         parser, "method", "variational", "tol_rel_obj");
-    double eta = get_arg_val<real_argument>(
-        parser, "method", "variational", "eta");
+    double eta
+        = get_arg_val<real_argument>(parser, "method", "variational", "eta");
     bool adapt_engaged = get_arg_val<bool_argument>(
         parser, "method", "variational", "adapt", "engaged");
     int adapt_iterations = get_arg_val<int_argument>(
         parser, "method", "variational", "adapt", "iter");
-    int eval_elbo = get_arg_val<int_argument>(
-        parser, "method", "variational", "eval_elbo");
+    int eval_elbo = get_arg_val<int_argument>(parser, "method", "variational",
+                                              "eval_elbo");
     int output_samples = get_arg_val<int_argument>(
         parser, "method", "variational", "output_samples");
     if (algorithm == "fullrank") {
@@ -739,7 +739,7 @@ int command(int argc, const char *argv[]) {
           diagnostic_csv_writers[0]);
     } else {
       msg << "Variational algorithm must be either \"fullrank\" or "
-            << "\"meanfield\", found: " << algorithm << std::endl;
+          << "\"meanfield\", found: " << algorithm << std::endl;
       throw std::invalid_argument(msg.str());
     }
 

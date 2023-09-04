@@ -16,26 +16,26 @@ class arg_bfgs : public categorical_argument {
         "init_alpha", "Line search step size for first iteration", 0.001));
     _subarguments.push_back(
         new arg_single_real_pos("tol_obj",
-                          "Convergence tolerance on absolute changes "
-                          "in objective function value",
-                          1e-12));
+                                "Convergence tolerance on absolute changes "
+                                "in objective function value",
+                                1e-12));
     _subarguments.push_back(
         new arg_single_real_pos("tol_rel_obj",
-                          "Convergence tolerance on relative changes "
-                          "in objective function value",
-                          1e+4));
+                                "Convergence tolerance on relative changes "
+                                "in objective function value",
+                                1e+4));
     _subarguments.push_back(new arg_single_real_pos(
         "tol_grad", "Convergence tolerance on the norm of the gradient", 1e-8));
     _subarguments.push_back(
         new arg_single_real_pos("tol_rel_grad",
-                          "Convergence tolerance on the relative norm "
-                          "of the gradient",
-                          1e+7));
+                                "Convergence tolerance on the relative norm "
+                                "of the gradient",
+                                1e+7));
     _subarguments.push_back(
         new arg_single_real_pos("tol_param",
-                          "Convergence tolerance on changes "
-                          "in parameter value",
-                          1e-8));
+                                "Convergence tolerance on changes "
+                                "in parameter value",
+                                1e-8));
   }
 };
 

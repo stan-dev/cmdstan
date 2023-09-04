@@ -21,14 +21,12 @@ class arg_variational : public categorical_argument {
         "iter", "Maximum number of ADVI iterations.", 1e+4));
     _subarguments.push_back(new arg_single_int_pos(
         "grad_samples",
-        "Number of Monte Carlo draws for computing the gradient.",
-        1));
+        "Number of Monte Carlo draws for computing the gradient.", 1));
     _subarguments.push_back(new arg_single_int_pos(
-        "elbo_samples",
-        "Number of Monte Carlo draws for estimate of ELBO.",
+        "elbo_samples", "Number of Monte Carlo draws for estimate of ELBO.",
         100));
-    _subarguments.push_back(new arg_single_real_pos(
-        "eta", "Stepsize scaling parameter.", 1.0));
+    _subarguments.push_back(
+        new arg_single_real_pos("eta", "Stepsize scaling parameter.", 1.0));
 
     _subarguments.push_back(new arg_variational_adapt());
 
@@ -38,8 +36,7 @@ class arg_variational : public categorical_argument {
         "eval_elbo", "Number of iterations between ELBO evaluations", 100));
     _subarguments.push_back(new arg_single_int_pos(
         "output_samples",
-        "Number of approximate posterior output draws to save.",
-        1000));
+        "Number of approximate posterior output draws to save.", 1000));
   }
 };
 
