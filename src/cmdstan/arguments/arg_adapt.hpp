@@ -20,7 +20,7 @@ class arg_adapt : public categorical_argument {
     _subarguments.push_back(new arg_single_real_pos(
         "gamma", "Adaptation regularization scale", 0.05));
     _subarguments.push_back(new arg_single_real_bounded(
-        "delta", "Adaptation target acceptance statistic", 0.8, 0.0, 1.0));
+        "delta", "Adaptation target acceptance statistic", 0.8, 0.1, 0.999));
     _subarguments.push_back(new arg_single_real_pos(
         "kappa", "Adaptation relaxation exponent", 0.75));
     _subarguments.push_back(new arg_single_real_pos(

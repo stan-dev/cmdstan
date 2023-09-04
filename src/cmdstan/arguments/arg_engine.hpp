@@ -4,7 +4,6 @@
 #include <cmdstan/arguments/list_argument.hpp>
 #include <cmdstan/arguments/arg_nuts.hpp>
 #include <cmdstan/arguments/arg_static.hpp>
-#include <cmdstan/arguments/arg_xhmc.hpp>
 
 namespace cmdstan {
 
