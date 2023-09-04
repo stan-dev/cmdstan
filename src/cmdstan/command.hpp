@@ -210,7 +210,7 @@ int command(int argc, const char *argv[]) {
   }
 
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
-      = get_vec_var_context(init, num_chains);
+      = get_vec_var_context(init, num_chains, id);
   std::vector<std::string> model_compile_info = model.model_compile_info();
 
   for (int i = 0; i < num_chains; ++i) {
@@ -259,6 +259,10 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<bool_argument>(*pathfinder_arg, "save_single_paths");
 
     if (num_paths == 1) {
+      if (!get_arg_val<string_argument>(parser, "output", "diagnostic_file")
+               .empty()) {
+        save_iterations = true;
+      }
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -506,7 +510,7 @@ int command(int argc, const char *argv[]) {
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
               ->value());
       context_vector metric_contexts
-          = get_vec_var_context(metric_filename, num_chains);
+          = get_vec_var_context(metric_filename, num_chains, id);
       categorical_argument *adapt
           = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
       categorical_argument *hmc
