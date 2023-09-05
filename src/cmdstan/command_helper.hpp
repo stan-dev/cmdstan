@@ -579,7 +579,11 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
   Eigen::VectorXd theta_hat;
   if (get_suffix(fname) == ".csv") {
     theta_hat = get_laplace_mode_csv(fname, model);
+<<<<<<< HEAD
   } else if (get_suffix(fname) == ".json") {
+=======
+  } else if (suffix(fname) == ".json") {
+>>>>>>> origin/master
     std::vector<double> unc_params
         = unconstrain_params_var_context(fname, model);
     theta_hat
