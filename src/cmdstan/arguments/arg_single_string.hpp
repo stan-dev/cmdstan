@@ -17,8 +17,6 @@ class arg_single_string : public string_argument {
     _validity = "[0, 1]";
     _default = def;
     _default_value = def;
-    _constrained = false;
-    _good_value = 1;
     _value = _default_value;
   }
 };

@@ -111,13 +111,6 @@ class categorical_argument : public argument {
     return valid_arg;
   }
 
-  virtual void probe_args(argument *base_arg, stan::callbacks::writer &w) {
-    for (std::vector<argument *>::iterator it = _subarguments.begin();
-         it != _subarguments.end(); ++it) {
-      (*it)->probe_args(base_arg, w);
-    }
-  }
-
   void find_arg(const std::string &name, const std::string &prefix,
                 std::vector<std::string> &valid_paths) {
     argument::find_arg(name, prefix, valid_paths);

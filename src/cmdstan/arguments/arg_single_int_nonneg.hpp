@@ -17,9 +17,6 @@ class arg_single_int_nonneg : public int_argument {
     _validity = std::string("0 < ").append(name);
     _default = std::to_string(def);
     _default_value = def;
-    _constrained = true;
-    _good_value = 2.0;
-    _bad_value = -1.0;
     _value = _default_value;
   }
 

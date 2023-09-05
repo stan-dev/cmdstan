@@ -23,9 +23,6 @@ class arg_single_real_bounded : public real_argument {
             std::to_string(ub));
     _default = std::to_string(def);
     _default_value = def;
-    _constrained = true;
-    _good_value = def;
-    _bad_value = lb - 1.0;
     _value = _default_value;
     _lb = lb;
     _ub = ub;

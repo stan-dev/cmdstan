@@ -4,7 +4,6 @@
 #include <cmdstan/arguments/arg_method.hpp>
 #include <cmdstan/arguments/arg_output.hpp>
 #include <cmdstan/arguments/arg_random.hpp>
-#include <cmdstan/arguments/argument_probe.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
@@ -68,8 +67,6 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_method());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -198,8 +195,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -293,8 +288,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -412,8 +405,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -513,8 +504,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -632,8 +621,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_init());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
   // Check argument consistency
   bool expected_success = false;
 
@@ -722,8 +709,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_init());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -837,8 +822,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -928,8 +911,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -1047,8 +1028,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
@@ -1142,8 +1121,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());
 
-  cmdstan::argument_probe probe(valid_arguments);
-  probe.probe_args(w);
 
   // Check argument consistency
   bool expected_success = false;
