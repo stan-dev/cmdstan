@@ -28,11 +28,11 @@ class categorical_argument : public argument {
       (*it)->print(w, depth + 1, prefix);
   }
 
-  void print_json(json_ostream_writer &j) {
+  void print(stan::callbacks::structured_writer &j) {
     j.begin_record(_name);
     for (std::vector<argument *>::iterator it = _subarguments.begin();
          it != _subarguments.end(); ++it)
-      (*it)->print_json(j);
+      (*it)->print(j);
     j.end_record();
   }
 

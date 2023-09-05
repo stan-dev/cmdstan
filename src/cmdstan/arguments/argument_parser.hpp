@@ -140,9 +140,9 @@ class argument_parser {
     }
   }
 
-  void print_json(json_ostream_writer &j) {
+  void print(stan::callbacks::structured_writer &j) {
     for (size_t i = 0; i < _arguments.size(); ++i) {
-      _arguments.at(i)->print_json(j);
+      _arguments.at(i)->print(j);
     }
   }
 

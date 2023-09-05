@@ -218,7 +218,7 @@ int command(int argc, const char *argv[]) {
     ofs_args->precision(sig_figs);
   }
 
-  json_ostream_writer json_args(std::move(ofs_args));
+  stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
 
   json_args.begin_record();
   json_args.write("stan_major_version", stan::MAJOR_VERSION);
@@ -226,7 +226,7 @@ int command(int argc, const char *argv[]) {
   json_args.write("stan_patch_version", stan::PATCH_VERSION);
   json_args.write("model_name", model.model_name());
   json_args.write("start_datetime", current_datetime());
-  parser.print_json(json_args);
+  parser.print(json_args);
 #ifdef STAN_MPI
   json_args.write("mpi_enabled", true);
 #else

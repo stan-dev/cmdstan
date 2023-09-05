@@ -19,7 +19,7 @@ class valued_argument : public argument {
     w(message);
   }
 
-  virtual void print_json(json_ostream_writer &j) {
+  virtual void print(stan::callbacks::structured_writer &j) {
     j.write(_name, print_value());
   }
 

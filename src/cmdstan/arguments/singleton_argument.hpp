@@ -115,7 +115,7 @@ class singleton_argument : public valued_argument {
 
   bool is_default() { return _value == _default_value; }
 
-  virtual void print_json(json_ostream_writer &j) { j.write(_name, _value); }
+  virtual void print(stan::callbacks::structured_writer &j) { j.write(_name, _value); }
 
  protected:
   std::string _validity;

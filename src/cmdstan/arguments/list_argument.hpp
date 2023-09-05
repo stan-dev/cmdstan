@@ -28,10 +28,10 @@ class list_argument : public valued_argument {
     _values.at(_cursor)->print(w, depth + 1, prefix);
   }
 
-  virtual void print_json(json_ostream_writer &j) {
+  virtual void print(stan::callbacks::structured_writer &j) {
     j.begin_record(_name);
     j.write("value", print_value());
-    _values.at(_cursor)->print_json(j);
+    _values.at(_cursor)->print(j);
     j.end_record();
   }
 

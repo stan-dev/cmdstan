@@ -15,7 +15,7 @@ class unvalued_argument : public argument {
   void print(stan::callbacks::writer &w, const int depth,
              const std::string &prefix) {}
 
-  void print_json(json_ostream_writer &j) {}
+  void print(stan::callbacks::structured_writer &j) {}
 
   void print_help(stan::callbacks::writer &w, const int depth,
                   const bool recurse = false) {
