@@ -748,8 +748,8 @@ int command(int argc, const char *argv[]) {
 
   stan::math::profile_map &profile_data = get_stan_profile_data();
   if (profile_data.size() > 0) {
-    std::string profile_file_name = get_arg_val<string_argument>(
-        parser, "output", "profile_file");
+    std::string profile_file_name
+        = get_arg_val<string_argument>(parser, "output", "profile_file");
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);
     if (sig_figs > -1) {
       profile_stream << std::setprecision(sig_figs);
