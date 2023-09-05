@@ -67,7 +67,6 @@ TEST_F(StanGmArgumentsConfiguration, TestMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_method());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -195,7 +194,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -287,7 +285,6 @@ TEST_F(StanGmArgumentsConfiguration, TestIdWithoutMethod) {
 
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_id());
-
 
   // Check argument consistency
   bool expected_success = false;
@@ -405,7 +402,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -503,7 +499,6 @@ TEST_F(StanGmArgumentsConfiguration, TestDataWithoutMethod) {
 
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_data());
-
 
   // Check argument consistency
   bool expected_success = false;
@@ -709,7 +704,6 @@ TEST_F(StanGmArgumentsConfiguration, TestInitWithoutMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_init());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -822,7 +816,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -910,7 +903,6 @@ TEST_F(StanGmArgumentsConfiguration, TestRandomWithoutMethod) {
 
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_random());
-
 
   // Check argument consistency
   bool expected_success = false;
@@ -1028,7 +1020,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithMethod) {
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());
 
-
   // Check argument consistency
   bool expected_success = false;
 
@@ -1120,7 +1111,6 @@ TEST_F(StanGmArgumentsConfiguration, TestOutputWithoutMethod) {
 
   std::vector<cmdstan::argument *> valid_arguments;
   valid_arguments.push_back(new cmdstan::arg_output());
-
 
   // Check argument consistency
   bool expected_success = false;
