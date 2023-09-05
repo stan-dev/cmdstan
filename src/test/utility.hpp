@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include <sys/stat.h>
+
 namespace cmdstan {
 namespace test {
 
@@ -28,8 +30,7 @@ int count_matches(const std::string &target, const std::string &s) {
 /**
  * Gets the path separator for the OS.
  *
- * @return '\' for Windo  ASSERT_TRUE(names[1].compare(0,2, std::string("g_"))
-== 0); ws, '/' otherwise.
+ * @return '\' for Windows, '/' otherwise.
  */
 char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
@@ -280,6 +281,11 @@ int idx_first_match(const std::vector<std::string> &lines,
     }
   }
   return idx;
+}
+
+bool file_exists(const std::string &filename) {
+  struct stat buffer;
+  return (stat(filename.c_str(), &buffer) == 0);
 }
 
 }  // namespace test

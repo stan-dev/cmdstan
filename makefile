@@ -133,7 +133,7 @@ PRECOMPILED_HEADERS ?= true
 endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS).hpp.gch
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
@@ -149,7 +149,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.32.2
+CMDSTAN_VERSION := 2.33.0
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
