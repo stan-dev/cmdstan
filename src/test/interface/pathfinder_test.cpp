@@ -112,6 +112,8 @@ TEST_F(CmdStan, pathfinder_single) {
   EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
 }
 
+bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
+
 TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
@@ -142,7 +144,10 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
 
   rapidjson::Document document;
   ASSERT_FALSE(document.Parse<0>(single_json.c_str()).HasParseError());
-  EXPECT_EQ(1, count_matches("\"1\" : {\"iter\" : 1,", single_json));
+  single_json.erase(
+      std::remove_if(single_json.begin(), single_json.end(), is_whitespace),
+      single_json.end());
+  EXPECT_EQ(1, count_matches("\"1\":{\"iter\":1,", single_json));
 }
 
 TEST_F(CmdStan, pathfinder_save_single_num_paths_1) {
@@ -233,6 +238,8 @@ TEST_F(CmdStan, pathfinder_lbfgs_iterations) {
   ASSERT_FALSE(output.empty());
   rapidjson::Document document;
   ASSERT_FALSE(document.Parse<0>(output.c_str()).HasParseError());
-  EXPECT_EQ(1, count_matches("\"3\" : {\"iter\" : 3,", output));
-  EXPECT_EQ(0, count_matches("\"4\" : {\"iter\" : 4,", output));
+  output.erase(std::remove_if(output.begin(), output.end(), is_whitespace),
+               output.end());
+  EXPECT_EQ(1, count_matches("\"3\":{\"iter\":3,", output));
+  EXPECT_EQ(0, count_matches("\"4\":{\"iter\":4,", output));
 }
