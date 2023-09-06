@@ -500,13 +500,10 @@ int command(int argc, const char *argv[]) {
           num_samples, num_thin, refresh, interrupt, logger, init_writers,
           sample_writers, diagnostic_csv_writers);
     } else if (algo_name == "hmc") {
-      std::string metric = get_arg_val<string_argument>(
-          parser, "method", "sample", "algorithm", "hmc", "metric");
-      if (!(metric == "diag_e" || metric == "dense_e" || metric == "unit_e")) {
-        msg << "Sampler metric argument must be either \"dense_e\" or "
-            << "\"diag_e\" or \"unit_e\", found: " << metric << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
+      list_argument *metric_arg = dynamic_cast<list_argument *>(
+          parser.arg("method")->arg("sample")->arg("algorithm")->arg("hmc")
+          ->arg("metric"));
+      std::string metric = metric_arg->value();
       std::string metric_file = get_arg_val<string_argument>(
           parser, "method", "sample", "algorithm", "hmc", "metric_file");
       bool metric_supplied = !metric_file.empty();
@@ -702,8 +699,9 @@ int command(int argc, const char *argv[]) {
     }    // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
     // ---- variational start ---- //
-    std::string algorithm = get_arg_val<string_argument>(
-        parser, "method", "variational", "algorithm");
+    list_argument *algo = dynamic_cast<list_argument *>(
+        parser.arg("method")->arg("variational")->arg("algorithm"));
+    std::string algorithm = algo->value();
     int grad_samples = get_arg_val<int_argument>(parser, "method",
                                                  "variational", "grad_samples");
     int elbo_samples = get_arg_val<int_argument>(parser, "method",
@@ -736,10 +734,6 @@ int command(int argc, const char *argv[]) {
           adapt_engaged, adapt_iterations, eval_elbo, output_samples, interrupt,
           logger, init_writers[0], sample_writers[0],
           diagnostic_csv_writers[0]);
-    } else {
-      msg << "Variational algorithm must be either \"fullrank\" or "
-          << "\"meanfield\", found: " << algorithm << std::endl;
-      throw std::invalid_argument(msg.str());
     }
 
     // ---- variational end ---- //
