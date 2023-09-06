@@ -1,0 +1,13 @@
+CMDSTAN RELEASE NOTES
+======================================================================
+
+v2.33.0 (5 September 2023)
+======================================================================
+
+- Exposed `pathfinder` algorithm. (#1155)
+- Added `CXX_MAJOR` and `CXX_MINOR` to the name of the precompiled header file when it is enabled. The goal is to prevent the annoying errors from clang updates etc. (#1171)
+- Removed use of `boost::lexical_cast` wherever possible. (#1172)
+- Fixes various typos in output messages and comments. (#1174)
+- Enabled the `num_chains` argument on all HMC variants other than the `static` engine. (#1176)
+- Fixed a bug where the `num_chains` argument was not properly using multiple init files (#1191)
+- A warning is now shown when users provide "R dump" formatted inputs to CmdStan, letting them know that this format is essentially unsupported and new features like Tuples are not being added to it. (#1177, #1183)

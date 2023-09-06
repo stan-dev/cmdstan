@@ -195,6 +195,7 @@ int command(int argc, const char *argv[]) {
       diagnostic_csv_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>>
       diagnostic_json_writers;
+
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
                  diagnostic_json_writers);
 
@@ -207,9 +208,11 @@ int command(int argc, const char *argv[]) {
     init = "";
   } catch (const std::logic_error &e) {
   }
+
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
-      = get_vec_var_context(init, num_chains);
+      = get_vec_var_context(init, num_chains, id);
   std::vector<std::string> model_compile_info = model.model_compile_info();
+
   for (int i = 0; i < num_chains; ++i) {
     write_stan(sample_writers[i]);
     write_model(sample_writers[i], model.model_name());
@@ -253,9 +256,13 @@ int command(int argc, const char *argv[]) {
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
     int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
     bool save_iterations
-        = !get_arg_val<string_argument>(parser, "output", "diagnostic_file")
-               .empty();
+        = get_arg_val<bool_argument>(*pathfinder_arg, "save_single_paths");
+
     if (num_paths == 1) {
+      if (!get_arg_val<string_argument>(parser, "output", "diagnostic_file")
+               .empty()) {
+        save_iterations = true;
+      }
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -264,16 +271,13 @@ int command(int argc, const char *argv[]) {
           save_iterations, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      std::string output_file
-          = get_arg_val<string_argument>(parser, "output", "file");
-      auto base_sfx = get_basename_suffix(output_file);
-      if (base_sfx.second.empty())
-        base_sfx.second = ".csv";
-      auto ofs = std::make_unique<std::ofstream>(base_sfx.first + "_pathfinder"
-                                                 + base_sfx.second);
-      if (sig_figs > -1) {
+      auto ofs = std::make_unique<std::ofstream>(
+          get_basename_suffix(
+              get_arg_val<string_argument>(parser, "output", "file"))
+              .first
+          + ".csv");
+      if (sig_figs > -1)
         ofs->precision(sig_figs);
-      }
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_stan(pathfinder_writer);
@@ -506,7 +510,7 @@ int command(int argc, const char *argv[]) {
           dynamic_cast<string_argument *>(algo->arg("hmc")->arg("metric_file"))
               ->value());
       context_vector metric_contexts
-          = get_vec_var_context(metric_filename, num_chains);
+          = get_vec_var_context(metric_filename, num_chains, id);
       categorical_argument *adapt
           = dynamic_cast<categorical_argument *>(sample_arg->arg("adapt"));
       categorical_argument *hmc

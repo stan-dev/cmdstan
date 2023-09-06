@@ -18,6 +18,7 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -150,24 +151,68 @@ std::pair<std::string, std::string> get_basename_suffix(
   return {base, suffix};
 }
 
+/**
+ * Opens input stream for file.
+ * Throws exception if stream cannot be opened.
+ *
+ * @param fname name of file which exists and has read perms.
+ * @return input stream
+ */
+std::ifstream safe_open(const std::string fname) {
+  std::ifstream stream(fname.c_str());
+  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
+    std::stringstream msg;
+    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+  return stream;
+}
+
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
  * Given the name of a file, return a shared pointer holding the data contents.
  * @param file A system file to read from
  */
 inline shared_context_ptr get_var_context(const std::string &file) {
-  std::fstream stream(file.c_str(), std::fstream::in);
-  if (file != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << file << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
+  if (file.empty()) {
+    return std::make_shared<stan::io::empty_var_context>();
   }
+  std::ifstream stream = safe_open(file);
   if (get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
+}
+
+std::vector<std::string> make_filenames(const std::string &filename,
+                                        const std::string &tag,
+                                        const std::string &type,
+                                        unsigned int num_chains,
+                                        unsigned int id) {
+  std::vector<std::string> names(num_chains);
+  auto base_sfx = get_basename_suffix(filename);
+  if (base_sfx.second.empty()) {
+    base_sfx.second = type;
+  }
+  auto name_iterator = [num_chains, id](auto i) {
+    if (num_chains == 1) {
+      return std::string("");
+    } else {
+      return std::string("_" + std::to_string(i + id));
+    }
+  };
+  for (int i = 0; i < num_chains; ++i) {
+    names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
+  }
+  return names;
 }
 
 using context_vector = std::vector<shared_context_ptr>;
@@ -179,7 +224,8 @@ using context_vector = std::vector<shared_context_ptr>;
  * @param num_chains The number of chains to run
  * @return a std vector of shared pointers to var contexts
  */
-context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
+context_vector get_vec_var_context(const std::string &file, size_t num_chains,
+                                   unsigned int id) {
   using stan::io::var_context;
   if (num_chains == 1) {
     return context_vector(1, get_var_context(file));
@@ -201,10 +247,9 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   };
   // use default for all chain inits
-  if (file == "") {
-    using stan::io::dump;
-    std::fstream stream(file.c_str(), std::fstream::in);
-    return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
+  if (file.empty()) {
+    return context_vector(num_chains,
+                          std::make_shared<stan::io::empty_var_context>());
   } else {
     size_t file_marker_pos = file.find_last_of(".");
     if (file_marker_pos > file.size()) {
@@ -220,8 +265,17 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
     }
-    std::string file_1
-        = std::string(file_name + "_" + std::to_string(1) + file_ending);
+    if (file_ending != ".json") {
+      std::cerr
+          << "Warning: file '" << file
+          << "' is being read as an 'RDump' file.\n"
+             "\tThis format is deprecated and will not receive new features.\n"
+             "\tConsider saving your data in JSON format instead."
+          << std::endl;
+    }
+
+    auto filenames = make_filenames(file_name, "", file_ending, num_chains, id);
+    auto &file_1 = filenames[0];
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
     // if file_1 exists we'll assume num_chains of these files exist
     if (stream_1.rdstate() & std::ifstream::failbit) {
@@ -245,9 +299,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
       ret.reserve(num_chains);
       ret.push_back(make_context(file_1, stream_1, file_ending));
       for (size_t i = 1; i < num_chains; ++i) {
-        std::string file_i
-            = std::string(file_name + "_" + std::to_string(i) + file_ending);
-        std::fstream stream_i(file_1.c_str(), std::fstream::in);
+        auto &file_i = filenames[i];
+        std::fstream stream_i(file_i.c_str(), std::fstream::in);
         // If any stream fails here something went wrong with file names
         if (stream_i.rdstate() & std::ifstream::failbit) {
           std::string file_name_err = std::string(
@@ -262,26 +315,15 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains) {
     }
   }
   // This should not happen
+  std::cerr
+      << "Warning: file '" << file
+      << "' is being read as an 'RDump' file.\n"
+         "\tThis format is deprecated and will not receive new features.\n"
+         "\tConsider saving your data in JSON format instead."
+      << std::endl;
   using stan::io::dump;
   std::fstream stream(file.c_str(), std::fstream::in);
   return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
-}
-
-/**
- * Opens input stream for file.
- * Throws exception if stream cannot be opened.
- *
- * @param fname name of file which exists and has read perms.
- * @return input stream
- */
-std::ifstream safe_open(const std::string fname) {
-  std::ifstream stream(fname.c_str());
-  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-  return stream;
 }
 
 /**
@@ -719,28 +761,6 @@ void check_file_config(argument_parser &parser) {
   }
 }
 
-std::vector<std::string> make_filenames(const std::string &filename,
-                                        const std::string &type,
-                                        unsigned int num_chains,
-                                        unsigned int id) {
-  std::vector<std::string> names(num_chains);
-  auto base_sfx = get_basename_suffix(filename);
-  if (base_sfx.second.empty()) {
-    base_sfx.second = type;
-  }
-  auto name_iterator = [num_chains, id](auto i) {
-    if (num_chains == 1) {
-      return std::string("");
-    } else {
-      return std::string("_" + std::to_string(i + id));
-    }
-  };
-  for (int i = 0; i < num_chains; ++i) {
-    names[i] = base_sfx.first + name_iterator(i) + base_sfx.second;
-  }
-  return names;
-}
-
 void init_callbacks(
     argument_parser &parser,
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
@@ -753,48 +773,92 @@ void init_callbacks(
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
-
+  bool save_single_paths
+      = user_method->arg("pathfinder")
+        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                      "save_single_paths");
+  std::string output_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  std::vector<std::string> output_filenames;
+  std::vector<std::string> diagnostic_filenames;
   sample_writers.reserve(num_chains);
-  std::vector<std::string> output_filenames
-      = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
-                       ".csv", num_chains, id);
-  for (int i = 0; i < num_chains; ++i) {
-    auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
-    if (sig_figs > -1)
-      ofs->precision(sig_figs);
-    sample_writers.emplace_back(std::move(ofs), "# ");
-  }
-
-  diag_json_writers.reserve(num_chains);
   diag_csv_writers.reserve(num_chains);
-  // create no-op writers by default
+  diag_json_writers.reserve(num_chains);
+
+  // default - no diagnostics
   for (int i = 0; i < num_chains; ++i) {
+    diag_csv_writers.emplace_back(nullptr, "# ");
     diag_json_writers.emplace_back(
         stan::callbacks::json_writer<std::ofstream>());
   }
-  for (int i = 0; i < num_chains; ++i) {
-    diag_csv_writers.emplace_back(nullptr, "# ");
-  }
-  // create json, csv writers as needed.
-  std::string diagnostic_file
-      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  if (!diagnostic_file.empty()) {
-    std::vector<std::string> diag_filenames;
-    if (user_method->arg("pathfinder")) {
-      diag_json_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, ".json", num_chains, id);
+
+  if (user_method->arg("pathfinder")) {
+    std::string basename = get_basename_suffix(output_file).first;
+    std::string diag_basename = get_basename_suffix(diagnostic_file).first;
+    bool inst_writers = true;
+    bool inst_diags = true;
+    if (num_chains == 1) {
+      output_filenames.emplace_back(basename + ".csv");
+      if (!diag_basename.empty()) {
+        diagnostic_filenames.emplace_back(diag_basename + ".json");
+      } else if (save_single_paths) {
+        diagnostic_filenames.emplace_back(basename + ".json");
+      } else {
+        inst_diags = false;
+      }
+    } else if (save_single_paths) {  // filenames for single-path outputs
+      output_filenames
+          = make_filenames(basename, "_path", ".csv", num_chains, id);
+      diagnostic_filenames
+          = make_filenames(basename, "_path", ".json", num_chains, id);
+    } else {  // multi-path default: don't save single-path outputs
+      inst_writers = false;
+      inst_diags = false;
       for (int i = 0; i < num_chains; ++i) {
-        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
-        if (sig_figs > -1)
+        sample_writers.emplace_back(nullptr, "# ");
+      }
+    }
+    // allocate writers
+    if (inst_writers) {
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
+        if (sig_figs > -1) {
           ofs->precision(sig_figs);
-        stan::callbacks::json_writer<std::ofstream> jwriter(std::move(ofs));
+        }
+        sample_writers.emplace_back(std::move(ofs), "# ");
+      }
+    }
+    if (inst_diags) {
+      diag_json_writers.clear();
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs_diag
+            = std::make_unique<std::ofstream>(diagnostic_filenames[i]);
+        if (sig_figs > -1) {
+          ofs_diag->precision(sig_figs);
+        }
+        stan::callbacks::json_writer<std::ofstream> jwriter(
+            std::move(ofs_diag));
         diag_json_writers.emplace_back(std::move(jwriter));
       }
-    } else {
+    }
+  } else {  // not pathfinder
+    output_filenames
+        = make_filenames(get_arg_val<string_argument>(parser, "output", "file"),
+                         "", ".csv", num_chains, id);
+    for (int i = 0; i < num_chains; ++i) {
+      auto ofs = std::make_unique<std::ofstream>(output_filenames[i]);
+      if (sig_figs > -1)
+        ofs->precision(sig_figs);
+      sample_writers.emplace_back(std::move(ofs), "# ");
+    }
+    if (!diagnostic_file.empty()) {
       diag_csv_writers.clear();
-      diag_filenames = make_filenames(diagnostic_file, ".csv", num_chains, id);
+      diagnostic_filenames
+          = make_filenames(diagnostic_file, "", ".csv", num_chains, id);
       for (int i = 0; i < num_chains; ++i) {
-        auto ofs = std::make_unique<std::ofstream>(diag_filenames[i]);
+        auto ofs = std::make_unique<std::ofstream>(diagnostic_filenames[i]);
         if (sig_figs > -1)
           ofs->precision(sig_figs);
         diag_csv_writers.emplace_back(std::move(ofs), "# ");
