@@ -27,34 +27,26 @@ class arg_variational : public categorical_argument {
     _description = "Variational inference";
 
     _subarguments.push_back(new arg_variational_algo());
+    _subarguments.push_back(
+        new arg_single_int_pos("iter", max_iterations::description().c_str(),
+                               max_iterations::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
-        "iter",
-        max_iterations::description().c_str(),
-        max_iterations::default_value()));
-    _subarguments.push_back(new arg_single_int_pos(
-        "grad_samples",
-        gradient_samples::description().c_str(),
+        "grad_samples", gradient_samples::description().c_str(),
         gradient_samples::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
-        "elbo_samples",
-        elbo_samples::description().c_str(),
+        "elbo_samples", elbo_samples::description().c_str(),
         elbo_samples::default_value()));
     _subarguments.push_back(new arg_single_real_pos(
-        "eta",
-        eta::description().c_str(),
-        eta::default_value()));
+        "eta", eta::description().c_str(), eta::default_value()));
     _subarguments.push_back(new arg_variational_adapt());
     _subarguments.push_back(new arg_single_real_pos(
-        "tol_rel_obj",
-        tol_rel_obj::description().c_str(),
+        "tol_rel_obj", tol_rel_obj::description().c_str(),
         tol_rel_obj::default_value()));
+    _subarguments.push_back(
+        new arg_single_int_pos("eval_elbo", eval_elbo::description().c_str(),
+                               eval_elbo::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
-        "eval_elbo",
-        eval_elbo::description().c_str(),
-        eval_elbo::default_value()));
-    _subarguments.push_back(new arg_single_int_pos(
-        "output_samples",
-        output_draws::description().c_str(),
+        "output_samples", output_draws::description().c_str(),
         output_draws::default_value()));
   }
 };
