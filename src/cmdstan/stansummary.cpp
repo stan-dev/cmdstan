@@ -97,16 +97,18 @@ Options:
     return return_codes::NOT_OK;
   }
   std::vector<std::string> percentiles;
-  boost::algorithm::trim(percentiles_spec);
-  boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
-                          boost::token_compress_on);
   Eigen::VectorXd probs;
-  try {
-    probs = percentiles_to_probs(percentiles);
-  } catch (const std::invalid_argument &e) {
-    std::cout << "Option --percentiles " << percentiles_spec << ": " << e.what()
-              << std::endl;
-    return return_codes::NOT_OK;
+  boost::algorithm::trim(percentiles_spec);
+  if (!percentiles_spec.empty()) {
+    boost::algorithm::split(percentiles, percentiles_spec,
+                            boost::is_any_of(", "), boost::token_compress_on);
+    try {
+      probs = percentiles_to_probs(percentiles);
+    } catch (const std::invalid_argument &e) {
+      std::cout << "Option --percentiles " << percentiles_spec << ": "
+                << e.what() << std::endl;
+      return return_codes::NOT_OK;
+    }
   }
   if (app.count("--csv_filename")) {
     if (FILE *file = fopen(csv_filename.c_str(), "w")) {

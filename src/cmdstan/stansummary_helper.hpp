@@ -293,7 +293,7 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
  * @return vector of doubles
  */
 Eigen::VectorXd percentiles_to_probs(
-    const std::vector<std::string> percentiles) {
+    const std::vector<std::string> &percentiles) {
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
   double pct = 0;
