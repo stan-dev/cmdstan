@@ -14,7 +14,6 @@ class arg_single_string : public string_argument {
       : string_argument() {
     _name = name;
     _description = desc;
-    _validity = "[0, 1]";
     _default = def;
     _default_value = def;
     _value = _default_value;

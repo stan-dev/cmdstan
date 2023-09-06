@@ -3,8 +3,8 @@
 
 #include <cmdstan/arguments/arg_single_int_pos.hpp>
 #include <cmdstan/arguments/arg_single_real_pos.hpp>
-#include <cmdstan/arguments/arg_single_string.hpp>
 #include <cmdstan/arguments/arg_variational_adapt.hpp>
+#include <cmdstan/arguments/arg_variational_algo.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
 
 namespace cmdstan {
@@ -15,8 +15,8 @@ class arg_variational : public categorical_argument {
     _name = "variational";
     _description = "Variational inference";
 
-    _subarguments.push_back(new arg_single_string(
-        "algorithm", "Variational inference algorithm.", "meanfield"));
+    _subarguments.push_back(new arg_variational_algo());
+
     _subarguments.push_back(new arg_single_int_pos(
         "iter", "Maximum number of ADVI iterations.", 1e+4));
     _subarguments.push_back(new arg_single_int_pos(

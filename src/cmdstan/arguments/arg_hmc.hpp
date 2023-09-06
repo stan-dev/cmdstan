@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARG_HMC_HPP
 
 #include <cmdstan/arguments/arg_engine.hpp>
+#include <cmdstan/arguments/arg_metric.hpp>
 #include <cmdstan/arguments/arg_single_real_bounded.hpp>
 #include <cmdstan/arguments/arg_single_real_pos.hpp>
 #include <cmdstan/arguments/arg_single_string.hpp>
@@ -16,8 +17,7 @@ class arg_hmc : public categorical_argument {
     _description = "Hamiltonian Monte Carlo";
 
     _subarguments.push_back(new arg_engine());
-    _subarguments.push_back(
-        new arg_single_string("metric", "Geometry of base manifold", "diag_e"));
+    _subarguments.push_back(new arg_metric());
     _subarguments.push_back(new arg_single_string(
         "metric_file", "Input file with precomputed Euclidean metric", ""));
     _subarguments.push_back(new arg_single_real_pos(
