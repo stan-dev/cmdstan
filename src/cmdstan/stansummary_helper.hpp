@@ -293,23 +293,23 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
  * @return vector of doubles
  */
 Eigen::VectorXd percentiles_to_probs(
-    const std::vector<std::string> percentiles) {
+    const std::vector<std::string> &percentiles) {
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
-  int pct = 0;
+  double pct = 0;
   int i = 0;
   for (size_t i = 0; i < percentiles.size(); ++i) {
     try {
-      pct = std::stoi(percentiles[i]);
-      if (pct < 1 || pct > 99 || pct < cur_pct)
+      pct = std::stod(percentiles[i]);
+      if (!std::isfinite(pct) || pct < 0.1 || pct > 99.9 || pct < cur_pct)
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
       throw std::invalid_argument(
-          "values must be in range (1,99)"
+          "values must be in range (0.1,99.9)"
           ", inclusive, and strictly increasing.");
     }
-    probs[i] = pct * 1.0 / 100.0;
+    probs[i] = pct / 100.0;
   }
   return probs;
 }
@@ -399,22 +399,26 @@ std::vector<std::string> get_header(
  * @param in vector of warmup times  (required for N_eff/S)
  * @param in vector of sampling times (required for N_eff/S)
  * @param in vector of probabilities
- * @param in index of first model param column in chains object
+ * @param in vector of model param column incides in chains object
  * @param in span length
  * @param in out matrix of model param statistics
  */
 void get_stats(const stan::mcmc::chains<> &chains,
                const Eigen::VectorXd &warmup_times,
                const Eigen::VectorXd &sampling_times,
-               const Eigen::VectorXd &probs, int params_start_col,
+               const Eigen::VectorXd &probs, std::vector<int> cols,
                Eigen::MatrixXd &params) {
   params.setZero();
   double total_warmup_time = warmup_times.sum();
   double total_sampling_time = sampling_times.sum();
 
+  if (params.rows() != cols.size()) {
+    throw std::domain_error("get_stats: size mismatch");
+  }
+
   // Model parameters
-  for (int i = 0, i_chains = params_start_col; i < params.rows();
-       ++i, ++i_chains) {
+  int i = 0;
+  for (int i_chains : cols) {
     double sd = chains.sd(i_chains);
     double n_eff = chains.effective_sample_size(i_chains);
     params(i, 0) = chains.mean(i_chains);
@@ -427,6 +431,7 @@ void get_stats(const stan::mcmc::chains<> &chains,
     params(i, quantiles.size() + 4) = n_eff / total_sampling_time;
     params(i, quantiles.size() + 5)
         = chains.split_potential_scale_reduction(i_chains);
+    i++;
   }
 }
 
@@ -467,7 +472,7 @@ void write_header(const std::vector<std::string> &header,
  * @param in vector of output column formats
  * @param in size of longest parameter name - (width of 1st output column)
  * @param in significant digits required
- * @param in index of first column in chains object
+ * @param in vector of column indexes to output from chains
  * @param in output format flag:  true for csv; false for plain text
  * @param in output stream
  */
@@ -476,8 +481,56 @@ void write_params(const stan::mcmc::chains<> &chains,
                   const Eigen::VectorXi &col_widths,
                   const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic,
                                       1> &col_formats,
-                  int max_name_length, int sig_figs, int params_start_col,
+                  int max_name_length, int sig_figs, std::vector<int> cols,
                   bool as_csv, std::ostream *out) {
+  int num_sampler_params = params.rows();
+  int i = 0;
+  for (int i_chains : cols) {
+    if (as_csv) {
+      *out << "\"" << chains.param_name(i_chains) << "\"";
+      for (int j = 0; j < params.cols(); j++) {
+        *out << "," << params(i, j);
+      }
+    } else {
+      *out << std::setw(max_name_length + 1) << std::left
+           << chains.param_name(i_chains);
+      *out << std::right;
+      for (int j = 0; j < params.cols(); j++) {
+        std::cout.setf(col_formats(j), std::ios::floatfield);
+        *out << std::setprecision(
+            compute_precision(params(i, j), sig_figs,
+                              col_formats(j) == std::ios_base::scientific))
+             << std::setw(col_widths(j)) << params(i, j);
+      }
+    }
+    *out << std::endl;
+    i++;
+  }
+}
+
+/**
+ * Output statistics for a set of parameters
+ * either as fixed-width text columns or in csv format.
+ * Containers are re-ordered as first-index-major order
+ *
+ * @param in set of samples from one or more chains
+ * @param in matrix of statistics
+ * @param in vector of output column widths
+ * @param in vector of output column formats
+ * @param in size of longest parameter name - (width of 1st output column)
+ * @param in significant digits required
+ * @param in index of first column in chains object
+ * @param in output format flag:  true for csv; false for plain text
+ * @param in output stream
+ */
+void write_all_model_params(const stan::mcmc::chains<> &chains,
+                            const Eigen::MatrixXd &params,
+                            const Eigen::VectorXi &col_widths,
+                            const Eigen::Matrix<std::ios_base::fmtflags,
+                                                Eigen::Dynamic, 1> &col_formats,
+                            int max_name_length, int sig_figs,
+                            int params_start_col, bool as_csv,
+                            std::ostream *out) {
   int num_sampler_params = params.rows();
   for (int i = 0, i_chains = params_start_col; i < params.rows();
        ++i, ++i_chains) {
