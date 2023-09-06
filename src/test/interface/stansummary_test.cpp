@@ -531,6 +531,44 @@ TEST(CommandStansummary, check_csv_output) {
     FAIL();
 }
 
+TEST(CommandStansummary, check_csv_output_no_percentiles) {
+  std::string csv_header = "name,Mean,MCSE,StdDev,N_Eff,N_Eff/s,R_hat";
+  std::string lp
+      = "\"lp__\",-7.2719,0.0365168,0.768874,443.328,19275.1,1.00037";
+
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+
+  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+                                + "interface" + path_separator
+                                + "example_output" + path_separator
+                                + "tmp_test_target_csv_file.csv";
+  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
+
+  std::string arg_percentiles = "-p \"\"";
+
+  run_command_output out = run_command(command + " " + arg_csv_file + " "
+                                       + csv_file + " " + arg_percentiles);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::ifstream target_stream(target_csv_file.c_str());
+  if (!target_stream.is_open())
+    FAIL();
+  std::string line;
+  std::getline(target_stream, line);
+  EXPECT_EQ(csv_header, line);
+  std::getline(target_stream, line);
+  EXPECT_EQ(lp, line);
+  target_stream.close();
+  int return_code = std::remove(target_csv_file.c_str());
+  if (return_code != 0)
+    FAIL();
+}
+
 TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string csv_header
       = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
