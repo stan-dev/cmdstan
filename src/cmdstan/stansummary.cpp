@@ -34,7 +34,7 @@ Options:
   -c, --csv_filename [file]   Write statistics to a csv file.
   -h, --help                  Produce help message, then exit.
   -p, --percentiles [values]  Percentiles to report as ordered set of
-                              comma-separated integers from (1,99), inclusive.
+                              comma-separated numbers from (0.1,99.9), inclusive.
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.

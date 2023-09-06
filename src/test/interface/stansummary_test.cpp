@@ -169,6 +169,37 @@ TEST(CommandStansummary, header_tests) {
   EXPECT_EQ(expect_csv, ss.str());
 }
 
+TEST(CommandStansummary, percentiles) {
+  std::vector<std::string> pcts;
+  pcts.push_back("2.5");
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  pcts.push_back("97.5");
+  Eigen::VectorXd probs;
+  EXPECT_NO_THROW(probs = percentiles_to_probs(pcts));
+  EXPECT_FLOAT_EQ(probs[0], 0.025);
+  EXPECT_FLOAT_EQ(probs[4], 0.975);
+
+  pcts.clear();
+  pcts.push_back("120");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+  pcts.clear();
+  pcts.push_back("NAN");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+  pcts.clear();
+  pcts.push_back("infinity");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+
+  pcts.clear();
+  pcts.push_back("nonsenseString");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+}
+
 TEST(CommandStansummary, param_tests) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
