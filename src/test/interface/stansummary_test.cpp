@@ -193,11 +193,9 @@ TEST(CommandStansummary, percentiles) {
   pcts.push_back("infinity");
   EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
 
-
   pcts.clear();
   pcts.push_back("nonsenseString");
   EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
-
 }
 
 TEST(CommandStansummary, param_tests) {
