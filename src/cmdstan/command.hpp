@@ -500,9 +500,12 @@ int command(int argc, const char *argv[]) {
           num_samples, num_thin, refresh, interrupt, logger, init_writers,
           sample_writers, diagnostic_csv_writers);
     } else if (algo_name == "hmc") {
-      list_argument *metric_arg = dynamic_cast<list_argument *>(
-          parser.arg("method")->arg("sample")->arg("algorithm")->arg("hmc")
-          ->arg("metric"));
+      list_argument *metric_arg
+          = dynamic_cast<list_argument *>(parser.arg("method")
+                                              ->arg("sample")
+                                              ->arg("algorithm")
+                                              ->arg("hmc")
+                                              ->arg("metric"));
       std::string metric = metric_arg->value();
       std::string metric_file = get_arg_val<string_argument>(
           parser, "method", "sample", "algorithm", "hmc", "metric_file");
