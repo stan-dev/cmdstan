@@ -12,7 +12,8 @@ class arg_static : public categorical_argument {
     _name = "static";
     _description = "Static integration time";
     _subarguments.push_back(new arg_single_real_pos(
-        "int_time", "Total integration time for Hamiltonian evolution, default is 2 * pi",
+        "int_time",
+        "Total integration time for Hamiltonian evolution, default is 2 * pi",
         6.28318530717959));
   }
 };
