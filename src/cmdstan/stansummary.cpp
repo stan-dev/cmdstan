@@ -34,7 +34,7 @@ Options:
   -c, --csv_filename [file]   Write statistics to a csv file.
   -h, --help                  Produce help message, then exit.
   -p, --percentiles [values]  Percentiles to report as ordered set of
-                              comma-separated integers from (1,99), inclusive.
+                              comma-separated numbers from (0.1,99.9), inclusive.
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
@@ -97,16 +97,18 @@ Options:
     return return_codes::NOT_OK;
   }
   std::vector<std::string> percentiles;
-  boost::algorithm::trim(percentiles_spec);
-  boost::algorithm::split(percentiles, percentiles_spec, boost::is_any_of(", "),
-                          boost::token_compress_on);
   Eigen::VectorXd probs;
-  try {
-    probs = percentiles_to_probs(percentiles);
-  } catch (const std::invalid_argument &e) {
-    std::cout << "Option --percentiles " << percentiles_spec << ": " << e.what()
-              << std::endl;
-    return return_codes::NOT_OK;
+  boost::algorithm::trim(percentiles_spec);
+  if (!percentiles_spec.empty()) {
+    boost::algorithm::split(percentiles, percentiles_spec,
+                            boost::is_any_of(", "), boost::token_compress_on);
+    try {
+      probs = percentiles_to_probs(percentiles);
+    } catch (const std::invalid_argument &e) {
+      std::cout << "Option --percentiles " << percentiles_spec << ": "
+                << e.what() << std::endl;
+      return return_codes::NOT_OK;
+    }
   }
   if (app.count("--csv_filename")) {
     if (FILE *file = fopen(csv_filename.c_str(), "w")) {

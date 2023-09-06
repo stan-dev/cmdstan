@@ -293,23 +293,23 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
  * @return vector of doubles
  */
 Eigen::VectorXd percentiles_to_probs(
-    const std::vector<std::string> percentiles) {
+    const std::vector<std::string> &percentiles) {
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
-  int pct = 0;
+  double pct = 0;
   int i = 0;
   for (size_t i = 0; i < percentiles.size(); ++i) {
     try {
-      pct = std::stoi(percentiles[i]);
-      if (pct < 1 || pct > 99 || pct < cur_pct)
+      pct = std::stod(percentiles[i]);
+      if (!std::isfinite(pct) || pct < 0.1 || pct > 99.9 || pct < cur_pct)
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
       throw std::invalid_argument(
-          "values must be in range (1,99)"
+          "values must be in range (0.1,99.9)"
           ", inclusive, and strictly increasing.");
     }
-    probs[i] = pct * 1.0 / 100.0;
+    probs[i] = pct / 100.0;
   }
   return probs;
 }

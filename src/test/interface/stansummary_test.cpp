@@ -169,6 +169,35 @@ TEST(CommandStansummary, header_tests) {
   EXPECT_EQ(expect_csv, ss.str());
 }
 
+TEST(CommandStansummary, percentiles) {
+  std::vector<std::string> pcts;
+  pcts.push_back("2.5");
+  pcts.push_back("10");
+  pcts.push_back("50");
+  pcts.push_back("90");
+  pcts.push_back("97.5");
+  Eigen::VectorXd probs;
+  EXPECT_NO_THROW(probs = percentiles_to_probs(pcts));
+  EXPECT_FLOAT_EQ(probs[0], 0.025);
+  EXPECT_FLOAT_EQ(probs[4], 0.975);
+
+  pcts.clear();
+  pcts.push_back("120");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+  pcts.clear();
+  pcts.push_back("NAN");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+  pcts.clear();
+  pcts.push_back("infinity");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+
+  pcts.clear();
+  pcts.push_back("nonsenseString");
+  EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
+}
+
 TEST(CommandStansummary, param_tests) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -496,6 +525,44 @@ TEST(CommandStansummary, check_csv_output) {
   EXPECT_EQ(energy, line);
   std::getline(target_stream, line);
   EXPECT_EQ(theta, line);
+  target_stream.close();
+  int return_code = std::remove(target_csv_file.c_str());
+  if (return_code != 0)
+    FAIL();
+}
+
+TEST(CommandStansummary, check_csv_output_no_percentiles) {
+  std::string csv_header = "name,Mean,MCSE,StdDev,N_Eff,N_Eff/s,R_hat";
+  std::string lp
+      = "\"lp__\",-7.2719,0.0365168,0.768874,443.328,19275.1,1.00037";
+
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bernoulli_chain_1.csv";
+
+  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+                                + "interface" + path_separator
+                                + "example_output" + path_separator
+                                + "tmp_test_target_csv_file.csv";
+  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
+
+  std::string arg_percentiles = "-p \"\"";
+
+  run_command_output out = run_command(command + " " + arg_csv_file + " "
+                                       + csv_file + " " + arg_percentiles);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::ifstream target_stream(target_csv_file.c_str());
+  if (!target_stream.is_open())
+    FAIL();
+  std::string line;
+  std::getline(target_stream, line);
+  EXPECT_EQ(csv_header, line);
+  std::getline(target_stream, line);
+  EXPECT_EQ(lp, line);
   target_stream.close();
   int return_code = std::remove(target_csv_file.c_str());
   if (return_code != 0)
