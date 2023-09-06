@@ -535,10 +535,10 @@ int command(int argc, const char *argv[]) {
                 init_writers, sample_writers, diagnostic_csv_writers);
           } else if (metric == "dense_e") {
             return_code = stan::services::sample::hmc_nuts_dense_e(
-                model, *(init_contexts[0]), random_seed, id, init_radius,
-                num_warmup, num_samples, num_thin, save_warmup, refresh,
-                stepsize, jitter, max_depth, interrupt, logger, init_writers[0],
-                sample_writers[0], diagnostic_csv_writers[0]);
+                model, num_chains, init_contexts, random_seed,
+                id, init_radius, num_warmup, num_samples, num_thin, save_warmup,
+                refresh, stepsize, jitter, max_depth, interrupt, logger,
+                init_writers, sample_writers, diagnostic_csv_writers);
           } else if (metric == "diag_e" && metric_supplied == true) {
             return_code = stan::services::sample::hmc_nuts_diag_e(
                 model, num_chains, init_contexts, metric_contexts, random_seed,
@@ -547,16 +547,16 @@ int command(int argc, const char *argv[]) {
                 init_writers, sample_writers, diagnostic_csv_writers);
           } else if (metric == "diag_e") {
             return_code = stan::services::sample::hmc_nuts_diag_e(
-                model, *(init_contexts[0]), random_seed, id, init_radius,
-                num_warmup, num_samples, num_thin, save_warmup, refresh,
-                stepsize, jitter, max_depth, interrupt, logger, init_writers[0],
-                sample_writers[0], diagnostic_csv_writers[0]);
+                model, num_chains, init_contexts, random_seed,
+                id, init_radius, num_warmup, num_samples, num_thin, save_warmup,
+                refresh, stepsize, jitter, max_depth, interrupt, logger,
+                init_writers, sample_writers, diagnostic_csv_writers);
           } else if (metric == "unit_e") {
             return_code = stan::services::sample::hmc_nuts_unit_e(
-                model, num_chains, init_contexts, random_seed, id, init_radius,
-                num_warmup, num_samples, num_thin, save_warmup, refresh,
-                stepsize, jitter, max_depth, interrupt, logger, init_writers,
-                sample_writers, diagnostic_csv_writers);
+                model, num_chains, init_contexts, random_seed,
+                id, init_radius, num_warmup, num_samples, num_thin, save_warmup,
+                refresh, stepsize, jitter, max_depth, interrupt, logger,
+                init_writers, sample_writers, diagnostic_csv_writers);
           }
         } else {
           // NUTS adaptation

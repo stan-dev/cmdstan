@@ -6,8 +6,19 @@
 #include <cmdstan/arguments/arg_variational_adapt.hpp>
 #include <cmdstan/arguments/arg_variational_algo.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
+#include <stan/services/experimental/advi/defaults.hpp>
+#include <string>
 
 namespace cmdstan {
+
+using stan::services::experimental::advi::adapt_iterations;
+using stan::services::experimental::advi::elbo_samples;
+using stan::services::experimental::advi::eta;
+using stan::services::experimental::advi::eval_elbo;
+using stan::services::experimental::advi::gradient_samples;
+using stan::services::experimental::advi::max_iterations;
+using stan::services::experimental::advi::output_draws;
+using stan::services::experimental::advi::tol_rel_obj;
 
 class arg_variational : public categorical_argument {
  public:
@@ -16,27 +27,35 @@ class arg_variational : public categorical_argument {
     _description = "Variational inference";
 
     _subarguments.push_back(new arg_variational_algo());
-
     _subarguments.push_back(new arg_single_int_pos(
-        "iter", "Maximum number of ADVI iterations.", 1e+4));
+        "iter",
+        max_iterations::description().c_str(),
+        max_iterations::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
         "grad_samples",
-        "Number of Monte Carlo draws for computing the gradient.", 1));
+        gradient_samples::description().c_str(),
+        gradient_samples::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
-        "elbo_samples", "Number of Monte Carlo draws for estimate of ELBO.",
-        100));
-    _subarguments.push_back(
-        new arg_single_real_pos("eta", "Stepsize scaling parameter.", 1.0));
-
-    _subarguments.push_back(new arg_variational_adapt());
-
+        "elbo_samples",
+        elbo_samples::description().c_str(),
+        elbo_samples::default_value()));
     _subarguments.push_back(new arg_single_real_pos(
-        "tol_rel_obj", "Relative tolerance parameter for convergence", 0.01));
+        "eta",
+        eta::description().c_str(),
+        eta::default_value()));
+    _subarguments.push_back(new arg_variational_adapt());
+    _subarguments.push_back(new arg_single_real_pos(
+        "tol_rel_obj",
+        tol_rel_obj::description().c_str(),
+        tol_rel_obj::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
-        "eval_elbo", "Number of iterations between ELBO evaluations", 100));
+        "eval_elbo",
+        eval_elbo::description().c_str(),
+        eval_elbo::default_value()));
     _subarguments.push_back(new arg_single_int_pos(
         "output_samples",
-        "Number of approximate posterior output draws to save.", 1000));
+        output_draws::description().c_str(),
+        output_draws::default_value()));
   }
 };
 
