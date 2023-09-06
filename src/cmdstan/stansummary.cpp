@@ -38,6 +38,10 @@ Options:
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
+  -i, --include_param [name]  Include the named parameter in the summary output.
+                              By default, all parameters in the file are summarized,
+                              passing this argument one or more times will filter
+                              the output down to just the requested arguments.
 )";
   if (argc < 2) {
     std::cout << usage << std::endl;
@@ -50,6 +54,7 @@ Options:
   std::string csv_filename;
   std::string percentiles_spec = "5,50,95";
   std::vector<std::string> filenames;
+  std::vector<std::string> requested_params_vec;
 
   CLI::App app{"Allowed options"};
   app.add_option("--sig_figs,-s", sig_figs, "Significant figures, default 2.",
@@ -63,6 +68,17 @@ Options:
       ->check(CLI::NonexistentPath);
   app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
                  true);
+  app.add_option("--include_param,-i", requested_params_vec,
+                 "Include the named parameter in the output. By default all "
+                 "are included.",
+                 true)
+      ->transform([](auto str) {
+        // allow both 'theta.1' and 'theta[1]' style.
+        std::string token(str);
+        stan::io::prettify_stan_csv_name(token);
+        return token;
+      })
+      ->take_all();
   app.add_option("input_files", filenames, "Sampler csv files.", true)
       ->required()
       ->check(CLI::ExistingFile);
@@ -134,8 +150,44 @@ Options:
       if (stan::io::ends_with("__", chains.param_name(i)))
         num_sampler_params++;
     }
+
+    // Get column indices for the sampler params
+    std::vector<int> sampler_params_idxes(num_sampler_params);
+    std::iota(sampler_params_idxes.begin(), sampler_params_idxes.end(), 1);
+
     size_t model_params_offset = num_sampler_params + 1;
-    size_t num_model_params = chains.num_params() - model_params_offset;
+
+    size_t num_model_params = 0;
+    std::vector<int> model_param_idxes(0);
+
+    bool model_params_subset = requested_params_vec.size() > 0;
+    if (model_params_subset) {
+      std::set<std::string> requested_params(requested_params_vec.begin(),
+                                             requested_params_vec.end());
+
+      for (int i = model_params_offset; i < chains.num_params(); ++i) {
+        if (requested_params.erase(chains.param_name(i)) > 0) {
+          model_param_idxes.emplace_back(i);
+          num_model_params++;
+        }
+      }
+      // some params were requested but not found by above loop
+      if (requested_params.size() > 0) {
+        std::cout << "--include_param: Unrecognized parameter(s): ";
+        for (auto param : requested_params) {
+          std::cout << "'" << param << "' ";
+        }
+        std::cout << std::endl;
+        return return_codes::NOT_OK;
+      }
+
+    } else {
+      // if none were requested, get all of the model parameters
+      num_model_params = chains.num_params() - num_sampler_params - 1;
+      model_param_idxes.resize(num_model_params);
+      std::iota(model_param_idxes.begin(), model_param_idxes.end(),
+                model_params_offset);
+    }
 
     std::vector<std::string> header = get_header(percentiles);
 
@@ -144,9 +196,10 @@ Options:
     Eigen::MatrixXd sampler_params(num_sampler_params, header.size());
     Eigen::MatrixXd model_params(num_model_params, header.size());
 
-    get_stats(chains, warmup_times, sampling_times, probs, 0, lp_param);
-    get_stats(chains, warmup_times, sampling_times, probs, 1, sampler_params);
-    get_stats(chains, warmup_times, sampling_times, probs, model_params_offset,
+    get_stats(chains, warmup_times, sampling_times, probs, {0}, lp_param);
+    get_stats(chains, warmup_times, sampling_times, probs, sampler_params_idxes,
+              sampler_params);
+    get_stats(chains, warmup_times, sampling_times, probs, model_param_idxes,
               model_params);
 
     // Console output formatting
@@ -176,13 +229,19 @@ Options:
     write_header(header, column_widths, max_name_length, false, &std::cout);
     std::cout << std::endl;
     write_params(chains, lp_param, column_widths, model_formats,
-                 max_name_length, sig_figs, 0, false, &std::cout);
+                 max_name_length, sig_figs, {0}, false, &std::cout);
     write_params(chains, sampler_params, column_widths, sampler_formats,
-                 max_name_length, sig_figs, 1, false, &std::cout);
-    std::cout << std::endl;
-    write_params(chains, model_params, column_widths, model_formats,
-                 max_name_length, sig_figs, model_params_offset, false,
+                 max_name_length, sig_figs, sampler_params_idxes, false,
                  &std::cout);
+    std::cout << std::endl;
+    if (model_params_subset)
+      write_params(chains, model_params, column_widths, model_formats,
+                   max_name_length, sig_figs, model_param_idxes, false,
+                   &std::cout);
+    else
+      write_all_model_params(chains, model_params, column_widths, model_formats,
+                             max_name_length, sig_figs, model_params_offset,
+                             false, &std::cout);
     std::cout << std::endl;
     write_sampler_info(metadata, "", &std::cout);
 
@@ -198,12 +257,19 @@ Options:
 
       write_header(header, column_widths, max_name_length, true, &csv_file);
       write_params(chains, lp_param, column_widths, model_formats,
-                   max_name_length, sig_figs, 0, true, &csv_file);
+                   max_name_length, sig_figs, {0}, true, &csv_file);
       write_params(chains, sampler_params, column_widths, sampler_formats,
-                   max_name_length, sig_figs, 1, true, &csv_file);
-      write_params(chains, model_params, column_widths, model_formats,
-                   max_name_length, sig_figs, model_params_offset, true,
+                   max_name_length, sig_figs, sampler_params_idxes, true,
                    &csv_file);
+
+      if (model_params_subset)
+        write_params(chains, model_params, column_widths, model_formats,
+                     max_name_length, sig_figs, model_param_idxes, true,
+                     &csv_file);
+      else
+        write_all_model_params(chains, model_params, column_widths,
+                               model_formats, max_name_length, sig_figs,
+                               model_params_offset, true, &csv_file);
 
       write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
