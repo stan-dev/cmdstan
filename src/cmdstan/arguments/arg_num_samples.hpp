@@ -13,9 +13,6 @@ class arg_num_samples : public int_argument {
     _validity = "0 <= num_samples";
     _default = "1000";
     _default_value = 1000;
-    _constrained = true;
-    _good_value = 2.0;
-    _bad_value = -1.0;
     _value = _default_value;
   }
 

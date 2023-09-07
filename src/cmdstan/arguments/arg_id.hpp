@@ -13,9 +13,6 @@ class arg_id : public int_argument {
     _validity = "id >= 0";
     _default = "1";
     _default_value = 1;
-    _constrained = true;
-    _good_value = 2.0;
-    _bad_value = -1.0;
     _value = _default_value;
   }
 

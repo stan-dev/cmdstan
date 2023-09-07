@@ -88,27 +88,6 @@ class list_argument : public valued_argument {
     return true;
   }
 
-  virtual void probe_args(argument *base_arg, stan::callbacks::writer &w) {
-    for (size_t i = 0; i < _values.size(); ++i) {
-      _cursor = i;
-
-      w("good");
-      base_arg->print(w, 0, "");
-      w();
-
-      _values.at(i)->probe_args(base_arg, w);
-    }
-
-    _values.push_back(new arg_fail);
-    _cursor = _values.size() - 1;
-    w("bad");
-    base_arg->print(w, 0, "");
-    w();
-
-    _values.pop_back();
-    _cursor = _default_cursor;
-  }
-
   void find_arg(const std::string &name, const std::string &prefix,
                 std::vector<std::string> &valid_paths) {
     if (name == _name) {

@@ -16,9 +16,6 @@ class arg_output_sig_figs : public int_argument {
           "figures";
     _default = "-1";
     _default_value = -1;
-    _constrained = true;
-    _good_value = 8;
-    _bad_value = -2;
     _value = _default_value;
   }
 

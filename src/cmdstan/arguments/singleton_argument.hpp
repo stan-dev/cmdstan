@@ -92,22 +92,6 @@ class singleton_argument : public valued_argument {
     return true;
   }
 
-  virtual void probe_args(argument *base_arg, stan::callbacks::writer &w) {
-    w("good");
-    _value = _good_value;
-    base_arg->print(w, 0, "");
-    w();
-
-    if (_constrained) {
-      w("bad");
-      _value = _bad_value;
-      base_arg->print(w, 0, "");
-      w();
-    }
-
-    _value = _default_value;
-  }
-
   void find_arg(const std::string &name, const std::string &prefix,
                 std::vector<std::string> &valid_paths) {
     if (name == _name) {

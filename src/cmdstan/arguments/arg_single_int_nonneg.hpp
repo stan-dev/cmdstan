@@ -1,16 +1,16 @@
-#ifndef CMDSTAN_ARGUMENTS_ARG_SINGLE_INT_POS_HPP
-#define CMDSTAN_ARGUMENTS_ARG_SINGLE_INT_POS_HPP
+#ifndef CMDSTAN_ARGUMENTS_ARG_SINGLE_INT_NONNEG_HPP
+#define CMDSTAN_ARGUMENTS_ARG_SINGLE_INT_NONNEG_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <string>
 
-/** Generic positive int value argument */
+/** Generic non-negative int value argument */
 
 namespace cmdstan {
 
-class arg_single_int_pos : public int_argument {
+class arg_single_int_nonneg : public int_argument {
  public:
-  arg_single_int_pos(const char* name, const char* desc, int def)
+  arg_single_int_nonneg(const char* name, const char* desc, int def)
       : int_argument() {
     _name = name;
     _description = desc;
@@ -20,7 +20,7 @@ class arg_single_int_pos : public int_argument {
     _value = _default_value;
   }
 
-  bool is_valid(int value) { return value > 0; }
+  bool is_valid(int value) { return value >= 0; }
 };
 
 }  // namespace cmdstan

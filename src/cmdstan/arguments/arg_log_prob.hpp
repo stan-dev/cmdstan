@@ -3,7 +3,7 @@
 
 #include <cmdstan/arguments/arg_log_prob_unconstrained_params.hpp>
 #include <cmdstan/arguments/arg_log_prob_constrained_params.hpp>
-#include <cmdstan/arguments/arg_jacobian.hpp>
+#include <cmdstan/arguments/arg_single_bool.hpp>
 #include <cmdstan/arguments/categorical_argument.hpp>
 
 namespace cmdstan {
@@ -23,7 +23,11 @@ class arg_log_prob : public categorical_argument {
 
     _subarguments.push_back(new arg_log_prob_unconstrained_params());
     _subarguments.push_back(new arg_log_prob_constrained_params());
-    _subarguments.push_back(new arg_jacobian());
+    _subarguments.push_back(
+        new arg_single_bool("jacobian",
+                            "When true, include change-of-variables adjustment"
+                            " for constraining parameter transforms",
+                            true));
   }
 };
 

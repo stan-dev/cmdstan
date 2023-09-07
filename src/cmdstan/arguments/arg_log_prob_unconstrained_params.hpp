@@ -22,8 +22,6 @@ class arg_log_prob_unconstrained_params : public string_argument {
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";
-    _constrained = false;
-    _good_value = "";
     _value = _default_value;
   }
 };

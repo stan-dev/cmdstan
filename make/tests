@@ -58,8 +58,8 @@ TEST_MODELS := $(wildcard src/test/test-models/*.stan)
 
 .PHONY: test-models-hpp
 test-models-hpp:
+	$(MAKE) $(patsubst %.stan,%.hpp,$(TEST_MODELS))
 	$(MAKE) $(patsubst %.stan,%$(EXE),$(TEST_MODELS))
-
 ##
 # Tests that depend on compiled models
 ##
