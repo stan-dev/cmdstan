@@ -23,9 +23,6 @@ class arg_num_threads : public int_argument {
     _default = "1";
 #endif
     _default_value = stan::math::internal::get_num_threads();
-    _good_value = 1.0;
-    _bad_value = -2.0;
-    _constrained = true;
     _value = _default_value;
   }
 #ifdef STAN_THREADS

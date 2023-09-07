@@ -13,9 +13,6 @@ class arg_x_delta : public real_argument {
     _validity = "0 < x_delta";
     _default = "0.1";
     _default_value = 0.1;
-    _constrained = true;
-    _good_value = 0.1;
-    _bad_value = -0.1;
     _value = _default_value;
   }
 

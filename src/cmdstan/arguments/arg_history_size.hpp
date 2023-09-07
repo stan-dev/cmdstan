@@ -13,9 +13,6 @@ class arg_history_size : public int_argument {
     _validity = "0 < history_size";
     _default = "5";
     _default_value = 5;
-    _constrained = true;
-    _good_value = 2;
-    _bad_value = -1;
     _value = _default_value;
   }
 
