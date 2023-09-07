@@ -767,7 +767,9 @@ void init_callbacks(
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
         &diag_csv_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
-        &diag_json_writers) {
+        &diag_json_writers,
+    std::vector<stan::callbacks::json_writer<std::ofstream>>
+        &metric_json_writers) {
   auto user_method = parser.arg("method");
   unsigned int num_chains = get_num_chains(parser);
   unsigned int id = get_arg_val<int_argument>(parser, "id");
@@ -785,11 +787,17 @@ void init_callbacks(
   sample_writers.reserve(num_chains);
   diag_csv_writers.reserve(num_chains);
   diag_json_writers.reserve(num_chains);
+  adapted_metric_writers.reserve(num_chains);
 
   // default - no diagnostics
   for (int i = 0; i < num_chains; ++i) {
     diag_csv_writers.emplace_back(nullptr, "# ");
     diag_json_writers.emplace_back(
+        stan::callbacks::json_writer<std::ofstream>());
+  }
+  // default - not savng adaptated metric
+  for (int i = 0; i < num_chains; ++i) {
+    metric_json_writers.emplace_back(
         stan::callbacks::json_writer<std::ofstream>());
   }
 
@@ -861,6 +869,21 @@ void init_callbacks(
         if (sig_figs > -1)
           ofs->precision(sig_figs);
         diag_csv_writers.emplace_back(std::move(ofs), "# ");
+      }
+    }
+    if (user_method->arg("sample") && get_arg_val<bool_argument>(
+            parser, "method", "sample", "adapt", "save_metric")) {
+      metric_filenames = make_filenames(
+          get_arg_val<string_argument>(parser, "output", "file"),
+          "_metric", ".json", num_chains, id);
+      metric_json_writers.clear();
+      for (int i = 0; i < num_chains; ++i) {
+        auto ofs_metric
+            = std::make_unique<std::ofstream>(metric_filenames[i]);
+        ofs_metric->precision(15);  // max fp precision
+        stan::callbacks::json_writer<std::ofstream> jwriter(
+            std::move(ofs_metric));
+        metric_json_writers.emplace_back(std::move(jwriter));
       }
     }
   }
