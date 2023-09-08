@@ -198,10 +198,10 @@ Options:
     Eigen::MatrixXd sampler_params(num_sampler_params, header.size());
     Eigen::MatrixXd model_params(num_model_params, header.size());
 
-    get_stats(chains, warmup_times, sampling_times, probs, {0}, lp_param);
-    get_stats(chains, warmup_times, sampling_times, probs, sampler_params_idxes,
+    get_stats(chains, sampling_times, probs, {0}, lp_param);
+    get_stats(chains, sampling_times, probs, sampler_params_idxes,
               sampler_params);
-    get_stats(chains, warmup_times, sampling_times, probs, model_param_idxes,
+    get_stats(chains, sampling_times, probs, model_param_idxes,
               model_params);
 
     // Console output formatting

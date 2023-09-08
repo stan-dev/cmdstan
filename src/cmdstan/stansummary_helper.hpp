@@ -297,7 +297,6 @@ Eigen::VectorXd percentiles_to_probs(
   Eigen::VectorXd probs(percentiles.size());
   int cur_pct = 0;
   double pct = 0;
-  int i = 0;
   for (size_t i = 0; i < percentiles.size(); ++i) {
     try {
       pct = std::stod(percentiles[i]);
@@ -404,12 +403,10 @@ std::vector<std::string> get_header(
  * @param in out matrix of model param statistics
  */
 void get_stats(const stan::mcmc::chains<> &chains,
-               const Eigen::VectorXd &warmup_times,
                const Eigen::VectorXd &sampling_times,
                const Eigen::VectorXd &probs, std::vector<int> cols,
                Eigen::MatrixXd &params) {
   params.setZero();
-  double total_warmup_time = warmup_times.sum();
   double total_sampling_time = sampling_times.sum();
 
   if (params.rows() != cols.size()) {
@@ -483,7 +480,6 @@ void write_params(const stan::mcmc::chains<> &chains,
                                       1> &col_formats,
                   int max_name_length, int sig_figs, std::vector<int> cols,
                   bool as_csv, std::ostream *out) {
-  int num_sampler_params = params.rows();
   int i = 0;
   for (int i_chains : cols) {
     if (as_csv) {
@@ -531,7 +527,6 @@ void write_all_model_params(const stan::mcmc::chains<> &chains,
                             int max_name_length, int sig_figs,
                             int params_start_col, bool as_csv,
                             std::ostream *out) {
-  int num_sampler_params = params.rows();
   for (int i = 0, i_chains = params_start_col; i < params.rows();
        ++i, ++i_chains) {
     if (!is_container(chains.param_name(i_chains))) {
