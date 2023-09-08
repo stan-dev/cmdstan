@@ -201,8 +201,7 @@ Options:
     get_stats(chains, sampling_times, probs, {0}, lp_param);
     get_stats(chains, sampling_times, probs, sampler_params_idxes,
               sampler_params);
-    get_stats(chains, sampling_times, probs, model_param_idxes,
-              model_params);
+    get_stats(chains, sampling_times, probs, model_param_idxes, model_params);
 
     // Console output formatting
     Eigen::VectorXi column_sig_figs(header.size());
