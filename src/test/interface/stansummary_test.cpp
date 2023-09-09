@@ -241,8 +241,7 @@ TEST(CommandStansummary, param_tests) {
   std::vector<int> model_param_idxes(num_model_params);
   std::iota(model_param_idxes.begin(), model_param_idxes.end(),
             model_params_offset);
-  get_stats(chains, sampling_times, probs, model_param_idxes,
-            model_params);
+  get_stats(chains, sampling_times, probs, model_param_idxes, model_params);
 
   double mean_theta = model_params(0, 0);
   EXPECT_TRUE(mean_theta > 0.25);
