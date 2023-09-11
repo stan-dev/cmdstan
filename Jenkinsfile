@@ -231,7 +231,7 @@ pipeline {
                                 excludeFile('/lib/.*'),
                                 excludeFile('tbb/*'),
                                 excludeFile('stan/lib/stan_math/lib/*'),
-                                excludeMessage("*'sprintf' is deprecated*")
+                                excludeMessage(".*'sprintf' is deprecated.*")
                             ],
                             tools: [
                                 gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
@@ -264,7 +264,7 @@ pipeline {
                                 excludeFile('/lib/.*'),
                                 excludeFile('tbb/*'),
                                 excludeFile('stan/lib/stan_math/lib/*'),
-                                excludeMessage("*'sprintf' is deprecated*")
+                                excludeMessage(".*'sprintf' is deprecated.*")
                             ],
                             tools: [
                                 gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
