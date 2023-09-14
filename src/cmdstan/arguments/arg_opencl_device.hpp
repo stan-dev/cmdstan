@@ -13,9 +13,6 @@ class arg_opencl_device : public int_argument {
     _validity = "device >= 0 or -1 to use the compile-time device ID";
     _default = "-1";
     _default_value = -1;
-    _constrained = true;
-    _good_value = 1;
-    _bad_value = -1.0;
     _value = _default_value;
   }
 

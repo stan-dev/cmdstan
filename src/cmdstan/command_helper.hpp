@@ -2,7 +2,6 @@
 #define CMDSTAN_HELPER_HPP
 
 #include <cmdstan/arguments/argument_parser.hpp>
-#include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
 #include <cmdstan/write_chain.hpp>
 #include <cmdstan/write_datetime.hpp>

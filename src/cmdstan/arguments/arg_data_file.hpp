@@ -13,8 +13,6 @@ class arg_data_file : public string_argument {
     _validity = "Path to existing file";
     _default = "\"\"";
     _default_value = "";
-    _constrained = false;
-    _good_value = "good";
     _value = _default_value;
   }
 };

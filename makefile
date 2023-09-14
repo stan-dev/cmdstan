@@ -149,7 +149,11 @@ include make/program
 include make/tests
 include make/command
 
+<<<<<<< HEAD
 CMDSTAN_VERSION := 2.33.1
+=======
+CMDSTAN_VERSION := 2.33.0
+>>>>>>> develop
 
 ifeq ($(OS),Windows_NT)
 HELP_MAKE=mingw32-make
@@ -206,6 +210,7 @@ endif
 	@echo '      the nightly version.'
 	@echo '    STAN_CPP_OPTIMS: Turns on additonal compiler flags for performance.'
 	@echo '    STAN_NO_RANGE_CHECKS: Removes the range checks from the model for performance.'
+	@echo '    STAN_THREADS: Enable multi-threaded execution of the Stan model.'
 	@echo ''
 	@echo ''
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
@@ -295,9 +300,9 @@ endif
 ##
 # Clean up.
 ##
-.PHONY: clean clean-deps clean-manual clean-all clean-program
+.PHONY: clean clean-deps clean-all
 
-clean: clean-manual
+clean:
 	$(RM) -r test
 	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
 	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
@@ -316,15 +321,6 @@ clean-all: clean clean-deps clean-libraries
 	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
 	$(RM) -r $(wildcard $(BOOST)/stage/lib $(BOOST)/bin.v2 $(BOOST)/tools/build/src/engine/bootstrap/ $(BOOST)/tools/build/src/engine/bin.* $(BOOST)/project-config.jam* $(BOOST)/b2 $(BOOST)/bjam $(BOOST)/bootstrap.log)
-
-clean-program:
-ifndef STANPROG
-	$(error STANPROG not set)
-endif
-	$(RM) "$(wildcard $(patsubst %.stan,%.d,$(basename ${STANPROG}).stan))"
-	$(RM) "$(wildcard $(patsubst %.stan,%.hpp,$(basename ${STANPROG}).stan))"
-	$(RM) "$(wildcard $(patsubst %.stan,%.o,$(basename ${STANPROG}).stan))"
-	$(RM) "$(wildcard $(patsubst %.stan,%$(EXE),$(basename ${STANPROG}).stan))"
 
 ##
 # Submodule related tasks

@@ -36,8 +36,6 @@ class argument {
     return true;
   }
 
-  virtual void probe_args(argument *base_arg, stan::callbacks::writer &w) {}
-
   virtual void find_arg(const std::string &name, const std::string &prefix,
                         std::vector<std::string> &valid_paths) {
     if (name == _name) {

@@ -13,8 +13,6 @@ class arg_profile_file : public string_argument {
     _validity = "Valid path and write access to the folder";
     _default = "\"\"";
     _default_value = "profile.csv";
-    _constrained = false;
-    _good_value = "profile.csv";
     _value = _default_value;
   }
 };

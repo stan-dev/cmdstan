@@ -13,9 +13,6 @@ class arg_test_grad_eps : public real_argument {
     _validity = "0 < epsilon";
     _default = "1e-6";
     _default_value = 1e-6;
-    _constrained = true;
-    _good_value = 1e-6;
-    _bad_value = -1.0;
     _value = _default_value;
   }
 

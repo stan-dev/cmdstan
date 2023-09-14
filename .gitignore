@@ -49,5 +49,6 @@ src/docs/**/*.pdf
 output.csv
 output*.csv
 *.d
+*.o
 # gdb
 .gdb_history
