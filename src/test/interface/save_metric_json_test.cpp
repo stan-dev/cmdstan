@@ -10,7 +10,6 @@ using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
 
-
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
@@ -35,7 +34,6 @@ class CmdStan : public testing::Test {
   std::vector<std::string> output_metric_4;
   std::vector<std::string> simplex_model;
 };
-
 
 TEST_F(CmdStan, save_diag_metric) {
   std::stringstream ss;
