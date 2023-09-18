@@ -83,7 +83,6 @@ int main(int argc, const char *argv[]) {
   bool has_errors = false;
 
   for (int i = 0; i < chains.num_params(); ++i) {
-    int max_limit = 10;
     if (chains.param_name(i) == std::string("treedepth__")) {
       std::cout << "Checking sampler transitions treedepth." << std::endl;
       int max_limit = stan_csv.metadata.max_depth;

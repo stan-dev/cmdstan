@@ -519,7 +519,7 @@ int command(int argc, const char *argv[]) {
       double stepsize = get_arg_val<real_argument>(
           parser, "method", "sample", "algorithm", "hmc", "stepsize");
       double jitter = get_arg_val<real_argument>(
-          parser, "method", "sample", "algorithm", "hmc", "stepsize");
+          parser, "method", "sample", "algorithm", "hmc", "stepsize_jitter");
       list_argument *hmc_engine
           = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
       std::string engine = hmc_engine->value();
