@@ -784,10 +784,11 @@ void init_callbacks(
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   std::vector<std::string> output_filenames;
   std::vector<std::string> diagnostic_filenames;
+  std::vector<std::string> metric_filenames;
   sample_writers.reserve(num_chains);
   diag_csv_writers.reserve(num_chains);
   diag_json_writers.reserve(num_chains);
-  adapted_metric_writers.reserve(num_chains);
+  metric_json_writers.reserve(num_chains);
 
   // default - no diagnostics
   for (int i = 0; i < num_chains; ++i) {
@@ -874,7 +875,9 @@ void init_callbacks(
     if (user_method->arg("sample") && get_arg_val<bool_argument>(
             parser, "method", "sample", "adapt", "save_metric")) {
       metric_filenames = make_filenames(
-          get_arg_val<string_argument>(parser, "output", "file"),
+          get_basename_suffix(
+              get_arg_val<string_argument>(parser, "output", "file")
+                              ).first,
           "_metric", ".json", num_chains, id);
       metric_json_writers.clear();
       for (int i = 0; i < num_chains; ++i) {
