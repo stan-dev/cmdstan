@@ -194,8 +194,7 @@ int command(int argc, const char *argv[]) {
       diagnostic_csv_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>>
       diagnostic_json_writers;
-  std::vector<stan::callbacks::json_writer<std::ofstream>>
-      metric_json_writers;
+  std::vector<stan::callbacks::json_writer<std::ofstream>> metric_json_writers;
 
   init_callbacks(parser, sample_writers, diagnostic_csv_writers,
                  diagnostic_json_writers, metric_json_writers);
@@ -519,7 +518,7 @@ int command(int argc, const char *argv[]) {
       double stepsize = get_arg_val<real_argument>(
           parser, "method", "sample", "algorithm", "hmc", "stepsize");
       double jitter = get_arg_val<real_argument>(
-          parser, "method", "sample", "algorithm", "hmc", "stepsize");
+          parser, "method", "sample", "algorithm", "hmc", "stepsize_jitter");
       list_argument *hmc_engine
           = dynamic_cast<list_argument *>(algo->arg("hmc")->arg("engine"));
       std::string engine = hmc_engine->value();
@@ -576,7 +575,7 @@ int command(int argc, const char *argv[]) {
               parser, "method", "sample", "adapt", "term_buffer");
           unsigned int window = get_arg_val<u_int_argument>(
               parser, "method", "sample", "adapt", "window");
-              
+
           if (metric == "dense_e" && metric_supplied == true) {
             return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
                 model, num_chains, init_contexts, metric_contexts, random_seed,
