@@ -766,8 +766,7 @@ void init_callbacks(
         &sample_writers,
     std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
         &diag_csv_writers,
-    std::vector<stan::callbacks::json_writer<std::ofstream>>
-        &diag_json_writers,
+    std::vector<stan::callbacks::json_writer<std::ofstream>> &diag_json_writers,
     std::vector<stan::callbacks::json_writer<std::ofstream>>
         &metric_json_writers) {
   auto user_method = parser.arg("method");
@@ -872,17 +871,17 @@ void init_callbacks(
         diag_csv_writers.emplace_back(std::move(ofs), "# ");
       }
     }
-    if (user_method->arg("sample") && get_arg_val<bool_argument>(
-            parser, "method", "sample", "adapt", "save_metric")) {
-      metric_filenames = make_filenames(
-          get_basename_suffix(
-              get_arg_val<string_argument>(parser, "output", "file")
-                              ).first,
-          "_metric", ".json", num_chains, id);
+    if (user_method->arg("sample")
+        && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
+                                      "save_metric")) {
+      metric_filenames
+          = make_filenames(get_basename_suffix(get_arg_val<string_argument>(
+                                                   parser, "output", "file"))
+                               .first,
+                           "_metric", ".json", num_chains, id);
       metric_json_writers.clear();
       for (int i = 0; i < num_chains; ++i) {
-        auto ofs_metric
-            = std::make_unique<std::ofstream>(metric_filenames[i]);
+        auto ofs_metric = std::make_unique<std::ofstream>(metric_filenames[i]);
         ofs_metric->precision(15);  // max fp precision
         stan::callbacks::json_writer<std::ofstream> jwriter(
             std::move(ofs_metric));
