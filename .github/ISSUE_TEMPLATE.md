@@ -24,8 +24,4 @@ Describe what you expect the output to be. Knowing the correct behavior is also 
 Provide any additional information here.
 
 #### Current Version:
-<<<<<<< HEAD
 v2.33.1
-=======
-v2.33.0
->>>>>>> develop
