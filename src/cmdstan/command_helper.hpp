@@ -3,16 +3,6 @@
 
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
-#include <cmdstan/write_chain.hpp>
-#include <cmdstan/write_datetime.hpp>
-#include <cmdstan/write_model_compile_info.hpp>
-#include <cmdstan/write_model.hpp>
-#include <cmdstan/write_opencl_device.hpp>
-#include <cmdstan/write_parallel_info.hpp>
-#include <cmdstan/write_profiling.hpp>
-#include <cmdstan/write_stan.hpp>
-#include <cmdstan/write_stan_flags.hpp>
-#include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
