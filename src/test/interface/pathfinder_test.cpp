@@ -1,10 +1,9 @@
 #include <test/utility.hpp>
-#include <rapidjson/document.h>
+#include <test/unit/util.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
-using cmdstan::test::count_matches;
 using cmdstan::test::file_exists;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
@@ -142,8 +141,7 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   std::string single_json = result_json_sstream.str();
   ASSERT_FALSE(single_json.empty());
 
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(single_json.c_str()).HasParseError());
+  ASSERT_TRUE(stan::test::is_valid_JSON(single_json));
   single_json.erase(
       std::remove_if(single_json.begin(), single_json.end(), is_whitespace),
       single_json.end());
