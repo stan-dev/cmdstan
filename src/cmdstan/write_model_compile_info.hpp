@@ -9,7 +9,7 @@ namespace cmdstan {
 void write_compile_info(stan::callbacks::writer& writer,
                         stan::model::model_base& model) {
   auto compile_info = model.model_compile_info();
-  for (auto s: compile_info) {
+  for (auto s : compile_info) {
     writer(s);
   }
 }
@@ -17,7 +17,7 @@ void write_compile_info(stan::callbacks::writer& writer,
 void write_compile_info(stan::callbacks::structured_writer& writer,
                         stan::model::model_base& model) {
   auto compile_info = model.model_compile_info();
-  for (auto s: compile_info) {
+  for (auto s : compile_info) {
     // split on "="
     std::string::size_type pos = s.find(" = ");
     if (pos == std::string::npos) {
