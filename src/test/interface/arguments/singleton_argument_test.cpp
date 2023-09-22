@@ -1,6 +1,7 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <boost/lexical_cast.hpp>
 #include <gtest/gtest.h>
 
 template <typename T>
