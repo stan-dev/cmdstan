@@ -2,12 +2,38 @@
 #define CMDSTAN_ARGUMENTS_SINGLETON_ARGUMENT_HPP
 
 #include <cmdstan/arguments/valued_argument.hpp>
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
 
 namespace cmdstan {
+
+namespace internal {
+void from_string(std::string &src, double &dest) { dest = std::stod(src); }
+void from_string(std::string &src, int &dest) { dest = std::stoi(src); }
+void from_string(std::string &src, long long int &dest) {
+  dest = std::stoll(src);
+}
+void from_string(std::string &src, unsigned int &dest) {
+  dest = std::stoul(src);
+}
+void from_string(std::string &src, bool &dest) {
+  if (src == "true" || src == "1") {
+    dest = true;
+  } else if (src == "false" || src == "0") {
+    dest = false;
+  } else {
+    throw std::invalid_argument(std::string("invalid boolean value ") + src);
+  }
+}
+void from_string(std::string &src, std::string &dest) { dest = src; }
+
+std::string to_string(std::string &src) { return src; }
+template <typename T>
+std::string to_string(T &src) {
+  return std::to_string(src);
+}
+}  // namespace internal
 
 template <typename T>
 struct type_name {
@@ -73,7 +99,8 @@ class singleton_argument : public valued_argument {
       args.pop_back();
 
       try {
-        T proposed_value = boost::lexical_cast<T>(value);
+        T proposed_value;
+        internal::from_string(value, proposed_value);
         if (set_value(proposed_value)) {
           return true;
         }
@@ -109,7 +136,7 @@ class singleton_argument : public valued_argument {
     return false;
   }
 
-  std::string print_value() { return boost::lexical_cast<std::string>(_value); }
+  std::string print_value() { return internal::to_string(_value); }
 
   std::string print_valid() { return " " + _validity; }
 
