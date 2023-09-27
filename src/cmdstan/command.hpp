@@ -205,11 +205,11 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
-    auto filename = get_basename_suffix(
-                        get_arg_val<string_argument>(parser, "output", "file"))
-                        .first
-                    + "_config.json";
-    auto ofs_args = std::make_unique<std::ofstream>(filename);
+    auto config_filename = get_basename_suffix(get_arg_val<string_argument>(
+                                                   parser, "output", "file"))
+                               .first
+                           + "_config.json";
+    auto ofs_args = std::make_unique<std::ofstream>(config_filename);
     if (sig_figs > -1) {
       ofs_args->precision(sig_figs);
     }
