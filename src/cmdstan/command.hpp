@@ -12,15 +12,11 @@
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/command_helper.hpp>
 #include <cmdstan/return_codes.hpp>
-#include <cmdstan/write_chain.hpp>
-#include <cmdstan/write_datetime.hpp>
-#include <cmdstan/write_model_compile_info.hpp>
 #include <cmdstan/write_model.hpp>
-#include <cmdstan/write_opencl_device.hpp>
-#include <cmdstan/write_parallel_info.hpp>
-#include <cmdstan/write_profiling.hpp>
 #include <cmdstan/write_stan.hpp>
-#include <cmdstan/write_stan_flags.hpp>
+#include <cmdstan/write_config.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/math/prim/core/init_threadpool_tbb.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -32,7 +28,6 @@
 #include <stan/io/ends_with.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/json/json_data.hpp>
-#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/model/model_base.hpp>
 #include <stan/services/diagnose/diagnose.hpp>
 #include <stan/services/experimental/advi/fullrank.hpp>
@@ -65,8 +60,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-
-#include <stan/math/prim/core/init_threadpool_tbb.hpp>
 
 #ifdef STAN_MPI
 #include <stan/math/prim/functor/mpi_cluster.hpp>
@@ -254,16 +247,25 @@ int command(int argc, const char *argv[]) {
 
   std::vector<std::shared_ptr<stan::io::var_context>> init_contexts
       = get_vec_var_context(init, num_chains, id);
-  std::vector<std::string> model_compile_info = model.model_compile_info();
+
+  if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
+    auto config_filename = get_basename_suffix(get_arg_val<string_argument>(
+                                                   parser, "output", "file"))
+                               .first
+                           + "_config.json";
+    auto ofs_args = std::make_unique<std::ofstream>(config_filename);
+    if (sig_figs > -1) {
+      ofs_args->precision(sig_figs);
+    }
+
+    stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
+
+    write_config(json_args, parser, model);
+  }
 
   for (int i = 0; i < num_chains; ++i) {
-    write_stan(sample_writers[i]);
-    write_model(sample_writers[i], model.model_name());
-    write_datetime(sample_writers[i]);
-    parser.print(sample_writers[i]);
-    write_parallel_info(sample_writers[i]);
-    write_opencl_device(sample_writers[i]);
-    write_compile_info(sample_writers[i], model_compile_info);
+    write_config(sample_writers[i], parser, model);
+
     write_stan(diagnostic_csv_writers[i]);
     write_model(diagnostic_csv_writers[i], model.model_name());
     parser.print(diagnostic_csv_writers[i]);
@@ -322,10 +324,8 @@ int command(int argc, const char *argv[]) {
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
-      write_stan(pathfinder_writer);
-      write_model(pathfinder_writer, model.model_name());
-      write_datetime(pathfinder_writer);
-      parser.print(pathfinder_writer);
+      write_config(pathfinder_writer, parser, model);
+
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
           stan::model::model_base>(
           model, init_contexts, random_seed, id, init_radius, history_size,
