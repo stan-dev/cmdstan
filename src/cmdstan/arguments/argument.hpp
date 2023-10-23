@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARGUMENT_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -25,6 +26,8 @@ class argument {
   virtual void print(stan::callbacks::writer &w, const int depth,
                      const std::string &prefix)
       = 0;
+
+  virtual void print(stan::callbacks::structured_writer &j) = 0;
 
   virtual void print_help(stan::callbacks::writer &w, const int depth,
                           const bool recurse)

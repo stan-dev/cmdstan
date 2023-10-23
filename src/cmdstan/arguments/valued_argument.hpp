@@ -19,6 +19,10 @@ class valued_argument : public argument {
     w(message);
   }
 
+  virtual void print(stan::callbacks::structured_writer &j) {
+    j.write(_name, print_value());
+  }
+
   virtual void print_help(stan::callbacks::writer &w, const int depth,
                           const bool recurse = false) {
     std::string indent(indent_width * depth, ' ');

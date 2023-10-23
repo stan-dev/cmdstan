@@ -3,16 +3,6 @@
 
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
-#include <cmdstan/write_chain.hpp>
-#include <cmdstan/write_datetime.hpp>
-#include <cmdstan/write_model_compile_info.hpp>
-#include <cmdstan/write_model.hpp>
-#include <cmdstan/write_opencl_device.hpp>
-#include <cmdstan/write_parallel_info.hpp>
-#include <cmdstan/write_profiling.hpp>
-#include <cmdstan/write_stan.hpp>
-#include <cmdstan/write_stan_flags.hpp>
-#include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
@@ -157,7 +147,7 @@ std::pair<std::string, std::string> get_basename_suffix(
  * @param fname name of file which exists and has read perms.
  * @return input stream
  */
-std::ifstream safe_open(const std::string fname) {
+std::ifstream safe_open(const std::string &fname) {
   std::ifstream stream(fname.c_str());
   if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
     std::stringstream msg;
@@ -734,13 +724,13 @@ void check_file_config(argument_parser &parser) {
       throw std::invalid_argument(
           std::string("Argument fitted_params file - found empty string, "
                       "expecting filename."));
-      if (input_file.compare(sample_file) == 0) {
-        std::stringstream msg;
-        msg << "Filename conflict, fitted_params file " << input_file
-            << " and output file names are identical, must be different."
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
+    }
+    if (input_file.compare(sample_file) == 0) {
+      std::stringstream msg;
+      msg << "Filename conflict, fitted_params file " << input_file
+          << " and output file names are identical, must be different."
+          << std::endl;
+      throw std::invalid_argument(msg.str());
     }
   } else if (user_method->arg("laplace")) {
     std::string input_file
@@ -749,13 +739,13 @@ void check_file_config(argument_parser &parser) {
       throw std::invalid_argument(
           std::string("Argument mode file - found empty string, "
                       "expecting filename."));
-      if (input_file.compare(sample_file) == 0) {
-        std::stringstream msg;
-        msg << "Filename conflict, parameter modes file " << input_file
-            << " and output file names are identical, must be different."
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
+    }
+    if (input_file.compare(sample_file) == 0) {
+      std::stringstream msg;
+      msg << "Filename conflict, parameter modes file " << input_file
+          << " and output file names are identical, must be different."
+          << std::endl;
+      throw std::invalid_argument(msg.str());
     }
   }
 }
@@ -772,7 +762,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&...args) {
+                             Ts &&... args) {
   writers.reserve(num_chains);
   auto filenames = make_filenames(filename, tag, suffix, num_chains, id);
 
