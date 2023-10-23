@@ -166,8 +166,8 @@ int command(int argc, const char *argv[]) {
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   bool save_single_paths
       = user_method->arg("pathfinder")
-      && get_arg_val<bool_argument>(parser, "method", "pathfinder",
-                                    "save_single_paths");
+        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                      "save_single_paths");
 
   //////////////////////////////////////////////////
   //                Initialize Model              //
@@ -200,37 +200,37 @@ int command(int argc, const char *argv[]) {
   std::vector<stan::callbacks::json_writer<std::ofstream>> metric_json_writers;
 
   if (diagnostic_file.empty() && !save_single_paths) {
-        init_null_callbacks(diagnostic_csv_writers, num_chains);
-        init_null_callbacks(diagnostic_json_writers, num_chains);
+    init_null_callbacks(diagnostic_csv_writers, num_chains);
+    init_null_callbacks(diagnostic_json_writers, num_chains);
   }
-  
+
   if (user_method->arg("pathfinder")) {
     if (num_chains == 1) {
-      init_filestream_writers(sample_writers, num_chains, id,
-                              output_file, "", ".csv", sig_figs, "#");
+      init_filestream_writers(sample_writers, num_chains, id, output_file, "",
+                              ".csv", sig_figs, "#");
       if (!diagnostic_file.empty() && save_single_paths) {
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
                                 output_file, "", ".json", sig_figs);
       }
     } else {
-      init_filestream_writers(sample_writers, num_chains, id,
-                              output_file, "_path", ".csv", sig_figs, "#");
+      init_filestream_writers(sample_writers, num_chains, id, output_file,
+                              "_path", ".csv", sig_figs, "#");
       if (save_single_paths)
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
                                 output_file, "_path", ".json", sig_figs);
     }
   } else {
-      init_filestream_writers(sample_writers, num_chains, id,
+    init_filestream_writers(sample_writers, num_chains, id, output_file, "",
+                            ".csv", sig_figs, "#");
+    if (!diagnostic_file.empty())
+      init_filestream_writers(diagnostic_csv_writers, num_chains, id,
                               output_file, "", ".csv", sig_figs, "#");
-      if (!diagnostic_file.empty())
-        init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                                output_file, "", ".csv", sig_figs, "#");
   }
   if (user_method->arg("sample")
-      && get_arg_val<bool_argument>(parser, "method", "sample",
-                                    "adapt", "save_metric")) {
-    init_filestream_writers(metric_json_writers, num_chains, id,
-                            output_file, "_metric", ".json", sig_figs);
+      && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
+                                    "save_metric")) {
+    init_filestream_writers(metric_json_writers, num_chains, id, output_file,
+                            "_metric", ".json", sig_figs);
   } else {
     init_null_callbacks(metric_json_writers, num_chains);
   }

@@ -762,7 +762,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&...args) {
+                             Ts &&... args) {
   writers.reserve(num_chains);
   auto filenames = make_filenames(filename, tag, suffix, num_chains, id);
 
