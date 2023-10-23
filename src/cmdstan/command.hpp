@@ -155,20 +155,6 @@ int command(int argc, const char *argv[]) {
   write_opencl_device(info);
   info();
 
-  // General config for all methods
-  auto user_method = parser.arg("method");
-  unsigned int id = get_arg_val<int_argument>(parser, "id");
-  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
-  int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
-  std::string output_file
-      = get_arg_val<string_argument>(parser, "output", "file");
-  std::string diagnostic_file
-      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  bool save_single_paths
-      = user_method->arg("pathfinder")
-        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
-                                      "save_single_paths");
-
   //////////////////////////////////////////////////
   //                Initialize Model              //
   //////////////////////////////////////////////////
@@ -184,7 +170,23 @@ int command(int argc, const char *argv[]) {
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
-  // Setup callbacks
+  //////////////////////////////////////////////////
+  //                Configure callbacks           //
+  //////////////////////////////////////////////////
+  auto user_method = parser.arg("method");
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
+  int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
+  std::string output_file
+      = get_arg_val<string_argument>(parser, "output", "file");
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  bool save_single_paths
+      = user_method->arg("pathfinder")
+        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                      "save_single_paths");
+  auto output_base = get_basename_suffix(output_file).first;
+
   stan::callbacks::interrupt interrupt;
   stan::callbacks::json_writer<std::ofstream> dummy_json_writer;  // pathfinder
   stan::callbacks::writer init_writer;  // unused - save param initializations
@@ -206,30 +208,30 @@ int command(int argc, const char *argv[]) {
 
   if (user_method->arg("pathfinder")) {
     if (num_chains == 1) {
-      init_filestream_writers(sample_writers, num_chains, id, output_file, "",
+      init_filestream_writers(sample_writers, num_chains, id, output_base, "",
                               ".csv", sig_figs, "#");
       if (!diagnostic_file.empty() && save_single_paths) {
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                output_file, "", ".json", sig_figs);
+                                output_base, "", ".json", sig_figs);
       }
     } else {
-      init_filestream_writers(sample_writers, num_chains, id, output_file,
+      init_filestream_writers(sample_writers, num_chains, id, output_base,
                               "_path", ".csv", sig_figs, "#");
       if (save_single_paths)
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                output_file, "_path", ".json", sig_figs);
+                                output_base, "_path", ".json", sig_figs);
     }
   } else {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "#");
     if (!diagnostic_file.empty())
       init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              output_file, "", ".csv", sig_figs, "#");
+                              diagnostic_file, "", ".csv", sig_figs, "#");
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
                                     "save_metric")) {
-    init_filestream_writers(metric_json_writers, num_chains, id, output_file,
+    init_filestream_writers(metric_json_writers, num_chains, id, output_base,
                             "_metric", ".json", sig_figs);
   } else {
     init_null_callbacks(metric_json_writers, num_chains);
