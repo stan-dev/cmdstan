@@ -105,8 +105,8 @@ TEST_F(CmdStan, pathfinder_single) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string output = result_sstream.str();
-  EXPECT_EQ(1, count_matches("# Elapsed Time:", output));
-  EXPECT_EQ(1, count_matches(" seconds (Pathfinder)", output));
+  EXPECT_EQ(1, count_matches("Elapsed Time:", output));
+  EXPECT_EQ(1, count_matches("seconds (Pathfinder)", output));
   EXPECT_EQ(1, count_matches("num_paths = 1", output));
   EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
 }
@@ -130,8 +130,8 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   result_sstream << single_csv_stream.rdbuf();
   single_csv_stream.close();
   std::string single_csv = result_sstream.str();
-  EXPECT_EQ(1, count_matches("# Elapsed Time:", single_csv));
-  EXPECT_EQ(1, count_matches(" seconds (Pathfinder)", single_csv));
+  EXPECT_EQ(1, count_matches("Elapsed Time:", single_csv));
+  EXPECT_EQ(1, count_matches("seconds (Pathfinder)", single_csv));
   EXPECT_EQ(1, count_matches("save_single_paths = 1", single_csv));
 
   std::fstream single_json_stream(convert_model_path(output_single_json));

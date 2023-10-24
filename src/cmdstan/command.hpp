@@ -181,18 +181,12 @@ int command(int argc, const char *argv[]) {
       = get_arg_val<string_argument>(parser, "output", "file");
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  bool save_single_paths
-      = user_method->arg("pathfinder")
-        && get_arg_val<bool_argument>(parser, "method", "pathfinder",
-                                      "save_single_paths");
-  auto output_base = get_basename_suffix(output_file).first;
 
   stan::callbacks::interrupt interrupt;
   stan::callbacks::json_writer<std::ofstream> dummy_json_writer;  // pathfinder
   stan::callbacks::writer init_writer;  // unused - save param initializations
   std::vector<stan::callbacks::writer> init_writers{num_chains,
                                                     stan::callbacks::writer{}};
-
   std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
       sample_writers;
   std::vector<stan::callbacks::unique_stream_writer<std::ofstream>>
@@ -201,32 +195,50 @@ int command(int argc, const char *argv[]) {
       diagnostic_json_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>> metric_json_writers;
 
-  if (diagnostic_file.empty() && !save_single_paths) {
-    init_null_callbacks(diagnostic_csv_writers, num_chains);
-    init_null_callbacks(diagnostic_json_writers, num_chains);
-  }
+  std::string output_base = get_basename_suffix(output_file).first;
+  std::string diagnostic_base;
+  if (!diagnostic_file.empty())
+    diagnostic_base = get_basename_suffix(diagnostic_file).first;
+  else
+    diagnostic_base = output_base;
+  bool save_single_paths
+      = user_method->arg("pathfinder")
+      && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                     "save_single_paths"));
+  bool save_diagnostics = diagnostic_base != output_base;
 
   if (user_method->arg("pathfinder")) {
     if (num_chains == 1) {
       init_filestream_writers(sample_writers, num_chains, id, output_base, "",
-                              ".csv", sig_figs, "#");
-      if (!diagnostic_file.empty() && save_single_paths) {
+                              ".csv", sig_figs, "# ");
+      if (save_single_paths || save_diagnostics) {
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                output_base, "", ".json", sig_figs);
-      }
+                                diagnostic_base, "", ".json", sig_figs);
+      } else {
+        init_null_callbacks(diagnostic_json_writers, num_chains);
+      }        
     } else {
-      init_filestream_writers(sample_writers, num_chains, id, output_base,
-                              "_path", ".csv", sig_figs, "#");
-      if (save_single_paths)
+      if (save_single_paths || save_diagnostics) {
+        init_filestream_writers(sample_writers, num_chains, id, output_base,
+                              "_path", ".csv", sig_figs, "# ");
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                output_base, "_path", ".json", sig_figs);
+                                diagnostic_base, "_path", ".json", sig_figs);
+      } else {
+        init_null_callbacks(sample_writers, num_chains);
+        init_null_callbacks(diagnostic_json_writers, num_chains);
+      }
     }
+    init_null_callbacks(diagnostic_csv_writers, num_chains);
   } else {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
-                            ".csv", sig_figs, "#");
-    if (!diagnostic_file.empty())
+                            ".csv", sig_figs, "# ");
+    if (save_diagnostics) {
       init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              diagnostic_file, "", ".csv", sig_figs, "#");
+                              diagnostic_base, "", ".csv", sig_figs, "# ");
+    } else {
+      init_null_callbacks(diagnostic_csv_writers, num_chains);
+    }
+    init_null_callbacks(diagnostic_json_writers, num_chains);
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
@@ -251,23 +263,17 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
-    auto config_filename = get_basename_suffix(get_arg_val<string_argument>(
-                                                   parser, "output", "file"))
-                               .first
-                           + "_config.json";
+    auto config_filename = output_base + "_config.json";
     auto ofs_args = std::make_unique<std::ofstream>(config_filename);
     if (sig_figs > -1) {
       ofs_args->precision(sig_figs);
     }
-
     stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
-
     write_config(json_args, parser, model);
   }
 
   for (int i = 0; i < num_chains; ++i) {
     write_config(sample_writers[i], parser, model);
-
     write_stan(diagnostic_csv_writers[i]);
     write_model(diagnostic_csv_writers[i], model.model_name());
     parser.print(diagnostic_csv_writers[i]);
@@ -300,40 +306,28 @@ int command(int argc, const char *argv[]) {
     int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
-    int num_paths = get_arg_val<int_argument>(*pathfinder_arg, "num_paths");
-    bool save_iterations
-        = get_arg_val<bool_argument>(*pathfinder_arg, "save_single_paths");
-
-    if (num_paths == 1) {
-      if (!get_arg_val<string_argument>(parser, "output", "diagnostic_file")
-               .empty()) {
-        save_iterations = true;
-      }
+    if (num_chains == 1) {
+      save_single_paths = save_single_paths || !diagnostic_file.empty();
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
-          save_iterations, refresh, interrupt, logger, init_writer,
+          save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      auto ofs = std::make_unique<std::ofstream>(
-          get_basename_suffix(
-              get_arg_val<string_argument>(parser, "output", "file"))
-              .first
-          + ".csv");
+      auto ofs = std::make_unique<std::ofstream>(output_base + ".csv");
       if (sig_figs > -1)
         ofs->precision(sig_figs);
-      stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
-          std::move(ofs), "# ");
+      stan::callbacks::unique_stream_writer<std::ofstream>
+          pathfinder_writer(std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
-
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
           stan::model::model_base>(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_paths,
-          save_iterations, refresh, interrupt, logger, init_writers,
+          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_chains,
+          save_single_paths, refresh, interrupt, logger, init_writers,
           sample_writers, diagnostic_json_writers, pathfinder_writer,
           dummy_json_writer);
     }
