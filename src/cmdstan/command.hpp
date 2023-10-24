@@ -203,8 +203,8 @@ int command(int argc, const char *argv[]) {
     diagnostic_base = output_base;
   bool save_single_paths
       = user_method->arg("pathfinder")
-      && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
-                                     "save_single_paths"));
+        && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                       "save_single_paths"));
   bool save_diagnostics = diagnostic_base != output_base;
 
   if (user_method->arg("pathfinder")) {
@@ -216,11 +216,11 @@ int command(int argc, const char *argv[]) {
                                 diagnostic_base, "", ".json", sig_figs);
       } else {
         init_null_callbacks(diagnostic_json_writers, num_chains);
-      }        
+      }
     } else {
       if (save_single_paths || save_diagnostics) {
         init_filestream_writers(sample_writers, num_chains, id, output_base,
-                              "_path", ".csv", sig_figs, "# ");
+                                "_path", ".csv", sig_figs, "# ");
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
                                 diagnostic_base, "_path", ".json", sig_figs);
       } else {
@@ -319,17 +319,17 @@ int command(int argc, const char *argv[]) {
       auto ofs = std::make_unique<std::ofstream>(output_base + ".csv");
       if (sig_figs > -1)
         ofs->precision(sig_figs);
-      stan::callbacks::unique_stream_writer<std::ofstream>
-          pathfinder_writer(std::move(ofs), "# ");
+      stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
+          std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
       return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
           stan::model::model_base>(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws, num_chains,
-          save_single_paths, refresh, interrupt, logger, init_writers,
-          sample_writers, diagnostic_json_writers, pathfinder_writer,
-          dummy_json_writer);
+          max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
+          num_chains, save_single_paths, refresh, interrupt, logger,
+          init_writers, sample_writers, diagnostic_json_writers,
+          pathfinder_writer, dummy_json_writer);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
