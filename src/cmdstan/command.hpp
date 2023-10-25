@@ -171,7 +171,7 @@ int command(int argc, const char *argv[]) {
       = new_model(*var_context, random_seed, &std::cout);
 
   //////////////////////////////////////////////////
-  //                Configure callbacks           //
+  //           Configure callback writers         //
   //////////////////////////////////////////////////
   auto user_method = parser.arg("method");
   unsigned int id = get_arg_val<int_argument>(parser, "id");
@@ -215,7 +215,7 @@ int command(int argc, const char *argv[]) {
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
                                 diagnostic_base, "", ".json", sig_figs);
       } else {
-        init_null_callbacks(diagnostic_json_writers, num_chains);
+        init_null_writers(diagnostic_json_writers, num_chains);
       }
     } else {
       if (save_single_paths || save_diagnostics) {
@@ -224,11 +224,11 @@ int command(int argc, const char *argv[]) {
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
                                 diagnostic_base, "_path", ".json", sig_figs);
       } else {
-        init_null_callbacks(sample_writers, num_chains);
-        init_null_callbacks(diagnostic_json_writers, num_chains);
+        init_null_writers(sample_writers, num_chains);
+        init_null_writers(diagnostic_json_writers, num_chains);
       }
     }
-    init_null_callbacks(diagnostic_csv_writers, num_chains);
+    init_null_writers(diagnostic_csv_writers, num_chains);
   } else {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "# ");
@@ -236,9 +236,9 @@ int command(int argc, const char *argv[]) {
       init_filestream_writers(diagnostic_csv_writers, num_chains, id,
                               diagnostic_base, "", ".csv", sig_figs, "# ");
     } else {
-      init_null_callbacks(diagnostic_csv_writers, num_chains);
+      init_null_writers(diagnostic_csv_writers, num_chains);
     }
-    init_null_callbacks(diagnostic_json_writers, num_chains);
+    init_null_writers(diagnostic_json_writers, num_chains);
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
@@ -246,7 +246,7 @@ int command(int argc, const char *argv[]) {
     init_filestream_writers(metric_json_writers, num_chains, id, output_base,
                             "_metric", ".json", sig_figs);
   } else {
-    init_null_callbacks(metric_json_writers, num_chains);
+    init_null_writers(metric_json_writers, num_chains);
   }
 
   // Setup initial parameter values - arg "init"

@@ -306,7 +306,7 @@ TEST(StanUiCommand, timing_info) {
   output_csv_stream.close();
   std::string output = output_sstream.str();
 
-  EXPECT_EQ(1, count_matches(" Elapsed Time:", output));
+  EXPECT_EQ(1, count_matches("#  Elapsed Time:", output));
   EXPECT_EQ(1, count_matches(" seconds (Warm-up)", output));
   EXPECT_EQ(1, count_matches(" seconds (Sampling)", output));
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
@@ -331,10 +331,10 @@ TEST(StanUiCommand, run_info) {
   output_csv_stream.close();
   std::string output = output_sstream.str();
 
-  EXPECT_EQ(1, count_matches("method = sample", output));
-  EXPECT_EQ(1, count_matches("num_samples = 10", output));
-  EXPECT_EQ(1, count_matches("num_warmup = 10", output));
-  EXPECT_EQ(1, count_matches("init = 0", output));
+  EXPECT_EQ(1, count_matches("# method = sample", output));
+  EXPECT_EQ(1, count_matches(" num_samples = 10", output));
+  EXPECT_EQ(1, count_matches(" num_warmup = 10", output));
+  EXPECT_EQ(1, count_matches(" init = 0", output));
 }
 
 TEST(StanUiCommand, random_seed_default) {

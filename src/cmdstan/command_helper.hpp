@@ -751,7 +751,7 @@ void check_file_config(argument_parser &parser) {
 }
 
 template <typename T>
-void init_null_callbacks(std::vector<T> &writers, size_t num_chains) {
+void init_null_writers(std::vector<T> &writers, size_t num_chains) {
   writers.reserve(num_chains);
   for (size_t i = 0; i < num_chains; ++i) {
     writers.emplace_back(nullptr);

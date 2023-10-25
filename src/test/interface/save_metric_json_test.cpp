@@ -1,5 +1,5 @@
 #include <test/utility.hpp>
-#include <rapidjson/document.h>
+#include <test/unity/util.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
 
@@ -50,8 +50,7 @@ TEST_F(CmdStan, save_diag_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(metric.c_str()).HasParseError());
+  ASSERT_TRUE(stan::test::is_valid_json(metric.c_str()));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
   EXPECT_EQ(count_matches("[", metric), 1);  // diagonal metric
@@ -72,11 +71,10 @@ TEST_F(CmdStan, save_dense_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(metric.c_str()).HasParseError());
+  ASSERT_TRUE(stan::test::is_valid_json(metric.c_str()));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
-  EXPECT_EQ(count_matches("[", metric), 7);  // diagonal metric
+  EXPECT_EQ(count_matches("[", metric), 7);  // dense metric
 }
 
 TEST_F(CmdStan, save_unit_metric) {
@@ -94,9 +92,8 @@ TEST_F(CmdStan, save_unit_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  rapidjson::Document document;
-  ASSERT_FALSE(document.Parse<0>(metric.c_str()).HasParseError());
+  ASSERT_TRUE(stan::test::is_valid_json(metric.c_str()));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
-  EXPECT_EQ(count_matches("[", metric), 1);  // diagonal metric
+  EXPECT_EQ(count_matches("[", metric), 1);  // unit metric is diagonal
 }
