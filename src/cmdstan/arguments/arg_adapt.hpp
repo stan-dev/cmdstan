@@ -7,6 +7,7 @@
 #include <cmdstan/arguments/arg_single_u_int.hpp>
 #include <cmdstan/arguments/arg_single_real_bounded.hpp>
 #include <cmdstan/arguments/arg_single_real_pos.hpp>
+#include <cmdstan/arguments/arg_single_string.hpp>
 #include <cmath>
 namespace cmdstan {
 class arg_adapt : public categorical_argument {
@@ -32,6 +33,8 @@ class arg_adapt : public categorical_argument {
         "term_buffer", "Width of final fast adaptation interval", 50));
     _subarguments.push_back(new arg_single_u_int(
         "window", "Initial width of slow adaptation interval", 25));
+    _subarguments.push_back(
+        new arg_single_bool("save_metric", "Save metric as JSON?", false));
   }
 };
 
