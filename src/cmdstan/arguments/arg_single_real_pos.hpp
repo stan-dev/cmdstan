@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <string>
+#include <sstream>
 
 /** Generic pos real value argument */
 
@@ -15,7 +16,10 @@ class arg_single_real_pos : public real_argument {
     _name = name;
     _description = desc;
     _validity = std::string("0 < ").append(name);
-    _default = std::to_string(def);
+
+    std::stringstream def_ss;
+    def_ss << def;
+    _default = def_ss.str();
     _default_value = def;
     _value = _default_value;
   }

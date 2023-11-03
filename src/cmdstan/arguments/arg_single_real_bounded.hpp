@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <string>
+#include <sstream>
 
 /** Generic bounded real value argument */
 
@@ -21,7 +22,10 @@ class arg_single_real_bounded : public real_argument {
     _validity
         = std::to_string(lb).append(" <= ").append(name).append(" <= ").append(
             std::to_string(ub));
-    _default = std::to_string(def);
+
+    std::stringstream def_ss;
+    def_ss << def;
+    _default = def_ss.str();
     _default_value = def;
     _value = _default_value;
     _lb = lb;
