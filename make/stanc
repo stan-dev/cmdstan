@@ -9,7 +9,6 @@ endef
 
 # if nothing was set to $(OS) that means that the Stan Math submodule is missing
 OS ?= missing-submodules
-CMDSTAN_SUBMODULES = 1
 STANC_DL_RETRY = 5
 STANC_DL_DELAY = 10
 STANC3_TEST_BIN_URL ?=
@@ -38,14 +37,11 @@ else ifeq ($(OS),Linux)
   endif
  endif
 
-else ifeq ($(OS),missing-submodules)
- CMDSTAN_SUBMODULES = 0
 else
   $(error  Cannot detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc. $n )
 endif
 
-# bin/stanc build rules - requires stan, stan_math submodules in place
-ifeq ($(CMDSTAN_SUBMODULES),1)
+# bin/stanc build rules
 ifneq ($(STANC3),)
   # build stanc3 from local installation
   bin/stanc$(EXE) : $(call findfiles,$(STANC3)/src/,*.ml*) $(STANC#)
@@ -90,6 +86,5 @@ else
 	@mkdir -p $(dir $@)
 	curl -L https://github.com/stan-dev/stanc3/releases/download/$(STANC3_VERSION)/$(OS_TAG)$(ARCH_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
 	chmod +x bin/stanc$(EXE)
-endif
 endif
 # end bin/stanc build rules
