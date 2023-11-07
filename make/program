@@ -79,6 +79,9 @@ ifeq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
 endif
 endif
 
+$(patsubst %.cpp,%$(STAN_FLAGS).d,$(CMDSTAN_MAIN)) : $(CMDSTAN_MAIN)
+	$(COMPILE.cpp) $(DEPFLAGS) $<
+
 ##
 # Dependencies file
 ##
