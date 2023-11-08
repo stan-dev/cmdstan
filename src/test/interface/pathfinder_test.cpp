@@ -17,6 +17,7 @@ class CmdStan : public testing::Test {
     eight_schools_model = {"src", "test", "test-models", "eight_schools"};
     eight_schools_data
         = {"src", "test", "test-models", "eight_schools.data.json"};
+    empty_model = {"src", "test", "test-models", "empty"};
     arg_output = {"test", "output"};
     arg_diags = {"test", "diagnostics"};
     output_csv = {"test", "output.csv"};
@@ -38,6 +39,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> multi_normal_model;
   std::vector<std::string> eight_schools_model;
   std::vector<std::string> eight_schools_data;
+  std::vector<std::string> empty_model;
   std::vector<std::string> arg_output;
   std::vector<std::string> arg_diags;
   std::vector<std::string> output_csv;
@@ -240,4 +242,22 @@ TEST_F(CmdStan, pathfinder_lbfgs_iterations) {
                output.end());
   EXPECT_EQ(1, count_matches("\"3\":{\"iter\":3,", output));
   EXPECT_EQ(0, count_matches("\"4\":{\"iter\":4,", output));
+}
+
+TEST_F(CmdStan, pathfinder_empty_model) {
+  std::stringstream ss;
+  ss << convert_model_path(empty_model) << " method=pathfinder";
+  run_command_output out = run_command(ss.str());
+  ASSERT_TRUE(out.hasError);
+  EXPECT_EQ(1, count_matches("Model has 0 parameters", out.output));
+}
+
+TEST_F(CmdStan, pathfinder_too_many_PSIS_draws) {
+  std::stringstream ss;
+  ss << convert_model_path(multi_normal_model) << " method=pathfinder"
+     << " num_paths=1 num_draws=10 num_psis_draws=11";
+  run_command_output out = run_command(ss.str());
+  ASSERT_FALSE(out.hasError);
+  EXPECT_EQ(
+      1, count_matches("Warning: Number of PSIS draws is larger", out.output));
 }
