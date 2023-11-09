@@ -48,7 +48,7 @@ pipeline {
     agent none
     options {
         skipDefaultCheckout()
-        disableConcurrentBuilds(abortPrevious: true)
+        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" || env.BRANCH_NAME != "downstream_hotfix")
     }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
