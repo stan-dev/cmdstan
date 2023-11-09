@@ -46,7 +46,10 @@ String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
 
 pipeline {
     agent none
-    options { skipDefaultCheckout() }
+    options {
+        skipDefaultCheckout()
+        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" || env.BRANCH_NAME != "downstream_hotfix")
+    }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
                description: "Stan PR to test against. Will check out this PR in the downstream Stan repo.")
@@ -67,14 +70,6 @@ pipeline {
         GIT_COMMITTER_EMAIL = 'mc.stanislaw@gmail.com'
     }
     stages {
-        stage('Kill previous builds') {
-            when {
-                not { branch 'develop' }
-                not { branch 'master' }
-                not { branch 'downstream_tests' }
-            }
-            steps { script { utils.killOldBuilds() } }
-        }
         stage('Clean & Setup') {
             agent {
                 docker {
