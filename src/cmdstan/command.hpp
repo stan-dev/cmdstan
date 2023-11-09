@@ -306,6 +306,18 @@ int command(int argc, const char *argv[]) {
     int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
+
+    if (num_psis_draws > num_draws * num_chains) {
+      logger.warn(
+          "Warning: Number of PSIS draws is larger than the total number of "
+          "draws returned by the single Pathfinders. This is likely "
+          "unintentional and leads to re-sampling from the same draws.");
+    }
+    if (model.num_params_r() == 0) {
+      throw std::invalid_argument(
+          "Model has 0 parameters, cannot run Pathfinder.");
+    }
+
     if (num_chains == 1) {
       save_single_paths = save_single_paths || !diagnostic_file.empty();
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
