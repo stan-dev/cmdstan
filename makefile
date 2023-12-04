@@ -250,7 +250,7 @@ help-dev:
 	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary$(EXE): Build the print utility.'
-	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
+	@echo '- bin/diagnose$(EXE): Build the diagnostic utility.'
 	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
