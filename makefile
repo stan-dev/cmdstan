@@ -141,9 +141,9 @@ else
 PRECOMPILED_MODEL_HEADER=
 endif
 
--include $(MATH)make/compiler_flags
--include $(MATH)make/dependencies
--include $(MATH)make/libraries
+include $(MATH)make/compiler_flags
+include $(MATH)make/dependencies
+include $(MATH)make/libraries
 include make/stanc
 include make/program
 include make/tests
@@ -249,8 +249,8 @@ help-dev:
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
 	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
-	@echo '- bin/stansummary$(EXE): Build the print utility.'
-	@echo '- bin/diagnostic$(EXE): Build the diagnostic utility.'
+	@echo '- bin/stansummary$(EXE): Build the stansummary utility.'
+	@echo '- bin/diagnose$(EXE): Build the diagnose utility.'
 	@echo ''
 	@echo '- *$(EXE)        : If a Stan model exists at *.stan, this target will build'
 	@echo '                   the Stan model as an executable.'
@@ -262,7 +262,6 @@ build-mpi: $(MPI_TARGETS)
 	@echo ''
 	@echo '--- boost mpi bindings built ---'
 
-ifeq ($(CMDSTAN_SUBMODULES),1)
 .PHONY: build
 build: bin/stanc$(EXE) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	@echo ''
@@ -275,17 +274,6 @@ ifeq ($(OS),Windows_NT)
 		@echo 'to automatically update your user configuration.'
 endif
 	@echo '--- CmdStan v$(CMDSTAN_VERSION) built ---'
-else
-.PHONY: build
-build:
-	@echo 'ERROR: Missing Stan submodules.'
-	@echo 'Please run the following to fix:'
-	@echo ''
-	@echo 'git submodule update --init --recursive'
-	@echo ''
-	@echo 'And try building again'
-	@exit 1
-endif
 
 .PHONY: install-tbb
 install-tbb: $(TBB_TARGETS)
@@ -352,3 +340,20 @@ print-%  : ; @echo $* = $($*)
 
 .PHONY: clean-build
 clean-build: clean-all build
+
+
+##
+# This is only run if the `include` statements earlier fail to find a file.
+# We assume that means the submodule is missing
+##
+$(MATH)make/% :
+	@echo 'ERROR: Missing Stan submodules.'
+	@echo 'We tried to find the Stan Math submodule at:'
+	@echo '  $(MATH)'
+	@echo ''
+	@echo 'The most likely source of the problem is CmdStan was cloned without'
+	@echo 'the --recursive flag.  To fix this, run the following command:'
+	@echo '  git submodule update --init --recursive'
+	@echo ''
+	@echo 'And try building again'
+	@exit 1
