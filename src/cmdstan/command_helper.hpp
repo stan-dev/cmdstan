@@ -103,6 +103,23 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
+
+/**
+ * Gets the path separator for the OS.
+ *
+ * @return '\' for Windows, '/' otherwise.
+ */
+char get_path_separator() {
+#if defined(WIN32) || defined(_WIN32) \
+    || defined(__WIN32) && !defined(__CYGWIN__)
+  static char path_separator = '\\';
+#else
+  static char path_separator = '/';
+#endif
+  return path_separator;
+}
+
+
 /**
  * Get suffix
  *
@@ -112,11 +129,15 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
 std::string get_suffix(const std::string &name) {
   if (name.empty())
     return "";
-  size_t file_marker_pos = name.find_last_of(".");
-  if (file_marker_pos > name.size())
+  size_t idx = name.find_last_of(get_path_separator());
+  std::string filename = name;
+  if (idx < name.size())
+    filename = name.substr(idx, name.size());
+  idx = filename.find_last_of(".");
+  if (idx > filename.size())
     return std::string();
   else
-    return name.substr(file_marker_pos, name.size());
+    return filename.substr(idx, filename.size());
 }
 
 /**
