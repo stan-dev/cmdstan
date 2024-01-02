@@ -76,7 +76,6 @@ TEST(CommandHelper, validate_output_filename) {
   EXPECT_THROW(validate_output_filename(fp4), std::invalid_argument);
 }
 
-
 TEST(CommandHelper, check_filename_config_good) {
   std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
 
@@ -169,5 +168,3 @@ TEST(CommandHelper, check_filename_config_bad3) {
 
   EXPECT_THROW(check_file_config(parser), std::invalid_argument);
 }
-
-
