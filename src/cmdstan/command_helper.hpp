@@ -102,7 +102,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
-
 /**
  * Gets the path separator for the OS.
  *
@@ -123,19 +122,19 @@ char get_path_separator() {
  * and relative filepaths '.' and '..'
  */
 bool valid_dot_suffix(char prev, char current, char next) {
-    if (current != '.') {
-        return false;
-    }
-    if (prev == '\0' || next == '\0') {
-        return false;
-    }
-    if (prev == '.' || next == '.') {
-        return false;
-    }
-    if (prev == get_path_separator() || next == get_path_separator()) {
-        return false;
-    }
-    return true;
+  if (current != '.') {
+    return false;
+  }
+  if (prev == '\0' || next == '\0') {
+    return false;
+  }
+  if (prev == '.' || next == '.') {
+    return false;
+  }
+  if (prev == get_path_separator() || next == get_path_separator()) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -144,20 +143,20 @@ bool valid_dot_suffix(char prev, char current, char next) {
  *
  * @return index of suffix separator '.' , or std::string::npos if not found.
  */
-size_t find_dot_suffix(const std::string& input) {
-    if (input.empty()) {
-        return std::string::npos;
-    }
-    for (size_t i = input.size() - 1; i != 0; --i) {
-      if (input[i] == get_path_separator())
-        return std::string::npos;
-      char prev = i < input.size() - 1 ? input[i + 1] : '\0';
-      char next = i > 0 ? input[i - 1] : '\0';
-      if (valid_dot_suffix(next, input[i], prev)) {
-        return i;
-      }
-    }
+size_t find_dot_suffix(const std::string &input) {
+  if (input.empty()) {
     return std::string::npos;
+  }
+  for (size_t i = input.size() - 1; i != 0; --i) {
+    if (input[i] == get_path_separator())
+      return std::string::npos;
+    char prev = i < input.size() - 1 ? input[i + 1] : '\0';
+    char next = i > 0 ? input[i - 1] : '\0';
+    if (valid_dot_suffix(next, input[i], prev)) {
+      return i;
+    }
+  }
+  return std::string::npos;
 }
 
 /**
@@ -250,10 +249,9 @@ std::vector<std::string> make_filenames(const std::string &filename,
                                         const std::string &type,
                                         unsigned int num_chains,
                                         unsigned int id) {
-  std::pair<std::string, std::string>  base_sfx;
+  std::pair<std::string, std::string> base_sfx;
   std::string fname = filename;
-  std::transform(fname.begin(), fname.end(),
-                 fname.begin(), ::tolower);
+  std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
   if (boost::algorithm::ends_with(fname, ".csv")
       || boost::algorithm::ends_with(fname, ".json")) {
     base_sfx = get_basename_suffix(filename);
@@ -789,19 +787,17 @@ void check_file_config(argument_parser &parser) {
       = get_arg_val<string_argument>(parser, "output", "file");
   if (sample_file[sample_file.size() - 1] == get_path_separator()
       || boost::algorithm::ends_with(sample_file, "..")) {
-      std::stringstream msg;
-      msg << "Ill-formed output filename " << sample_file
-          << std::endl;
-      throw std::invalid_argument(msg.str());
+    std::stringstream msg;
+    msg << "Ill-formed output filename " << sample_file << std::endl;
+    throw std::invalid_argument(msg.str());
   }
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   if (diagnostic_file[diagnostic_file.size() - 1] == get_path_separator()
-      ||  boost::algorithm::ends_with(sample_file, "..")) {
-      std::stringstream msg;
-      msg << "Ill-formed diagnostic filename " << diagnostic_file
-          << std::endl;
-      throw std::invalid_argument(msg.str());
+      || boost::algorithm::ends_with(sample_file, "..")) {
+    std::stringstream msg;
+    msg << "Ill-formed diagnostic filename " << diagnostic_file << std::endl;
+    throw std::invalid_argument(msg.str());
   }
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
