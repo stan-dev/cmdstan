@@ -254,6 +254,18 @@ inline shared_context_ptr get_var_context(const std::string &file) {
   return std::make_shared<stan::io::dump>(var_context);
 }
 
+/**
+ * Construct output file names given template filename,
+ * adding tags and numbers as needed for per-chain outputs.
+ * Output file types are either CSV or JSON.
+ * Template filenames may already contain suffix ".csv" or "json".
+ *
+ * @param filename output or diagnostic filename, user-specified or default.
+ * @param tag distinguishing tag
+ * @param type suffix string corresponding to types CSV, JSON
+ * @param num_chains number of names to return
+ * @param id numbering offset
+ */
 std::vector<std::string> make_filenames(const std::string &filename,
                                         const std::string &tag,
                                         const std::string &type,
@@ -265,6 +277,8 @@ std::vector<std::string> make_filenames(const std::string &filename,
   if (boost::algorithm::ends_with(fname, ".csv")
       || boost::algorithm::ends_with(fname, ".json")) {
     base_sfx = get_basename_suffix(filename);
+    if (type != base_sfx.second)
+      base_sfx.second = type;
   } else {
     base_sfx.first = filename;
     base_sfx.second = type;
