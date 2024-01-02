@@ -202,5 +202,3 @@ TEST(CommandHelper, check_filename_config_bad3) {
 
   EXPECT_THROW(check_file_config(parser), std::invalid_argument);
 }
-
-
