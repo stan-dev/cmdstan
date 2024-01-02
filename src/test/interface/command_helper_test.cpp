@@ -84,7 +84,7 @@ TEST(CommandHelper, check_filename_config_good) {
   EXPECT_NO_THROW(check_file_config(parser));
 }
 
-TEST(CommandHelper, check_filename_config_fubar) {
+TEST(CommandHelper, check_filename_config_bad) {
   std::string sep = std::string(1, get_path_separator());
 
   std::vector<std::string> argv;
@@ -107,7 +107,7 @@ TEST(CommandHelper, check_filename_config_fubar) {
   EXPECT_THROW(check_file_config(parser), std::invalid_argument);
 }
 
-TEST(CommandHelper, check_filename_config_fubar2) {
+TEST(CommandHelper, check_filename_config_bad2) {
   std::string sep = std::string(1, get_path_separator());
 
   std::vector<std::string> argv;
@@ -130,7 +130,7 @@ TEST(CommandHelper, check_filename_config_fubar2) {
   EXPECT_THROW(check_file_config(parser), std::invalid_argument);
 }
 
-TEST(CommandHelper, check_filename_config_fubar3) {
+TEST(CommandHelper, check_filename_config_bad3) {
   std::string sep = std::string(1, get_path_separator());
 
   std::vector<std::string> argv;
