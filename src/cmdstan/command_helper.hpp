@@ -102,20 +102,12 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
-/**
- * Gets the path separator for the OS.
- *
- * @return '\' for Windows, '/' otherwise.
- */
-char get_path_separator() {
 #if defined(WIN32) || defined(_WIN32) \
     || defined(__WIN32) && !defined(__CYGWIN__)
-  static char path_separator = '\\';
+constexpr char PATH_SEPARATOR = '\\';
 #else
-  static char path_separator = '/';
+constexpr char PATH_SEPARATOR = '/';
 #endif
-  return path_separator;
-}
 
 /**
  * Distinguish between dot char '.' used as suffix sep
@@ -131,7 +123,7 @@ bool valid_dot_suffix(char prev, char current, char next) {
   if (prev == '.' || next == '.') {
     return false;
   }
-  if (prev == get_path_separator() || next == get_path_separator()) {
+  if (prev == PATH_SEPARATOR || next == PATH_SEPARATOR) {
     return false;
   }
   return true;
@@ -148,7 +140,7 @@ size_t find_dot_suffix(const std::string &input) {
     return std::string::npos;
   }
   for (size_t i = input.size() - 1; i != 0; --i) {
-    if (input[i] == get_path_separator())
+    if (input[i] == PATH_SEPARATOR)
       return std::string::npos;
     char prev = i < input.size() - 1 ? input[i + 1] : '\0';
     char next = i > 0 ? input[i - 1] : '\0';
@@ -169,7 +161,7 @@ std::string get_suffix(const std::string &name) {
   if (name.empty())
     return "";
   std::string filename = name;
-  size_t idx = name.find_last_of(get_path_separator());
+  size_t idx = name.find_last_of(PATH_SEPARATOR);
   if (idx < name.size())
     filename = name.substr(idx);
   idx = find_dot_suffix(filename);
@@ -201,6 +193,24 @@ std::pair<std::string, std::string> get_basename_suffix(
     }
   }
   return {base, suffix};
+}
+
+/**
+ * Check that output filename isn't a directory name
+ * or relative dir path.
+ * Throws exception if output filename is invalid.
+ *
+ * @param fname candidate output filename
+ */
+void validate_output_filename(const std::string &fname) {
+  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  if (fname[fname.size() - 1] == PATH_SEPARATOR
+      || boost::algorithm::ends_with(fname, "..")
+      || boost::algorithm::ends_with(fname, sep + ".")) {
+    std::stringstream msg;
+    msg << "Ill-formed output filename " << fname << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
 }
 
 /**
@@ -785,20 +795,10 @@ unsigned int get_num_chains(argument_parser &parser) {
 void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
-  if (sample_file[sample_file.size() - 1] == get_path_separator()
-      || boost::algorithm::ends_with(sample_file, "..")) {
-    std::stringstream msg;
-    msg << "Ill-formed output filename " << sample_file << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
+  validate_output_filename(sample_file);
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  if (diagnostic_file[diagnostic_file.size() - 1] == get_path_separator()
-      || boost::algorithm::ends_with(sample_file, "..")) {
-    std::stringstream msg;
-    msg << "Ill-formed diagnostic filename " << diagnostic_file << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
+  validate_output_filename(diagnostic_file);
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
     std::string input_file = get_arg_val<string_argument>(
