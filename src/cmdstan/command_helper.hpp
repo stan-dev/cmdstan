@@ -8,7 +8,6 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <stan/io/ends_with.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
@@ -119,6 +118,44 @@ char get_path_separator() {
   return path_separator;
 }
 
+/**
+ * Distinguish between dot char '.' used as suffix sep
+ * and relative filepaths '.' and '..'
+ */
+bool valid_dot_suffix(char prev, char current, char next) {
+    if (current != '.') {
+        return false;
+    }
+    if (prev == '.' || next == '.') {
+        return false;
+    }
+    if (prev == '/' || prev == '\\' || next == '/' || next == '\\') {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Find start of filename suffix, if any.
+ * Start search from end of string, quit at first path separator.
+ *
+ * @return index of suffix separator '.' , or std::string::npos if not found.
+ */
+size_t find_dot_suffix(const std::string& input) {
+    if (input.empty()) {
+        return std::string::npos;
+    }
+    for (size_t i = input.size() - 1; i != 0; --i) {
+      if (input[i] == get_path_separator())
+        return std::string::npos;
+      char prev = i < input.size() - 1 ? input[i + 1] : '\0';
+      char next = i > 0 ? input[i - 1] : '\0';
+      if (valid_dot_suffix(next, input[i], prev)) {
+        return i;
+      }
+    }
+    return std::string::npos;
+}
 
 /**
  * Get suffix
@@ -129,15 +166,11 @@ char get_path_separator() {
 std::string get_suffix(const std::string &name) {
   if (name.empty())
     return "";
-  size_t idx = name.find_last_of(get_path_separator());
-  std::string filename = name;
-  if (idx < name.size())
-    filename = name.substr(idx, name.size());
-  idx = filename.find_last_of(".");
-  if (idx > filename.size())
+  size_t idx = find_dot_suffix(name);
+  if (idx > name.size())
     return std::string();
   else
-    return filename.substr(idx, filename.size());
+    return name.substr(idx);
 }
 
 /**
@@ -394,7 +427,7 @@ void parse_stan_csv(const std::string &fname,
   // compute offset, size of parameters block
   col_offset = 0;
   for (auto col_name : fitted_params.header) {
-    if (boost::ends_with(col_name, "__")) {
+    if (boost::algorithm::ends_with(col_name, "__")) {
       col_offset++;
     } else {
       break;
@@ -737,6 +770,22 @@ unsigned int get_num_chains(argument_parser &parser) {
 void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
+  if (sample_file[sample_file.size() - 1] == '.'
+      || sample_file[sample_file.size() - 1] == get_path_separator()) {
+      std::stringstream msg;
+      msg << "Ill-formed output filename " << sample_file
+          << std::endl;
+      throw std::invalid_argument(msg.str());
+  }
+  std::string diagnostic_file
+      = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
+  if (diagnostic_file[diagnostic_file.size() - 1] == '.'
+      || diagnostic_file[diagnostic_file.size() - 1] == get_path_separator()) {
+      std::stringstream msg;
+      msg << "Ill-formed diagnostic filename " << diagnostic_file
+          << std::endl;
+      throw std::invalid_argument(msg.str());
+  }
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
     std::string input_file = get_arg_val<string_argument>(
