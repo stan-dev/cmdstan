@@ -81,11 +81,11 @@ TEST(CommandHelper, make_filenames) {
   std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
   unsigned int num_chains = 2;
   unsigned int id = 1;
-  
+
   std::string fp1 = "foo" + sep + "bar" + sep + "baz.csv";
   std::string expect_n1_0 = "foo" + sep + "bar" + sep + "baz_mu_1.json";
   std::string expect_n1_1 = "foo" + sep + "bar" + sep + "baz_mu_2.json";
-  
+
   std::vector<std::string> names;
   names = make_filenames(fp1, "_mu", ".json", num_chains, id);
   EXPECT_EQ(names.size(), num_chains);
