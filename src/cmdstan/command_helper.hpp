@@ -126,10 +126,13 @@ bool valid_dot_suffix(char prev, char current, char next) {
     if (current != '.') {
         return false;
     }
+    if (prev == '\0' || next == '\0') {
+        return false;
+    }
     if (prev == '.' || next == '.') {
         return false;
     }
-    if (prev == '/' || prev == '\\' || next == '/' || next == '\\') {
+    if (prev == get_path_separator() || next == get_path_separator()) {
         return false;
     }
     return true;
@@ -166,15 +169,21 @@ size_t find_dot_suffix(const std::string& input) {
 std::string get_suffix(const std::string &name) {
   if (name.empty())
     return "";
-  size_t idx = find_dot_suffix(name);
-  if (idx > name.size())
+  std::string filename = name;
+  size_t idx = name.find_last_of(get_path_separator());
+  if (idx < name.size())
+    filename = name.substr(idx);
+  idx = find_dot_suffix(filename);
+  if (idx > filename.size())
     return std::string();
   else
-    return name.substr(idx);
+    return filename.substr(idx);
 }
 
 /**
- * Split name on last ".", if any.
+ * Split name on last "." with at least one following char.
+ * If suffix is good, return pair base, suffix including initial '.'.
+ * Else return pair base, empty string.
  *
  * @param filename - name to split
  * @return pair of strings {base, suffix}
@@ -185,10 +194,11 @@ std::pair<std::string, std::string> get_basename_suffix(
   std::string suffix;
   if (!name.empty()) {
     suffix = get_suffix(name);
-    if (suffix.size() > 0) {
+    if (suffix.size() > 1) {
       base = name.substr(0, name.size() - suffix.size());
     } else {
       base = name;
+      suffix = "";
     }
   }
   return {base, suffix};
@@ -770,8 +780,8 @@ unsigned int get_num_chains(argument_parser &parser) {
 void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
-  if (sample_file[sample_file.size() - 1] == '.'
-      || sample_file[sample_file.size() - 1] == get_path_separator()) {
+  if (sample_file[sample_file.size() - 1] == get_path_separator()
+      || boost::algorithm::ends_with(sample_file, "..")) {
       std::stringstream msg;
       msg << "Ill-formed output filename " << sample_file
           << std::endl;
@@ -779,8 +789,8 @@ void check_file_config(argument_parser &parser) {
   }
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  if (diagnostic_file[diagnostic_file.size() - 1] == '.'
-      || diagnostic_file[diagnostic_file.size() - 1] == get_path_separator()) {
+  if (diagnostic_file[diagnostic_file.size() - 1] == get_path_separator()
+      ||  boost::algorithm::ends_with(sample_file, "..")) {
       std::stringstream msg;
       msg << "Ill-formed diagnostic filename " << diagnostic_file
           << std::endl;

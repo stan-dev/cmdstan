@@ -44,15 +44,20 @@ TEST(CommandHelper, basename_suffix) {
   EXPECT_EQ(get_basename_suffix(fp4).first, fp3);
   EXPECT_EQ(get_basename_suffix(fp4).second, ".csv");
 
-  std::string fp5 = "foo.bar.";
-  EXPECT_EQ(get_suffix(fp5), ".");
-  EXPECT_EQ(get_basename_suffix(fp5).first, "foo.bar");
-  EXPECT_EQ(get_basename_suffix(fp5).second, ".");
+  std::string fp5 = "foo.";
+  EXPECT_EQ(get_suffix(fp5), "");
+  EXPECT_EQ(get_basename_suffix(fp5).first, fp5);
+  EXPECT_EQ(get_basename_suffix(fp5).second, "");
 
   std::string fp6 = "foo.bar" + sep;
   EXPECT_EQ(get_suffix(fp6), "");
   EXPECT_EQ(get_basename_suffix(fp6).first, fp6);
   EXPECT_EQ(get_basename_suffix(fp6).second, "");
+
+  std::string fp7 = "foo.bar.";
+  EXPECT_EQ(get_suffix(fp7), ".bar.");
+  EXPECT_EQ(get_basename_suffix(fp7).first, "foo");
+  EXPECT_EQ(get_basename_suffix(fp7).second, ".bar.");
 }
 
 
@@ -110,7 +115,7 @@ TEST(CommandHelper, check_filename_config_fubar2) {
   argv.push_back("my_model");
   argv.push_back("sample");
   argv.push_back("output");
-  argv.push_back("file=foo" + sep + "bar" + sep + "baz.csv.");
+  argv.push_back("file=foo" + sep + "bar" + sep + "..");
   char const **argv_prime = new const char *[argv.size()];
   for (size_t i = 0; i < argv.size(); i++) {
     argv_prime[i] = argv[i].c_str();
@@ -133,7 +138,7 @@ TEST(CommandHelper, check_filename_config_fubar3) {
   argv.push_back("my_model");
   argv.push_back("sample");
   argv.push_back("output");
-  argv.push_back("file=foo" + sep + "bar" + sep + "baz.csv" + sep + "..");
+  argv.push_back("file=foo.bar." + sep);
   char const **argv_prime = new const char *[argv.size()];
   for (size_t i = 0; i < argv.size(); i++) {
     argv_prime[i] = argv[i].c_str();
