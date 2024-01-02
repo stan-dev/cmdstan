@@ -60,7 +60,6 @@ TEST(CommandHelper, basename_suffix) {
   EXPECT_EQ(get_basename_suffix(fp7).second, ".bar.");
 }
 
-
 TEST(CommandHelper, check_filename_config_good) {
   std::string sep = std::string(1, get_path_separator());
 
