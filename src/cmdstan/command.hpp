@@ -170,6 +170,8 @@ int command(int argc, const char *argv[]) {
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
+  std::stringstream msg;
+
   //////////////////////////////////////////////////
   //           Configure callback writers         //
   //////////////////////////////////////////////////
@@ -242,6 +244,14 @@ int command(int argc, const char *argv[]) {
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
                                     "save_metric")) {
+    // adaptation must be engaged
+    if (!get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
+                                    "engaged")) {
+      msg << "Saving the adapted metric (save_metric=1) can only be enabled "
+             "when adaptation is engaged (adapt engaged=1)"
+          << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
     init_filestream_writers(metric_json_writers, num_chains, id, output_file,
                             "_metric", ".json", sig_figs);
   } else {
@@ -283,7 +293,6 @@ int command(int argc, const char *argv[]) {
   //            Invoke Services                   //
   //////////////////////////////////////////////////
   int return_code = return_codes::NOT_OK;
-  std::stringstream msg;
 
   if (user_method->arg("pathfinder")) {
     // ---- pathfinder start ---- //

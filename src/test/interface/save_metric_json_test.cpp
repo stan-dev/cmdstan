@@ -96,3 +96,13 @@ TEST_F(CmdStan, save_unit_metric) {
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
   EXPECT_EQ(count_matches("[", metric), 1);  // unit metric is diagonal
 }
+
+TEST_F(CmdStan, save_metric_no_adapt) {
+  std::stringstream ss;
+  ss << convert_model_path(simplex_model) << " random seed=1234"
+     << " method=sample adapt engaged=0 save_metric=1 "
+     << " output file=" << convert_model_path(output_csv) << " 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+}
