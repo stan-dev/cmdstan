@@ -272,17 +272,11 @@ std::vector<std::string> make_filenames(const std::string &filename,
                                         unsigned int num_chains,
                                         unsigned int id) {
   std::pair<std::string, std::string> base_sfx;
-  std::string fname = filename;
-  std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
-  if (boost::algorithm::ends_with(fname, ".csv")
-      || boost::algorithm::ends_with(fname, ".json")) {
-    base_sfx = get_basename_suffix(filename);
-    if (type != base_sfx.second)
-      base_sfx.second = type;
-  } else {
-    base_sfx.first = filename;
+  base_sfx = get_basename_suffix(filename);
+  if (type != ".csv" || base_sfx.second.empty()) {
     base_sfx.second = type;
   }
+    
   std::vector<std::string> names(num_chains);
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {

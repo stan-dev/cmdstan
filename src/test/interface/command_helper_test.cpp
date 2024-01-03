@@ -82,19 +82,20 @@ TEST(CommandHelper, make_filenames) {
   unsigned int num_chains = 2;
   unsigned int id = 1;
 
+  // make json filenames - suffix == ".csv", swap out for ".json"
   std::string fp1 = "foo" + sep + "bar" + sep + "baz.csv";
   std::string expect_n1_0 = "foo" + sep + "bar" + sep + "baz_mu_1.json";
   std::string expect_n1_1 = "foo" + sep + "bar" + sep + "baz_mu_2.json";
-
   std::vector<std::string> names;
   names = make_filenames(fp1, "_mu", ".json", num_chains, id);
   EXPECT_EQ(names.size(), num_chains);
   EXPECT_EQ(names[0], expect_n1_0);
   EXPECT_EQ(names[1], expect_n1_1);
 
+  // make csv filenames - suffix != ".csv", keep as suffix
   std::string fp2 = "foo" + sep + "bar" + sep + "baz.boz";
-  std::string expect_n2_0 = "foo" + sep + "bar" + sep + "baz.boz_mu_1.csv";
-  std::string expect_n2_1 = "foo" + sep + "bar" + sep + "baz.boz_mu_2.csv";
+  std::string expect_n2_0 = "foo" + sep + "bar" + sep + "baz_mu_1.boz";
+  std::string expect_n2_1 = "foo" + sep + "bar" + sep + "baz_mu_2.boz";
   names.clear();
   names.resize(0);
   names = make_filenames(fp2, "_mu", ".csv", num_chains, id);
@@ -102,17 +103,27 @@ TEST(CommandHelper, make_filenames) {
   EXPECT_EQ(names[0], expect_n2_0);
   EXPECT_EQ(names[1], expect_n2_1);
 
+  // make single filename - don't need chain id
+  std::string expect_n3 = "foo" + sep + "bar" + sep + "baz_mu.boz";
   names.clear();
   names.resize(0);
   names = make_filenames(fp2, "_mu", ".csv", 1, id);
-  std::string expect_n3 = "foo" + sep + "bar" + sep + "baz.boz_mu.csv";
   EXPECT_EQ(names.size(), 1);
   EXPECT_EQ(names[0], expect_n3);
+
+  // make json filenames - suffix != ".csv", swap out for ".json"
+  std::string expect_n4_0 = "foo" + sep + "bar" + sep + "baz_mu_1.json";
+  std::string expect_n4_1 = "foo" + sep + "bar" + sep + "baz_mu_2.json";
+  names.clear();
+  names.resize(0);
+  names = make_filenames(fp2, "_mu", ".json", num_chains, id);
+  EXPECT_EQ(names.size(), num_chains);
+  EXPECT_EQ(names[0], expect_n4_0);
+  EXPECT_EQ(names[1], expect_n4_1);
 }
 
 TEST(CommandHelper, check_filename_config_good) {
   std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
-
   std::vector<std::string> argv;
   argv.push_back("my_model");
   argv.push_back("sample");
