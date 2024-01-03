@@ -276,7 +276,7 @@ std::vector<std::string> make_filenames(const std::string &filename,
   if (type != ".csv" || base_sfx.second.empty()) {
     base_sfx.second = type;
   }
-    
+
   std::vector<std::string> names(num_chains);
   auto name_iterator = [num_chains, id](auto i) {
     if (num_chains == 1) {
