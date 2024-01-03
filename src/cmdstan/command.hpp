@@ -206,8 +206,6 @@ int command(int argc, const char *argv[]) {
     if (save_single_paths && diagnostic_file.empty()) {
       diagnostic_file = output_file;
     }
-    std::cout << "save_single_paths ? " << save_single_paths
-              << " diagnostic file? " << diagnostic_file << std::endl;
     if (num_chains == 1) {
       init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                               ".csv", sig_figs, "# ");
@@ -219,7 +217,7 @@ int command(int argc, const char *argv[]) {
         init_null_writers(diagnostic_json_writers, num_chains);
       }
     } else {
-      if (save_single_paths) {
+      if (save_single_paths || !diagnostic_file.empty()) {
         init_filestream_writers(sample_writers, num_chains, id, output_file,
                                 "_path", ".csv", sig_figs, "# ");
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
@@ -336,7 +334,8 @@ int command(int argc, const char *argv[]) {
           save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      auto ofs = std::make_unique<std::ofstream>(output_file);
+      auto output_filenames = make_filenames(output_file, "", ".csv", 1, id);
+      auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
       if (sig_figs > -1)
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(

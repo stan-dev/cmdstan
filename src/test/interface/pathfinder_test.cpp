@@ -18,7 +18,7 @@ class CmdStan : public testing::Test {
     eight_schools_data
         = {"src", "test", "test-models", "eight_schools.data.json"};
     empty_model = {"src", "test", "test-models", "empty"};
-    arg_output = {"test", "output.csv"};
+    arg_output = {"test", "output"};
     arg_diags = {"test", "diagnostics"};
     output_csv = {"test", "output.csv"};
     output_json = {"test", "output.json"};
