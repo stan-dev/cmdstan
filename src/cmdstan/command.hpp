@@ -197,14 +197,15 @@ int command(int argc, const char *argv[]) {
 
   bool save_single_paths
       = user_method->arg("pathfinder")
-      && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
-                                     "save_single_paths"));
+        && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
+                                       "save_single_paths"));
 
   if (user_method->arg("pathfinder")) {
     if (save_single_paths && diagnostic_file.empty()) {
       diagnostic_file = output_file;
     }
-    std::cout << "save_single_paths ? " << save_single_paths << " diagnostic file? " << diagnostic_file << std::endl;
+    std::cout << "save_single_paths ? " << save_single_paths
+              << " diagnostic file? " << diagnostic_file << std::endl;
     if (num_chains == 1) {
       init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                               ".csv", sig_figs, "# ");
@@ -261,7 +262,8 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
-    auto config_filename = get_basename_suffix(output_file).first + "_config.json";
+    auto config_filename
+        = get_basename_suffix(output_file).first + "_config.json";
     auto ofs_args = std::make_unique<std::ofstream>(config_filename);
     if (sig_figs > -1) {
       ofs_args->precision(sig_figs);
