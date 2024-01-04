@@ -197,34 +197,31 @@ int command(int argc, const char *argv[]) {
       diagnostic_json_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>> metric_json_writers;
 
-  std::string output_base = get_basename_suffix(output_file).first;
-  std::string diagnostic_base;
-  if (!diagnostic_file.empty())
-    diagnostic_base = get_basename_suffix(diagnostic_file).first;
-  else
-    diagnostic_base = output_base;
   bool save_single_paths
       = user_method->arg("pathfinder")
         && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
                                        "save_single_paths"));
-  bool save_diagnostics = diagnostic_base != output_base;
 
   if (user_method->arg("pathfinder")) {
+    if (save_single_paths && diagnostic_file.empty()) {
+      diagnostic_file = output_file;
+    }
     if (num_chains == 1) {
-      init_filestream_writers(sample_writers, num_chains, id, output_base, "",
+      init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                               ".csv", sig_figs, "# ");
-      if (save_single_paths || save_diagnostics) {
+      if (!diagnostic_file.empty()) {
+        save_single_paths = true;
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                diagnostic_base, "", ".json", sig_figs);
+                                diagnostic_file, "", ".json", sig_figs);
       } else {
         init_null_writers(diagnostic_json_writers, num_chains);
       }
     } else {
-      if (save_single_paths || save_diagnostics) {
-        init_filestream_writers(sample_writers, num_chains, id, output_base,
+      if (save_single_paths || !diagnostic_file.empty()) {
+        init_filestream_writers(sample_writers, num_chains, id, output_file,
                                 "_path", ".csv", sig_figs, "# ");
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                diagnostic_base, "_path", ".json", sig_figs);
+                                diagnostic_file, "_path", ".json", sig_figs);
       } else {
         init_null_writers(sample_writers, num_chains);
         init_null_writers(diagnostic_json_writers, num_chains);
@@ -234,9 +231,9 @@ int command(int argc, const char *argv[]) {
   } else {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "# ");
-    if (save_diagnostics) {
+    if (!diagnostic_file.empty()) {
       init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              diagnostic_base, "", ".csv", sig_figs, "# ");
+                              diagnostic_file, "", ".csv", sig_figs, "# ");
     } else {
       init_null_writers(diagnostic_csv_writers, num_chains);
     }
@@ -253,8 +250,7 @@ int command(int argc, const char *argv[]) {
           << std::endl;
       throw std::invalid_argument(msg.str());
     }
-
-    init_filestream_writers(metric_json_writers, num_chains, id, output_base,
+    init_filestream_writers(metric_json_writers, num_chains, id, output_file,
                             "_metric", ".json", sig_figs);
   } else {
     init_null_writers(metric_json_writers, num_chains);
@@ -274,7 +270,8 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
-    auto config_filename = output_base + "_config.json";
+    auto config_filename
+        = get_basename_suffix(output_file).first + "_config.json";
     auto ofs_args = std::make_unique<std::ofstream>(config_filename);
     if (sig_figs > -1) {
       ofs_args->precision(sig_figs);
@@ -329,7 +326,6 @@ int command(int argc, const char *argv[]) {
     }
 
     if (num_chains == 1) {
-      save_single_paths = save_single_paths || !diagnostic_file.empty();
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
@@ -338,7 +334,8 @@ int command(int argc, const char *argv[]) {
           save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0]);
     } else {
-      auto ofs = std::make_unique<std::ofstream>(output_base + ".csv");
+      auto output_filenames = make_filenames(output_file, "", ".csv", 1, id);
+      auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
       if (sig_figs > -1)
         ofs->precision(sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
