@@ -21,6 +21,17 @@ class arg_pathfinder : public arg_lbfgs {
     _subarguments.push_back(new arg_single_bool(
         "save_single_paths", "Output single-path pathfinder draws as CSV",
         false));
+    _subarguments.push_back(new arg_single_bool(
+        "psis_resample", "If true, perform psis resampling on samples returned"
+        " from individual pathfinders. If false, returns num_paths * num_draws"
+        " samples",
+        true));
+    _subarguments.push_back(new arg_single_bool(
+        "calculate_lp", "If true, individual pathfinders do not calculate lp."
+        " If false, returns num_paths * num_draws samples. The output will "
+        "still contain any lp values used when calculating ELBO scores within"
+        " LBFGS iterations.",
+        true));
     _subarguments.push_back(new arg_single_int_pos(
         "max_lbfgs_iters", "Maximum number of LBFGS iterations", 1000));
     _subarguments.push_back(new arg_single_int_pos(
