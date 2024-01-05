@@ -78,7 +78,7 @@ inline constexpr auto get_arg(List &&arg_list, const char *arg1,
  */
 template <typename caster, typename Arg>
 inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
-  auto* arg = argument.arg(arg_name);
+  auto *arg = argument.arg(arg_name);
   if (arg) {
     return dynamic_cast<std::decay_t<caster> *>(arg)->value();
   } else {
