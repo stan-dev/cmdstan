@@ -32,10 +32,10 @@ class arg_pathfinder : public arg_lbfgs {
         "If true, individual pathfinders lp calculations are calculated and"
         " returned with the output. If false, each pathfinder will only "
         " calculate the lp values needed for the elbo calculation."
-        " If false, the algorithm returns"
-        " num_paths * num_draws samples. The output will "
-        "still contain any lp values used when calculating ELBO scores within"
-        " LBFGS iterations.",
+        " If false, psis resampling cannot be performed and"
+        " the algorithm returns num_paths * num_draws samples."
+        " The output will still contain any lp values used when"
+        " calculating ELBO scores within LBFGS iterations.",
         true));
     _subarguments.push_back(new arg_single_int_pos(
         "max_lbfgs_iters", "Maximum number of LBFGS iterations", 1000));
