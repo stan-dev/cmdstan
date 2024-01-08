@@ -313,7 +313,10 @@ int command(int argc, const char *argv[]) {
     int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
-
+    bool psis_resample
+        = get_arg_val<bool_argument>(*pathfinder_arg, "psis_resample");
+    bool calculate_lp
+        = get_arg_val<bool_argument>(*pathfinder_arg, "calculate_lp");
     if (num_psis_draws > num_draws * num_chains) {
       logger.warn(
           "Warning: Number of PSIS draws is larger than the total number of "
@@ -332,7 +335,7 @@ int command(int argc, const char *argv[]) {
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
           save_single_paths, refresh, interrupt, logger, init_writer,
-          sample_writers[0], diagnostic_json_writers[0]);
+          sample_writers[0], diagnostic_json_writers[0], calculate_lp);
     } else {
       auto output_filenames = make_filenames(output_file, "", ".csv", 1, id);
       auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
@@ -348,7 +351,7 @@ int command(int argc, const char *argv[]) {
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
           num_chains, save_single_paths, refresh, interrupt, logger,
           init_writers, sample_writers, diagnostic_json_writers,
-          pathfinder_writer, dummy_json_writer);
+          pathfinder_writer, dummy_json_writer, calculate_lp, psis_resample);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
