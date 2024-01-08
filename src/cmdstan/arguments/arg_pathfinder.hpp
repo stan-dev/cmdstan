@@ -29,8 +29,11 @@ class arg_pathfinder : public arg_lbfgs {
         true));
     _subarguments.push_back(new arg_single_bool(
         "calculate_lp",
-        "If true, individual pathfinders do not calculate lp."
-        " If false, returns num_paths * num_draws samples. The output will "
+        "If true, individual pathfinders lp calculations are calculated and"
+        " returned with the output. If false, each pathfinder will only "
+        " calculate the lp values needed for the elbo calculation."
+        " If false, the algorithm returns"
+        " num_paths * num_draws samples. The output will "
         "still contain any lp values used when calculating ELBO scores within"
         " LBFGS iterations.",
         true));
