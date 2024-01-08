@@ -351,7 +351,7 @@ int command(int argc, const char *argv[]) {
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
           num_chains, save_single_paths, refresh, interrupt, logger,
           init_writers, sample_writers, diagnostic_json_writers,
-          pathfinder_writer, dummy_json_writer, psis_resample, calculate_lp);
+          pathfinder_writer, dummy_json_writer, calculate_lp, psis_resample);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
