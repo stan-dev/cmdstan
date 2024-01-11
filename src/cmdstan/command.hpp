@@ -433,6 +433,9 @@ int command(int argc, const char *argv[]) {
                              sample_writers[0].get_stream());
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
+      msg << "Error during log_prob calculation:" << std::endl;
+      msg << e.what() << std::endl;
+      logger.error(msg.str());
       return_code = return_codes::NOT_OK;
     }
     // ---- log_prob end ---- //
