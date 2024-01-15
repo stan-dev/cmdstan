@@ -12,8 +12,8 @@
 #endif
 
 #define CMDSTAN_MAJOR 2
-#define CMDSTAN_MINOR 33
-#define CMDSTAN_PATCH 1
+#define CMDSTAN_MINOR 34
+#define CMDSTAN_PATCH 0
 
 namespace cmdstan {
 
