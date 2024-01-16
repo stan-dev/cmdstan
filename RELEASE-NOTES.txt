@@ -1,6 +1,24 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.34.0 (16 January 2024)
+======================================================================
+
+- Add option `adaptation save_metric=1` to save adapted metric in separate JSON file with elements "stepsize", "metric_type" and "inv_metric" (#1203, #1229)
+- New argument under `output save_cmdstan_config`. If set to `1`, creates `output_config.json` which contains the argument tree and extra information (equivalent to the CSV file header) (#1204)
+- Adds `psis_resample` and `calculate_lp` as options for Pathfinder (#1234)
+- Removed usages of boost::lexical_cast (#1205)
+- Resolved various compiler warnings (#1206)
+- Fixed a linking issue when building `stansummary` (#1209)
+- Fixed an issue where the default values of some arguments were not printed in sufficient precision (#1215)
+- Improved the error users see if they are missing the stan or stan_math submodules (#1217)
+- Improved the dependency detection in the build system (#1219)
+- Added a warning when more PSIS draws are requested than total number of draws from single-pathfinders (#1221)
+- Disallowed pathfinder when the model has no parameters. (#1221)
+- Fixed a typo in `make help-dev`. (#1225)
+- Fixed several edge cases and unexpected behaviors in the way output filenames were generated for multi-chain sampling and multi-path Pathfinder (#1228)
+- Added a `version.hpp` header (#1231)
+
 v2.33.1 (13 September 2023)
 ======================================================================
 
