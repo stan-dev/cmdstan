@@ -209,9 +209,10 @@ std::pair<std::string, std::string> get_basename_suffix(
  */
 void validate_output_filename(const std::string &fname) {
   std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
-  if (fname[fname.size() - 1] == PATH_SEPARATOR
-      || boost::algorithm::ends_with(fname, "..")
-      || boost::algorithm::ends_with(fname, sep + ".")) {
+  if (!fname.empty()
+      && (fname[fname.size() - 1] == PATH_SEPARATOR
+          || boost::algorithm::ends_with(fname, "..")
+          || boost::algorithm::ends_with(fname, sep + "."))) {
     std::stringstream msg;
     msg << "Ill-formed output filename " << fname << std::endl;
     throw std::invalid_argument(msg.str());
