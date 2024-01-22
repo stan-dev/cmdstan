@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/valued_argument.hpp>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -29,6 +30,14 @@ void from_string(std::string &src, bool &dest) {
 void from_string(std::string &src, std::string &dest) { dest = src; }
 
 std::string to_string(std::string &src) { return src; }
+
+std::string to_string(double &src) {
+  // better handling of precision than std::to_string
+  std::stringstream ss;
+  ss << src;
+  return ss.str();
+}
+
 template <typename T>
 std::string to_string(T &src) {
   return std::to_string(src);
