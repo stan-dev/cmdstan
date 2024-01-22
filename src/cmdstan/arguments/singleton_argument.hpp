@@ -36,7 +36,7 @@ std::string to_string(double &src) {
   std::stringstream ss;
   ss << src;
   return ss.str();
- }
+}
 
 template <typename T>
 std::string to_string(T &src) {
