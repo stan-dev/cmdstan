@@ -332,7 +332,7 @@ pipeline {
                                     git checkout downstream_hotfix
                                     git reset --hard origin/master
                                     git status
-                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                    git push -f https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
                                 """
                             }
                         }
