@@ -21,11 +21,15 @@ class arg_laplace : public categorical_argument {
         ""));
     _subarguments.push_back(
         new arg_single_bool("jacobian",
-                            "When true, include change-of-variables adjustment"
-                            " for constraining parameter transforms",
+                            "When true, include change-of-variables adjustment "
+                            "for constraining parameter transforms.",
                             true));
     _subarguments.push_back(new arg_single_int_nonneg(
         "draws", "Number of draws from the laplace approximation", 1000));
+    _subarguments.push_back(new arg_single_bool(
+        "calculate_lp",
+        "If true, calculate the log probability of the model at each draw.",
+        true));
   }
 };
 
