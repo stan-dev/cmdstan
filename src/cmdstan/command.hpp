@@ -232,12 +232,20 @@ int command(int argc, const char *argv[]) {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "# ");
     if (!diagnostic_file.empty()) {
-      init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              diagnostic_file, "", ".csv", sig_figs, "# ");
+      if (user_method->arg("laplace")) {
+        init_filestream_writers(diagnostic_json_writers, num_chains, id,
+                                diagnostic_file, "", ".json", sig_figs);
+        init_null_writers(diagnostic_csv_writers, num_chains);
+
+      } else {
+        init_filestream_writers(diagnostic_csv_writers, num_chains, id,
+                                diagnostic_file, "", ".csv", sig_figs, "# ");
+        init_null_writers(diagnostic_json_writers, num_chains);
+      }
     } else {
       init_null_writers(diagnostic_csv_writers, num_chains);
+      init_null_writers(diagnostic_json_writers, num_chains);
     }
-    init_null_writers(diagnostic_json_writers, num_chains);
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
@@ -383,15 +391,17 @@ int command(int argc, const char *argv[]) {
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
     bool jacobian = get_arg_val<bool_argument>(*laplace_arg, "jacobian");
+    bool calculate_lp
+        = get_arg_val<bool_argument>(*laplace_arg, "calculate_lp");
     int draws = get_arg_val<int_argument>(*laplace_arg, "draws");
     if (jacobian) {
       return_code = stan::services::laplace_sample<true>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     } else {
       return_code = stan::services::laplace_sample<false>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     }
     // ---- laplace end ---- //
   } else if (user_method->arg("log_prob")) {
