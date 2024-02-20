@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
+#include <cmdstan/file.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
@@ -107,135 +108,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   }
 }
 
-#if defined(WIN32) || defined(_WIN32) \
-    || defined(__WIN32) && !defined(__CYGWIN__)
-constexpr char PATH_SEPARATOR = '\\';
-#else
-constexpr char PATH_SEPARATOR = '/';
-#endif
-
-/**
- * Distinguish between dot char '.' used as suffix sep
- * and relative filepaths '.' and '..'
- */
-bool valid_dot_suffix(char prev, char current, char next) {
-  if (current != '.') {
-    return false;
-  }
-  if (prev == '\0' || next == '\0') {
-    return false;
-  }
-  if (prev == '.' || next == '.') {
-    return false;
-  }
-  if (prev == PATH_SEPARATOR || next == PATH_SEPARATOR) {
-    return false;
-  }
-  return true;
-}
-
-/**
- * Find start of filename suffix, if any.
- * Start search from end of string, quit at first path separator.
- *
- * @return index of suffix separator '.' , or std::string::npos if not found.
- */
-size_t find_dot_suffix(const std::string &input) {
-  if (input.empty()) {
-    return std::string::npos;
-  }
-  for (size_t i = input.size() - 1; i != 0; --i) {
-    if (input[i] == PATH_SEPARATOR)
-      return std::string::npos;
-    char prev = i < input.size() - 1 ? input[i + 1] : '\0';
-    char next = i > 0 ? input[i - 1] : '\0';
-    if (valid_dot_suffix(next, input[i], prev)) {
-      return i;
-    }
-  }
-  return std::string::npos;
-}
-
-/**
- * Get suffix
- *
- * @param filename
- * @return suffix
- */
-std::string get_suffix(const std::string &name) {
-  if (name.empty())
-    return "";
-  std::string filename = name;
-  size_t idx = name.find_last_of(PATH_SEPARATOR);
-  if (idx < name.size())
-    filename = name.substr(idx);
-  idx = find_dot_suffix(filename);
-  if (idx > filename.size())
-    return std::string();
-  else
-    return filename.substr(idx);
-}
-
-/**
- * Split name on last "." with at least one following char.
- * If suffix is good, return pair base, suffix including initial '.'.
- * Else return pair base, empty string.
- *
- * @param filename - name to split
- * @return pair of strings {base, suffix}
- */
-std::pair<std::string, std::string> get_basename_suffix(
-    const std::string &name) {
-  std::string base;
-  std::string suffix;
-  if (!name.empty()) {
-    suffix = get_suffix(name);
-    if (suffix.size() > 1) {
-      base = name.substr(0, name.size() - suffix.size());
-    } else {
-      base = name;
-      suffix = "";
-    }
-  }
-  return {base, suffix};
-}
-
-/**
- * Check that output filename isn't a directory name
- * or relative dir path.
- * Throws exception if output filename is invalid.
- *
- * @param fname candidate output filename
- */
-void validate_output_filename(const std::string &fname) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
-  if (!fname.empty()
-      && (fname[fname.size() - 1] == PATH_SEPARATOR
-          || boost::algorithm::ends_with(fname, "..")
-          || boost::algorithm::ends_with(fname, sep + "."))) {
-    std::stringstream msg;
-    msg << "Ill-formed output filename " << fname << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-}
-
-/**
- * Opens input stream for file.
- * Throws exception if stream cannot be opened.
- *
- * @param fname name of file which exists and has read perms.
- * @return input stream
- */
-std::ifstream safe_open(const std::string &fname) {
-  std::ifstream stream(fname.c_str());
-  if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
-    std::stringstream msg;
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
-    throw std::invalid_argument(msg.str());
-  }
-  return stream;
-}
-
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
  * Given the name of a file, return a shared pointer holding the data contents.
@@ -245,8 +117,8 @@ inline shared_context_ptr get_var_context(const std::string &file) {
   if (file.empty()) {
     return std::make_shared<stan::io::empty_var_context>();
   }
-  std::ifstream stream = safe_open(file);
-  if (get_suffix(file) == ".json") {
+  std::ifstream stream = file::safe_open(file);
+  if (file::get_suffix(file) == ".json") {
     stan::json::json_data var_context(stream);
     return std::make_shared<stan::json::json_data>(var_context);
   }
@@ -258,43 +130,6 @@ inline shared_context_ptr get_var_context(const std::string &file) {
       << std::endl;
   stan::io::dump var_context(stream);
   return std::make_shared<stan::io::dump>(var_context);
-}
-
-/**
- * Construct output file names given template filename,
- * adding tags and numbers as needed for per-chain outputs.
- * Output file types are either CSV or JSON.
- * Template filenames may already contain suffix ".csv" or "json".
- *
- * @param filename output or diagnostic filename, user-specified or default.
- * @param tag distinguishing tag
- * @param type suffix string corresponding to types CSV, JSON
- * @param num_chains number of names to return
- * @param id numbering offset
- */
-std::vector<std::string> make_filenames(const std::string &filename,
-                                        const std::string &tag,
-                                        const std::string &type,
-                                        unsigned int num_chains,
-                                        unsigned int id) {
-  std::pair<std::string, std::string> base_sfx;
-  base_sfx = get_basename_suffix(filename);
-  if (type != ".csv" || base_sfx.second.empty()) {
-    base_sfx.second = type;
-  }
-
-  std::vector<std::string> names(num_chains);
-  auto name_iterator = [num_chains, id](auto i) {
-    if (num_chains == 1) {
-      return std::string("");
-    } else {
-      return std::string("_" + std::to_string(i + id));
-    }
-  };
-  for (int i = 0; i < num_chains; ++i) {
-    names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
-  }
-  return names;
 }
 
 using context_vector = std::vector<shared_context_ptr>;
@@ -356,7 +191,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
           << std::endl;
     }
 
-    auto filenames = make_filenames(file_name, "", file_ending, num_chains, id);
+    auto filenames
+        = file::make_filenames(file_name, "", file_ending, num_chains, id);
     auto &file_1 = filenames[0];
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
     // if file_1 exists we'll assume num_chains of these files exist
@@ -447,7 +283,7 @@ void parse_stan_csv(const std::string &fname,
                     size_t &num_rows, size_t &num_cols) {
   std::stringstream msg;
   // parse CSV contents
-  std::ifstream stream = safe_open(fname);
+  std::ifstream stream = file::safe_open(fname);
   stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
                                            &msg);
   if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
@@ -587,7 +423,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
   // parse CSV file: header comments (config), header row, single data row
   std::string line;
   bool is_optimization = false;
-  std::ifstream in = safe_open(fname);
+  std::ifstream in = file::safe_open(fname);
   while (in.peek() == '#') {
     std::getline(in, line);
     if (boost::contains(line, "method = optimize"))
@@ -659,9 +495,9 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
                                  const stan::model::model_base &model) {
   std::stringstream msg;
   Eigen::VectorXd theta_hat;
-  if (get_suffix(fname) == ".csv") {
+  if (file::get_suffix(fname) == ".csv") {
     theta_hat = get_laplace_mode_csv(fname, model);
-  } else if (get_suffix(fname) == ".json") {
+  } else if (file::get_suffix(fname) == ".json") {
     std::vector<double> unc_params
         = unconstrain_params_var_context(fname, model);
     theta_hat
@@ -809,10 +645,10 @@ unsigned int get_num_chains(argument_parser &parser) {
 void check_file_config(argument_parser &parser) {
   std::string sample_file
       = get_arg_val<string_argument>(parser, "output", "file");
-  validate_output_filename(sample_file);
+  file::validate_output_filename(sample_file);
   std::string diagnostic_file
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
-  validate_output_filename(diagnostic_file);
+  file::validate_output_filename(diagnostic_file);
   auto user_method = parser.arg("method");
   if (user_method->arg("generate_quantities")) {
     std::string input_file = get_arg_val<string_argument>(
@@ -861,13 +697,10 @@ void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              std::string tag, std::string suffix, int sig_figs,
                              Ts &&... args) {
   writers.reserve(num_chains);
-  auto filenames = make_filenames(filename, tag, suffix, num_chains, id);
+  auto filenames = file::make_filenames(filename, tag, suffix, num_chains, id);
 
   for (size_t i = 0; i < num_chains; ++i) {
-    auto ofs = std::make_unique<std::ofstream>(filenames[i]);
-    if (sig_figs > -1) {
-      ofs->precision(sig_figs);
-    }
+    auto ofs = file::safe_create(filenames[i], sig_figs);
     writers.emplace_back(std::move(ofs), std::forward<Ts>(args)...);
   }
 }

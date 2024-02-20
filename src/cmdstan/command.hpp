@@ -279,11 +279,8 @@ int command(int argc, const char *argv[]) {
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
     auto config_filename
-        = get_basename_suffix(output_file).first + "_config.json";
-    auto ofs_args = std::make_unique<std::ofstream>(config_filename);
-    if (sig_figs > -1) {
-      ofs_args->precision(sig_figs);
-    }
+        = file::get_basename_suffix(output_file).first + "_config.json";
+    auto ofs_args = file::safe_create(config_filename, sig_figs);
     stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
     write_config(json_args, parser, model);
   }
@@ -345,10 +342,9 @@ int command(int argc, const char *argv[]) {
           save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0], calculate_lp);
     } else {
-      auto output_filenames = make_filenames(output_file, "", ".csv", 1, id);
-      auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
-      if (sig_figs > -1)
-        ofs->precision(sig_figs);
+      auto output_filenames
+          = file::make_filenames(output_file, "", ".csv", 1, id);
+      auto ofs = file::safe_create(output_filenames[0], sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
@@ -427,7 +423,7 @@ int command(int argc, const char *argv[]) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
       std::vector<std::string> param_names = get_constrained_param_names(model);
-      if (get_suffix(cpars_file) == ".csv") {
+      if (file::get_suffix(cpars_file) == ".csv") {
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
         parse_stan_csv(cpars_file, model, param_names, fitted_params,
