@@ -17,13 +17,13 @@
 using cmdstan::argument;
 using cmdstan::argument_parser;
 using cmdstan::check_file_config;
-using cmdstan::get_basename_suffix;
-using cmdstan::get_suffix;
-using cmdstan::make_filenames;
-using cmdstan::validate_output_filename;
+using cmdstan::file::make_filenames;
+using cmdstan::file::get_basename_suffix;
+using cmdstan::file::get_suffix;
+using cmdstan::file::validate_output_filename;
 
 TEST(CommandHelper, basename_suffix) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
 
   std::string fp1 = "foo" + sep + "bar" + sep + "baz.csv";
   EXPECT_EQ(get_suffix(fp1), ".csv");
@@ -62,7 +62,7 @@ TEST(CommandHelper, basename_suffix) {
 }
 
 TEST(CommandHelper, validate_output_filename) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
 
   std::string fp1 = "foo.bar";
   EXPECT_NO_THROW(validate_output_filename(fp1));
@@ -78,7 +78,7 @@ TEST(CommandHelper, validate_output_filename) {
 }
 
 TEST(CommandHelper, make_filenames) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
   unsigned int num_chains = 2;
   unsigned int id = 1;
 
@@ -123,7 +123,7 @@ TEST(CommandHelper, make_filenames) {
 }
 
 TEST(CommandHelper, check_filename_config_good) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
   std::vector<std::string> argv;
   argv.push_back("my_model");
   argv.push_back("sample");
@@ -146,7 +146,7 @@ TEST(CommandHelper, check_filename_config_good) {
 }
 
 TEST(CommandHelper, check_filename_config_bad) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
 
   std::vector<std::string> argv;
   argv.push_back("my_model");
@@ -169,7 +169,7 @@ TEST(CommandHelper, check_filename_config_bad) {
 }
 
 TEST(CommandHelper, check_filename_config_bad2) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
 
   std::vector<std::string> argv;
   argv.push_back("my_model");
@@ -192,7 +192,7 @@ TEST(CommandHelper, check_filename_config_bad2) {
 }
 
 TEST(CommandHelper, check_filename_config_bad3) {
-  std::string sep = std::string(1, cmdstan::PATH_SEPARATOR);
+  std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
 
   std::vector<std::string> argv;
   argv.push_back("my_model");
