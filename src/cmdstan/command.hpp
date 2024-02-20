@@ -342,7 +342,8 @@ int command(int argc, const char *argv[]) {
           save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0], calculate_lp);
     } else {
-      auto output_filenames = file::make_filenames(output_file, "", ".csv", 1, id);
+      auto output_filenames
+          = file::make_filenames(output_file, "", ".csv", 1, id);
       auto ofs = file::safe_create(output_filenames[0], sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");

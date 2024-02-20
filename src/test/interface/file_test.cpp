@@ -17,9 +17,9 @@
 using cmdstan::argument;
 using cmdstan::argument_parser;
 using cmdstan::check_file_config;
-using cmdstan::file::make_filenames;
 using cmdstan::file::get_basename_suffix;
 using cmdstan::file::get_suffix;
+using cmdstan::file::make_filenames;
 using cmdstan::file::validate_output_filename;
 
 TEST(CommandHelper, basename_suffix) {

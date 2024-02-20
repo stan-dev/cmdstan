@@ -47,7 +47,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&...args) {
+                                      Args &&... args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -63,7 +63,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&...args) {
+                              Args &&... args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -99,7 +99,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -107,8 +107,6 @@ inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
     throw std::invalid_argument("encountered nullptr");
   }
 }
-
-
 
 using shared_context_ptr = std::shared_ptr<stan::io::var_context>;
 /**
@@ -193,7 +191,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
           << std::endl;
     }
 
-    auto filenames = file::make_filenames(file_name, "", file_ending, num_chains, id);
+    auto filenames
+        = file::make_filenames(file_name, "", file_ending, num_chains, id);
     auto &file_1 = filenames[0];
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
     // if file_1 exists we'll assume num_chains of these files exist
@@ -696,7 +695,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&...args) {
+                             Ts &&... args) {
   writers.reserve(num_chains);
   auto filenames = file::make_filenames(filename, tag, suffix, num_chains, id);
 

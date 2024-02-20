@@ -161,7 +161,6 @@ std::vector<std::string> make_filenames(const std::string &filename,
   return names;
 }
 
-
 /**
  * Opens input stream for file.
  * Throws exception if stream cannot be opened.
