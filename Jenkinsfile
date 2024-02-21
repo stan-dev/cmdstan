@@ -8,7 +8,7 @@ def setupCXX(CXX = env.CXX) {
     unstash 'CmdStanSetup'
 
     stanc3_bin_url_str = params.stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n" : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} \n${stanc3_bin_url_str}")
+    writeFile(file: "make/local", text: "CXX=${CXX} \n${stanc3_bin_url_str} \nCXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS\n")
 }
 
 def runTests(String prefix = "") {
@@ -48,7 +48,7 @@ pipeline {
     agent none
     options {
         skipDefaultCheckout()
-        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" || env.BRANCH_NAME != "downstream_hotfix")
+        disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != "downstream_tests" && env.BRANCH_NAME != "downstream_hotfix")
     }
     parameters {
         string(defaultValue: '', name: 'stan_pr',
@@ -332,7 +332,7 @@ pipeline {
                                     git checkout downstream_hotfix
                                     git reset --hard origin/master
                                     git status
-                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
+                                    git push -f https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/stan-dev/cmdstan.git downstream_hotfix
                                 """
                             }
                         }

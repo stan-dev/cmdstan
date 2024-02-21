@@ -170,6 +170,8 @@ int command(int argc, const char *argv[]) {
   stan::model::model_base &model
       = new_model(*var_context, random_seed, &std::cout);
 
+  std::stringstream msg;
+
   //////////////////////////////////////////////////
   //           Configure callback writers         //
   //////////////////////////////////////////////////
@@ -195,34 +197,31 @@ int command(int argc, const char *argv[]) {
       diagnostic_json_writers;
   std::vector<stan::callbacks::json_writer<std::ofstream>> metric_json_writers;
 
-  std::string output_base = get_basename_suffix(output_file).first;
-  std::string diagnostic_base;
-  if (!diagnostic_file.empty())
-    diagnostic_base = get_basename_suffix(diagnostic_file).first;
-  else
-    diagnostic_base = output_base;
   bool save_single_paths
       = user_method->arg("pathfinder")
         && (get_arg_val<bool_argument>(parser, "method", "pathfinder",
                                        "save_single_paths"));
-  bool save_diagnostics = diagnostic_base != output_base;
 
   if (user_method->arg("pathfinder")) {
+    if (save_single_paths && diagnostic_file.empty()) {
+      diagnostic_file = output_file;
+    }
     if (num_chains == 1) {
-      init_filestream_writers(sample_writers, num_chains, id, output_base, "",
+      init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                               ".csv", sig_figs, "# ");
-      if (save_single_paths || save_diagnostics) {
+      if (!diagnostic_file.empty()) {
+        save_single_paths = true;
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                diagnostic_base, "", ".json", sig_figs);
+                                diagnostic_file, "", ".json", sig_figs);
       } else {
         init_null_writers(diagnostic_json_writers, num_chains);
       }
     } else {
-      if (save_single_paths || save_diagnostics) {
-        init_filestream_writers(sample_writers, num_chains, id, output_base,
+      if (save_single_paths || !diagnostic_file.empty()) {
+        init_filestream_writers(sample_writers, num_chains, id, output_file,
                                 "_path", ".csv", sig_figs, "# ");
         init_filestream_writers(diagnostic_json_writers, num_chains, id,
-                                diagnostic_base, "_path", ".json", sig_figs);
+                                diagnostic_file, "_path", ".json", sig_figs);
       } else {
         init_null_writers(sample_writers, num_chains);
         init_null_writers(diagnostic_json_writers, num_chains);
@@ -232,18 +231,34 @@ int command(int argc, const char *argv[]) {
   } else {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "# ");
-    if (save_diagnostics) {
-      init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              diagnostic_base, "", ".csv", sig_figs, "# ");
+    if (!diagnostic_file.empty()) {
+      if (user_method->arg("laplace")) {
+        init_filestream_writers(diagnostic_json_writers, num_chains, id,
+                                diagnostic_file, "", ".json", sig_figs);
+        init_null_writers(diagnostic_csv_writers, num_chains);
+
+      } else {
+        init_filestream_writers(diagnostic_csv_writers, num_chains, id,
+                                diagnostic_file, "", ".csv", sig_figs, "# ");
+        init_null_writers(diagnostic_json_writers, num_chains);
+      }
     } else {
       init_null_writers(diagnostic_csv_writers, num_chains);
+      init_null_writers(diagnostic_json_writers, num_chains);
     }
-    init_null_writers(diagnostic_json_writers, num_chains);
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
                                     "save_metric")) {
-    init_filestream_writers(metric_json_writers, num_chains, id, output_base,
+    // adaptation must be engaged
+    if (!get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
+                                    "engaged")) {
+      msg << "Saving the adapted metric (save_metric=1) can only be enabled "
+             "when adaptation is engaged (adapt engaged=1)"
+          << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+    init_filestream_writers(metric_json_writers, num_chains, id, output_file,
                             "_metric", ".json", sig_figs);
   } else {
     init_null_writers(metric_json_writers, num_chains);
@@ -263,11 +278,9 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
-    auto config_filename = output_base + "_config.json";
-    auto ofs_args = std::make_unique<std::ofstream>(config_filename);
-    if (sig_figs > -1) {
-      ofs_args->precision(sig_figs);
-    }
+    auto config_filename
+        = file::get_basename_suffix(output_file).first + "_config.json";
+    auto ofs_args = file::safe_create(config_filename, sig_figs);
     stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
     write_config(json_args, parser, model);
   }
@@ -283,7 +296,6 @@ int command(int argc, const char *argv[]) {
   //            Invoke Services                   //
   //////////////////////////////////////////////////
   int return_code = return_codes::NOT_OK;
-  std::stringstream msg;
 
   if (user_method->arg("pathfinder")) {
     // ---- pathfinder start ---- //
@@ -306,7 +318,10 @@ int command(int argc, const char *argv[]) {
     int num_draws = get_arg_val<int_argument>(*pathfinder_arg, "num_draws");
     int num_psis_draws
         = get_arg_val<int_argument>(*pathfinder_arg, "num_psis_draws");
-
+    bool psis_resample
+        = get_arg_val<bool_argument>(*pathfinder_arg, "psis_resample");
+    bool calculate_lp
+        = get_arg_val<bool_argument>(*pathfinder_arg, "calculate_lp");
     if (num_psis_draws > num_draws * num_chains) {
       logger.warn(
           "Warning: Number of PSIS draws is larger than the total number of "
@@ -319,18 +334,17 @@ int command(int argc, const char *argv[]) {
     }
 
     if (num_chains == 1) {
-      save_single_paths = save_single_paths || !diagnostic_file.empty();
       return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
           false, stan::model::model_base>(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
           save_single_paths, refresh, interrupt, logger, init_writer,
-          sample_writers[0], diagnostic_json_writers[0]);
+          sample_writers[0], diagnostic_json_writers[0], calculate_lp);
     } else {
-      auto ofs = std::make_unique<std::ofstream>(output_base + ".csv");
-      if (sig_figs > -1)
-        ofs->precision(sig_figs);
+      auto output_filenames
+          = file::make_filenames(output_file, "", ".csv", 1, id);
+      auto ofs = file::safe_create(output_filenames[0], sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
@@ -341,7 +355,7 @@ int command(int argc, const char *argv[]) {
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
           num_chains, save_single_paths, refresh, interrupt, logger,
           init_writers, sample_writers, diagnostic_json_writers,
-          pathfinder_writer, dummy_json_writer);
+          pathfinder_writer, dummy_json_writer, calculate_lp, psis_resample);
     }
     // ---- pathfinder end ---- //
   } else if (user_method->arg("generate_quantities")) {
@@ -373,15 +387,17 @@ int command(int argc, const char *argv[]) {
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
     bool jacobian = get_arg_val<bool_argument>(*laplace_arg, "jacobian");
+    bool calculate_lp
+        = get_arg_val<bool_argument>(*laplace_arg, "calculate_lp");
     int draws = get_arg_val<int_argument>(*laplace_arg, "draws");
     if (jacobian) {
       return_code = stan::services::laplace_sample<true>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     } else {
       return_code = stan::services::laplace_sample<false>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     }
     // ---- laplace end ---- //
   } else if (user_method->arg("log_prob")) {
@@ -407,7 +423,7 @@ int command(int argc, const char *argv[]) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
       std::vector<std::string> param_names = get_constrained_param_names(model);
-      if (get_suffix(cpars_file) == ".csv") {
+      if (file::get_suffix(cpars_file) == ".csv") {
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
         parse_stan_csv(cpars_file, model, param_names, fitted_params,
@@ -423,6 +439,9 @@ int command(int argc, const char *argv[]) {
                              sample_writers[0].get_stream());
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
+      msg << "Error during log_prob calculation:" << std::endl;
+      msg << e.what() << std::endl;
+      logger.error(msg.str());
       return_code = return_codes::NOT_OK;
     }
     // ---- log_prob end ---- //
