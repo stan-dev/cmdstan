@@ -247,7 +247,7 @@ help-dev:
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
-	@echo '- bin/print$(EXE): Build the print utility. (deprecated)
+	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary$(EXE): Build the stansummary utility.'
 	@echo '- bin/diagnose$(EXE): Build the diagnose utility.'
 	@echo ''
