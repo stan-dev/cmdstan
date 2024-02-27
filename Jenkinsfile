@@ -177,24 +177,24 @@ pipeline {
                     post {
                         always {
 
-                            recordIssues id: "Windows",
-                            name: "Windows interface tests",
-                            enabledForFailure: true,
-                            aggregatingResults : false,
-                            filters: [
-                                excludeFile('/lib/.*'),
-                                excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*'),
-                                excludeMessage(".*'sprintf' is deprecated.*")
-                            ],
-                            tools: [
-                                gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
-                                clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
-                            ],
-                            blameDisabled: false,
-                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: env.BRANCH_NAME
+                            recordIssues(
+                                id: "Windows",
+                                name: "Windows interface tests",
+                                enabledForFailure: true,
+                                aggregatingResults : false,
+                                filters: [
+                                    excludeFile('/lib/.*'),
+                                    excludeFile('tbb/*'),
+                                    excludeFile('stan/lib/stan_math/lib/*'),
+                                    excludeMessage(".*'sprintf' is deprecated.*")
+                                ],
+                                tools: [
+                                    gcc4(id: "Windows_gcc4", name: "Windows interface tests@GCC4"),
+                                    clang(id: "Windows_clang", name: "Windows interface tests@CLANG")
+                                ],
+                                qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
+                            )
 
                             deleteDirWin()
                         }
@@ -218,24 +218,24 @@ pipeline {
                     post {
                         always {
 
-                            recordIssues id: "Linux_mpi",
-                            name: "Linux interface tests with MPI",
-                            enabledForFailure: true,
-                            aggregatingResults : false,
-                            filters: [
-                                excludeFile('/lib/.*'),
-                                excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*'),
-                                excludeMessage(".*'sprintf' is deprecated.*")
-                            ],
-                            tools: [
-                                gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
-                                clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
-                            ],
-                            blameDisabled: false,
-                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: env.BRANCH_NAME
+                            recordIssues(
+                                id: "Linux_mpi",
+                                name: "Linux interface tests with MPI",
+                                enabledForFailure: true,
+                                aggregatingResults : false,
+                                filters: [
+                                    excludeFile('/lib/.*'),
+                                    excludeFile('tbb/*'),
+                                    excludeFile('stan/lib/stan_math/lib/*'),
+                                    excludeMessage(".*'sprintf' is deprecated.*")
+                                ],
+                                tools: [
+                                    gcc4(id: "Linux_mpi_gcc4", name: "Linux interface tests with MPI@GCC4"),
+                                    clang(id: "Linux_mpi_clang", name: "Linux interface tests with MPI@CLANG")
+                                ],
+                                qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
+                            )
 
                             deleteDir()
                         }
@@ -251,24 +251,24 @@ pipeline {
                     post {
                         always {
 
-                            recordIssues id: "Mac",
-                            name: "Mac interface tests",
-                            enabledForFailure: true,
-                            aggregatingResults : false,
-                            filters: [
-                                excludeFile('/lib/.*'),
-                                excludeFile('tbb/*'),
-                                excludeFile('stan/lib/stan_math/lib/*'),
-                                excludeMessage(".*'sprintf' is deprecated.*")
-                            ],
-                            tools: [
-                                gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
-                                clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
-                            ],
-                            blameDisabled: false,
-                            qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                            healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                            referenceJobName: env.BRANCH_NAME
+                            recordIssues(
+                                id: "Mac",
+                                name: "Mac interface tests",
+                                enabledForFailure: true,
+                                aggregatingResults : false,
+                                filters: [
+                                    excludeFile('/lib/.*'),
+                                    excludeFile('tbb/*'),
+                                    excludeFile('stan/lib/stan_math/lib/*'),
+                                    excludeMessage(".*'sprintf' is deprecated.*")
+                                ],
+                                tools: [
+                                    gcc4(id: "Mac_gcc4", name: "Mac interface tests@GCC4"),
+                                    clang(id: "Mac_clang", name: "Mac interface tests@CLANG")
+                                ],
+                                qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH'
+                            )
 
                             deleteDir()
                         }
