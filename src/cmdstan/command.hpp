@@ -368,13 +368,16 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
     std::vector<std::string> param_names = get_constrained_param_names(model);
-    stan::io::stan_csv fitted_params;
-    size_t col_offset, num_rows, num_cols;
-    parse_stan_csv(fname, model, param_names, fitted_params, col_offset,
-                   num_rows, num_cols);
+    for (int i = 0; i < num_chains; ++i) {
+      stan::io::stan_csv fitted_params;
+      size_t col_offset, num_rows, num_cols;
+      parse_stan_csv(fname, model, param_names, fitted_params, col_offset,
+                    num_rows, num_cols);
+      std::vector<Eigen::MatrixXd>.emplace_back(fitted_params.samples.block(0, col_offset, num_rows, num_cols));
+    }
     return_code = stan::services::standalone_generate(
-        model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
-        random_seed, interrupt, logger, sample_writers[0]);
+        model, num_chains, fitted_params_vec,
+        random_seed, interrupt, logger, sample_writers);
     // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
     // ---- laplace start ---- //
