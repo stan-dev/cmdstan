@@ -360,7 +360,7 @@ int command(int argc, const char *argv[]) {
   } else if (user_method->arg("generate_quantities")) {
     // ---- generate_quantities start ---- //
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
-    //TODO: MOVE THIS UP
+    // TODO: MOVE THIS UP
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
       msg << "Missing fitted_params argument, cannot run generate_quantities "
@@ -368,21 +368,25 @@ int command(int argc, const char *argv[]) {
       throw std::invalid_argument(msg.str());
     }
     auto file_info = file::get_basename_suffix(fname);
-    std::vector<std::string> fname_vec = file::make_filenames(file_info.first.substr(0, file_info.first.size() - (num_chains > 1 ? std::to_string(id).size() + 1 : 0)), "", ".csv",
-                                                             num_chains, id);
+    std::vector<std::string> fname_vec = file::make_filenames(
+        file_info.first.substr(
+            0, file_info.first.size()
+                   - (num_chains > 1 ? std::to_string(id).size() + 1 : 0)),
+        "", ".csv", num_chains, id);
     std::vector<std::string> param_names = get_constrained_param_names(model);
     std::vector<Eigen::MatrixXd> fitted_params_vec;
     fitted_params_vec.reserve(num_chains);
     for (int i = 0; i < num_chains; ++i) {
       stan::io::stan_csv fitted_params;
       size_t col_offset, num_rows, num_cols;
-      parse_stan_csv(fname_vec[i], model, param_names, fitted_params, col_offset,
-                    num_rows, num_cols);
-      fitted_params_vec.emplace_back(fitted_params.samples.block(0, col_offset, num_rows, num_cols));
+      parse_stan_csv(fname_vec[i], model, param_names, fitted_params,
+                     col_offset, num_rows, num_cols);
+      fitted_params_vec.emplace_back(
+          fitted_params.samples.block(0, col_offset, num_rows, num_cols));
     }
     return_code = stan::services::standalone_generate(
-        model, num_chains, fitted_params_vec,
-        random_seed, interrupt, logger, sample_writers);
+        model, num_chains, fitted_params_vec, random_seed, interrupt, logger,
+        sample_writers);
     // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
     // ---- laplace start ---- //

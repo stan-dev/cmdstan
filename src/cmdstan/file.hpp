@@ -66,10 +66,10 @@ size_t find_dot_suffix(const std::string &input) {
  * @param file_path Path to file
  * @return A pair of ifstream and bool.
  */
-inline auto exists(const std::string& file_path) {
-    std::ifstream file(file_path);
-    bool file_good = file.good();
-    return std::make_pair(std::move(file), file_good);
+inline auto exists(const std::string &file_path) {
+  std::ifstream file(file_path);
+  bool file_good = file.good();
+  return std::make_pair(std::move(file), file_good);
 }
 
 /**

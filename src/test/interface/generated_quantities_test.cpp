@@ -75,7 +75,6 @@ TEST_F(CmdStan, generate_quantities_good_multi) {
   ASSERT_FALSE(out.hasError);
 }
 
-
 TEST_F(CmdStan, generate_quantities_non_scalar_good) {
   std::stringstream ss;
   ss << convert_model_path(gq_non_scalar_model)
