@@ -609,6 +609,7 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
  * this will throw an error.
  *
  * @param parser user config
+ * @param id id of initial chain or path. Only used for generated quantities
  * @return int num chains or paths
  */
 inline unsigned int get_num_chains(argument_parser &parser, unsigned int id) {
