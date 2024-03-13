@@ -18,6 +18,8 @@ class CmdStan : public testing::Test {
     bern_data = {"src", "test", "test-models", "bern.data.json"};
     bern_fitted_params
         = {"src", "test", "test-models", "bern_fitted_params.csv"};
+    bern_fitted_params_multi
+        = {"src", "test", "test-models", "bern_params_multi_1.csv"};
     bern_fitted_params_warmup
         = {"src", "test", "test-models", "bern_fitted_params_warmup.csv"};
     bern_optimized_params
@@ -37,6 +39,7 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_extra_model;
   std::vector<std::string> bern_data;
   std::vector<std::string> bern_fitted_params;
+  std::vector<std::string> bern_fitted_params_multi;
   std::vector<std::string> bern_fitted_params_warmup;
   std::vector<std::string> bern_optimized_params;
   std::vector<std::string> bern_variational_params;
@@ -59,6 +62,19 @@ TEST_F(CmdStan, generate_quantities_good) {
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
 }
+
+TEST_F(CmdStan, generate_quantities_good_multi) {
+  std::stringstream ss;
+  ss << convert_model_path(bern_gq_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(dev_null_path)
+     << " method=generate_quantities fitted_params="
+     << convert_model_path(bern_fitted_params_multi);
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_FALSE(out.hasError);
+}
+
 
 TEST_F(CmdStan, generate_quantities_non_scalar_good) {
   std::stringstream ss;
