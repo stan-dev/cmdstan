@@ -13,8 +13,6 @@ class arg_save_warmup : public bool_argument {
     _validity = "[0, 1]";
     _default = "0";
     _default_value = false;
-    _constrained = false;
-    _good_value = 1;
     _value = _default_value;
   }
 };

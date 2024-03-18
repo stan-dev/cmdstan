@@ -17,6 +17,7 @@ src/cmdstan/main*.o
 /src/test/test-models/*
 !/src/test/test-models/*.stan
 !/src/test/test-models/*.R
+!/src/test/test-models/*.json
 
 # local make include
 make/local
@@ -48,5 +49,10 @@ src/docs/**/*.pdf
 output.csv
 output*.csv
 *.d
+*.o
 # gdb
 .gdb_history
+
+#vscode 
+.vscode/*
+.vscode/**

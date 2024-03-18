@@ -3,6 +3,7 @@
 
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <string>
 
 namespace cmdstan {
 
@@ -17,9 +18,6 @@ class arg_seed : public long_long_int_argument {
           "system time";
     _default = "-1";
     _default_value = -1;
-    _constrained = true;
-    _good_value = 18383;
-    _bad_value = -2;
     _value = _default_value;
     _random_value
         = (boost::posix_time::microsec_clock::universal_time()
@@ -41,9 +39,9 @@ class arg_seed : public long_long_int_argument {
 
   std::string print_value() {
     if (_value == _default_value) {
-      return boost::lexical_cast<std::string>(_random_value);
+      return std::to_string(_random_value);
     } else {
-      return boost::lexical_cast<std::string>(_value);
+      return std::to_string(_value);
     }
   }
 };

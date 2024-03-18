@@ -1,0 +1,43 @@
+CMDSTAN RELEASE NOTES
+======================================================================
+
+v2.34.1 (23 January 2024)
+======================================================================
+
+- Fixed an indexing error which could lead to crashes (#1239)
+- Fixed an issue where output was swallowed by the `log_prob` method if an error occurred (#1235)
+- Fixed an issue where floating point arguments would be echoed back to the user with insufficient precision (#1243)
+
+v2.34.0 (16 January 2024)
+======================================================================
+
+- Add option `adaptation save_metric=1` to save adapted metric in separate JSON file with elements "stepsize", "metric_type" and "inv_metric" (#1203, #1229)
+- New argument under `output save_cmdstan_config`. If set to `1`, creates `output_config.json` which contains the argument tree and extra information (equivalent to the CSV file header) (#1204)
+- Adds `psis_resample` and `calculate_lp` as options for Pathfinder (#1234)
+- Removed usages of boost::lexical_cast (#1205)
+- Resolved various compiler warnings (#1206)
+- Fixed a linking issue when building `stansummary` (#1209)
+- Fixed an issue where the default values of some arguments were not printed in sufficient precision (#1215)
+- Improved the error users see if they are missing the stan or stan_math submodules (#1217)
+- Improved the dependency detection in the build system (#1219)
+- Added a warning when more PSIS draws are requested than total number of draws from single-pathfinders (#1221)
+- Disallowed pathfinder when the model has no parameters. (#1221)
+- Fixed a typo in `make help-dev`. (#1225)
+- Fixed several edge cases and unexpected behaviors in the way output filenames were generated for multi-chain sampling and multi-path Pathfinder (#1228)
+- Added a `version.hpp` header (#1231)
+
+v2.33.1 (13 September 2023)
+======================================================================
+
+- Update stanc3 binaries to v2.33.1
+
+v2.33.0 (5 September 2023)
+======================================================================
+
+- Exposed `pathfinder` algorithm. (#1155)
+- Added `CXX_MAJOR` and `CXX_MINOR` to the name of the precompiled header file when it is enabled. The goal is to prevent the annoying errors from clang updates etc. (#1171)
+- Removed use of `boost::lexical_cast` wherever possible. (#1172)
+- Fixes various typos in output messages and comments. (#1174)
+- Enabled the `num_chains` argument on all HMC variants other than the `static` engine. (#1176)
+- Fixed a bug where the `num_chains` argument was not properly using multiple init files (#1191)
+- A warning is now shown when users provide "R dump" formatted inputs to CmdStan, letting them know that this format is essentially unsupported and new features like Tuples are not being added to it. (#1177, #1183)
