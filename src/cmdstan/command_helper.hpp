@@ -620,32 +620,12 @@ inline unsigned int get_num_chains(argument_parser &parser, unsigned int id) {
 
   auto gq_arg = user_method->arg("generate_quantities");
   if (gq_arg) {
-    std::string filename
-        = get_arg_val<string_argument>(*gq_arg, "fitted_params");
-    auto file_info = file::get_basename_suffix(filename);
-    auto id_str = std::to_string(id);
-    if (filename.find(std::string("_") + id_str + file_info.second)
-        != std::string::npos) {
-      unsigned int prev_id_str_size = id_str.size();
-      id_str = std::to_string(id + 1U);
-      std::string new_file
-          = filename.substr(0, file_info.first.size() - prev_id_str_size)
-            + id_str + file_info.second;
-      unsigned int num_files = 1;
-      for (; file::exists(new_file).second; num_files++) {
-        unsigned int prev_id_str_size = id_str.size();
-        id_str = std::to_string(id + num_files + 1U);
-        new_file = filename.substr(0, file_info.first.size() - prev_id_str_size)
-                   + id_str + file_info.second;
-      }
-      return num_files;
-    } else {
-      return 1;
-    }
+    return static_cast<unsigned int>(get_arg_val<int_argument>(*gq_arg, "num_chains"));
   }
   auto sample_arg = user_method->arg("sample");
-  if (!sample_arg)  // TODO parallel GQ now possible, consider
+  if (!sample_arg) {
     return 1;
+  }
 
   unsigned int num_chains
       = get_arg_val<int_argument>(*sample_arg, "num_chains");

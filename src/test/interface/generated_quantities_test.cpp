@@ -69,7 +69,8 @@ TEST_F(CmdStan, generate_quantities_good_multi) {
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
      << " method=generate_quantities fitted_params="
-     << convert_model_path(bern_fitted_params_multi);
+     << convert_model_path(bern_fitted_params_multi)
+     << " num_chains=4";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError);
