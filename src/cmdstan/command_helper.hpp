@@ -620,7 +620,8 @@ inline unsigned int get_num_chains(argument_parser &parser, unsigned int id) {
 
   auto gq_arg = user_method->arg("generate_quantities");
   if (gq_arg) {
-    return static_cast<unsigned int>(get_arg_val<int_argument>(*gq_arg, "num_chains"));
+    return static_cast<unsigned int>(
+        get_arg_val<int_argument>(*gq_arg, "num_chains"));
   }
   auto sample_arg = user_method->arg("sample");
   if (!sample_arg) {

@@ -16,7 +16,6 @@ class arg_generate_quantities : public categorical_argument {
     _subarguments.push_back(new arg_generate_quantities_fitted_params());
     _subarguments.push_back(
         new arg_single_int_pos("num_chains", "Number of chains", 1));
-
   }
 };
 
