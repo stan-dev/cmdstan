@@ -1,32 +1,20 @@
-#include <algorithm>
-#include <fstream>
-#include <iomanip>
-#include <ios>
-#include <iostream>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
 #include <CLI11/CLI11.hpp>
 
 #include <arrow/api.h>
 #include <arrow/csv/api.h>
-#include <arrow/filesystem/api.h>
 #include <arrow/io/api.h>
-#include <parquet/arrow/reader.h>
+#include <arrow/result.h>
+#include <arrow/status.h>
+#include <arrow/table.h>
+
 #include <parquet/arrow/writer.h>
 #include <parquet/exception.h>
 
-
-void write_parquet_file(const arrow::Table& table, const std::string &filename) {
-  std::shared_ptr<arrow::io::FileOutputStream> outfile;
-  PARQUET_ASSIGN_OR_THROW(
-      outfile, arrow::io::FileOutputStream::Open(filename));
-  // The last argument to the function call is the size of the RowGroup in
-  // the parquet file.
-  PARQUET_THROW_NOT_OK(
-      parquet::arrow::WriteTable(table, arrow::default_memory_pool(), outfile, 1000));
-}
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 struct CustomHandler {
     operator arrow::csv::InvalidRowHandler() {
@@ -35,6 +23,61 @@ struct CustomHandler {
       };
     }
 };
+
+void
+check_args(const CLI::App& app, std::string& csv_file, std::string& pqt_file) {
+  std::stringstream msg;
+  if (app.count("--output_pqt")) {
+    if (FILE *file = fopen(pqt_file.c_str(), "w")) {
+      fclose(file);
+    } else {
+      msg << "Bad output file: " << pqt_file << std::endl;
+      throw std::invalid_argument(msg.str());
+    }
+  }
+  std::ifstream ifs;
+  ifs.open(csv_file.c_str());
+  if (ifs.good()) {
+    ifs.close();
+  } else {
+    msg << "Cannot read input csv file: " << csv_file << std::endl;
+    throw std::invalid_argument(msg.str());
+  }
+}
+
+arrow::Result<std::shared_ptr<arrow::Table>>
+read_csv_file(const std::string& csv_file) {
+  std::shared_ptr<arrow::io::ReadableFile> infile;
+  ARROW_ASSIGN_OR_RAISE(infile, arrow::io::ReadableFile::Open(csv_file));
+  // handle Stan CSV file  
+  auto parse_stan_csv_options = arrow::csv::ParseOptions::Defaults();
+  CustomHandler handler;
+  parse_stan_csv_options.invalid_row_handler = handler;
+
+  ARROW_ASSIGN_OR_RAISE(
+      auto csv_reader,
+      arrow::csv::TableReader::Make(
+          arrow::io::default_io_context(), infile,
+          arrow::csv::ReadOptions::Defaults(),
+          parse_stan_csv_options,
+          arrow::csv::ConvertOptions::Defaults()));
+  ARROW_ASSIGN_OR_RAISE(auto csv_table, csv_reader->Read());
+  std::cout << "Loaded " << csv_table->num_rows()
+            << " rows in " << csv_table->num_columns()
+            << " columns." << std::endl;
+  return csv_table;
+}
+
+void
+write_parquet_file(const arrow::Result<std::shared_ptr<arrow::Table>>& ok_result,
+                   const std::string &filename) {
+  auto table = ok_result.ValueOrDie();
+  std::shared_ptr<arrow::io::FileOutputStream> outfile;
+  PARQUET_ASSIGN_OR_THROW(
+      outfile, arrow::io::FileOutputStream::Open(filename));
+  PARQUET_THROW_NOT_OK(
+      parquet::arrow::WriteTable(*table, arrow::default_memory_pool(), outfile, 1000));
+}
 
 /**
  * read in stan_csv file
@@ -47,11 +90,8 @@ int main(int argc, const char *argv[]) {
     std::cout << usage << std::endl;
     return -1;
   }
-
-  // Command-line arguments
   std::string csv_file;
   std::string pqt_file = "output.parquet";
-
   CLI::App app{"Allowed options"};
   app.add_option("--output_pqt,-o", pqt_file,
                  "parquet file", true)
@@ -59,89 +99,20 @@ int main(int argc, const char *argv[]) {
   app.add_option("input_csv", csv_file, "Stan CSV file.", true)
       ->required()
       ->check(CLI::ExistingFile);
-
   try {
     CLI11_PARSE(app, argc, argv);
   } catch (const CLI::ParseError &e) {
     std::cout << e.get_exit_code();
     return app.exit(e);
   }
+  check_args(app, csv_file, pqt_file);
 
-  // Check options semantic consistency
-  if (app.count("--output_pqt")) {
-    if (FILE *file = fopen(pqt_file.c_str(), "w")) {
-      fclose(file);
-    } else {
-      std::cout << "Cannot save as parquet to file: " << pqt_file << "."
-                << std::endl;
-      return -1;
-    }
+  auto result = read_csv_file(csv_file);
+  if (!result.ok()) {
+    std::stringstream msg;
+    msg << "Error reading CSV table: " << result.status() << std::endl;
+    throw std::domain_error(msg.str());
   }
-  std::ifstream infile;
-  infile.open(csv_file.c_str());
-  if (infile.good()) {
-    infile.close();
-  } else {
-    std::cout << "Cannot read input csv file: " << csv_file << "."
-              << std::endl;
-    return -1;
-  }
-
-  try {
-    // copied from https://arrow.apache.org/docs/cpp/csv.html
-    arrow::io::IOContext io_context = arrow::io::default_io_context();
-
-    auto read_options = arrow::csv::ReadOptions::Defaults();
-    auto parse_options = arrow::csv::ParseOptions::Defaults();
-    CustomHandler handler;
-    parse_options.invalid_row_handler = handler;
-    auto convert_options = arrow::csv::ConvertOptions::Defaults();
-
-    // input csv file is on local filesystem
-    std::shared_ptr<arrow::fs::LocalFileSystem> fs =
-        std::make_shared<arrow::fs::LocalFileSystem>();
-    auto maybe_infile = fs->OpenInputStream(csv_file.c_str());
-    if (!maybe_infile.ok()) {
-      // Handle instantiation error...
-    }
-    std::shared_ptr<arrow::io::InputStream> input = *maybe_infile;
-
-    // Instantiate TableReader from input stream and options
-    auto maybe_reader =
-        arrow::csv::TableReader::Make(io_context,
-                                      input,
-                                      read_options,
-                                      parse_options,
-                                      convert_options);
-
-    std::cout << "Instantiated reader" << std::endl;
-
-    if (!maybe_reader.ok()) {
-      // Handle TableReader instantiation error...
-    }
-    std::shared_ptr<arrow::csv::TableReader> reader = *maybe_reader;
-
-    // Read table from CSV file
-    auto maybe_table = reader->Read();
-
-    std::cout << "read table" << std::endl;
-
-    if (!maybe_table.ok()) {
-      // Handle CSV read error
-      // (for example a CSV syntax error or failed type conversion)
-    }
-
-    std::shared_ptr<arrow::Table> table = *maybe_table;
-    std::cout << "Loaded " << table->num_rows() << " rows in " << table->num_columns()
-              << " columns." << std::endl;
-
-    // Write to csv file
-    write_parquet_file(*table, pqt_file);    
-    
-  } catch (const std::exception &e) {
-    std::cout << "Error during processing. " << e.what() << std::endl;
-    return -1;
-  }
-
+  write_parquet_file(result, pqt_file);    
   return 0;
 }

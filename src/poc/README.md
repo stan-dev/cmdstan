@@ -31,22 +31,25 @@ to compile and link the programs.
 
 ```
 cmake .. \
+	-DARROW_CXXFLAGS="-g" \
 	-DARROW_COMPUTE=ON \
 	-DARROW_CSV=ON \
 	-DARROW_FILESYSTEM=ON \
 	-DARROW_PARQUET=ON \
 	-DARROW_BUILD_STATIC=ON \
 	-DARROW_BUILD_SHARED=OFF \
+	-DARROW_BUILD_UTILITIES=ON \
 	-DARROW_DEPENDENCY_SOURCE=BUNDLED \
 	-DARROW_DEPENDENCY_USE_SHARED=OFF \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DPARQUET_BUILD_TESTS=Off \
-	-DPARQUET_MINIMAL_DEPENDENCY=OFF \
-	-DPARQUET_ARROW_LINKAGE=static
+	-DARROW_EXTRA_ERROR_CONTEXT=ON \
+	-DCMAKE_BUILD_TYPE="Debug" \
+	-DCMAKE_INSTALL_PREFIX:PATH=lib \
+	-DPARQUET_BUILD_EXECUTABLES=ON \
+	-DPARQUET_MINIMAL_DEPENDENCY=OFF
 
 make -j4 arrow
 make -j4 parquet
-make install   # default install location is /usr/local/lib - NSFW
+make install   # into local dir "lib" (not /usr/local/lib)
 ```
 
 Once installed, use GNU make to compile a program - see Makefile in this directory -
