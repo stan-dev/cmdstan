@@ -31,21 +31,14 @@ to compile and link the programs.
 
 ```
 cmake .. \
-	-DARROW_CXXFLAGS="-g" \
+	-DARROW_BUILD_STATIC=ON \
 	-DARROW_COMPUTE=ON \
 	-DARROW_CSV=ON \
 	-DARROW_FILESYSTEM=ON \
 	-DARROW_PARQUET=ON \
-	-DARROW_BUILD_STATIC=ON \
-	-DARROW_BUILD_SHARED=OFF \
-	-DARROW_BUILD_UTILITIES=ON \
 	-DARROW_DEPENDENCY_SOURCE=BUNDLED \
-	-DARROW_DEPENDENCY_USE_SHARED=OFF \
-	-DARROW_EXTRA_ERROR_CONTEXT=ON \
-	-DCMAKE_BUILD_TYPE="Debug" \
-	-DCMAKE_INSTALL_PREFIX:PATH=lib \
-	-DPARQUET_BUILD_EXECUTABLES=ON \
-	-DPARQUET_MINIMAL_DEPENDENCY=OFF
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_INSTALL_PREFIX:PATH=lib
 
 make -j4 arrow
 make -j4 parquet
@@ -53,11 +46,11 @@ make install   # into local dir "lib" (not /usr/local/lib)
 ```
 
 Once installed, use GNU make to compile a program - see Makefile in this directory -
-and run the program on one of the two test files included here
+and run the program on one of the test file "stan_test.csv"
 
 ```
 make
-./arrow_poc vanilla.csv -o vanilla.parquet
+./arrow_poc stan_test.csv -o stan_test.parquet
 ```
 
 
