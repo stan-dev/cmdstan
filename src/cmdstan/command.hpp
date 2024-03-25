@@ -360,14 +360,6 @@ int command(int argc, const char *argv[]) {
   } else if (user_method->arg("generate_quantities")) {
     // ---- generate_quantities start ---- //
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
-    // TODO: MOVE THIS UP
-    std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
-    if (fname.empty()) {
-      msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
-      throw std::invalid_argument(msg.str());
-    }
-    auto file_info = file::get_basename_suffix(fname);
     std::vector<std::string> fname_vec = file::make_filenames(
         file_info.first.substr(
             0, file_info.first.size()
