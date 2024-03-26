@@ -146,8 +146,8 @@ int command(int argc, const char *argv[]) {
     }
   }
   stan::math::init_threadpool_tbb(num_threads);
-
-  unsigned int num_chains = get_num_chains(parser);
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  unsigned int num_chains = get_num_chains(parser, id);
   check_file_config(parser);
 
   parser.print(info);
@@ -176,7 +176,6 @@ int command(int argc, const char *argv[]) {
   //           Configure callback writers         //
   //////////////////////////////////////////////////
   auto user_method = parser.arg("method");
-  unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
   std::string output_file
@@ -361,20 +360,25 @@ int command(int argc, const char *argv[]) {
   } else if (user_method->arg("generate_quantities")) {
     // ---- generate_quantities start ---- //
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
-    std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
-    if (fname.empty()) {
-      msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
-      throw std::invalid_argument(msg.str());
-    }
+    std::vector<std::string> fname_vec = file::make_filenames(
+        file_info.first.substr(
+            0, file_info.first.size()
+                   - (num_chains > 1 ? std::to_string(id).size() + 1 : 0)),
+        "", ".csv", num_chains, id);
     std::vector<std::string> param_names = get_constrained_param_names(model);
-    stan::io::stan_csv fitted_params;
-    size_t col_offset, num_rows, num_cols;
-    parse_stan_csv(fname, model, param_names, fitted_params, col_offset,
-                   num_rows, num_cols);
+    std::vector<Eigen::MatrixXd> fitted_params_vec;
+    fitted_params_vec.reserve(num_chains);
+    for (int i = 0; i < num_chains; ++i) {
+      stan::io::stan_csv fitted_params;
+      size_t col_offset, num_rows, num_cols;
+      parse_stan_csv(fname_vec[i], model, param_names, fitted_params,
+                     col_offset, num_rows, num_cols);
+      fitted_params_vec.emplace_back(
+          fitted_params.samples.block(0, col_offset, num_rows, num_cols));
+    }
     return_code = stan::services::standalone_generate(
-        model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
-        random_seed, interrupt, logger, sample_writers[0]);
+        model, num_chains, fitted_params_vec, random_seed, interrupt, logger,
+        sample_writers);
     // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
     // ---- laplace start ---- //
