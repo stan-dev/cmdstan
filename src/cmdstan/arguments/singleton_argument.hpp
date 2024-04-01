@@ -38,9 +38,7 @@ std::string to_string(double &src) {
   return ss.str();
 }
 
-std::string to_string(bool &src) {
-  return src ? "true" : "false";
- }
+std::string to_string(bool &src) { return src ? "true" : "false"; }
 
 template <typename T>
 std::string to_string(T &src) {
