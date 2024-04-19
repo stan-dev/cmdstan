@@ -657,32 +657,28 @@ void check_file_config(argument_parser &parser) {
       = get_arg_val<string_argument>(parser, "output", "diagnostic_file");
   file::validate_output_filename(diagnostic_file);
   auto user_method = parser.arg("method");
+
+  std::string input_file_name = "";
+  std::string input_file = "";
   if (user_method->arg("generate_quantities")) {
-    std::string input_file = get_arg_val<string_argument>(
+    input_file_name = "fitted_params";
+    input_file = get_arg_val<string_argument>(
         parser, "method", "generate_quantities", "fitted_params");
-    if (input_file.empty()) {
-      throw std::invalid_argument(
-          std::string("Argument fitted_params file - found empty string, "
-                      "expecting filename."));
-    }
-    if (input_file.compare(sample_file) == 0) {
-      std::stringstream msg;
-      msg << "Filename conflict, fitted_params file " << input_file
-          << " and output file names are identical, must be different."
-          << std::endl;
-      throw std::invalid_argument(msg.str());
-    }
+
   } else if (user_method->arg("laplace")) {
-    std::string input_file
+    input_file_name = "mode";
+    input_file
         = get_arg_val<string_argument>(parser, "method", "laplace", "mode");
-    if (input_file.empty()) {
-      throw std::invalid_argument(
-          std::string("Argument mode file - found empty string, "
-                      "expecting filename."));
-    }
+  } else if (user_method->arg("log_prob")) {
+    input_file_name = "constrained_params";
+    input_file = get_arg_val<string_argument>(parser, "method", "log_prob",
+                                              "constrained_params");
+  }
+
+  if (!input_file_name.empty()) {
     if (input_file.compare(sample_file) == 0) {
       std::stringstream msg;
-      msg << "Filename conflict, parameter modes file " << input_file
+      msg << "Filename conflict, " << input_file_name << " file " << input_file
           << " and output file names are identical, must be different."
           << std::endl;
       throw std::invalid_argument(msg.str());
