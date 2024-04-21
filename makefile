@@ -151,11 +151,7 @@ include make/command
 
 CMDSTAN_VERSION := 2.34.1
 
-ifeq ($(OS),Windows_NT)
-HELP_MAKE=mingw32-make
-else
 HELP_MAKE=make
-endif
 
 
 .PHONY: help
@@ -181,7 +177,7 @@ ifeq ($(OS),Windows_NT)
 	@echo '    On Windows it is recommended to include with the PATH environment'
 	@echo '    variable the directory of the Intel TBB library.'
 	@echo '    This can be setup permanently for the user with'
-	@echo '    > mingw32-make install-tbb'
+	@echo '    > make install-tbb'
 endif
 	@echo ''
 	@echo '  Build a Stan program:'

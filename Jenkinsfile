@@ -27,7 +27,7 @@ def runWinTests(String prefix = "") {
             SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
             SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
             SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
-            mingw32-make -j${env.PARALLEL} build
+            make -j${env.PARALLEL} build
             python ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
         """
     }
