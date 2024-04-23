@@ -362,9 +362,12 @@ int command(int argc, const char *argv[]) {
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
-      throw std::invalid_argument("Missing fitted_params argument, cannot run generate_quantities without fitted sample.");
+      throw std::invalid_argument(
+          "Missing fitted_params argument, cannot run generate_quantities "
+          "without fitted sample.");
     } else if (file::check_same_file(fname, output_file)) {
-      throw std::invalid_argument("Output file cannot be the same as the input file.");
+      throw std::invalid_argument(
+          "Output file cannot be the same as the input file.");
     }
     auto file_info = file::get_basename_suffix(fname);
     if (file_info.second != ".csv") {

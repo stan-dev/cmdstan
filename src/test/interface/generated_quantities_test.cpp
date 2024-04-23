@@ -90,15 +90,14 @@ TEST_F(CmdStan, generate_quantities_same_in_out_multi) {
 TEST_F(CmdStan, generate_quantities_same_in_out_multi_path_diff) {
   std::stringstream ss;
   ss << convert_model_path(bern_gq_model)
-     << " data file=" << convert_model_path(bern_data)
-     << " output file=" << std::string("./") + convert_model_path(bern_fitted_params_multi)
+     << " data file=" << convert_model_path(bern_data) << " output file="
+     << std::string("./") + convert_model_path(bern_fitted_params_multi)
      << " method=generate_quantities fitted_params="
      << convert_model_path(bern_fitted_params_multi) << " num_chains=4";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
 }
-
 
 TEST_F(CmdStan, generate_quantities_non_scalar_good) {
   std::stringstream ss;

@@ -115,7 +115,7 @@ std::pair<std::string, std::string> get_basename_suffix(
  * @param path2 second file path
  * @return true if paths are the same file, false otherwise
  */
-bool check_same_file(const std::string& path1, const std::string& path2) {
+bool check_same_file(const std::string &path1, const std::string &path2) {
   const auto path1_size = path1.size();
   const auto path2_size = path2.size();
   for (int path1_i = path1_size - 1, path2_i = path2_size - 1;
@@ -130,16 +130,16 @@ bool check_same_file(const std::string& path1, const std::string& path2) {
     if (path1[path1_i] == PATH_SEPARATOR) {
       if (path1_i > 0 && path1[path1_i - 1] == '.') {
         tick_1 = 1;
-      } else if (path1_i > 1 &&
-        path1[path1_i - 1] == '.' && path1[path1_i - 2] == '.') {
+      } else if (path1_i > 1 && path1[path1_i - 1] == '.'
+                 && path1[path1_i - 2] == '.') {
         tick_1 = 2;
       }
     }
     if (path2[path2_i] == PATH_SEPARATOR) {
       if (path2_i > 0 && path2[path2_i - 1] == '.') {
         tick_2 = 1;
-      } else if (path2_i > 1 &&
-        path2[path2_i - 1] == '.' && path2[path2_i - 2] == '.') {
+      } else if (path2_i > 1 && path2[path2_i - 1] == '.'
+                 && path2[path2_i - 2] == '.') {
         tick_2 = 2;
       }
     }
