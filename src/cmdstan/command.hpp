@@ -362,16 +362,16 @@ int command(int argc, const char *argv[]) {
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
-      msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
-      throw std::invalid_argument(msg.str());
+      throw std::invalid_argument("Missing fitted_params argument, cannot run generate_quantities without fitted sample.");
+    } else if (file::check_same_file(fname, output_file)) {
+      throw std::invalid_argument("Output file cannot be the same as the input file.");
     }
     auto file_info = file::get_basename_suffix(fname);
-    std::vector<std::string> fname_vec = file::make_filenames(
-        file_info.first.substr(
-            0, file_info.first.size()
-                   - (num_chains > 1 ? std::to_string(id).size() + 1 : 0)),
-        "", ".csv", num_chains, id);
+    if (file_info.second != ".csv") {
+      throw std::invalid_argument("Fitted params file must be a CSV file.");
+    }
+    std::vector<std::string> fname_vec
+        = file::make_filenames(file_info.first, "", ".csv", num_chains, id);
     std::vector<std::string> param_names = get_constrained_param_names(model);
     std::vector<Eigen::MatrixXd> fitted_params_vec;
     fitted_params_vec.reserve(num_chains);

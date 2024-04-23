@@ -36,6 +36,8 @@ def isWin():
 
 # edit filename into makefile target name
 def mungeName(name):
+    if name.startswith("./"):
+        name = name[2:]
     if DEBUG:
         print('munge input: %s' % name)
     if name.startswith('src/test/interface'):
@@ -45,7 +47,6 @@ def mungeName(name):
     if isWin():
         name += WIN_SFX
         name = name.replace('\\','/')
-
     name = name.replace(' ', '\\ ').replace('(','\\(').replace(')','\\)')
     if DEBUG:
         print('munge return: %s' % name)
@@ -130,7 +131,7 @@ def runTest(name, mpi=False, j=1):
     executable = mungeName(name).replace('/',os.sep)
     xml = mungeName(name).replace(WIN_SFX, '')
     command = '%s --gtest_output="xml:%s.xml"' % (executable, xml)
-    if mpi:
+    if mpi is True:
         if not commandExists('mpirun'):
             stopErr('Error: need to have mpi (and mpirun) installed to run mpi tests'
                     + '\nCheck https://github.com/stan-dev/stan/wiki/Parallelism-using-MPI-in-Stan for more details.'
@@ -145,8 +146,16 @@ def main():
         usage()
 
     try:
+        stan_mpi = False
         with open('make/local') as f:
-            stan_mpi =  'STAN_MPI' in f.read()
+            for (_, line) in enumerate(f):
+                if line.strip().startswith("#"):
+                    continue
+                else:
+                    stan_mpi = line.find('STAN_MPI=true')
+                    if stan_mpi is True:
+                        break
+
     except IOError:
         stan_mpi = False
 

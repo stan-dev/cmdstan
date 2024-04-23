@@ -106,6 +106,51 @@ std::pair<std::string, std::string> get_basename_suffix(
 }
 
 /**
+ * Check if two file paths are the same file.
+ * @note This function only handles very basic access patterns.
+ *  It will miss cases such as
+ *  path1: ./a/b/../b/file.txt
+ *  path1: ./a/b/file.txt
+ * @param path1 first file path
+ * @param path2 second file path
+ * @return true if paths are the same file, false otherwise
+ */
+bool check_same_file(const std::string& path1, const std::string& path2) {
+  const auto path1_size = path1.size();
+  const auto path2_size = path2.size();
+  for (int path1_i = path1_size - 1, path2_i = path2_size - 1;
+       path1_i >= 0 && path2_i >= 0; --path1_i, --path2_i) {
+    if (path1[path1_i] != path2[path2_i]) {
+      return false;
+    }
+    // Check for path seperator, then look ahead to see
+    //  if we have ./ or ../
+    int tick_1 = 0;
+    int tick_2 = 0;
+    if (path1[path1_i] == PATH_SEPARATOR) {
+      if (path1_i > 0 && path1[path1_i - 1] == '.') {
+        tick_1 = 1;
+      } else if (path1_i > 1 &&
+        path1[path1_i - 1] == '.' && path1[path1_i - 2] == '.') {
+        tick_1 = 2;
+      }
+    }
+    if (path2[path2_i] == PATH_SEPARATOR) {
+      if (path2_i > 0 && path2[path2_i - 1] == '.') {
+        tick_2 = 1;
+      } else if (path2_i > 1 &&
+        path2[path2_i - 1] == '.' && path2[path2_i - 2] == '.') {
+        tick_2 = 2;
+      }
+    }
+    // If ./ then skip it
+    path1_i -= tick_1;
+    path2_i -= tick_2;
+  }
+  return true;
+}
+
+/**
  * Check that output filename isn't a directory name
  * or relative dir path.
  * Throws exception if output filename is invalid.
