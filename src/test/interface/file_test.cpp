@@ -228,6 +228,4 @@ TEST(CommandHelper, check_same_file_test) {
   EXPECT_FALSE(cmdstan::file::check_approx_same_file(path, dot_path_bad));
   std::string dot_path_good = "a/b/file.txt";
   EXPECT_TRUE(cmdstan::file::check_approx_same_file(path, dot_path_good));
-
-
 }
