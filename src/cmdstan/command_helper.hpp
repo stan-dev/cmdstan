@@ -676,7 +676,7 @@ void check_file_config(argument_parser &parser) {
   }
 
   if (!input_file_name.empty()) {
-    if (input_file.compare(sample_file) == 0) {
+    if (file::check_approx_same_file(input_file, sample_file)) {
       std::stringstream msg;
       msg << "Filename conflict, " << input_file_name << " file " << input_file
           << " and output file names are identical, must be different."
