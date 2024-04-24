@@ -115,7 +115,8 @@ std::pair<std::string, std::string> get_basename_suffix(
  * @param path2 second file path
  * @return true if paths are the same file, false otherwise
  */
-bool check_approx_same_file(const std::string &path1, const std::string &path2) {
+bool check_approx_same_file(const std::string &path1,
+                            const std::string &path2) {
   std::cout << "\tpath1: " << path1 << std::endl;
   std::cout << "\tpath2: " << path2 << std::endl;
   const auto path1_size = path1.size();
