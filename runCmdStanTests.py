@@ -131,7 +131,7 @@ def runTest(name, mpi=False, j=1):
     executable = mungeName(name).replace('/',os.sep)
     xml = mungeName(name).replace(WIN_SFX, '')
     command = '%s --gtest_output="xml:%s.xml"' % (executable, xml)
-    if mpi is True:
+    if mpi:
         if not commandExists('mpirun'):
             stopErr('Error: need to have mpi (and mpirun) installed to run mpi tests'
                     + '\nCheck https://github.com/stan-dev/stan/wiki/Parallelism-using-MPI-in-Stan for more details.'
@@ -145,20 +145,18 @@ def main():
     if len(sys.argv) < 2:
         usage()
 
+    stan_mpi = False
     try:
-        stan_mpi = False
         with open('make/local') as f:
             for (_, line) in enumerate(f):
                 if line.strip().startswith("#"):
                     continue
                 else:
-                    stan_mpi = line.find('STAN_MPI=true')
-                    if stan_mpi is True:
+                    stan_mpi = line.find('STAN_MPI=true') != -1
+                    if stan_mpi:
                         break
-
     except IOError:
-        stan_mpi = False
-
+        pass
     argsIdx = 1
     j = None
     if sys.argv[1].startswith('-j'):
