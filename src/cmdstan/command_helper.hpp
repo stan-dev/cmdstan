@@ -609,17 +609,24 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
  * this will throw an error.
  *
  * @param parser user config
+ * @param id id of initial chain or path. Only used for generated quantities
  * @return int num chains or paths
  */
-unsigned int get_num_chains(argument_parser &parser) {
+inline unsigned int get_num_chains(argument_parser &parser, unsigned int id) {
   auto user_method = parser.arg("method");
   if (user_method->arg("pathfinder"))
     return get_arg_val<int_argument>(parser, "method", "pathfinder",
                                      "num_paths");
 
+  auto gq_arg = user_method->arg("generate_quantities");
+  if (gq_arg) {
+    return static_cast<unsigned int>(
+        get_arg_val<int_argument>(*gq_arg, "num_chains"));
+  }
   auto sample_arg = user_method->arg("sample");
-  if (!sample_arg)  // TODO parallel GQ now possible, consider
+  if (!sample_arg) {
     return 1;
+  }
 
   unsigned int num_chains
       = get_arg_val<int_argument>(*sample_arg, "num_chains");
@@ -669,7 +676,7 @@ void check_file_config(argument_parser &parser) {
   }
 
   if (!input_file_name.empty()) {
-    if (input_file.compare(sample_file) == 0) {
+    if (file::check_approx_same_file(input_file, sample_file)) {
       std::stringstream msg;
       msg << "Filename conflict, " << input_file_name << " file " << input_file
           << " and output file names are identical, must be different."

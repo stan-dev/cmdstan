@@ -213,3 +213,19 @@ TEST(CommandHelper, check_filename_config_bad3) {
 
   EXPECT_THROW(check_file_config(parser), std::invalid_argument);
 }
+
+TEST(CommandHelper, check_same_file_test) {
+  std::string path = "./a/b/file.txt";
+  EXPECT_TRUE(cmdstan::file::check_approx_same_file(path, path));
+  // We know this is not caught
+  std::string path_ddot = "./a/b/../b/file.txt";
+  EXPECT_FALSE(cmdstan::file::check_approx_same_file(path, path_ddot));
+
+  std::string path_dot = "a/b/./c/file.txt";
+  EXPECT_FALSE(cmdstan::file::check_approx_same_file(path, path_dot));
+
+  std::string dot_path_bad = "./a/b/c/file.txt";
+  EXPECT_FALSE(cmdstan::file::check_approx_same_file(path, dot_path_bad));
+  std::string dot_path_good = "a/b/file.txt";
+  EXPECT_TRUE(cmdstan::file::check_approx_same_file(path, dot_path_good));
+}
