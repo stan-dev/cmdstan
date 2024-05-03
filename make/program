@@ -32,8 +32,21 @@ $(STAN_TARGETS) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CX
 endif
 endif
 
-ifneq ($(findstring allow_undefined,$(STANCFLAGS))$(findstring allow-undefined,$(STANCFLAGS)),)
+ifneq ($(findstring allow-undefined,$(STANCFLAGS)),)
+
+USER_HEADER ?= $(dir $(STAN_TARGETS))user_header.hpp
 $(STAN_TARGETS) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
+##
+# Give a better error message if the USER_HEADER is not found
+##
+$(USER_HEADER):
+	@echo 'ERROR: Missing user header.'
+	@echo 'Because --allow-undefined is set, we need a C++ header file to include.'
+	@echo 'We tried to find the user header at:'
+	@echo '  $(USER_HEADER)'
+	@echo ''
+	@echo 'You can also set the USER_HEADER variable to the path of your C++ file.'
+	@exit 1
 endif
 
 ##
@@ -55,7 +68,7 @@ ifeq ($(KEEP_OBJECT), true)
 .PRECIOUS: %.o
 endif
 
-%.o : %.hpp
+%.o : %.hpp $(USER_HEADER)
 	@echo ''
 	@echo '--- Compiling C++ code ---'
 	$(COMPILE.cpp) $(CXXFLAGS_PROGRAM) -x c++ -o $(subst  \,/,$*).o $(subst \,/,$<)
