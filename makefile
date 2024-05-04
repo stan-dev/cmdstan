@@ -151,16 +151,13 @@ include make/command
 
 CMDSTAN_VERSION := 2.34.1
 
-HELP_MAKE=make
-
-
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'CmdStan v$(CMDSTAN_VERSION) help'
 	@echo ''
 	@echo '  Build CmdStan utilities:'
-	@echo '    > $(HELP_MAKE) build'
+	@echo '    > $(MAKE) build'
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries.'
@@ -171,7 +168,7 @@ help:
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
 	@echo '    for 4 cores:'
-	@echo '    > $(HELP_MAKE) build -j4'
+	@echo '    > $(MAKE) build -j4'
 	@echo ''
 ifeq ($(OS),Windows_NT)
 	@echo '    On Windows it is recommended to include with the PATH environment'
@@ -208,7 +205,7 @@ endif
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
 	@echo ''
 	@echo '    1. Build the model:'
-	@echo '       > $(HELP_MAKE) examples/bernoulli/bernoulli$(EXE)'
+	@echo '       > $(MAKE) examples/bernoulli/bernoulli$(EXE)'
 	@echo '    2. Run the model:'
 	@echo '       > examples/bernoulli/bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
 	@echo '    3. Look at the samples:'
@@ -265,7 +262,7 @@ ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
 		@echo 'You may call'
 		@echo ''
-		@echo '$(HELP_MAKE) install-tbb'
+		@echo '$(MAKE) install-tbb'
 		@echo ''
 		@echo 'to automatically update your user configuration.'
 endif
