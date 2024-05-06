@@ -376,7 +376,7 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
 std::vector<std::string> get_header(
     const std::vector<std::string> &percentiles) {
   // Mean, MCSE,  StdDev, ... percentiles ..., N_eff, N_eff/s, R_hat
-  std::vector<std::string> header(percentiles.size() + 6);
+  std::vector<std::string> header(percentiles.size() + 8);
   header.at(0) = "Mean";
   header.at(1) = "MCSE";
   header.at(2) = "StdDev";
@@ -387,6 +387,8 @@ std::vector<std::string> get_header(
   header.at(offset) = "N_Eff";
   header.at(offset + 1) = "N_Eff/s";
   header.at(offset + 2) = "R_hat";
+  header.at(offset + 3) = "R_hat (bulk)";
+  header.at(offset + 4) = "R_hat (tail)";
   return header;
 }
 
@@ -428,6 +430,9 @@ void get_stats(const stan::mcmc::chains<> &chains,
     params(i, quantiles.size() + 4) = n_eff / total_sampling_time;
     params(i, quantiles.size() + 5)
         = chains.split_potential_scale_reduction(i_chains);
+    auto bulk_tail_rhat = chains.split_potential_scale_reduction_rank(i_chains);
+    params(i, quantiles.size() + 6) = bulk_tail_rhat.first;
+    params(i, quantiles.size() + 7) = bulk_tail_rhat.second;
     i++;
   }
 }
