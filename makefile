@@ -278,12 +278,14 @@ endif
 ##
 .PHONY: clean clean-deps clean-all
 
-clean:
-	$(RM) -r test
-	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%.o,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
+clean: clean-tests
+	@echo '  removing built CmdStan utilities'
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) -r bin/cmdstan
+	@echo '  removing cached compiler objects'
+	$(RM) $(wildcard src/cmdstan/main*.o) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
+	@echo '  removing built example model'
+	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp $(wildcard examples/bernoulli/*.csv)
 
 clean-deps:
 	@echo '  removing dependency files'
@@ -292,11 +294,6 @@ clean-deps:
 	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
 clean-all: clean clean-deps clean-libraries
-	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
-	$(RM) -r src/cmdstan/main*.o bin/cmdstan
-	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
-	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
-	$(RM) -r $(wildcard $(BOOST)/stage/lib $(BOOST)/bin.v2 $(BOOST)/tools/build/src/engine/bootstrap/ $(BOOST)/tools/build/src/engine/bin.* $(BOOST)/project-config.jam* $(BOOST)/b2 $(BOOST)/bjam $(BOOST)/bootstrap.log)
 
 ##
 # Submodule related tasks
