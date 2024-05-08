@@ -279,7 +279,9 @@ endif
 .PHONY: clean clean-deps clean-all
 
 clean: clean-tests
-	$(RM) -r bin
+	@echo '  removing built CmdStan utilities'
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) -r bin/cmdstan
 	@echo '  removing cached compiler objects'
 	$(RM) $(wildcard src/cmdstan/main*.o) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
 	@echo '  removing built example model'
