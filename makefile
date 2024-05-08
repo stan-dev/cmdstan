@@ -278,8 +278,7 @@ endif
 ##
 .PHONY: clean clean-deps clean-all
 
-clean:
-	$(RM) -r test
+clean: clean-tests
 	$(RM) -r bin
 	@echo '  removing cached compiler objects'
 	$(RM) $(wildcard src/cmdstan/main*.o) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
