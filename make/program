@@ -28,8 +28,8 @@ $(PRECOMPILED_MODEL_HEADER) : $(STAN)src/stan/model/model_header.hpp
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
 ifeq ($(CXX_TYPE),clang)
-CXXFLAGS_PROGRAM += -include-pch $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
-$(STAN_TARGETS) : %$(EXE) : $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
+CXXFLAGS_PROGRAM += -include-pch $(PRECOMPILED_MODEL_HEADER)
+$(STAN_TARGETS) : %$(EXE) : $(PRECOMPILED_MODEL_HEADER)
 endif
 endif
 
