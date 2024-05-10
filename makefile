@@ -132,7 +132,7 @@ PRECOMPILED_HEADERS ?= true
 endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
@@ -284,6 +284,7 @@ clean: clean-tests
 	$(RM) -r bin/cmdstan
 	@echo '  removing cached compiler objects'
 	$(RM) $(wildcard src/cmdstan/main*.o) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
+	$(RM) -r $(STAN)src/stan/model/model_header.hpp.gch/
 	@echo '  removing built example model'
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp $(wildcard examples/bernoulli/*.csv)
 
