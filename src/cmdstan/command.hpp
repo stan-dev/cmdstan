@@ -786,7 +786,7 @@ int command(int argc, const char *argv[]) {
           }
         }
       }  // end static HMC
-    }    // ---- sample end ---- //
+    }  // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
     // ---- variational start ---- //
     list_argument *algo = dynamic_cast<list_argument *>(
@@ -831,7 +831,7 @@ int command(int argc, const char *argv[]) {
   //////////////////////////////////////////////////
 
   stan::math::profile_map &profile_data = get_stan_profile_data();
-  if (profile_data.size() > 0) {
+  if (profile_data.begin() != profile_data.end()) {
     std::string profile_file_name
         = get_arg_val<string_argument>(parser, "output", "profile_file");
     std::fstream profile_stream(profile_file_name.c_str(), std::fstream::out);

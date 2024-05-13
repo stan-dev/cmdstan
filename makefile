@@ -283,8 +283,8 @@ clean: clean-tests
 	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	$(RM) -r bin/cmdstan
 	@echo '  removing cached compiler objects'
-	$(RM) $(wildcard src/cmdstan/main*.o) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
-	$(RM) -r $(STAN)src/stan/model/model_header.hpp.gch/
+	$(RM) $(wildcard src/cmdstan/main*.o)
+	$(RM) -r $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
 	@echo '  removing built example model'
 	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp $(wildcard examples/bernoulli/*.csv)
 
