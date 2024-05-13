@@ -786,7 +786,7 @@ int command(int argc, const char *argv[]) {
           }
         }
       }  // end static HMC
-    }  // ---- sample end ---- //
+    }    // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
     // ---- variational start ---- //
     list_argument *algo = dynamic_cast<list_argument *>(
