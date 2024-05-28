@@ -563,7 +563,8 @@ int command(int argc, const char *argv[]) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("sample")->arg("algorithm"));
     std::string algo_name = algo->value();
-    bool use_fixed_param = model.num_params_r() == 0 || algo_name == "fixed_param";
+    bool use_fixed_param
+        = model.num_params_r() == 0 || algo_name == "fixed_param";
 
     bool adapt_engaged = get_arg_val<bool_argument>(parser, "method", "sample",
                                                     "adapt", "engaged");
