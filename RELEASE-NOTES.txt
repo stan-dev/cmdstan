@@ -1,6 +1,23 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.35.0 (3 June 2024)
+======================================================================
+
+ - Exposes new arguments for `laplace`:
+	`calculate_lp` is a boolean subarg of `laplace` which controls whether or not log_prob is called for each approximate draw. Default is true (existing behavior).
+	The `diagnostic_file` argument of `output` now exposes information from the mode, namely the gradient and Hessian.
+	(#1246)
+ - CmdStan will now halt if a filesystem error prevents writing to one of the output files. (#1249)
+ - The `generate_quantities` method now supports the `num_chains` arguments to perform downstream analysis in parallel. (#1256)
+ - `log_prob` now prevents the same CSV from being read and written to at the same time. (#1259)
+ - Boolean arguments to cmdstan accept `true` and `false` in addition to 1 and 0. (#1260)
+ - `mingw32-make` is no longer necessary on Windows, the standard `make` program is sufficient. (#1262)
+ - Improved the logic around the `USER_HEADER` variable to give an informative error when it is misspecified. (#1264)
+ - `make clean` deletes more files, hopefully making it so `make clean-all` needs to be run far less often. (#1267)
+ - Fixed an issue preventing the precompiled header from being used with GCC. (#1268)
+ - Allow `num_warmup=0` to be paired with `adapt engaged=0` when the algorithm is the `fixed_param` sampler. (#1277)
+
 v2.34.1 (23 January 2024)
 ======================================================================
 
