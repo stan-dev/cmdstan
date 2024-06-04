@@ -18,6 +18,7 @@ $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 ##
 ifneq ($(PRECOMPILED_MODEL_HEADER),)
 $(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : DEPTARGETS = -MT $@
+$(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : DEPFLAGS_OS = -M -E
 $(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : $(STAN)src/stan/model/model_header.hpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(DEPFLAGS) $<
