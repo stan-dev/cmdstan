@@ -56,7 +56,7 @@ TEST_F(CmdStan, optimize_default) {
 
   int jacobian_idx = idx_first_match(config, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config[jacobian_idx], "= 0 (Default)"));
+  EXPECT_TRUE(boost::contains(config[jacobian_idx], "= false (Default)"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   EXPECT_FLOAT_EQ(1, values[1]);
@@ -156,7 +156,7 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
 
   int jacobian_idx = idx_first_match(config1, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config1[jacobian_idx], "= 0 (Default)"));
+  EXPECT_TRUE(boost::contains(config1[jacobian_idx], "= false (Default)"));
 
   ASSERT_NEAR(0, values1[0], 0.00001);
   ASSERT_NEAR(3, values1[1], 0.01);
@@ -174,7 +174,7 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
 
   jacobian_idx = idx_first_match(config2, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config2[jacobian_idx], "= 1"));
+  EXPECT_TRUE(boost::contains(config2[jacobian_idx], "= true"));
 
   ASSERT_NEAR(3.3, values2[1], 0.01);
 }

@@ -81,3 +81,11 @@ test/interface/print_uninitialized_test$(EXE): src/test/test-models/print_uninit
 test/interface/arguments/argument_configuration_test$(EXE): src/test/test-models/test_model$(EXE)
 test/interface/stansummary_test$(EXE): bin/stansummary$(EXE)
 test/interface/variational_output_test$(EXE): src/test/test-models/variational_output$(EXE)
+
+.PHONY: clean-tests
+clean-tests:
+	$(RM) -r test
+	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%.o,$(TEST_MODELS)))
+	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))

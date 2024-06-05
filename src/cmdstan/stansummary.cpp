@@ -254,6 +254,7 @@ Options:
     // Write to csv file (optional)
     if (app.count("--csv_filename")) {
       std::ofstream csv_file(csv_filename.c_str(), std::ios_base::app);
+      csv_file.exceptions(std::ofstream::failbit | std::ofstream::badbit);
       csv_file << std::setprecision(app.count("--sig_figs") ? sig_figs : 6);
 
       write_header(header, column_widths, max_name_length, true, &csv_file);

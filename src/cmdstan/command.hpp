@@ -146,8 +146,8 @@ int command(int argc, const char *argv[]) {
     }
   }
   stan::math::init_threadpool_tbb(num_threads);
-
-  unsigned int num_chains = get_num_chains(parser);
+  unsigned int id = get_arg_val<int_argument>(parser, "id");
+  unsigned int num_chains = get_num_chains(parser, id);
   check_file_config(parser);
 
   parser.print(info);
@@ -176,7 +176,6 @@ int command(int argc, const char *argv[]) {
   //           Configure callback writers         //
   //////////////////////////////////////////////////
   auto user_method = parser.arg("method");
-  unsigned int id = get_arg_val<int_argument>(parser, "id");
   int sig_figs = get_arg_val<int_argument>(parser, "output", "sig_figs");
   int refresh = get_arg_val<int_argument>(parser, "output", "refresh");
   std::string output_file
@@ -232,12 +231,20 @@ int command(int argc, const char *argv[]) {
     init_filestream_writers(sample_writers, num_chains, id, output_file, "",
                             ".csv", sig_figs, "# ");
     if (!diagnostic_file.empty()) {
-      init_filestream_writers(diagnostic_csv_writers, num_chains, id,
-                              diagnostic_file, "", ".csv", sig_figs, "# ");
+      if (user_method->arg("laplace")) {
+        init_filestream_writers(diagnostic_json_writers, num_chains, id,
+                                diagnostic_file, "", ".json", sig_figs);
+        init_null_writers(diagnostic_csv_writers, num_chains);
+
+      } else {
+        init_filestream_writers(diagnostic_csv_writers, num_chains, id,
+                                diagnostic_file, "", ".csv", sig_figs, "# ");
+        init_null_writers(diagnostic_json_writers, num_chains);
+      }
     } else {
       init_null_writers(diagnostic_csv_writers, num_chains);
+      init_null_writers(diagnostic_json_writers, num_chains);
     }
-    init_null_writers(diagnostic_json_writers, num_chains);
   }
   if (user_method->arg("sample")
       && get_arg_val<bool_argument>(parser, "method", "sample", "adapt",
@@ -271,11 +278,8 @@ int command(int argc, const char *argv[]) {
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
     auto config_filename
-        = get_basename_suffix(output_file).first + "_config.json";
-    auto ofs_args = std::make_unique<std::ofstream>(config_filename);
-    if (sig_figs > -1) {
-      ofs_args->precision(sig_figs);
-    }
+        = file::get_basename_suffix(output_file).first + "_config.json";
+    auto ofs_args = file::safe_create(config_filename, sig_figs);
     stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
     write_config(json_args, parser, model);
   }
@@ -337,10 +341,9 @@ int command(int argc, const char *argv[]) {
           save_single_paths, refresh, interrupt, logger, init_writer,
           sample_writers[0], diagnostic_json_writers[0], calculate_lp);
     } else {
-      auto output_filenames = make_filenames(output_file, "", ".csv", 1, id);
-      auto ofs = std::make_unique<std::ofstream>(output_filenames[0]);
-      if (sig_figs > -1)
-        ofs->precision(sig_figs);
+      auto output_filenames
+          = file::make_filenames(output_file, "", ".csv", 1, id);
+      auto ofs = file::safe_create(output_filenames[0], sig_figs);
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
@@ -359,18 +362,30 @@ int command(int argc, const char *argv[]) {
     auto gq_arg = parser.arg("method")->arg("generate_quantities");
     std::string fname = get_arg_val<string_argument>(*gq_arg, "fitted_params");
     if (fname.empty()) {
-      msg << "Missing fitted_params argument, cannot run generate_quantities "
-             "without fitted sample.";
-      throw std::invalid_argument(msg.str());
+      throw std::invalid_argument(
+          "Missing fitted_params argument, cannot run generate_quantities "
+          "without fitted sample.");
     }
+    auto file_info = file::get_basename_suffix(fname);
+    if (file_info.second != ".csv") {
+      throw std::invalid_argument("Fitted params file must be a CSV file.");
+    }
+    std::vector<std::string> fname_vec
+        = file::make_filenames(file_info.first, "", ".csv", num_chains, id);
     std::vector<std::string> param_names = get_constrained_param_names(model);
-    stan::io::stan_csv fitted_params;
-    size_t col_offset, num_rows, num_cols;
-    parse_stan_csv(fname, model, param_names, fitted_params, col_offset,
-                   num_rows, num_cols);
+    std::vector<Eigen::MatrixXd> fitted_params_vec;
+    fitted_params_vec.reserve(num_chains);
+    for (int i = 0; i < num_chains; ++i) {
+      stan::io::stan_csv fitted_params;
+      size_t col_offset, num_rows, num_cols;
+      parse_stan_csv(fname_vec[i], model, param_names, fitted_params,
+                     col_offset, num_rows, num_cols);
+      fitted_params_vec.emplace_back(
+          fitted_params.samples.block(0, col_offset, num_rows, num_cols));
+    }
     return_code = stan::services::standalone_generate(
-        model, fitted_params.samples.block(0, col_offset, num_rows, num_cols),
-        random_seed, interrupt, logger, sample_writers[0]);
+        model, num_chains, fitted_params_vec, random_seed, interrupt, logger,
+        sample_writers);
     // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
     // ---- laplace start ---- //
@@ -383,15 +398,17 @@ int command(int argc, const char *argv[]) {
     }
     Eigen::VectorXd theta_hat = get_laplace_mode(fname, model);
     bool jacobian = get_arg_val<bool_argument>(*laplace_arg, "jacobian");
+    bool calculate_lp
+        = get_arg_val<bool_argument>(*laplace_arg, "calculate_lp");
     int draws = get_arg_val<int_argument>(*laplace_arg, "draws");
     if (jacobian) {
       return_code = stan::services::laplace_sample<true>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     } else {
       return_code = stan::services::laplace_sample<false>(
-          model, theta_hat, draws, random_seed, refresh, interrupt, logger,
-          sample_writers[0]);
+          model, theta_hat, draws, calculate_lp, random_seed, refresh,
+          interrupt, logger, sample_writers[0], diagnostic_json_writers[0]);
     }
     // ---- laplace end ---- //
   } else if (user_method->arg("log_prob")) {
@@ -417,7 +434,7 @@ int command(int argc, const char *argv[]) {
       params_r_ind = get_uparams_r(upars_file, model);
     } else if (cpars_file.length() > 0) {
       std::vector<std::string> param_names = get_constrained_param_names(model);
-      if (get_suffix(cpars_file) == ".csv") {
+      if (file::get_suffix(cpars_file) == ".csv") {
         stan::io::stan_csv fitted_params;
         size_t col_offset, num_rows, num_cols;
         parse_stan_csv(cpars_file, model, param_names, fitted_params,
@@ -543,17 +560,21 @@ int command(int argc, const char *argv[]) {
     bool save_warmup
         = get_arg_val<bool_argument>(parser, "method", "sample", "save_warmup");
 
+    list_argument *algo = dynamic_cast<list_argument *>(
+        parser.arg("method")->arg("sample")->arg("algorithm"));
+    std::string algo_name = algo->value();
+    bool use_fixed_param
+        = model.num_params_r() == 0 || algo_name == "fixed_param";
+
     bool adapt_engaged = get_arg_val<bool_argument>(parser, "method", "sample",
                                                     "adapt", "engaged");
-    if (adapt_engaged == true && num_warmup == 0) {
+    if (!use_fixed_param && adapt_engaged == true && num_warmup == 0) {
       msg << "The number of warmup samples (num_warmup) must be greater than "
           << "zero if adaptation is enabled." << std::endl;
       throw std::invalid_argument(msg.str());
     }
-    list_argument *algo = dynamic_cast<list_argument *>(
-        parser.arg("method")->arg("sample")->arg("algorithm"));
-    std::string algo_name = algo->value();
-    if (model.num_params_r() == 0 || algo_name == "fixed_param") {
+
+    if (use_fixed_param) {
       if (algo_name != "fixed_param") {
         info(
             "Model contains no parameters, running fixed_param sampler, "

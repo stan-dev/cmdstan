@@ -53,6 +53,6 @@ output*.csv
 # gdb
 .gdb_history
 
-#vscode 
+#vscode
 .vscode/*
 .vscode/**

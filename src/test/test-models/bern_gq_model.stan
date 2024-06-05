@@ -16,4 +16,3 @@ generated quantities {
     y_rep[n] = bernoulli_rng(theta);
   }
 }
-

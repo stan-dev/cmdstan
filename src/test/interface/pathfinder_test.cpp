@@ -66,7 +66,7 @@ TEST_F(CmdStan, pathfinder_defaults) {
   EXPECT_EQ(1, count_matches(" seconds (Pathfinders)", output));
   EXPECT_EQ(1, count_matches(" seconds (PSIS)", output));
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
-  EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
+  EXPECT_EQ(1, count_matches("save_single_paths = false (Default)", output));
   EXPECT_EQ(1, count_matches("num_paths = 4 (Default)", output));
 }
 
@@ -89,7 +89,7 @@ TEST_F(CmdStan, pathfinder_40_draws) {
   EXPECT_EQ(1, count_matches(" seconds (Total)", output));
   EXPECT_EQ(1, count_matches("num_psis_draws = 40", output));
   EXPECT_EQ(1, count_matches("num_paths = 4 (Default)", output));
-  EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
+  EXPECT_EQ(1, count_matches("save_single_paths = false (Default)", output));
 }
 
 TEST_F(CmdStan, pathfinder_single) {
@@ -110,7 +110,7 @@ TEST_F(CmdStan, pathfinder_single) {
   EXPECT_EQ(1, count_matches("Elapsed Time:", output));
   EXPECT_EQ(1, count_matches("seconds (Pathfinder)", output));
   EXPECT_EQ(1, count_matches("num_paths = 1", output));
-  EXPECT_EQ(1, count_matches("save_single_paths = 0 (Default)", output));
+  EXPECT_EQ(1, count_matches("save_single_paths = false (Default)", output));
 }
 
 bool is_whitespace(char c) { return c == ' ' || c == '\n'; }
@@ -134,7 +134,7 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   std::string single_csv = result_sstream.str();
   EXPECT_EQ(1, count_matches("Elapsed Time:", single_csv));
   EXPECT_EQ(1, count_matches("seconds (Pathfinder)", single_csv));
-  EXPECT_EQ(1, count_matches("save_single_paths = 1", single_csv));
+  EXPECT_EQ(1, count_matches("save_single_paths = true", single_csv));
 
   std::fstream single_json_stream(convert_model_path(output_single_json));
   std::stringstream result_json_sstream;

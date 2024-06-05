@@ -24,7 +24,6 @@ MATH ?= $(STAN)lib/stan_math/
 RAPIDJSON ?= $(STAN)lib/rapidjson_1.1.0/
 CLI11 ?= lib/CLI11-1.9.1/
 INC_FIRST ?= -I src -I $(STAN)src -I $(RAPIDJSON) -I $(CLI11)
-USER_HEADER ?= $(dir $<)user_header.hpp
 
 ## Detect operating system
 ifneq ($(OS),Windows_NT)
@@ -133,7 +132,7 @@ PRECOMPILED_HEADERS ?= true
 endif
 
 ifeq ($(PRECOMPILED_HEADERS),true)
-PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
+PRECOMPILED_MODEL_HEADER=$(STAN)src/stan/model/model_header.hpp.gch/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).hpp.gch
 ifeq ($(CXX_TYPE),gcc)
 CXXFLAGS_PROGRAM+= -Wno-ignored-attributes $(CXXFLAGS_OPTIM) $(CXXFLAGS_FLTO)
 endif
@@ -149,14 +148,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.34.1
-
-ifeq ($(OS),Windows_NT)
-HELP_MAKE=mingw32-make
-else
-HELP_MAKE=make
-endif
-
+CMDSTAN_VERSION := 2.35.0
 
 .PHONY: help
 help:
@@ -164,7 +156,7 @@ help:
 	@echo 'CmdStan v$(CMDSTAN_VERSION) help'
 	@echo ''
 	@echo '  Build CmdStan utilities:'
-	@echo '    > $(HELP_MAKE) build'
+	@echo '    > $(MAKE) build'
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries.'
@@ -175,13 +167,13 @@ help:
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
 	@echo '    for 4 cores:'
-	@echo '    > $(HELP_MAKE) build -j4'
+	@echo '    > $(MAKE) build -j4'
 	@echo ''
 ifeq ($(OS),Windows_NT)
 	@echo '    On Windows it is recommended to include with the PATH environment'
 	@echo '    variable the directory of the Intel TBB library.'
 	@echo '    This can be setup permanently for the user with'
-	@echo '    > mingw32-make install-tbb'
+	@echo '    > make install-tbb'
 endif
 	@echo ''
 	@echo '  Build a Stan program:'
@@ -212,7 +204,7 @@ endif
 	@echo '  Example - bernoulli model: examples/bernoulli/bernoulli.stan'
 	@echo ''
 	@echo '    1. Build the model:'
-	@echo '       > $(HELP_MAKE) examples/bernoulli/bernoulli$(EXE)'
+	@echo '       > $(MAKE) examples/bernoulli/bernoulli$(EXE)'
 	@echo '    2. Run the model:'
 	@echo '       > examples/bernoulli/bernoulli$(EXE) sample data file=examples/bernoulli/bernoulli.data.R'
 	@echo '    3. Look at the samples:'
@@ -269,7 +261,7 @@ ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
 		@echo 'You may call'
 		@echo ''
-		@echo '$(HELP_MAKE) install-tbb'
+		@echo '$(MAKE) install-tbb'
 		@echo ''
 		@echo 'to automatically update your user configuration.'
 endif
@@ -286,12 +278,15 @@ endif
 ##
 .PHONY: clean clean-deps clean-all
 
-clean:
-	$(RM) -r test
-	$(RM) $(wildcard $(patsubst %.stan,%.d,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%.hpp,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%.o,$(TEST_MODELS)))
-	$(RM) $(wildcard $(patsubst %.stan,%$(EXE),$(TEST_MODELS)))
+clean: clean-tests
+	@echo '  removing built CmdStan utilities'
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) -r bin/cmdstan
+	@echo '  removing cached compiler objects'
+	$(RM) $(wildcard src/cmdstan/main*.o)
+	$(RM) -r $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
+	@echo '  removing built example model'
+	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp $(wildcard examples/bernoulli/*.csv)
 
 clean-deps:
 	@echo '  removing dependency files'
@@ -300,11 +295,6 @@ clean-deps:
 	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src/stan,*.dSYM) $(call findfiles,$(MATH)/stan,*.dSYM)
 
 clean-all: clean clean-deps clean-libraries
-	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
-	$(RM) -r src/cmdstan/main*.o bin/cmdstan
-	$(RM) $(wildcard $(STAN)src/stan/model/model_header*.hpp.gch)
-	$(RM) examples/bernoulli/bernoulli$(EXE) examples/bernoulli/bernoulli.o examples/bernoulli/bernoulli.d examples/bernoulli/bernoulli.hpp
-	$(RM) -r $(wildcard $(BOOST)/stage/lib $(BOOST)/bin.v2 $(BOOST)/tools/build/src/engine/bootstrap/ $(BOOST)/tools/build/src/engine/bin.* $(BOOST)/project-config.jam* $(BOOST)/b2 $(BOOST)/bjam $(BOOST)/bootstrap.log)
 
 ##
 # Submodule related tasks

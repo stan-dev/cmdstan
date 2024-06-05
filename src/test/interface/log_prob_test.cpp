@@ -228,3 +228,15 @@ TEST_F(CmdStan, log_prob_unconstrained_bad_input) {
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
 }
+
+TEST_F(CmdStan, log_prob_conflict) {
+  std::stringstream ss;
+  ss << convert_model_path(bern_log_prob_model)
+     << " data file=" << convert_model_path(bern_data)
+     << " output file=" << convert_model_path(test_output)
+     << " method=log_prob constrained_params="
+     << convert_model_path(test_output);  // << " 2>&1";
+  std::string cmd = ss.str();
+  run_command_output out = run_command(cmd);
+  ASSERT_TRUE(out.hasError);
+}
