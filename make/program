@@ -16,11 +16,13 @@ $(CMDSTAN_MAIN_O) : $(CMDSTAN_MAIN)
 ##
 # Precompiled model header
 ##
-$(patsub %.d,%.hpp.gch,$(PRECOMPILED_MODEL_HEADER)) : $(STAN)src/stan/model/model_header.hpp
+ifneq ($(PRECOMPILED_MODEL_HEADER),)
+$(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : DEPTARGETS = -MT $@
+$(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : DEPFLAGS_OS = -M -E
+$(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : $(STAN)src/stan/model/model_header.hpp
+	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(DEPFLAGS) $<
 
-ifneq ($(PRECOMPILED_MODEL_HEADER),)
-$(patsub %.d,%.hpp.gch,$(PRECOMPILED_MODEL_HEADER)) : DEPTARGETS = -MT $(patsubst %.d,%.hpp.gch,$@) -MT $@
 $(PRECOMPILED_MODEL_HEADER) : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
 	@echo '--- Compiling pre-compiled header. This might take a few seconds. ---'
@@ -103,7 +105,7 @@ ifneq (,$(STAN_TARGETS))
 $(patsubst %$(EXE),%.d,$(STAN_TARGETS)) : DEPTARGETS += -MT $(patsubst %.d,%$(EXE),$@) -include $< -include $(CMDSTAN_MAIN)
 -include $(patsubst %$(EXE),%.d,$(STAN_TARGETS))
 -include $(patsubst %.cpp,%$(STAN_FLAGS).d,$(CMDSTAN_MAIN))
-ifeq ($(PRECOMPILED_HEADERS),true)
--include $(STAN)src/stan/model/model_header$(STAN_FLAGS)_$(CXX_MAJOR)_$(CXX_MINOR).d
+ifneq (,$(PRECOMPILED_MODEL_HEADER))
+-include $(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER))
 endif
 endif
