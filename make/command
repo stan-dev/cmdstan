@@ -1,4 +1,6 @@
-bin/cmdstan/stansummary.o : src/cmdstan/stansummary_helper.hpp
+src/cmdstan/stansummary.d: DEPTARGETS = -MT bin/cmdstan/stansummary.o
+-include src/cmdstan/stansummary.d
+
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) -fvisibility=hidden $< $(OUTPUT_OPTION)
