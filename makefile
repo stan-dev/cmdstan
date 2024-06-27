@@ -16,7 +16,7 @@
 # The default target of this Makefile is...
 help:
 
--include $(HOME)/.config/stan/make.local  # user-defined variables
+
 -include make/local                       # user-defined variables
 
 STAN ?= stan/
