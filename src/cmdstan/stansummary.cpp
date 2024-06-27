@@ -145,12 +145,16 @@ Options:
 
     // Get column headers for sampler, model params
     size_t max_name_length = 0;
-    size_t num_sampler_params = -1;  // don't count name 'lp__'
+    size_t num_sampler_params = 0;
     for (int i = 0; i < chains.num_params(); ++i) {
       if (chains.param_name(i).length() > max_name_length)
         max_name_length = chains.param_name(i).length();
       if (stan::io::ends_with("__", chains.param_name(i)))
         num_sampler_params++;
+    }
+    // don't count name 'lp__'
+    if (num_sampler_params > 0) {
+      num_sampler_params--;
     }
 
     // Get column indices for the sampler params
