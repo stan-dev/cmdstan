@@ -156,7 +156,7 @@ Options:
     if (num_sampler_params > 0) {
       num_sampler_params--;
     }
-    
+
     // Get column indices for the sampler params
     std::vector<int> sampler_params_idxes(num_sampler_params);
     std::iota(sampler_params_idxes.begin(), sampler_params_idxes.end(), 1);
