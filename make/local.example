@@ -30,3 +30,7 @@
 
 # Adding other arbitrary C++ compiler flags
 # CXXFLAGS+= -funroll-loops
+
+# Load more config from another location. Possibly useful on a shared system where
+# different users have different configurations.
+# -include $(HOME)/.config/stan/make.local
