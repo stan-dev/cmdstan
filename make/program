@@ -82,7 +82,7 @@ endif
 	$(LINK.cpp) $(subst \,/,$*.o) $(CMDSTAN_MAIN_O) $(LDLIBS) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(subst \,/,$(OUTPUT_OPTION))
 
 ifeq ($(OS),Windows_NT)
-ifneq(,$(TBB_TARGETS))
+ifneq (,$(TBB_TARGETS))
 ifeq (,$(findstring tbb.dll, $(notdir $(shell where tbb.dll))))
 	@echo 'Intel TBB is not in PATH.'
 	@echo 'Consider calling '
