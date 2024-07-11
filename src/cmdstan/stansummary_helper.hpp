@@ -367,16 +367,16 @@ stan::mcmc::chains<> parse_csv_files(const std::vector<std::string> &filenames,
 }
 
 /**
- * Assemble vector of output column labels as follows:
- * Mean, MCSE, StdDev, specified quantile labels, N_eff, N_eff/S, R-hat
+ * Assemble vector of output column labels in the following order:
+ * Mean, MCSE, StdDev, specified quantile labels, N_eff, N_eff/S, R_hat_bulk, R_hat_tail,
+ * total columns = 7 + number of specified quantiles.
  *
  * @param in vector of percentile values as strings
  * @return vector column labels
  */
 std::vector<std::string> get_header(
     const std::vector<std::string> &percentiles) {
-  // Mean, MCSE,  StdDev, ... percentiles ..., N_eff, N_eff/s, R_hat
-  std::vector<std::string> header(percentiles.size() + 6);
+  std::vector<std::string> header(percentiles.size() + 7);
   header.at(0) = "Mean";
   header.at(1) = "MCSE";
   header.at(2) = "StdDev";
@@ -386,7 +386,8 @@ std::vector<std::string> get_header(
   size_t offset = 3 + percentiles.size();
   header.at(offset) = "N_Eff";
   header.at(offset + 1) = "N_Eff/s";
-  header.at(offset + 2) = "R_hat";
+  header.at(offset + 2) = "R_hat_bulk";
+  header.at(offset + 3) = "R_hat_tail";
   return header;
 }
 
@@ -424,10 +425,13 @@ void get_stats(const stan::mcmc::chains<> &chains,
     Eigen::VectorXd quantiles = chains.quantiles(i_chains, probs);
     for (int j = 0; j < quantiles.size(); j++)
       params(i, 3 + j) = quantiles(j);
-    params(i, quantiles.size() + 3) = n_eff;
-    params(i, quantiles.size() + 4) = n_eff / total_sampling_time;
-    params(i, quantiles.size() + 5)
-        = chains.split_potential_scale_reduction(i_chains);
+    size_t offset = 3 + quantiles.size();
+    params(i, offset) = n_eff;
+    params(i, offset + 1) = n_eff / total_sampling_time;
+    double rhat_bulk, rhat_tail;
+    std::tie(rhat_bulk, rhat_tail) = chains.split_potential_scale_reduction_rank(i_chains);
+    params(i, offset + 2) = rhat_bulk;
+    params(i, offset + 3) = rhat_tail;
     i++;
   }
 }
