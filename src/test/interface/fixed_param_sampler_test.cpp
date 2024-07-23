@@ -92,4 +92,12 @@ TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
       = "Model contains no parameters, running fixed_param sampler";
   EXPECT_TRUE(
       boost::algorithm::contains(command_output.output, expected_message));
+
+  std::ifstream output_stream;
+  output_stream.open((convert_model_path(model_path) + ".csv").data());
+
+  stan::io::stan_csv parsed_output
+      = stan::io::stan_csv_reader::parse(output_stream, 0);
+
+  EXPECT_EQ("fixed_param (force)", parsed_output.metadata.algorithm);
 }

@@ -23,6 +23,9 @@ inline void write_config(stan::callbacks::writer &writer,
   write_model(writer, model.model_name());
   write_datetime(writer);
   parser.print(writer);
+  if (model.num_params_r() == 0) {
+    writer("algorithm = fixed_param (force)");
+  }
   write_parallel_info(writer);
   write_opencl_device(writer);
   write_compile_info(writer, model);
