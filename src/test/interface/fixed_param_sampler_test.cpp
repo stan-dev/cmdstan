@@ -40,9 +40,10 @@ TEST(McmcPersistentSampler, check_persistency) {
   stan::io::stan_csv parsed_output
       = stan::io::stan_csv_reader::parse(output_stream, 0);
 
-  std::cout << "parsed_output samples " << parsed_output.samples.rows() << std::endl;
-  std::cout << "parsed_output metadata " << parsed_output.metadata.num_samples << std::endl;
-
+  std::cout << "parsed_output samples " << parsed_output.samples.rows()
+            << std::endl;
+  std::cout << "parsed_output metadata " << parsed_output.metadata.num_samples
+            << std::endl;
 
   stan::mcmc::chains<> chains(parsed_output);
 

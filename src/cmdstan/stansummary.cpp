@@ -58,29 +58,29 @@ Options:
   CLI::App app{"Allowed options"};
   app.add_option("--sig_figs,-s", sig_figs, "Significant figures, default 2.",
                  true)
-    ->check(CLI::Range(1, 18));
+      ->check(CLI::Range(1, 18));
   app.add_option("--autocorr,-a", autocorr_idx,
                  "Display the chain autocorrelation.", true)
-    ->check(CLI::PositiveNumber);
+      ->check(CLI::PositiveNumber);
   app.add_option("--csv_filename,-c", csv_filename,
                  "Write statistics to a csv.", true)
-    ->check(CLI::NonexistentPath);
+      ->check(CLI::NonexistentPath);
   app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
                  true);
   app.add_option("--include_param,-i", requested_params_vec,
                  "Include the named parameter in the output. By default all "
                  "are included.",
                  true)
-    ->transform([](auto str) {
+      ->transform([](auto str) {
         // allow both 'theta.1' and 'theta[1]' style.
         std::string token(str);
         stan::io::prettify_stan_csv_name(token);
         return token;
       })
-    ->take_all();
+      ->take_all();
   app.add_option("input_files", filenames, "Sampler csv files.", true)
-    ->required()
-    ->check(CLI::ExistingFile);
+      ->required()
+      ->check(CLI::ExistingFile);
 
   try {
     CLI11_PARSE(app, argc, argv);
@@ -132,33 +132,36 @@ Options:
       sample = stan::io::stan_csv_reader::parse(infile, &out);
       // csv_reader warnings are errors - fail fast.
       if (!out.str().empty()) {
-	throw std::invalid_argument(out.str());
+        throw std::invalid_argument(out.str());
       }
       csv_files.push_back(sample);
       warmup_times(i) = sample.timing.warmup;
       sampling_times(i) = sample.timing.sampling;
       thin(i) = sample.metadata.thin;
     } catch (const std::invalid_argument &e) {
-      std::cout << "Cannot parse input csv file: " << filenames[i]
-		<< e.what() << "." << std::endl;
+      std::cout << "Cannot parse input csv file: " << filenames[i] << e.what()
+                << "." << std::endl;
       return return_codes::NOT_OK;
     }
   }
   stan::io::stan_csv_metadata metadata = csv_files[0].metadata;
   std::vector<std::string> param_names = csv_files[0].header;
   if (requested_params_vec.size() > 0) {
-    std::set<std::string> requested_params(requested_params_vec.begin(), requested_params_vec.end());
-    std::set<std::string> check_requested_params(requested_params_vec.begin(), requested_params_vec.end());
+    std::set<std::string> requested_params(requested_params_vec.begin(),
+                                           requested_params_vec.end());
+    std::set<std::string> check_requested_params(requested_params_vec.begin(),
+                                                 requested_params_vec.end());
     for (size_t i = 0; i < param_names.size(); ++i) {
       check_requested_params.erase(param_names[i]);
     }
     if (check_requested_params.size() == 0) {
       param_names.clear();
-      std::copy(requested_params.begin(), requested_params.end(), std::back_inserter(param_names));
+      std::copy(requested_params.begin(), requested_params.end(),
+                std::back_inserter(param_names));
     } else {
       std::cout << "--include_param: Unrecognized parameter(s): ";
       for (auto param : requested_params) {
-	std::cout << "'" << param << "' ";
+        std::cout << "'" << param << "' ";
       }
       std::cout << std::endl;
       return return_codes::NOT_OK;
@@ -178,20 +181,21 @@ Options:
 
     // Console output formatting
     Eigen::VectorXi column_sig_figs(header.size());
-    Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> column_formats(header.size());
+    Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1> column_formats(
+        header.size());
 
     Eigen::VectorXi column_widths(header.size());
     column_widths = calculate_column_widths(param_stats, header, sig_figs,
-					     column_formats);
+                                            column_formats);
 
     // Print to console
     write_timing(chains, metadata, warmup_times, sampling_times, thin, "",
-		 &std::cout);
+                 &std::cout);
     std::cout << std::endl;
     write_header(header, column_widths, max_name_length, false, &std::cout);
     std::cout << std::endl;
     write_stats(param_names, param_stats, column_widths, column_formats,
-		max_name_length, sig_figs, false, &std::cout);
+                max_name_length, sig_figs, false, &std::cout);
     std::cout << std::endl;
     write_sampler_info(metadata, "", &std::cout);
 
@@ -208,9 +212,9 @@ Options:
 
       write_header(header, column_widths, max_name_length, true, &csv_file);
       write_stats(param_names, param_stats, column_widths, column_formats,
-		  max_name_length, sig_figs, true, &csv_file);
+                  max_name_length, sig_figs, true, &csv_file);
       write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
-		   &csv_file);
+                   &csv_file);
       write_sampler_info(metadata, "# ", &csv_file);
       csv_file.close();
     }
