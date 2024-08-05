@@ -32,12 +32,18 @@ TEST(McmcPersistentSampler, check_persistency) {
   } catch (...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
+  std::cout << command_output << std::endl;
 
   std::ifstream output_stream;
   output_stream.open((convert_model_path(model_path) + ".csv").data());
 
   stan::io::stan_csv parsed_output
       = stan::io::stan_csv_reader::parse(output_stream, 0);
+
+  std::cout << "parsed_output samples " << parsed_output.samples.rows() << std::endl;
+  std::cout << "parsed_output metadata " << parsed_output.metadata.num_samples << std::endl;
+
+
   stan::mcmc::chains<> chains(parsed_output);
 
   for (int i = 0; i < chains.num_params(); ++i) {
