@@ -119,7 +119,7 @@ Options:
     }
   }
 
-  std::vector<stan::io::stan_csv> csv_files(filenames.size());
+  std::vector<stan::io::stan_csv> csv_files;
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
   Eigen::VectorXi thin(filenames.size());
@@ -131,7 +131,7 @@ Options:
     try {
       sample = stan::io::stan_csv_reader::parse(infile, &out);
       // csv_reader warnings are errors - fail fast.
-      if (out.str() != "") {
+      if (!out.str().empty()) {
 	throw std::invalid_argument(out.str());
       }
       csv_files.push_back(sample);
@@ -174,7 +174,6 @@ Options:
     stan::mcmc::chainset<> chains(csv_files);
 
     Eigen::MatrixXd param_stats(num_params, header.size());
-
     get_stats(chains, probs, param_names, param_stats);
 
     // Console output formatting
@@ -192,7 +191,7 @@ Options:
     write_header(header, column_widths, max_name_length, false, &std::cout);
     std::cout << std::endl;
     write_stats(param_names, param_stats, column_widths, column_formats,
-		max_name_length, false, true, &std::cout);
+		max_name_length, sig_figs, false, &std::cout);
     std::cout << std::endl;
     write_sampler_info(metadata, "", &std::cout);
 

@@ -96,7 +96,7 @@ int column_width(const Eigen::VectorXd &x, const std::string &name,
   int padding = 2;
 
   // Fixed Precision
-  size_t fixed_threshold = 8;
+  size_t fixed_threshold = 10;
   size_t max_fixed_width = 0;
 
   for (int i = 0; i < x.size(); ++i) {
@@ -443,9 +443,8 @@ void write_stats(const std::vector<std::string> &param_names,
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
         std::cout.setf(col_formats(j), std::ios::floatfield);
-        *out << std::setprecision(
-            compute_precision(stats(i, j), sig_figs,
-                              col_formats(j) == std::ios_base::scientific))
+        *out << std::setprecision(compute_precision(stats(i, j), sig_figs, false))
+	 //                              col_formats(j) == std::ios_base::scientific))
              << std::setw(col_widths(j)) << stats(i, j);
       }
     }
@@ -558,12 +557,15 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
        << " with " << metadata.engine << "." << std::endl;
   *out << prefix
        << "For each parameter, N_Eff_bulk and N_Eff_tail measure the "
-          "effective sample size for the entire sample and for the "
+          "effective sample size "
+       << std::endl
+       << "for the entire sample and for the "
            "the .05 and .95 tails, respectively, "
        << std::endl;
   *out << prefix
        << "and R_hat_bulk and R_hat_tail measure the potential scale reduction "
-          "on split chains, (at convergence will be very close to 1)."
+       << std::endl
+       << "on split chains, (at convergence will be very close to 1)."
        << std::endl;
 }
 
