@@ -563,23 +563,17 @@ int command(int argc, const char *argv[]) {
     list_argument *algo = dynamic_cast<list_argument *>(
         parser.arg("method")->arg("sample")->arg("algorithm"));
     std::string algo_name = algo->value();
-    bool use_fixed_param
-        = model.num_params_r() == 0 || algo_name == "fixed_param";
 
     bool adapt_engaged = get_arg_val<bool_argument>(parser, "method", "sample",
                                                     "adapt", "engaged");
-    if (!use_fixed_param && adapt_engaged == true && num_warmup == 0) {
+    if (algo_name != "fixed_param" && adapt_engaged == true
+        && num_warmup == 0) {
       msg << "The number of warmup samples (num_warmup) must be greater than "
           << "zero if adaptation is enabled." << std::endl;
       throw std::invalid_argument(msg.str());
     }
 
-    if (use_fixed_param) {
-      if (algo_name != "fixed_param") {
-        info(
-            "Model contains no parameters, running fixed_param sampler, "
-            "no updates to Markov chain");
-      }
+    if (algo_name == "fixed_param") {
       return_code = stan::services::sample::fixed_param(
           model, num_chains, init_contexts, random_seed, id, init_radius,
           num_samples, num_thin, refresh, interrupt, logger, init_writers,
