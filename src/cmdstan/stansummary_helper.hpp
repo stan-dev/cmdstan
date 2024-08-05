@@ -343,7 +343,7 @@ std::vector<std::string> get_header(
  * N_eff_bulk, N_eff_tail, R-hat_bulk, R-hat_tail
  * Populate data structure for output, one row per parameter,
  * one column per statistic.
- * 
+ *
  * Note:  if you change this function, change get_header above
  *
  * @param chains vector of matrices of per-chain draws
@@ -352,8 +352,8 @@ std::vector<std::string> get_header(
  * @param stats matrix of computed statistics
  */
 void get_stats(const stan::mcmc::chainset<> &chains,
-               const Eigen::VectorXd &probs, std::vector<std::string> param_names,
-               Eigen::MatrixXd &stats) {
+               const Eigen::VectorXd &probs,
+               std::vector<std::string> param_names, Eigen::MatrixXd &stats) {
   stats.setZero();
   size_t i = 0;
   for (std::string name : param_names) {
@@ -417,12 +417,12 @@ void write_header(const std::vector<std::string> &header,
  * @param out output stream
  */
 void write_stats(const std::vector<std::string> &param_names,
-                  const Eigen::MatrixXd &stats,
-                  const Eigen::VectorXi &col_widths,
-                  const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic,
-                                      1> &col_formats,
-                  int max_name_length, int sig_figs,
-                  bool as_csv, std::ostream *out) {
+                 const Eigen::MatrixXd &stats,
+                 const Eigen::VectorXi &col_widths,
+                 const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>
+                     &col_formats,
+                 int max_name_length, int sig_figs, bool as_csv,
+                 std::ostream *out) {
   bool in_sampler_params = true;
   if (!boost::ends_with(param_names[0], "__")) {
     in_sampler_params = false;
@@ -434,17 +434,19 @@ void write_stats(const std::vector<std::string> &param_names,
         *out << "," << stats(i, j);
       }
     } else {
-      if (i > 0 && in_sampler_params && !boost::ends_with(param_names[i], "__")) {
-	in_sampler_params = false;
-	std::cout << std::endl;
+      if (i > 0 && in_sampler_params
+          && !boost::ends_with(param_names[i], "__")) {
+        in_sampler_params = false;
+        std::cout << std::endl;
       }
-      *out << std::setw(max_name_length + 1) << std::left
-           << param_names[i];
+      *out << std::setw(max_name_length + 1) << std::left << param_names[i];
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
         std::cout.setf(col_formats(j), std::ios::floatfield);
-        *out << std::setprecision(compute_precision(stats(i, j), sig_figs, false))
-	 //                              col_formats(j) == std::ios_base::scientific))
+        *out << std::setprecision(
+            compute_precision(stats(i, j), sig_figs, false))
+             //                              col_formats(j) ==
+             //                              std::ios_base::scientific))
              << std::setw(col_widths(j)) << stats(i, j);
       }
     }
@@ -470,8 +472,8 @@ void write_timing(const stan::mcmc::chainset<> &chains,
                   const Eigen::VectorXi &thin, const std::string &prefix,
                   std::ostream *out) {
   *out << prefix << "Inference for Stan model: " << metadata.model << std::endl
-       << prefix << chains.num_chains() << " chains: each with iter="
-       << metadata.num_samples;
+       << prefix << chains.num_chains()
+       << " chains: each with iter=" << metadata.num_samples;
   *out << "; warmup=" << metadata.num_warmup;
   *out << "; thin=" << metadata.thin;
   *out << "; " << chains.num_samples() << " iterations saved." << std::endl
@@ -560,7 +562,7 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
           "effective sample size "
        << std::endl
        << "for the entire sample and for the "
-           "the .05 and .95 tails, respectively, "
+          "the .05 and .95 tails, respectively, "
        << std::endl;
   *out << prefix
        << "and R_hat_bulk and R_hat_tail measure the potential scale reduction "
