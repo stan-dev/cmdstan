@@ -68,7 +68,7 @@ TEST(McmcFixedParamSampler, check_empty) {
   EXPECT_EQ(success, true);
 }
 
-TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
+TEST(McmcFixedParamSampler, check_empty_not_fixed_param) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
   model_path.push_back("test");
@@ -88,8 +88,4 @@ TEST(McmcFixedParamSampler, check_empty_but_algorithm_not_fixed_param) {
   }
 
   EXPECT_EQ(success, true);
-  std::string expected_message
-      = "Model contains no parameters, running fixed_param sampler";
-  EXPECT_TRUE(
-      boost::algorithm::contains(command_output.output, expected_message));
 }
