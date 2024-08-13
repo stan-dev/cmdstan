@@ -26,6 +26,7 @@ There are separate repositories here on GitHub for interfaces:
 * [CmdStanR](https://github.com/stan-dev/cmdstanr) (a lightweight interface to CmdStan for R users)
 * [PyStan](https://github.com/stan-dev/pystan) (Python interface)
 * [RStan](https://github.com/stan-dev/rstan) (R interface)
+* [MathematicaStan](https://github.com/stan-dev/MathematicaStan) (Mathematica interface)
 
 ### Source Repository
 CmdStan's source-code repository is hosted here on GitHub.
