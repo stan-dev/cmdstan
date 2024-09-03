@@ -213,19 +213,19 @@ jobs:
         tar -xvzf cmdstan-${{ github.event.inputs.tarball_name }}.tar.gz
     
     - name: Download MacOS binaries
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
           name: mac-stanc
           path: bins/mac-stanc
 
     - name: Download Linux binaries
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
           name: linux-stanc
           path: bins/linux-stanc
 
     - name: Download Windows binaries
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
           name: windows-stanc
           path: bins/windows-stanc
