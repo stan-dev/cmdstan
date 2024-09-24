@@ -352,8 +352,7 @@ std::vector<std::string> get_header(
  * @param param_names vector of requested parameter names
  * @param stats matrix of computed statistics
  */
-void get_stats(const stan::mcmc::chainset &chains,
-               const Eigen::VectorXd &probs,
+void get_stats(const stan::mcmc::chainset &chains, const Eigen::VectorXd &probs,
                std::vector<std::string> param_names, Eigen::MatrixXd &stats) {
   stats.setZero();
   size_t i = 0;
