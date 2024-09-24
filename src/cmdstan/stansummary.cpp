@@ -174,7 +174,7 @@ Options:
   }
   try {
     std::vector<std::string> header = get_header(percentiles);
-    stan::mcmc::chainset<> chains(csv_files);
+    stan::mcmc::chainset chains(csv_files);
 
     Eigen::MatrixXd param_stats(num_params, header.size());
     get_stats(chains, probs, param_names, param_stats);
