@@ -166,7 +166,7 @@ bool is_container(const std::string &parameter_name) {
  * @param in column index
  * @return variable name
  */
-std::string base_param_name(const stan::mcmc::chainset<> &chains, int index) {
+std::string base_param_name(const stan::mcmc::chainset &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(0, name.find("["));
 }
@@ -178,7 +178,7 @@ std::string base_param_name(const stan::mcmc::chainset<> &chains, int index) {
  * @param in column index
  * @return parameter name
  */
-std::string matrix_index(const stan::mcmc::chainset<> &chains, int index) {
+std::string matrix_index(const stan::mcmc::chainset &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(name.find("["));
 }
@@ -190,7 +190,7 @@ std::string matrix_index(const stan::mcmc::chainset<> &chains, int index) {
  * @param in column index of first container element
  * @return vector of dimensions
  */
-std::vector<int> dimensions(const stan::mcmc::chainset<> &chains,
+std::vector<int> dimensions(const stan::mcmc::chainset &chains,
                             int start_index) {
   std::vector<int> dims;
   int dim;
@@ -325,21 +325,22 @@ std::vector<std::string> get_header(
   std::vector<std::string> header(percentiles.size() + 7);
   header.at(0) = "Mean";
   header.at(1) = "MCSE";
-  header.at(2) = "MaxAbsDev";
+  header.at(2) = "StdDev";
+  header.at(3) = "MAD";
+  size_t offset = 4;
   for (size_t i = 0; i < percentiles.size(); ++i) {
-    header[i + 3] = percentiles[i] + '%';
+    header[i + offset] = percentiles[i] + '%';
   }
-  size_t offset = 3 + percentiles.size();
-  header.at(offset) = "N_Eff_bulk";
-  header.at(offset + 1) = "N_Eff_tail";
-  header.at(offset + 2) = "R_hat_bulk";
-  header.at(offset + 3) = "R_hat_tail";
+  offset += percentiles.size();
+  header.at(offset++) = "N_Eff_bulk";
+  header.at(offset++) = "N_Eff_tail";
+  header.at(offset++) = "R_hat";
   return header;
 }
 
 /**
  * Compute per-parameters statistics, consisting of:
- * Mean, MCSE, MaxAbsDev, specified quantile(s),
+ * Mean, MCSE, MAD, specified quantile(s),
  * N_eff_bulk, N_eff_tail, R-hat_bulk, R-hat_tail
  * Populate data structure for output, one row per parameter,
  * one column per statistic.
@@ -351,7 +352,7 @@ std::vector<std::string> get_header(
  * @param param_names vector of requested parameter names
  * @param stats matrix of computed statistics
  */
-void get_stats(const stan::mcmc::chainset<> &chains,
+void get_stats(const stan::mcmc::chainset &chains,
                const Eigen::VectorXd &probs,
                std::vector<std::string> param_names, Eigen::MatrixXd &stats) {
   stats.setZero();
@@ -359,19 +360,19 @@ void get_stats(const stan::mcmc::chainset<> &chains,
   for (std::string name : param_names) {
     stats(i, 0) = chains.mean(name);
     stats(i, 1) = chains.mcse_mean(name);
-    stats(i, 2) = chains.max_abs_deviation(name);
+    stats(i, 2) = chains.sd(name);
+    stats(i, 3) = chains.max_abs_deviation(name);
+    size_t offset = 4;
     Eigen::VectorXd quantiles = chains.quantiles(name, probs);
     for (int j = 0; j < quantiles.size(); j++)
-      stats(i, 3 + j) = quantiles(j);
-    size_t offset = 3 + quantiles.size();
+      stats(i, offset++) = quantiles(j);
     double ess_bulk, ess_tail;
     std::tie(ess_bulk, ess_tail) = chains.split_rank_normalized_ess(name);
-    stats(i, offset) = ess_bulk;
-    stats(i, offset + 1) = ess_tail;
+    stats(i, offset++) = ess_bulk;
+    stats(i, offset++) = ess_tail;
     double rhat_bulk, rhat_tail;
     std::tie(rhat_bulk, rhat_tail) = chains.split_rank_normalized_rhat(name);
-    stats(i, offset + 2) = rhat_bulk;
-    stats(i, offset + 3) = rhat_tail;
+    stats(i, offset) = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
     i++;
   }
 }
@@ -465,7 +466,7 @@ void write_stats(const std::vector<std::string> &param_names,
  * @param in prefix string - used to output as comments in csv file
  * @param out output stream
  */
-void write_timing(const stan::mcmc::chainset<> &chains,
+void write_timing(const stan::mcmc::chainset &chains,
                   const stan::io::stan_csv_metadata &metadata,
                   const Eigen::VectorXd &warmup_times,
                   const Eigen::VectorXd &sampling_times,
@@ -584,7 +585,7 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
  * @param in size of longest sampler param name
  */
 // autocorrelation report prints to std::out
-void autocorrelation(const stan::mcmc::chainset<> &chains,
+void autocorrelation(const stan::mcmc::chainset &chains,
                      const stan::io::stan_csv_metadata &metadata,
                      int autocorr_idx, int max_name_length) {
   int c = autocorr_idx - 1;
