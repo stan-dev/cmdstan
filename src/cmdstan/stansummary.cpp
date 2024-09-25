@@ -95,6 +95,7 @@ Options:
               << " not a valid chain id." << std::endl;
     return return_codes::NOT_OK;
   }
+
   std::vector<std::string> percentiles;
   Eigen::VectorXd probs;
   boost::algorithm::trim(percentiles_spec);

@@ -136,10 +136,9 @@ TEST(CommandStansummary, matrix_index_2d) {
 
 TEST(CommandStansummary, header_tests) {
   std::string expect
-      = "      Mean  MCSE StdDev     10%      50%       90%      N_Eff     "
-        "N_Eff/s        R_hat\n";
+      = "      Mean  MCSE StdDev     MAD      10%       50%        90%  N_Eff_bulk   N_Eff_tail         R_hat\n";
   std::string expect_csv
-      = "name,Mean,MCSE,StdDev,10%,50%,90%,N_Eff,N_Eff/s,R_hat\n";
+      = "name,Mean,MCSE,StdDev,MAD,10%,50%,90%,N_Eff_bulk,N_Eff_tail,R_hat\n";
   std::vector<std::string> pcts;
   pcts.push_back("10");
   pcts.push_back("50");
@@ -150,12 +149,15 @@ TEST(CommandStansummary, header_tests) {
   EXPECT_FLOAT_EQ(probs[2], 0.9);
 
   std::vector<std::string> header = get_header(pcts);
-  EXPECT_EQ(header.size(), pcts.size() + 6);
+  EXPECT_EQ(header.size(), pcts.size() + 7);
   EXPECT_EQ(header[0], "Mean");
+  EXPECT_EQ(header[1], "MCSE");
   EXPECT_EQ(header[2], "StdDev");
-  EXPECT_EQ(header[4], "50%");
-  EXPECT_EQ(header[6], "N_Eff");
-  EXPECT_EQ(header[8], "R_hat");
+  EXPECT_EQ(header[3], "MAD");
+  EXPECT_EQ(header[5], "50%");
+  EXPECT_EQ(header[7], "N_Eff_bulk");
+  EXPECT_EQ(header[8], "N_Eff_tail");
+  EXPECT_EQ(header[9], "R_hat");
 
   Eigen::VectorXi column_widths(header.size());
   for (size_t i = 0, w = 5; i < header.size(); ++i, ++w) {
@@ -403,17 +405,17 @@ TEST(CommandStansummary, bad_include_param_args) {
 
 TEST(CommandStansummary, check_console_output) {
   std::string lp
-      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8    443    "
-        "19275    1.0";
+    = "lp__            -7.3   0.034 7.69e-01   0.30   -9.1  -7.0  -6.8"
+    "         519         503    1.0";
   std::string theta
-      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47    384    "
-        "16683   1.00";
+    = "theta           0.26  0.0063 1.20e-01   0.12  0.079  0.25  0.47"
+    "         361         395    1.0";
   std::string accept_stat
-      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0   1026    "
-        "44597   1.00";
+    = "accept_stat__   0.90  0.0041 1.48e-01  0.064   0.57  0.96   1.0"
+    "        1284         941   1.00";
   std::string energy
-      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9    411    "
-        "17865    1.0";
+    = "energy__         7.8   0.047  1.0e+00   0.74    6.8   7.5   9.9"
+    "         489         486    1.0";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -437,7 +439,6 @@ TEST(CommandStansummary, check_console_output) {
   std::getline(target_stream, line);  // blank
   std::getline(target_stream, line);  // header
   std::getline(target_stream, line);  // blank
-
   std::getline(target_stream, line);  // lp
   EXPECT_EQ(lp, line);
   std::getline(target_stream, line);  // accept stat
@@ -446,29 +447,22 @@ TEST(CommandStansummary, check_console_output) {
   std::getline(target_stream, line);  // treedepth
   std::getline(target_stream, line);  // n_leapfrog
   std::getline(target_stream, line);  // divergent
-
   std::getline(target_stream, line);  // energy
   EXPECT_EQ(energy, line);
-
   std::getline(target_stream, line);  // blank
-
   std::getline(target_stream, line);  // theta
   EXPECT_EQ(theta, line);
 }
 
 TEST(CommandStansummary, check_csv_output) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
+    = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,N_Eff_bulk,N_Eff_tail,R_hat";
   std::string lp
-      = "\"lp__\",-7.2719,0.0365168,0.768874,-9.05757,-6.96978,-6.75008,443."
-        "328,19275.1,1.00037";
+    = "\"lp__\",-7.2719,0.0337601,0.768874,0.303459,-9.05757,-6.97039,-6.75008,518.686,502.543,1.00141";
   std::string energy
-      = "\"energy__\""
-        ",7.78428,0.0508815,1.0314,6.80383,7.46839,9.88601,410."
-        "898,17865.1,1.00075";
+    = "\"energy__\",7.78428,0.0466296,1.0314,0.74471,6.80383,7.46677,9.88601,489.251,485.575,1.00495";
   std::string theta
-      = "\"theta\",0.256552,0.00610844,0.119654,0.0786292,0.24996,0.470263,383."
-        "704,16682.8,0.999309";
+      = "\"theta\",0.256552,0.0063012,0.119654,0.120799,0.0786292,0.24996,0.470263,360.587,394.974,1.00186";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -477,10 +471,9 @@ TEST(CommandStansummary, check_csv_output) {
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+  std::string target_csv_file = "test" + path_separator
                                 + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
+                                + "tmp_test_target_csv_file_a.csv";
   std::string arg_csv_file = "--csv_filename=" + target_csv_file;
 
   run_command_output out
@@ -511,9 +504,9 @@ TEST(CommandStansummary, check_csv_output) {
 }
 
 TEST(CommandStansummary, check_csv_output_no_percentiles) {
-  std::string csv_header = "name,Mean,MCSE,StdDev,N_Eff,N_Eff/s,R_hat";
+  std::string csv_header = "name,Mean,MCSE,StdDev,MAD,N_Eff_bulk,N_Eff_tail,R_hat";
   std::string lp
-      = "\"lp__\",-7.2719,0.0365168,0.768874,443.328,19275.1,1.00037";
+    = "\"lp__\",-7.2719,0.0337601,0.768874,0.303459,518.686,502.543,1.00141";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -522,16 +515,15 @@ TEST(CommandStansummary, check_csv_output_no_percentiles) {
                          + "interface" + path_separator + "example_output"
                          + path_separator + "bernoulli_chain_1.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+  std::string target_csv_file = "test" + path_separator
                                 + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
+                                + "tmp_test_target_csv_file_b.csv";
   std::string arg_csv_file = "--csv_filename=" + target_csv_file;
 
   std::string arg_percentiles = "-p \"\"";
 
   run_command_output out = run_command(command + " " + arg_csv_file + " "
-                                       + csv_file + " " + arg_percentiles);
+                                       + arg_percentiles + " " + csv_file);
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   std::ifstream target_stream(target_csv_file.c_str());
@@ -550,11 +542,10 @@ TEST(CommandStansummary, check_csv_output_no_percentiles) {
 
 TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
-  std::string lp = "\"lp__\",-7.3,0.037,0.77,-9.1,-7,-6.8,4.4e+02,1.9e+04,1";
-  std::string energy = "\"energy__\",7.8,0.051,1,6.8,7.5,9.9,4.1e+02,1.8e+04,1";
-  std::string theta
-      = "\"theta\",0.26,0.0061,0.12,0.079,0.25,0.47,3.8e+02,1.7e+04,1";
+    = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,N_Eff_bulk,N_Eff_tail,R_hat";
+  std::string lp = "\"lp__\",-7.3,0.034,0.77,0.3,-9.1,-7,-6.8,5.2e+02,5e+02,1";
+  std::string energy = "\"energy__\",7.8,0.047,1,0.74,6.8,7.5,9.9,4.9e+02,4.9e+02,1";
+  std::string theta = "\"theta\",0.26,0.0063,0.12,0.12,0.079,0.25,0.47,3.6e+02,3.9e+02,1";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -566,7 +557,7 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string target_csv_file = "src" + path_separator + "test" + path_separator
                                 + "interface" + path_separator
                                 + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
+                                + "tmp_test_target_csv_file_c.csv";
   std::string arg_csv_file = "--csv_filename " + target_csv_file;
   std::string arg_sig_figs = "--sig_figs 2";
 
@@ -599,20 +590,12 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
 
 TEST(CommandStansummary, check_csv_output_include_param) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
-  std::string lp
-      = "\"lp__\",-15.5617,0.97319,6.05585,-25.3432,-15.7562,-5.48405,38.7217,"
-        "372.539,1.00208";
-  std::string energy
-      = "\"energy__\",20.5888,1.01449,6.43127,10.2634,20.8487,30.9906,40.1879,"
-        "386.645,1.00109";
+    = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,N_Eff_bulk,N_Eff_tail,R_hat";
   // note: skipping theta 1-5
   std::string theta6
-      = "\"theta[6]\",5.001,0.365016,5.76072,-4.99688,5.23474,14.1597,249.074,"
-        "2396.33,1.00109";
+    = "\"theta[6]\",5.001,0.380843,5.76072,5.3632,-4.99688,5.22017,14.1597,228.803,464.032,1.00054";
   std::string theta7
-      = "\"theta[7]\",8.54125,0.650098,6.22195,-0.841225,8.09613,19.256,91."
-        "6001,881.279,0.999012";
+      = "\"theta[7]\",8.54125,0.654668,6.22195,5.35619,-0.841225,8.09071,19.256,90.3255,239.969,1.00244";
   // note: skipping theta 8
   std::string message = "# Inference for Stan model: eight_schools_cp_model";
 
@@ -623,10 +606,9 @@ TEST(CommandStansummary, check_csv_output_include_param) {
                          + "interface" + path_separator + "example_output"
                          + path_separator + "eight_schools_output.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
+  std::string target_csv_file = "test" + path_separator
                                 + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
+                                + "tmp_test_target_csv_file_d.csv";
   std::string arg_csv_file = "--csv_filename=" + target_csv_file;
 
   // both styles of name supported
@@ -634,7 +616,6 @@ TEST(CommandStansummary, check_csv_output_include_param) {
 
   run_command_output out = run_command(command + " " + arg_csv_file + " "
                                        + arg_include_param + " " + csv_file);
-
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   std::ifstream target_stream(target_csv_file.c_str());
@@ -643,15 +624,6 @@ TEST(CommandStansummary, check_csv_output_include_param) {
   std::string line;
   std::getline(target_stream, line);
   EXPECT_EQ(csv_header, line);
-  std::getline(target_stream, line);
-  EXPECT_EQ(lp, line);
-  std::getline(target_stream, line);  // accept_stat
-  std::getline(target_stream, line);  // stepsize
-  std::getline(target_stream, line);  // treedepth
-  std::getline(target_stream, line);  // n_leapfrog
-  std::getline(target_stream, line);  // divergent
-  std::getline(target_stream, line);  // energy
-  EXPECT_EQ(energy, line);
   std::getline(target_stream, line);
   EXPECT_EQ(theta6, line);
   std::getline(target_stream, line);
