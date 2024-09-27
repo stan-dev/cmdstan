@@ -183,10 +183,8 @@ TEST_F(CmdStan, generate_quantities_warmup) {
 
   std::ifstream fp_stream(fp_path.c_str());
   stan::io::stan_csv fitted_params;
-  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
-                                           &msg);
-  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, false);
   stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
                                           fitted_params.timing, &msg);
   fp_stream.close();
@@ -195,9 +193,8 @@ TEST_F(CmdStan, generate_quantities_warmup) {
   stan::io::stan_csv gq_output;
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
-  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata, &msg);
-  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, false);
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
   gq_stream.close();
@@ -222,10 +219,8 @@ TEST_F(CmdStan, generate_quantities_after_optimization) {
 
   std::ifstream fp_stream(fp_path.c_str());
   stan::io::stan_csv fitted_params;
-  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
-                                           &msg);
-  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, false);
   stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
                                           fitted_params.timing, &msg);
   fp_stream.close();
@@ -234,9 +229,8 @@ TEST_F(CmdStan, generate_quantities_after_optimization) {
   stan::io::stan_csv gq_output;
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
-  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata, &msg);
-  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, false);
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
   gq_stream.close();
@@ -261,10 +255,8 @@ TEST_F(CmdStan, generate_quantities_after_vb) {
 
   std::ifstream fp_stream(fp_path.c_str());
   stan::io::stan_csv fitted_params;
-  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
-                                           &msg);
-  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, false);
   stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
                                           fitted_params.timing, &msg);
   fp_stream.close();
@@ -273,9 +265,8 @@ TEST_F(CmdStan, generate_quantities_after_vb) {
   stan::io::stan_csv gq_output;
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
-  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata, &msg);
-  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, false);
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
   gq_stream.close();
@@ -300,10 +291,8 @@ TEST_F(CmdStan, generate_quantities_thin) {
 
   std::ifstream fp_stream(fp_path.c_str());
   stan::io::stan_csv fitted_params;
-  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata,
-                                           &msg);
-  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(fp_stream, fitted_params.metadata);
+  stan::io::stan_csv_reader::read_header(fp_stream, fitted_params.header, false);
   stan::io::stan_csv_reader::read_samples(fp_stream, fitted_params.samples,
                                           fitted_params.timing, &msg);
   fp_stream.close();
@@ -312,9 +301,8 @@ TEST_F(CmdStan, generate_quantities_thin) {
   stan::io::stan_csv gq_output;
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
-  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata, &msg);
-  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, &msg,
-                                         false);
+  stan::io::stan_csv_reader::read_metadata(gq_stream, gq_output.metadata);
+  stan::io::stan_csv_reader::read_header(gq_stream, gq_output.header, false);
   stan::io::stan_csv_reader::read_samples(gq_stream, gq_output.samples,
                                           gq_output.timing, &msg);
   gq_stream.close();

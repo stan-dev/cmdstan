@@ -123,7 +123,7 @@ Options:
   std::vector<stan::io::stan_csv> csv_files;
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
-  Eigen::VectorXi thin(filenames.size());
+  Eigen::VectorXi thin(filenames.size());  // relevant for timing info
   for (int i = 0; i < filenames.size(); ++i) {
     std::ifstream infile;
     std::stringstream out;
@@ -135,6 +135,7 @@ Options:
       if (!out.str().empty()) {
         throw std::invalid_argument(out.str());
       }
+      stan::mcmc::validate_sample(sample);
       csv_files.push_back(sample);
       warmup_times(i) = sample.timing.warmup;
       sampling_times(i) = sample.timing.sampling;
