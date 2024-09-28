@@ -120,7 +120,7 @@ Options:
     }
   }
 
-  std::vector<stan::io::stan_csv> csv_files;
+  std::vector<stan::io::stan_csv> csv_parsed;
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
   Eigen::VectorXi thin(filenames.size());  // relevant for timing info
@@ -135,8 +135,7 @@ Options:
       if (!out.str().empty()) {
         throw std::invalid_argument(out.str());
       }
-      stan::mcmc::validate_sample(sample);
-      csv_files.push_back(sample);
+      csv_parsed.push_back(sample);
       warmup_times(i) = sample.timing.warmup;
       sampling_times(i) = sample.timing.sampling;
       thin(i) = sample.metadata.thin;
@@ -146,8 +145,8 @@ Options:
       return return_codes::NOT_OK;
     }
   }
-  stan::io::stan_csv_metadata metadata = csv_files[0].metadata;
-  std::vector<std::string> param_names = csv_files[0].header;
+  stan::io::stan_csv_metadata metadata = csv_parsed[0].metadata;
+  std::vector<std::string> param_names = csv_parsed[0].header;
   if (requested_params_vec.size() > 0) {
     std::set<std::string> requested_params(requested_params_vec.begin(),
                                            requested_params_vec.end());
@@ -176,7 +175,7 @@ Options:
   }
   try {
     std::vector<std::string> header = get_header(percentiles);
-    stan::mcmc::chainset chains(csv_files);
+    stan::mcmc::chainset chains(csv_parsed);
 
     Eigen::MatrixXd param_stats(num_params, header.size());
     get_stats(chains, probs, param_names, param_stats);
