@@ -87,7 +87,8 @@ int main(int argc, const char *argv[]) {
       int max_limit = metadata.max_depth;
       long n_max = 0;
       Eigen::MatrixXd draws = chains.samples(i);
-      Eigen::VectorXd t_samples = Eigen::Map<Eigen::VectorXd>(draws.data(), draws.size());
+      Eigen::VectorXd t_samples
+          = Eigen::Map<Eigen::VectorXd>(draws.data(), draws.size());
       for (long n = 0; n < t_samples.size(); ++n) {
         if (t_samples(n) >= max_limit) {
           ++n_max;
@@ -133,7 +134,8 @@ int main(int argc, const char *argv[]) {
       std::cout << "Checking E-BFMI - sampler transitions HMC potential energy."
                 << std::endl;
       Eigen::MatrixXd draws = chains.samples(i);
-      Eigen::VectorXd e_samples = Eigen::Map<Eigen::VectorXd>(draws.data(), draws.size());
+      Eigen::VectorXd e_samples
+          = Eigen::Map<Eigen::VectorXd>(draws.data(), draws.size());
       double delta_e_sq_mean = 0;
       double e_mean = chains.mean(i);
       double e_var = chains.variance(i);
@@ -164,7 +166,7 @@ int main(int argc, const char *argv[]) {
       double n_eff = ess_bulk > ess_tail ? ess_bulk : ess_tail;
       if (n_eff / num_samples < 0.001)
         bad_n_eff_names.push_back(param_names[i]);
-      
+
       double rhat_bulk, rhat_tail;
       std::tie(rhat_bulk, rhat_tail) = chains.split_rank_normalized_rhat(i);
       double split_rhat = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
