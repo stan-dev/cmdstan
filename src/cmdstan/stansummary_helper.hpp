@@ -444,9 +444,9 @@ void write_stats(const std::vector<std::string> &param_names,
       for (int j = 0; j < stats.cols(); j++) {
         std::cout.setf(col_formats(j), std::ios::floatfield);
         *out << std::setprecision(
-            compute_precision(stats(i, j), sig_figs, false))
-             //                              col_formats(j) ==
-             //                              std::ios_base::scientific))
+            compute_precision(stats(i, j),
+			      sig_figs,
+			      col_formats(j) == std::ios_base::scientific))
              << std::setw(col_widths(j)) << stats(i, j);
       }
     }
