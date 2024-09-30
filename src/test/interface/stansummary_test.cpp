@@ -405,18 +405,15 @@ TEST(CommandStansummary, bad_include_param_args) {
 }
 
 TEST(CommandStansummary, check_console_output) {
+  // values match CmdStanR, via posterior
   std::string lp
-      = "lp__            -7.3   0.034 7.69e-01   0.30   -9.1  -7.0  -6.8"
-        "         519         503    1.0";
+    = "lp__            -7.3   0.034  7.7e-01   0.30   -9.1  -7.0  -6.8         519         503    1.0";
   std::string theta
-      = "theta           0.26  0.0063 1.20e-01   0.12  0.079  0.25  0.47"
-        "         361         395    1.0";
+    = "theta           0.26  0.0063  1.2e-01   0.12  0.079  0.25  0.47         361         395    1.0";
   std::string accept_stat
-      = "accept_stat__   0.90  0.0041 1.48e-01  0.064   0.57  0.96   1.0"
-        "        1284         941   1.00";
+    = "accept_stat__   0.90  0.0041  1.5e-01  0.064   0.57  0.96   1.0        1284         941   1.00";
   std::string energy
-      = "energy__         7.8   0.047  1.0e+00   0.74    6.8   7.5   9.9"
-        "         489         486    1.0";
+    = "energy__         7.8   0.047  1.0e+00   0.74    6.8   7.5   9.9         489         486    1.0";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
