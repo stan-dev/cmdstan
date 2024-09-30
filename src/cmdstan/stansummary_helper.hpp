@@ -443,10 +443,8 @@ void write_stats(const std::vector<std::string> &param_names,
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
         std::cout.setf(col_formats(j), std::ios::floatfield);
-        *out << std::setprecision(
-            compute_precision(stats(i, j),
-			      sig_figs,
-			      col_formats(j) == std::ios_base::scientific))
+        *out << std::setprecision(compute_precision(
+            stats(i, j), sig_figs, col_formats(j) == std::ios_base::scientific))
              << std::setw(col_widths(j)) << stats(i, j);
       }
     }
