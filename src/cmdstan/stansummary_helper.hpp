@@ -332,8 +332,8 @@ std::vector<std::string> get_header(
     header[i + offset] = percentiles[i] + '%';
   }
   offset += percentiles.size();
-  header.at(offset++) = "N_Eff_bulk";
-  header.at(offset++) = "N_Eff_tail";
+  header.at(offset++) = "ESS_bulk";
+  header.at(offset++) = "ESS_tail";
   header.at(offset++) = "R_hat";
   return header;
 }
@@ -341,7 +341,7 @@ std::vector<std::string> get_header(
 /**
  * Compute per-parameters statistics, consisting of:
  * Mean, MCSE, MAD, specified quantile(s),
- * N_eff_bulk, N_eff_tail, R-hat_bulk, R-hat_tail
+ * ESS_bulk, ESS_tail, R-hat_bulk, R-hat_tail
  * Populate data structure for output, one row per parameter,
  * one column per statistic.
  *
@@ -442,6 +442,10 @@ void write_stats(const std::vector<std::string> &param_names,
       *out << std::setw(max_name_length + 1) << std::left << param_names[i];
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
+	if (boost::ends_with(param_names[i], "__")
+	    && param_names[i] != "lp__"
+	    && j >= stats.cols() - 3)
+	  continue;  // don't report ESS or Rhat for sampler state
         std::cout.setf(col_formats(j), std::ios::floatfield);
         *out << std::setprecision(
             compute_precision(stats(i, j),
