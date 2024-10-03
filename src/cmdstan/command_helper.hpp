@@ -284,20 +284,18 @@ void parse_stan_csv(const std::string &fname,
   std::stringstream msg;
   // parse CSV contents
   std::ifstream stream = file::safe_open(fname);
-  stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata,
-                                           &msg);
+  stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata);
   if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
-                                              &msg, false)) {
+                                              false)) {
     msg << "Error reading fitted param names from sample csv file \"" << fname
         << "\"" << std::endl;
     throw std::invalid_argument(msg.str());
   }
-  stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation,
-                                             &msg);
+  stan::io::stan_csv_reader::read_adaptation(stream, fitted_params.adaptation);
   fitted_params.timing.warmup = 0;
   fitted_params.timing.sampling = 0;
   stan::io::stan_csv_reader::read_samples(stream, fitted_params.samples,
-                                          fitted_params.timing, &msg);
+                                          fitted_params.timing);
   stream.close();
   // compute offset, size of parameters block
   col_offset = 0;

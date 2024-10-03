@@ -50,7 +50,7 @@ TEST_F(CmdStan, variational_default) {
 
   stan::mcmc::chains<> chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1001, chains.num_samples());
+  ASSERT_EQ(1000, chains.num_samples());
 }
 
 TEST_F(CmdStan, variational_meanfield) {
@@ -61,7 +61,7 @@ TEST_F(CmdStan, variational_meanfield) {
 
   stan::mcmc::chains<> chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1001, chains.num_samples());
+  ASSERT_EQ(1000, chains.num_samples());
 }
 
 TEST_F(CmdStan, variational_fullrank) {
@@ -72,5 +72,5 @@ TEST_F(CmdStan, variational_fullrank) {
 
   stan::mcmc::chains<> chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
-  ASSERT_EQ(1001, chains.num_samples());
+  ASSERT_EQ(1000, chains.num_samples());
 }
