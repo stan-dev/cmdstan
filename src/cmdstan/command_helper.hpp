@@ -285,8 +285,7 @@ void parse_stan_csv(const std::string &fname,
   // parse CSV contents
   std::ifstream stream = file::safe_open(fname);
   stan::io::stan_csv_reader::read_metadata(stream, fitted_params.metadata);
-  if (!stan::io::stan_csv_reader::read_header(stream,
-					      fitted_params.header,
+  if (!stan::io::stan_csv_reader::read_header(stream, fitted_params.header,
                                               false)) {
     msg << "Error reading fitted param names from sample csv file \"" << fname
         << "\"" << std::endl;
