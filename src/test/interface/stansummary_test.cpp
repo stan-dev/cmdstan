@@ -136,8 +136,8 @@ TEST(CommandStansummary, matrix_index_2d) {
 
 TEST(CommandStansummary, header_tests) {
   std::string expect
-    = "      Mean  MCSE StdDev     MAD      10%       50%        90%"
-      "    ESS_bulk     ESS_tail         R_hat\n";
+      = "      Mean  MCSE StdDev     MAD      10%       50%        90%"
+        "    ESS_bulk     ESS_tail         R_hat\n";
   std::string expect_csv
       = "name,Mean,MCSE,StdDev,MAD,10%,50%,90%,ESS_bulk,ESS_tail,R_hat\n";
   std::vector<std::string> pcts;
@@ -374,13 +374,15 @@ TEST(CommandStansummary, bad_include_param_args) {
 TEST(CommandStansummary, check_console_output) {
   // values match CmdStanR, via posterior
   std::string lp
-    = "lp__            -7.3   0.034  7.7e-01   0.30   -9.0  -7.0  -6.8       519       503    1.0";
+      = "lp__            -7.3   0.034  7.7e-01   0.30   -9.0  -7.0  -6.8       "
+        "519       503    1.0";
   std::string theta
-    = "theta           0.26  0.0063  1.2e-01   0.12  0.080  0.25  0.47       361       395    1.0";
+      = "theta           0.26  0.0063  1.2e-01   0.12  0.080  0.25  0.47       "
+        "361       395    1.0";
   std::string accept_stat
-    = "accept_stat__   0.90  0.0041  1.5e-01  0.064   0.57  0.96   1.0";
+      = "accept_stat__   0.90  0.0041  1.5e-01  0.064   0.57  0.96   1.0";
   std::string energy
-    = "energy__         7.8   0.047  1.0e+00   0.75    6.8   7.5   9.9";
+      = "energy__         7.8   0.047  1.0e+00   0.75    6.8   7.5   9.9";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -423,11 +425,14 @@ TEST(CommandStansummary, check_csv_output) {
   std::string csv_header
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   std::string lp
-    = "\"lp__\",-7.2719,0.0337601,0.768874,0.303688,-8.98426,-6.97009,-6.75007,518.686,502.543,1.00141";
+      = "\"lp__\",-7.2719,0.0337601,0.768874,0.303688,-8.98426,-6.97009,-6."
+        "75007,518.686,502.543,1.00141";
   std::string energy
-    = "\"energy__\",7.78428,0.0466296,1.0314,0.745859,6.80565,7.46758,9.8864,489.251,485.575,1.00495";
+      = "\"energy__\",7.78428,0.0466296,1.0314,0.745859,6.80565,7.46758,9.8864,"
+        "489.251,485.575,1.00495";
   std::string theta
-    = "\"theta\",0.256552,0.0063012,0.119654,0.120965,0.0802982,0.24996,0.47034,360.587,394.974,1.00186";
+      = "\"theta\",0.256552,0.0063012,0.119654,0.120965,0.0802982,0.24996,0."
+        "47034,360.587,394.974,1.00186";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -469,8 +474,7 @@ TEST(CommandStansummary, check_csv_output) {
 }
 
 TEST(CommandStansummary, check_csv_output_no_percentiles) {
-  std::string csv_header
-      = "name,Mean,MCSE,StdDev,MAD,ESS_bulk,ESS_tail,R_hat";
+  std::string csv_header = "name,Mean,MCSE,StdDev,MAD,ESS_bulk,ESS_tail,R_hat";
   std::string lp
       = "\"lp__\",-7.2719,0.0337601,0.768874,0.303688,518.686,502.543,1.00141";
 
@@ -511,9 +515,9 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   std::string lp = "\"lp__\",-7.3,0.034,0.77,0.3,-9,-7,-6.8,5.2e+02,5e+02,1";
   std::string energy
-    = "\"energy__\",7.8,0.047,1,0.75,6.8,7.5,9.9,4.9e+02,4.9e+02,1";
+      = "\"energy__\",7.8,0.047,1,0.75,6.8,7.5,9.9,4.9e+02,4.9e+02,1";
   std::string theta
-    = "\"theta\",0.26,0.0063,0.12,0.12,0.08,0.25,0.47,3.6e+02,3.9e+02,1";
+      = "\"theta\",0.26,0.0063,0.12,0.12,0.08,0.25,0.47,3.6e+02,3.9e+02,1";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
@@ -561,9 +565,11 @@ TEST(CommandStansummary, check_csv_output_include_param) {
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   // note: skipping theta 1-5
   std::string theta6
-    = "\"theta[6]\",5.001,0.380843,5.76072,5.37947,-4.95375,5.22746,14.1688,228.803,464.032,1.00054";
+      = "\"theta[6]\",5.001,0.380843,5.76072,5.37947,-4.95375,5.22746,14.1688,"
+        "228.803,464.032,1.00054";
   std::string theta7
-    = "\"theta[7]\",8.54125,0.654668,6.22195,5.35785,-0.814388,8.09342,19.2622,90.3255,239.969,1.00244";
+      = "\"theta[7]\",8.54125,0.654668,6.22195,5.35785,-0.814388,8.09342,19."
+        "2622,90.3255,239.969,1.00244";
   // note: skipping theta 8
   std::string message = "# Inference for Stan model: eight_schools_cp_model";
 

@@ -442,10 +442,9 @@ void write_stats(const std::vector<std::string> &param_names,
       *out << std::setw(max_name_length + 1) << std::left << param_names[i];
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
-	if (boost::ends_with(param_names[i], "__")
-	    && param_names[i] != "lp__"
-	    && j >= stats.cols() - 3)
-	  continue;  // don't report ESS or Rhat for sampler state
+        if (boost::ends_with(param_names[i], "__") && param_names[i] != "lp__"
+            && j >= stats.cols() - 3)
+          continue;  // don't report ESS or Rhat for sampler state
         std::cout.setf(col_formats(j), std::ios::floatfield);
         *out << std::setprecision(compute_precision(
             stats(i, j), sig_figs, col_formats(j) == std::ios_base::scientific))
