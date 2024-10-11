@@ -140,8 +140,8 @@ Options:
       sampling_times(i) = sample.timing.sampling;
       thin(i) = sample.metadata.thin;
     } catch (const std::invalid_argument &e) {
-      std::cout << "Cannot parse input csv file: " << filenames[i] << e.what()
-                << "." << std::endl;
+      std::cout << "Cannot parse input csv file: " << filenames[i]
+		<< ", error: " << e.what() << std::endl;
       return return_codes::NOT_OK;
     }
   }
