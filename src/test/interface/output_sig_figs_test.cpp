@@ -1,7 +1,7 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/mcmc/chains.hpp>
+#include <stan/mcmc/chainset.hpp>
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
 
@@ -22,14 +22,12 @@ TEST(interface, output_sig_figs_1) {
   EXPECT_FALSE(out.hasError);
 
   std::string csv_file = cmdstan::test::convert_model_path(model_path) + ".csv";
-  std::vector<std::string> filenames;
-  filenames.push_back(csv_file);
-  stan::io::stan_csv_metadata metadata;
-  Eigen::VectorXd warmup_times(filenames.size());
-  Eigen::VectorXd sampling_times(filenames.size());
-  Eigen::VectorXi thin(filenames.size());
-  stan::mcmc::chains<> chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  std::ifstream infile;
+  std::stringstream warnings;
+  stan::io::stan_csv sample;
+  infile.open(csv_file.c_str());
+  sample = stan::io::stan_csv_reader::parse(infile, &warnings);
+  stan::mcmc::chainset chains(sample);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.1, 1E-16);
 }
 
@@ -50,14 +48,12 @@ TEST(interface, output_sig_figs_2) {
   EXPECT_FALSE(out.hasError);
 
   std::string csv_file = cmdstan::test::convert_model_path(model_path) + ".csv";
-  std::vector<std::string> filenames;
-  filenames.push_back(csv_file);
-  stan::io::stan_csv_metadata metadata;
-  Eigen::VectorXd warmup_times(filenames.size());
-  Eigen::VectorXd sampling_times(filenames.size());
-  Eigen::VectorXi thin(filenames.size());
-  stan::mcmc::chains<> chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  std::ifstream infile;
+  std::stringstream warnings;
+  stan::io::stan_csv sample;
+  infile.open(csv_file.c_str());
+  sample = stan::io::stan_csv_reader::parse(infile, &warnings);
+  stan::mcmc::chainset chains(sample);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.12, 1E-16);
 }
 
@@ -78,13 +74,11 @@ TEST(interface, output_sig_figs_9) {
   EXPECT_FALSE(out.hasError);
 
   std::string csv_file = cmdstan::test::convert_model_path(model_path) + ".csv";
-  std::vector<std::string> filenames;
-  filenames.push_back(csv_file);
-  stan::io::stan_csv_metadata metadata;
-  Eigen::VectorXd warmup_times(filenames.size());
-  Eigen::VectorXd sampling_times(filenames.size());
-  Eigen::VectorXi thin(filenames.size());
-  stan::mcmc::chains<> chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  std::ifstream infile;
+  std::stringstream warnings;
+  stan::io::stan_csv sample;
+  infile.open(csv_file.c_str());
+  sample = stan::io::stan_csv_reader::parse(infile, &warnings);
+  stan::mcmc::chainset chains(sample);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.123456789, 1E-16);
 }
