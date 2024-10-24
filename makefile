@@ -160,10 +160,9 @@ help:
 	@echo ''
 	@echo '    This target will:'
 	@echo '    1. Install the Stan compiler bin/stanc$(EXE) from stanc3 binaries.'
-	@echo '    2. Build the print utility bin/print$(EXE) (deprecated; will be removed in v3.0)'
-	@echo '    3. Build the stansummary utility bin/stansummary$(EXE)'
-	@echo '    4. Build the diagnose utility bin/diagnose$(EXE)'
-	@echo '    5. Build all libraries and object files compile and link an executable Stan program'
+	@echo '    2. Build the stansummary utility bin/stansummary$(EXE)'
+	@echo '    3. Build the diagnose utility bin/diagnose$(EXE)'
+	@echo '    4. Build all libraries and object files compile and link an executable Stan program'
 	@echo ''
 	@echo '    Note: to build using multiple cores, use the -j option to make, e.g., '
 	@echo '    for 4 cores:'
@@ -240,7 +239,6 @@ help-dev:
 	@echo ''
 	@echo 'Model related:'
 	@echo '- bin/stanc$(EXE): Download the Stan compiler binary.'
-	@echo '- bin/print$(EXE): Build the print utility. (deprecated)'
 	@echo '- bin/stansummary$(EXE): Build the stansummary utility.'
 	@echo '- bin/diagnose$(EXE): Build the diagnose utility.'
 	@echo ''
@@ -255,7 +253,7 @@ build-mpi: $(MPI_TARGETS)
 	@echo '--- boost mpi bindings built ---'
 
 .PHONY: build
-build: bin/stanc$(EXE) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+build: bin/stanc$(EXE) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/diagnose$(EXE)
 	@echo ''
 ifeq ($(OS),Windows_NT)
 		@echo 'NOTE: Please add $(TBB_BIN_ABSOLUTE_PATH) to your PATH variable.'
@@ -280,7 +278,7 @@ endif
 
 clean: clean-tests
 	@echo '  removing built CmdStan utilities'
-	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
+	$(RM) bin/stanc$(EXE) bin/stansummary$(EXE) bin/diagnose$(EXE)
 	$(RM) -r bin/cmdstan
 	@echo '  removing cached compiler objects'
 	$(RM) $(wildcard src/cmdstan/main*.o)

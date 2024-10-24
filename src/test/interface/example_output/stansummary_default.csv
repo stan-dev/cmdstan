@@ -1,0 +1,19 @@
+name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat
+"lp__",-7.28676,0.0202121,0.738616,0.329575,-8.7823,-6.99022,-6.7503,1512.77,1591.97,1.00073
+"accept_stat__",0.925878,0.0017776,0.116281,0.0378478,0.674387,0.974472,1,5207.13,3498.57,1.00097
+"stepsize__",0.904266,nan,0.019724,0.0209365,0.883328,0.900309,0.933117,nan,nan,nan
+"treedepth__",1.3515,0.00798399,0.479067,0,1,1,2,3601.3,3690.75,1.00019
+"n_leapfrog__",2.515,0.0230858,1.31423,0,1,3,3,3070.14,2630.54,1.00411
+"divergent__",0,nan,0,0,0,0,0,nan,nan,nan
+"energy__",7.7689,0.0271304,1.0079,0.744065,6.80125,7.45947,9.72882,1439.36,1817.6,1.00135
+"theta",0.251297,0.00327489,0.121547,0.123091,0.0771694,0.237476,0.473885,1407.51,1291.71,1.00679
+# Inference for Stan model: bernoulli_model
+# 4 chains: each with iter=1000; warmup=1000; thin=1; 1000 iterations saved.
+# 
+# Warmup took (0.0030, 0.0030, 0.0040, 0.0030) seconds, 0.013 seconds total
+# Sampling took (0.0090, 0.010, 0.010, 0.0090) seconds, 0.038 seconds total
+# Samples were drawn using hmc with nuts.
+# For each parameter, ESS_bulk and ESS_tail measure the effective sample size 
+for the entire sample and for the the .05 and .95 tails, respectively, 
+# and R_hat measures the potential scale reduction on split chains.
+At convergence R_hat will be very close to 1.00.
