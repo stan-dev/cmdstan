@@ -568,8 +568,7 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
   *out << prefix
        << "and R_hat measures the potential scale reduction on split chains."
        << std::endl
-       << "At convergence R_hat will be very close to 1.00."
-       << std::endl;
+       << "At convergence R_hat will be very close to 1.00." << std::endl;
 }
 
 /**

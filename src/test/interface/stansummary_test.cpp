@@ -361,20 +361,20 @@ TEST(CommandStansummary, bad_include_param_args) {
 }
 
 TEST(CommandStansummary, check_console_output) {
-  std::vector<std::string> header = {
-    "Mean", "MCSE", "StdDev", "MAD", "5%", "50%", "95%", "ESS_bulk", "ESS_tail", "R_hat"
-  };
-  std::vector<std::string> divergent = {
-    "divergent__", "0.00", "nan", "0.00", "0.00", "0.00", "0.00", "0.00"
-  };
-  std::vector<std::string> theta = {
-    "theta", "0.25", "0.0033", "0.12", "0.12", "0.077", "0.24", "0.47", "1408", "1292", "1.0"
-  };
+  std::vector<std::string> header
+      = {"Mean", "MCSE", "StdDev",   "MAD",      "5%",
+         "50%",  "95%",  "ESS_bulk", "ESS_tail", "R_hat"};
+  std::vector<std::string> divergent
+      = {"divergent__", "0.00", "nan", "0.00", "0.00", "0.00", "0.00", "0.00"};
+  std::vector<std::string> theta
+      = {"theta", "0.25", "0.0033", "0.12", "0.12", "0.077",
+         "0.24",  "0.47", "1408",   "1292", "1.0"};
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string csv_dir = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output" + path_separator;
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary ";
   for (int i = 1; i < 5; ++i) {
@@ -428,20 +428,24 @@ TEST(CommandStansummary, check_csv_output) {
   std::string csv_header
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   std::string lp
-    = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,-8.7823,-6.99022,-6.7503,1512.77,1591.97,1.00073";
+      = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,-8.7823,-6.99022,-6."
+        "7503,1512.77,1591.97,1.00073";
   std::string theta
-      = "\"theta\",0.251297,0.00327489,0.121547,0.123091,0.0771694,0.237476,0.473885,1407.51,1291.71,1.00679";
+      = "\"theta\",0.251297,0.00327489,0.121547,0.123091,0.0771694,0.237476,0."
+        "473885,1407.51,1291.71,1.00679";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string csv_dir = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output" + path_separator;
-  std::string target_csv_file = "test" + path_separator + "interface" + path_separator
-    + "tmp_test_target_csv_file_a.csv";
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_a.csv";
 
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-	     << "--csv_filename=" << target_csv_file;
+             << "--csv_filename=" << target_csv_file;
   for (int i = 1; i < 5; ++i) {
     ss_command << " " << csv_dir << "bern" << i << ".csv";
   }
@@ -479,19 +483,20 @@ TEST(CommandStansummary, check_csv_output) {
 TEST(CommandStansummary, check_csv_output_no_percentiles) {
   std::string csv_header = "name,Mean,MCSE,StdDev,MAD,ESS_bulk,ESS_tail,R_hat";
   std::string lp
-    = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,1512.77,1591.97,1.00073";
+      = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,1512.77,1591.97,1.00073";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string csv_dir = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output" + path_separator;
-  std::string target_csv_file = "test" + path_separator + "interface" + path_separator
-    + "tmp_test_target_csv_file_b.csv";
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_b.csv";
   std::string arg_percentiles = " -p \"\"";
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-	     << "--csv_filename=" << target_csv_file
-	     << arg_percentiles;
+             << "--csv_filename=" << target_csv_file << arg_percentiles;
   for (int i = 1; i < 5; ++i) {
     ss_command << " " << csv_dir << "bern" << i << ".csv";
   }
@@ -521,7 +526,8 @@ TEST(CommandStansummary, check_csv_output_no_percentiles) {
 TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string csv_header
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
-  std::string lp = "\"lp__\",-7.3,0.02,0.74,0.33,-8.8,-7,-6.8,1.5e+03,1.6e+03,1";
+  std::string lp
+      = "\"lp__\",-7.3,0.02,0.74,0.33,-8.8,-7,-6.8,1.5e+03,1.6e+03,1";
   std::string energy
       = "\"energy__\",7.8,0.027,1,0.74,6.8,7.5,9.7,1.4e+03,1.8e+03,1";
   std::string theta
@@ -530,14 +536,15 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string csv_dir = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output" + path_separator;
-  std::string target_csv_file = "test" + path_separator + "interface" + path_separator
-    + "tmp_test_target_csv_file_c.csv";
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_c.csv";
 
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-	     << "--csv_filename=" << target_csv_file
-	     << " --sig_figs 2";
+             << "--csv_filename=" << target_csv_file << " --sig_figs 2";
   for (int i = 1; i < 5; ++i) {
     ss_command << " " << csv_dir << "bern" << i << ".csv";
   }
@@ -578,23 +585,27 @@ TEST(CommandStansummary, check_csv_output_include_param) {
       = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   // note: skipping theta 1-5
   std::string theta6
-      = "\"theta[6]\",5.001,0.365016,5.76072,5.37947,-4.95375,5.22746,14.1688,230.645,464.978,1.00054";
+      = "\"theta[6]\",5.001,0.365016,5.76072,5.37947,-4.95375,5.22746,14.1688,"
+        "230.645,464.978,1.00054";
   std::string theta7
-      = "\"theta[7]\",8.54125,0.650098,6.22195,5.35785,-0.814388,8.09342,19.2622,92.3075,241.177,1.00244";
+      = "\"theta[7]\",8.54125,0.650098,6.22195,5.35785,-0.814388,8.09342,19."
+        "2622,92.3075,241.177,1.00244";
   std::string message = "# Inference for Stan model: eight_schools_cp_model";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string csv_dir = "src" + path_separator + "test" + path_separator
-    + "interface" + path_separator + "example_output" + path_separator;
-  std::string target_csv_file = "test" + path_separator + "interface" + path_separator
-    + "tmp_test_target_csv_file_d.csv";
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_d.csv";
 
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-	     << "--csv_filename=" << target_csv_file
-	     << " --include_param theta.6 -i theta[7] "
-	     << csv_dir << "eight_schools_output.csv";
+             << "--csv_filename=" << target_csv_file
+             << " --include_param theta.6 -i theta[7] " << csv_dir
+             << "eight_schools_output.csv";
 
   run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError);
