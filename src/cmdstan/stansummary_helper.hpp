@@ -284,7 +284,7 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
 }
 
 /**
- * Convert percentiles - int values in range (1,99)
+ * Convert percentiles - int values in range (0,100)
  * to probabilities - double values in range (0, 1).
  *
  * <p>Input values must be in strictly increasing order.
@@ -300,12 +300,12 @@ Eigen::VectorXd percentiles_to_probs(
   for (size_t i = 0; i < percentiles.size(); ++i) {
     try {
       pct = std::stod(percentiles[i]);
-      if (!std::isfinite(pct) || pct < 0.1 || pct > 99.9 || pct < cur_pct)
+      if (!std::isfinite(pct) || pct < 0.0 || pct > 100.0 || pct < cur_pct)
         throw std::exception();
       cur_pct = pct;
     } catch (const std::exception &e) {
       throw std::invalid_argument(
-          "values must be in range (0.1,99.9)"
+          "values must be in range (0, 100)"
           ", inclusive, and strictly increasing.");
     }
     probs[i] = pct / 100.0;
@@ -559,16 +559,16 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
   *out << prefix << "Samples were drawn using " << metadata.algorithm
        << " with " << metadata.engine << "." << std::endl;
   *out << prefix
-       << "For each parameter, N_Eff_bulk and N_Eff_tail measure the "
+       << "For each parameter, ESS_bulk and ESS_tail measure the "
           "effective sample size "
        << std::endl
        << "for the entire sample and for the "
           "the .05 and .95 tails, respectively, "
        << std::endl;
   *out << prefix
-       << "and R_hat_bulk and R_hat_tail measure the potential scale reduction "
+       << "and R_hat measures the potential scale reduction on split chains."
        << std::endl
-       << "on split chains, (at convergence will be very close to 1)."
+       << "At convergence R_hat will be very close to 1.00."
        << std::endl;
 }
 
