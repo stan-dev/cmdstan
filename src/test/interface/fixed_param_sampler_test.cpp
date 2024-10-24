@@ -1,6 +1,6 @@
 #include <test/utility.hpp>
 #include <stan/io/stan_csv_reader.hpp>
-#include <stan/mcmc/chains.hpp>
+#include <stan/mcmc/chainset.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
@@ -32,23 +32,16 @@ TEST(McmcPersistentSampler, check_persistency) {
   } catch (...) {
     ADD_FAILURE() << "Failed running command: " << command;
   }
-  std::cout << command_output << std::endl;
-
   std::ifstream output_stream;
   output_stream.open((convert_model_path(model_path) + ".csv").data());
 
   stan::io::stan_csv parsed_output
       = stan::io::stan_csv_reader::parse(output_stream, 0);
-
-  std::cout << "parsed_output samples " << parsed_output.samples.rows()
-            << std::endl;
-  std::cout << "parsed_output metadata " << parsed_output.metadata.num_samples
-            << std::endl;
-
-  stan::mcmc::chains<> chains(parsed_output);
+  stan::mcmc::chainset chains(parsed_output);
 
   for (int i = 0; i < chains.num_params(); ++i) {
-    test_constant(chains.samples(0, i));
+    auto draws = chains.samples(i);
+    test_constant(draws.col(0));
   }
 }
 

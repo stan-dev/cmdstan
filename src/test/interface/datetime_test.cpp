@@ -1,4 +1,3 @@
-#include <stan/mcmc/chains.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
