@@ -7,9 +7,9 @@ No divergent transitions found.
 Checking E-BFMI - sampler transitions HMC potential energy.
 E-BFMI satisfactory.
 
-Effective sample size satisfactory.
+Rank-normalized split effective sample size satisfactory for all parameters.
 
-The following parameters had split R-hat greater than 1.01:
+The following parameters had rank-normalized split R-hat greater than 1.01:
   mu[1], mu[2], sigma[1], theta
 Such high values indicate incomplete mixing and biased estimation.
 You should consider regularizating your model with additional prior information or a more effective parameterization.

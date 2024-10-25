@@ -284,7 +284,7 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
 }
 
 /**
- * Convert percentiles - int values in range (0,100)
+ * Convert percentiles - string-encoded doubles in range (0,100)
  * to probabilities - double values in range (0, 1).
  *
  * <p>Input values must be in strictly increasing order.
@@ -562,8 +562,8 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
        << "For each parameter, ESS_bulk and ESS_tail measure the "
           "effective sample size "
        << std::endl
-       << "for the entire sample and for the "
-          "the .05 and .95 tails, respectively, "
+       << "for the entire sample (bulk) and for the "
+          "the .05 and .95 tails (tail), "
        << std::endl;
   *out << prefix
        << "and R_hat measures the potential scale reduction on split chains."
