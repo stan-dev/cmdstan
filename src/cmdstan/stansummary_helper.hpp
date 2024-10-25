@@ -365,12 +365,10 @@ void get_stats(const stan::mcmc::chainset &chains, const Eigen::VectorXd &probs,
     Eigen::VectorXd quantiles = chains.quantiles(name, probs);
     for (int j = 0; j < quantiles.size(); j++)
       stats(i, offset++) = quantiles(j);
-    double ess_bulk, ess_tail;
-    std::tie(ess_bulk, ess_tail) = chains.split_rank_normalized_ess(name);
+    auto [ess_bulk, ess_tail] = chains.split_rank_normalized_ess(name);
     stats(i, offset++) = ess_bulk;
     stats(i, offset++) = ess_tail;
-    double rhat_bulk, rhat_tail;
-    std::tie(rhat_bulk, rhat_tail) = chains.split_rank_normalized_rhat(name);
+    auto [rhat_bulk, rhat_tail] = chains.split_rank_normalized_rhat(name);
     stats(i, offset) = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
     i++;
   }

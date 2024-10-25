@@ -161,14 +161,12 @@ int main(int argc, const char *argv[]) {
         std::cout << "E-BFMI satisfactory." << std::endl << std::endl;
       }
     } else if (param_names[i].find("__") == std::string::npos) {
-      double ess_bulk, ess_tail;
-      std::tie(ess_bulk, ess_tail) = chains.split_rank_normalized_ess(i);
+      auto [ess_bulk, ess_tail] = chains.split_rank_normalized_ess(i);
       double n_eff = ess_bulk > ess_tail ? ess_bulk : ess_tail;
       if (n_eff / num_samples < 0.001)
         bad_n_eff_names.push_back(param_names[i]);
 
-      double rhat_bulk, rhat_tail;
-      std::tie(rhat_bulk, rhat_tail) = chains.split_rank_normalized_rhat(i);
+      auto [rhat_bulk, rhat_tail] = chains.split_rank_normalized_rhat(i);
       double split_rhat = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
       if (split_rhat > RHAT_MAX)
         bad_rhat_names.push_back(param_names[i]);
