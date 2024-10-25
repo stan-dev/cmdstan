@@ -187,13 +187,14 @@ int main(int argc, const char *argv[]) {
               << std::endl;
   } else {
     std::cout << "Rank-normalized split effective sample size satisfactory "
-	      << "for all parameters." << std::endl
+              << "for all parameters." << std::endl
               << std::endl;
   }
 
   if (bad_rhat_names.size() > 0) {
     has_errors = true;
-    std::cout << "The following parameters had rank-normalized split R-hat greater than "
+    std::cout << "The following parameters had rank-normalized split R-hat "
+                 "greater than "
               << RHAT_MAX << ":" << std::endl;
     std::cout << "  ";
     for (size_t n = 0; n < bad_rhat_names.size() - 1; ++n)
@@ -208,7 +209,7 @@ int main(int argc, const char *argv[]) {
               << std::endl;
   } else {
     std::cout << "Rank-normalized split R-hat values satisfactory "
-	      << "for all parameters." << std::endl
+              << "for all parameters." << std::endl
               << std::endl;
   }
   if (!has_errors)
