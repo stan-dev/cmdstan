@@ -95,6 +95,18 @@ TEST(CommandStansummary, order_param_names_row_major) {
   }
 }
 
+TEST(CommandStansummary, order_param_names_requested) {
+  std::vector<std::string> requested_params = {
+    "theta[2]", "theta[3]",
+    "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
+    "rho[1,2,2]", "rho[1,3,1]", "rho[1,3,2]",
+    "zeta" };
+  auto names_row_major = order_param_names_row_major(requested_params);
+   for (size_t i = 0; i < requested_params.size(); ++i) {
+    EXPECT_EQ(requested_params[i], names_row_major[i]);
+  }
+}
+
 TEST(CommandStansummary, header_tests) {
   std::string expect_console
       = "      Mean  MCSE StdDev     MAD      10%       50%        90%"
@@ -315,9 +327,35 @@ TEST(CommandStansummary, bad_include_param_args) {
   std::string arg_include_param = "-i psi";
 
   run_command_output out
-      = run_command(command + " " + arg_include_param + " " + csv_file);
+      = run_command(command + " " + arg_include_param + " -f " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError);
+}
+
+TEST(CommandStansummary, input_files_flag) {
+  std::string expected_message
+      = "--include_param: Unrecognized parameter(s): 'psi' ";
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string arg_csv_files = "-f src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "bern1.csv";
+  std::string arg_percentiles = "--percentiles \"2,50,95\"";
+  std::string arg_include_param = "-i theta divergent__";
+
+  run_command_output out
+      = run_command(command + " " + arg_csv_files + " " + arg_percentiles
+		    + " " + arg_include_param);
+  ASSERT_FALSE(out.hasError);
+
+  out = run_command(command + " " + arg_percentiles + " " + arg_csv_files
+		    + " " + arg_include_param);
+  ASSERT_FALSE(out.hasError);
+
+  out = run_command(command + " " + arg_percentiles + " " + arg_include_param
+		    + " " + arg_csv_files);
+  ASSERT_FALSE(out.hasError);
 }
 
 TEST(CommandStansummary, check_console_output) {
@@ -564,7 +602,7 @@ TEST(CommandStansummary, check_csv_output_include_param) {
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
              << "--csv_filename=" << target_csv_file
-             << " --include_param theta.6 -i theta[7] " << csv_dir
+             << " --include_param theta.6 -i theta[7] -f " << csv_dir
              << "eight_schools_output.csv";
   run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError);

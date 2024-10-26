@@ -33,7 +33,7 @@ Options:
   -c, --csv_filename [file]   Write statistics to a csv file.
   -h, --help                  Produce help message, then exit.
   -p, --percentiles [values]  Percentiles to report as ordered set of
-                              comma-separated numbers from (0.1,99.9), inclusive.
+                              comma-separated numbers from (0.0,100.0), inclusive.
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
@@ -41,6 +41,12 @@ Options:
                               By default, all parameters in the file are summarized,
                               passing this argument one or more times will filter
                               the output down to just the requested arguments.
+                              For vector, matrix, and array parameters, you must specify
+                              all elements directly, e.g. beta[1], beta[2], beta[3].
+  -f, --input_files [name]    Specify one or more Stan CSV files. Only needed when
+                              specifying the --include_param option. By default,
+                              all final unflagged command line arguments are treated as
+                              input files.
 )";
   if (argc < 2) {
     std::cout << usage << std::endl;
@@ -76,17 +82,26 @@ Options:
         std::string token(str);
         stan::io::prettify_stan_csv_name(token);
         return token;
-      })
-      ->take_all();
-  app.add_option("input_files", filenames, "Sampler csv files.", true)
-      ->required()
-      ->check(CLI::ExistingFile);
+	});
+    //      ->take_all();
+  // Explicit input_files option
+  app.add_option("--input_files,-f", filenames, "Sampler csv files.", false) // Not required
+    ->check(CLI::ExistingFile);
+    
+  // Add the positional input files
+  app.add_option("input_files", filenames, "Sampler csv files.", false) // Not required
+    ->check(CLI::ExistingFile);
 
   try {
     CLI11_PARSE(app, argc, argv);
   } catch (const CLI::ParseError &e) {
     std::cout << e.get_exit_code();
     return app.exit(e);
+  }
+
+  if (filenames.empty()) {
+    std::cout << "Error: No input CSV files specified. Please provide at least one input file." << std::endl;
+    return return_codes::NOT_OK;
   }
 
   // Check options semantic consistency
