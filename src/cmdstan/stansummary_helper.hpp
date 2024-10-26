@@ -8,7 +8,6 @@
 #include <ios>
 #include <cmath>
 #include <iostream>
-#include <regex>
 #include <stdexcept>
 #include <string>
 #include <vector>
