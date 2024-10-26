@@ -166,48 +166,35 @@ bool is_container(const std::string &parameter_name) {
  * @param in column index
  * @return variable name
  */
-std::string base_param_name(const stan::mcmc::chainset &chains, int index) {
-  std::string name = chains.param_name(index);
-  return name.substr(0, name.find("["));
-}
-
-/**
- * Return parameter name corresponding to column label.
- *
- * @param in set of samples from one or more chains
- * @param in column index
- * @return parameter name
- */
-std::string matrix_index(const stan::mcmc::chainset &chains, int index) {
-  std::string name = chains.param_name(index);
-  return name.substr(name.find("["));
+std::string base_param_name(const std::vector<std::string> &param_names, int index) {
+  return param_names[index].substr(0, param_names[index].find("["));
 }
 
 /**
  * Return vector of dimensions for container variable.
+ * Parameter name at start index contains "[" char.
+ * Finds index of final array element and parse its name
+ * into a vector dimensions.
  *
  * @param in set of samples from one or more chains
  * @param in column index of first container element
  * @return vector of dimensions
  */
-std::vector<int> dimensions(const stan::mcmc::chainset &chains,
+std::vector<int> dimensions(const std::vector<std::string> &param_names,
                             int start_index) {
-  std::vector<int> dims;
-  int dim;
-
-  std::string name = base_param_name(chains, start_index);
-  int last_matrix_element = start_index;
-  while (last_matrix_element + 1 < chains.num_params()) {
-    if (base_param_name(chains, last_matrix_element + 1) == name)
-      last_matrix_element++;
+  std::string name = base_param_name(param_names, start_index);
+  int end_index = start_index;
+  while (end_index + 1 < param_names.size()) {
+    if (base_param_name(param_names, end_index + 1) == name)
+      end_index++;
     else
       break;
   }
-
-  std::stringstream ss(matrix_index(chains, last_matrix_element));
-  ss.get();
+  std::vector<int> dims;
+  int dim;
+  std::stringstream ss(param_names[end_index].substr(param_names[end_index].find("[")));
+  ss.get();  // skip open square bracket
   ss >> dim;
-
   dims.push_back(dim);
   while (ss.get() == ',') {
     ss >> dim;
@@ -217,29 +204,27 @@ std::vector<int> dimensions(const stan::mcmc::chainset &chains,
 }
 
 /**
- * Compute index for next container element,
- * for row-major order traversal.
+ * Given a current array coordinates and set of dimensions
+ * compute the next coordinate for row-major indexing.
+ * Update coordinate and return string of comma separted coords,
+ * enclosed by square brackets.
+ * Arg arrays must be the same size and next coordinate must not
+ * exceed allowed dimension.
  *
- * <p>Stan program stores/output container elements in column-major order.
- * Legacy code to manipulate indices accordingly.
- *
- * @param in out container element indices
- * @param in vector of array dimensions
+ * @param in out current/next element coords
+ * @param in array dimensions
+ * @return coordinates as string
  */
 void next_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
     throw std::domain_error("next_index: size mismatch");
-  if (dims.size() == 0)
-    return;
   index[index.size() - 1]++;
-
   for (int i = index.size() - 1; i > 0; i--) {
     if (index[i] > dims[i]) {
       index[i - 1]++;
       index[i] = 1;
     }
   }
-
   for (size_t n = 0; n < dims.size(); n++) {
     if (index[n] <= 0 || index[n] > dims[n]) {
       std::stringstream message_stream("");
@@ -250,37 +235,61 @@ void next_index(std::vector<int> &index, const std::vector<int> &dims) {
     }
   }
 }
+std::string coords_str(const std::vector<int> &coords) {
+  std::stringstream ss_coords;
+  ss_coords << "[";
+  for (size_t i = 0; i < coords.size(); ++i) {
+    ss_coords << coords[i];
+    if (i < coords.size() - 1)
+      ss_coords << ",";
+  }
+  ss_coords << "]";
+  return ss_coords.str();
+}
 
-/**
- * Return the flat 0-based index of a column major order matrix based on the
- * 1-based index
- *
- * @param in out container element indices
- * @param in vector of array dimensions
- * @return offset from first container element.
+/** 
+ * Creates array of parameter names where all container parameters
+ * are listed in row major order.
+ * E.g, ( "x[1,1]", "x[2,1]", "x[1,2]", "x[2,2]" ) becomes
+ *      ( "x[1,1]", "x[1,2]", "x[2,1]", "x[2,2]" ) becomes
  */
-int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
-  if (dims.size() != index.size())
-    throw std::domain_error("next_index: size mismatch");
-  if (dims.size() == 0)
-    return 0;
-  for (size_t n = 0; n < dims.size(); n++) {
-    if (index[n] <= 0 || index[n] > dims[n]) {
-      std::stringstream message_stream("");
-      message_stream << "matrix_index: index[" << n << "] out of bounds. "
-                     << "dims[" << n << "] = " << dims[n] << "; "
-                     << "index[" << n << "] = " << index[n];
-      throw std::domain_error(message_stream.str());
+std::vector<std::string>
+order_param_names_row_major(const std::vector<std::string> &param_names) {
+  std::vector<std::string> param_names_row_major(param_names.size());
+  int idx_name = 0;
+  while (idx_name < param_names.size()
+	 && boost::ends_with(param_names[idx_name], "__")) {
+    param_names_row_major[idx_name] = param_names[idx_name];
+    idx_name++;
+  }
+  while (idx_name < param_names.size()) {
+    if (!is_container(param_names[idx_name])) {
+      param_names_row_major[idx_name] = param_names[idx_name];
+      idx_name++;
+    } else {   // container
+      auto basename = base_param_name(param_names, idx_name);
+      auto dims = dimensions(param_names, idx_name);
+      if (dims.size() == 1) {   // 1-dim order is same
+	for (int i=0; i < dims[0]; ++i) {
+	  param_names_row_major[idx_name] = param_names[idx_name];
+	  idx_name++;
+	}
+      } else {  // multi-dim
+	std::vector<int> new_index(dims.size(), 1);
+	param_names_row_major[idx_name] = basename + coords_str(new_index);
+	int max = 1;
+	for (size_t j = 0; j < dims.size(); j++) {
+	  max *= dims[j];
+	}
+	for (int k = 1; k < max; ++k) {
+	  next_index(new_index, dims);
+	  param_names_row_major[idx_name + k] = basename + coords_str(new_index);
+	}
+	idx_name += max;
+      }
     }
   }
-
-  int offset = 0;
-  int prod = 1;
-  for (size_t i = 0; i < dims.size(); i++) {
-    offset += (index[i] - 1) * prod;
-    prod *= dims[i];
-  }
-  return offset;
+  return param_names_row_major;
 }
 
 /**
@@ -353,7 +362,7 @@ std::vector<std::string> get_header(
  * @param stats matrix of computed statistics
  */
 void get_stats(const stan::mcmc::chainset &chains, const Eigen::VectorXd &probs,
-               std::vector<std::string> param_names, Eigen::MatrixXd &stats) {
+               const std::vector<std::string> &param_names, Eigen::MatrixXd &stats) {
   stats.setZero();
   size_t i = 0;
   for (std::string name : param_names) {

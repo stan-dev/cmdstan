@@ -70,69 +70,29 @@ TEST(CommandStansummary, next_index_2d) {
   EXPECT_EQ(1, index[1]);
 }
 
-TEST(CommandStansummary, matrix_index_1d) {
-  std::vector<int> dims(1);
-  std::vector<int> index(1, 1);
-  dims[0] = 100;
-
-  EXPECT_EQ(0, matrix_index(index, dims));
-
-  index[0] = 50;
-  EXPECT_EQ(49, matrix_index(index, dims));
-
-  index[0] = 100;
-  EXPECT_EQ(99, matrix_index(index, dims));
-
-  index[0] = 0;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 101;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-}
-
-TEST(CommandStansummary, matrix_index_2d) {
-  std::vector<int> dims(2);
-  std::vector<int> index(2, 1);
-  dims[0] = 100;
-  dims[1] = 3;
-
-  EXPECT_EQ(0, matrix_index(index, dims));
-
-  index[0] = 50;
-  index[1] = 1;
-  EXPECT_EQ(49, matrix_index(index, dims));
-
-  index[0] = 100;
-  index[1] = 1;
-  EXPECT_EQ(99, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 2;
-  EXPECT_EQ(100, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 3;
-  EXPECT_EQ(200, matrix_index(index, dims));
-
-  index[0] = 100;
-  index[1] = 3;
-  EXPECT_EQ(299, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 0;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 0;
-  index[1] = 1;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 101;
-  index[1] = 1;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 1;
-  index[1] = 4;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
+TEST(CommandStansummary, order_param_names_row_major) {
+  std::vector<std::string> names_col_major = {
+    "lp__", "foo", "bar", "theta[1]", "theta[2]", "theta[3]",
+    "gamma[1,1]", "gamma[2,1]", "gamma[3,1]",
+    "gamma[1,2]", "gamma[2,2]", "gamma[3,2]",
+    "rho[1,1,1]", "rho[2,1,1]", "rho[3,1,1]",
+    "rho[1,2,1]", "rho[2,2,1]", "rho[3,2,1]",
+    "rho[1,1,2]", "rho[2,1,2]", "rho[3,1,2]",
+    "rho[1,2,2]", "rho[2,2,2]", "rho[3,2,2]",
+    "zeta" };
+  std::vector<std::string> expect_row_major = {
+    "lp__", "foo", "bar", "theta[1]", "theta[2]", "theta[3]",
+    "gamma[1,1]", "gamma[1,2]", "gamma[2,1]",
+    "gamma[2,2]", "gamma[3,1]", "gamma[3,2]",
+    "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
+    "rho[1,2,2]", "rho[2,1,1]", "rho[2,1,2]",
+    "rho[2,2,1]", "rho[2,2,2]", "rho[3,1,1]",
+    "rho[3,1,2]", "rho[3,2,1]", "rho[3,2,2]",
+    "zeta" };
+  auto names_row_major = order_param_names_row_major(names_col_major);
+  for (size_t i = 0; i < names_col_major.size(); ++i) {
+    EXPECT_EQ(expect_row_major[i], names_row_major[i]);
+  }
 }
 
 TEST(CommandStansummary, header_tests) {
@@ -606,7 +566,6 @@ TEST(CommandStansummary, check_csv_output_include_param) {
              << "--csv_filename=" << target_csv_file
              << " --include_param theta.6 -i theta[7] " << csv_dir
              << "eight_schools_output.csv";
-
   run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError);
 

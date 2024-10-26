@@ -147,6 +147,11 @@ Options:
   }
   stan::io::stan_csv_metadata metadata = csv_parsed[0].metadata;
   std::vector<std::string> param_names = csv_parsed[0].header;
+
+  /************ stopped here ***********/
+  auto param_names_row_major = order_param_names_row_major(param_names);
+  /************ stopped here ***********/
+
   if (requested_params_vec.size() > 0) {
     std::set<std::string> requested_params(requested_params_vec.begin(),
                                            requested_params_vec.end());
@@ -168,6 +173,7 @@ Options:
       return return_codes::NOT_OK;
     }
   }
+  
   size_t num_params = param_names.size();
   size_t max_name_length = 0;
   for (size_t i = 0; i < num_params; ++i) {
