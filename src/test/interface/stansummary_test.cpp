@@ -95,17 +95,6 @@ TEST(CommandStansummary, order_param_names_row_major) {
   }
 }
 
-TEST(CommandStansummary, order_param_names_requested) {
-  std::vector<std::string> requested_params = {
-    "theta[2]", "theta[3]",
-    "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
-    "rho[1,2,2]", "rho[1,3,1]", "rho[1,3,2]",
-    "zeta" };
-  auto names_row_major = order_param_names_row_major(requested_params);
-   for (size_t i = 0; i < requested_params.size(); ++i) {
-    EXPECT_EQ(requested_params[i], names_row_major[i]);
-  }
-}
 
 TEST(CommandStansummary, header_tests) {
   std::string expect_console

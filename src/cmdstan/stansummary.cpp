@@ -163,7 +163,9 @@ Options:
   stan::io::stan_csv_metadata metadata = csv_parsed[0].metadata;
   std::vector<std::string> param_names = csv_parsed[0].header;
 
+  bool reorder_params = true;
   if (requested_params_vec.size() > 0) {
+    reorder_params = false;
     std::set<std::string> requested_params(requested_params_vec.begin(),
                                            requested_params_vec.end());
     std::set<std::string> check_requested_params(requested_params_vec.begin(),
@@ -213,7 +215,7 @@ Options:
     write_header(header, column_widths, max_name_length, false, &std::cout);
     std::cout << std::endl;
     write_stats(param_names, param_stats, column_widths, column_formats,
-                max_name_length, sig_figs, false, &std::cout);
+                max_name_length, sig_figs, false, reorder_params, &std::cout);
     std::cout << std::endl;
     write_sampler_info(metadata, "", &std::cout);
 
@@ -230,7 +232,7 @@ Options:
 
       write_header(header, column_widths, max_name_length, true, &csv_file);
       write_stats(param_names, param_stats, column_widths, column_formats,
-                  max_name_length, sig_figs, true, &csv_file);
+                  max_name_length, sig_figs, true, reorder_params, &csv_file);
       write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
       write_sampler_info(metadata, "# ", &csv_file);
