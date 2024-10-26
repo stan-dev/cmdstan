@@ -280,35 +280,35 @@ std::vector<std::string> order_param_names_row_major(
     } else {
       auto basename = base_param_name(param_names, pname_idx);
       auto dims = dimensions(param_names, pname_idx);
-      if (dims.size() == 1) {   // 1-dim order is same
-	while (pname_idx + 1 < param_names.size()) {
-	  if (base_param_name(param_names, pname_idx + 1) == basename) {
-	    param_names_row_major[pname_idx] = param_names[pname_idx];
-	    pname_idx++;
-	  }
-	  else {
-	    break;
-	  }
-	}
-	if (base_param_name(param_names, pname_idx) == basename) {
-	  param_names_row_major[pname_idx] = param_names[pname_idx];
-	  pname_idx++;
-	}
+      if (dims.size() == 1) {  // 1-dim order is same
+        while (pname_idx + 1 < param_names.size()) {
+          if (base_param_name(param_names, pname_idx + 1) == basename) {
+            param_names_row_major[pname_idx] = param_names[pname_idx];
+            pname_idx++;
+          } else {
+            break;
+          }
+        }
+        if (base_param_name(param_names, pname_idx) == basename) {
+          param_names_row_major[pname_idx] = param_names[pname_idx];
+          pname_idx++;
+        }
       } else {  // mulit-dim
-	std::vector<int> new_index(dims.size(), 1);
-	param_names_row_major[pname_idx] = basename + coords_str(new_index);
-	int max = 1;
-	for (size_t j = 0; j < dims.size(); j++) {
-	  max *= dims[j];
-	}
-	for (int k = 1; k < max; ++k) {
-	  next_index(new_index, dims);
-	  param_names_row_major[pname_idx + k] = basename + coords_str(new_index);
-	}
-	pname_idx += max;
-      }  //end multi-dim
-    } // end container
-  } // end model params
+        std::vector<int> new_index(dims.size(), 1);
+        param_names_row_major[pname_idx] = basename + coords_str(new_index);
+        int max = 1;
+        for (size_t j = 0; j < dims.size(); j++) {
+          max *= dims[j];
+        }
+        for (int k = 1; k < max; ++k) {
+          next_index(new_index, dims);
+          param_names_row_major[pname_idx + k]
+              = basename + coords_str(new_index);
+        }
+        pname_idx += max;
+      }  // end multi-dim
+    }    // end container
+  }      // end model params
   return param_names_row_major;
 }
 
@@ -451,12 +451,11 @@ void write_stats(const std::vector<std::string> &param_names,
                  const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>
                      &col_formats,
                  int max_name_length, int sig_figs, bool as_csv,
-		 bool reorder_params,
-                 std::ostream *out) {
+                 bool reorder_params, std::ostream *out) {
   auto pnames = param_names;
   if (reorder_params) {
     pnames = order_param_names_row_major(param_names);
-  }    
+  }
 
   bool in_sampler_params = true;
   if (!boost::ends_with(pnames[0], "__")) {
@@ -469,8 +468,7 @@ void write_stats(const std::vector<std::string> &param_names,
         *out << "," << stats(i, j);
       }
     } else {
-      if (i > 0 && in_sampler_params
-          && !boost::ends_with(pnames[i], "__")) {
+      if (i > 0 && in_sampler_params && !boost::ends_with(pnames[i], "__")) {
         in_sampler_params = false;
         std::cout << std::endl;
       }
