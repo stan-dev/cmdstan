@@ -8,6 +8,7 @@
 #include <ios>
 #include <cmath>
 #include <iostream>
+#include <regex>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -150,14 +151,27 @@ Eigen::VectorXi calculate_column_widths(
 }
 
 /**
- * Given a column label, determine whether or not the parameter
- * is a scalar variable or a container variable.
+ * Given a column label, check for array dims, "[n(,n)*]"
+ * Return true if no array dimensions found.
  *
- * @param in column label
+ * @param parameter_name column label
  * @return boolean
  */
-bool is_container(const std::string &parameter_name) {
-  return (parameter_name.find("[") != std::string::npos);
+bool is_scalar(const std::string &parameter_name) {
+  return (parameter_name.find("[") == std::string::npos);
+}
+
+/**
+ * Given a column label which has array dims,
+ * return true if all dims are 1
+ *
+ * @param parameter_name column label
+ * @return boolean
+ */
+bool is_ones_coord(const std::string &parameter_name) {
+  std::regex pattern(R"(\[\s*(1\s*(,\s*1\s*)*)?\])");
+  auto coords = parameter_name.substr(parameter_name.find("["));
+  return std::regex_match(coords, pattern);
 }
 
 /**
@@ -211,9 +225,8 @@ std::vector<int> dimensions(const std::vector<std::string> &param_names,
  * Arg arrays must be the same size and next coordinate must not
  * exceed allowed dimension.
  *
- * @param in out current/next element coords
- * @param in array dimensions
- * @return coordinates as string
+ * @param index array of current/next element coords
+ * @param dims  array dimensions
  */
 void next_index(std::vector<int> &index, const std::vector<int> &dims) {
   if (dims.size() != index.size())
@@ -235,6 +248,13 @@ void next_index(std::vector<int> &index, const std::vector<int> &dims) {
     }
   }
 }
+
+/**
+ * Given an array of indices, convert to string.
+ *
+ * @param coords element coords
+ * @return coordinates as string
+ */
 std::string coords_str(const std::vector<int> &coords) {
   std::stringstream ss_coords;
   ss_coords << "[";
@@ -256,39 +276,66 @@ std::string coords_str(const std::vector<int> &coords) {
 std::vector<std::string>
 order_param_names_row_major(const std::vector<std::string> &param_names) {
   std::vector<std::string> param_names_row_major(param_names.size());
-  int idx_name = 0;
-  while (idx_name < param_names.size()
-	 && boost::ends_with(param_names[idx_name], "__")) {
-    param_names_row_major[idx_name] = param_names[idx_name];
-    idx_name++;
+  int pname_idx = 0;
+  // sampler params
+  while (pname_idx < param_names.size()
+	 && boost::ends_with(param_names[pname_idx], "__")) {
+    param_names_row_major[pname_idx] = param_names[pname_idx];
+    pname_idx++;
   }
-  while (idx_name < param_names.size()) {
-    if (!is_container(param_names[idx_name])) {
-      param_names_row_major[idx_name] = param_names[idx_name];
-      idx_name++;
-    } else {   // container
-      auto basename = base_param_name(param_names, idx_name);
-      auto dims = dimensions(param_names, idx_name);
+  // model params
+  while (pname_idx < param_names.size()) {
+    if (is_scalar(param_names[pname_idx])) {
+      param_names_row_major[pname_idx] = param_names[pname_idx];
+      pname_idx++;
+    } else {
+      auto basename = base_param_name(param_names, pname_idx);
+      auto dims = dimensions(param_names, pname_idx);
       if (dims.size() == 1) {   // 1-dim order is same
-	for (int i=0; i < dims[0]; ++i) {
-	  param_names_row_major[idx_name] = param_names[idx_name];
-	  idx_name++;
+	while (pname_idx + 1 < param_names.size()) {
+	  if (base_param_name(param_names, pname_idx + 1) == basename) {
+	    param_names_row_major[pname_idx] = param_names[pname_idx];
+	    pname_idx++;
+	  }
+	  else {
+	    break;
+	  }
+	}
+	if (base_param_name(param_names, pname_idx) == basename) {
+	    param_names_row_major[pname_idx] = param_names[pname_idx];
+	    pname_idx++;
 	}
       } else {  // multi-dim
-	std::vector<int> new_index(dims.size(), 1);
-	param_names_row_major[idx_name] = basename + coords_str(new_index);
-	int max = 1;
-	for (size_t j = 0; j < dims.size(); j++) {
-	  max *= dims[j];
+	if (is_ones_coord(param_names[pname_idx])) {
+	  std::vector<int> new_index(dims.size(), 1);
+	  param_names_row_major[pname_idx] = basename + coords_str(new_index);
+	  int max = 1;
+	  for (size_t j = 0; j < dims.size(); j++) {
+	    max *= dims[j];
+	  }
+	  for (int k = 1; k < max; ++k) {
+	    next_index(new_index, dims);
+	    param_names_row_major[pname_idx + k] = basename + coords_str(new_index);
+	  }
+	  pname_idx += max;
+	} else {  // requested specific param - add names as requested
+	  while (pname_idx + 1 < param_names.size()) {
+	    if (base_param_name(param_names, pname_idx + 1) == basename) {
+	      param_names_row_major[pname_idx] = param_names[pname_idx];
+	      pname_idx++;
+	    }
+	    else {
+	      break;
+	    }
+	  }
+	  if (base_param_name(param_names, pname_idx) == basename) {
+	    param_names_row_major[pname_idx] = param_names[pname_idx];
+	    pname_idx++;
+	  }
 	}
-	for (int k = 1; k < max; ++k) {
-	  next_index(new_index, dims);
-	  param_names_row_major[idx_name + k] = basename + coords_str(new_index);
-	}
-	idx_name += max;
-      }
-    }
-  }
+      }  //end multi-dim
+    } // end container
+  } // end model params
   return param_names_row_major;
 }
 
@@ -430,26 +477,28 @@ void write_stats(const std::vector<std::string> &param_names,
                      &col_formats,
                  int max_name_length, int sig_figs, bool as_csv,
                  std::ostream *out) {
+  auto names_row_major = order_param_names_row_major(param_names);
+
   bool in_sampler_params = true;
-  if (!boost::ends_with(param_names[0], "__")) {
+  if (!boost::ends_with(names_row_major[0], "__")) {
     in_sampler_params = false;
   }
-  for (size_t i = 0; i < param_names.size(); ++i) {
+  for (size_t i = 0; i < names_row_major.size(); ++i) {
     if (as_csv) {
-      *out << "\"" << param_names[i] << "\"";
+      *out << "\"" << names_row_major[i] << "\"";
       for (int j = 0; j < stats.cols(); j++) {
         *out << "," << stats(i, j);
       }
     } else {
       if (i > 0 && in_sampler_params
-          && !boost::ends_with(param_names[i], "__")) {
+          && !boost::ends_with(names_row_major[i], "__")) {
         in_sampler_params = false;
         std::cout << std::endl;
       }
-      *out << std::setw(max_name_length + 1) << std::left << param_names[i];
+      *out << std::setw(max_name_length + 1) << std::left << names_row_major[i];
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
-        if (boost::ends_with(param_names[i], "__") && param_names[i] != "lp__"
+        if (boost::ends_with(names_row_major[i], "__") && names_row_major[i] != "lp__"
             && j >= stats.cols() - 3)
           continue;  // don't report ESS or Rhat for sampler state
         std::cout.setf(col_formats(j), std::ios::floatfield);
