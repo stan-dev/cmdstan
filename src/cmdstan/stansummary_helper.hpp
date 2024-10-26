@@ -167,7 +167,8 @@ bool is_scalar(const std::string &parameter_name) {
  * @param in column index
  * @return variable name
  */
-std::string base_param_name(const std::vector<std::string> &param_names, int index) {
+std::string base_param_name(const std::vector<std::string> &param_names,
+                            int index) {
   return param_names[index].substr(0, param_names[index].find("["));
 }
 
@@ -193,7 +194,8 @@ std::vector<int> dimensions(const std::vector<std::string> &param_names,
   }
   std::vector<int> dims;
   int dim;
-  std::stringstream ss(param_names[end_index].substr(param_names[end_index].find("[")));
+  std::stringstream ss(
+      param_names[end_index].substr(param_names[end_index].find("[")));
   ss.get();  // skip open square bracket
   ss >> dim;
   dims.push_back(dim);
@@ -254,19 +256,19 @@ std::string coords_str(const std::vector<int> &coords) {
   return ss_coords.str();
 }
 
-/** 
+/**
  * Creates array of parameter names where all container parameters
  * are listed in row major order.
  * E.g, ( "x[1,1]", "x[2,1]", "x[1,2]", "x[2,2]" ) becomes
  *      ( "x[1,1]", "x[1,2]", "x[2,1]", "x[2,2]" ) becomes
  */
-std::vector<std::string>
-order_param_names_row_major(const std::vector<std::string> &param_names) {
+std::vector<std::string> order_param_names_row_major(
+    const std::vector<std::string> &param_names) {
   std::vector<std::string> param_names_row_major(param_names.size());
   int pname_idx = 0;
   // sampler params
   while (pname_idx < param_names.size()
-	 && boost::ends_with(param_names[pname_idx], "__")) {
+         && boost::ends_with(param_names[pname_idx], "__")) {
     param_names_row_major[pname_idx] = param_names[pname_idx];
     pname_idx++;
   }
@@ -380,7 +382,8 @@ std::vector<std::string> get_header(
  * @param stats matrix of computed statistics
  */
 void get_stats(const stan::mcmc::chainset &chains, const Eigen::VectorXd &probs,
-               const std::vector<std::string> &param_names, Eigen::MatrixXd &stats) {
+               const std::vector<std::string> &param_names,
+               Eigen::MatrixXd &stats) {
   stats.setZero();
   size_t i = 0;
   for (std::string name : param_names) {

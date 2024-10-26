@@ -82,15 +82,17 @@ Options:
         std::string token(str);
         stan::io::prettify_stan_csv_name(token);
         return token;
-	});
-    //      ->take_all();
+      });
+  //      ->take_all();
   // Explicit input_files option
-  app.add_option("--input_files,-f", filenames, "Sampler csv files.", false) // Not required
-    ->check(CLI::ExistingFile);
-    
+  app.add_option("--input_files,-f", filenames, "Sampler csv files.",
+                 false)  // Not required
+      ->check(CLI::ExistingFile);
+
   // Add the positional input files
-  app.add_option("input_files", filenames, "Sampler csv files.", false) // Not required
-    ->check(CLI::ExistingFile);
+  app.add_option("input_files", filenames, "Sampler csv files.",
+                 false)  // Not required
+      ->check(CLI::ExistingFile);
 
   try {
     CLI11_PARSE(app, argc, argv);
@@ -100,7 +102,9 @@ Options:
   }
 
   if (filenames.empty()) {
-    std::cout << "Error: No input CSV files specified. Please provide at least one input file." << std::endl;
+    std::cout << "Error: No input CSV files specified. Please provide at least "
+                 "one input file."
+              << std::endl;
     return return_codes::NOT_OK;
   }
 
@@ -186,7 +190,7 @@ Options:
       return return_codes::NOT_OK;
     }
   }
-  
+
   size_t num_params = param_names.size();
   size_t max_name_length = 0;
   for (size_t i = 0; i < num_params; ++i) {

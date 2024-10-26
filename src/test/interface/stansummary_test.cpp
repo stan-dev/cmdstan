@@ -71,30 +71,23 @@ TEST(CommandStansummary, next_index_2d) {
 }
 
 TEST(CommandStansummary, order_param_names_row_major) {
-  std::vector<std::string> names_col_major = {
-    "lp__", "foo", "bar", "theta[1]", "theta[2]", "theta[3]",
-    "gamma[1,1]", "gamma[2,1]", "gamma[3,1]",
-    "gamma[1,2]", "gamma[2,2]", "gamma[3,2]",
-    "rho[1,1,1]", "rho[2,1,1]", "rho[3,1,1]",
-    "rho[1,2,1]", "rho[2,2,1]", "rho[3,2,1]",
-    "rho[1,1,2]", "rho[2,1,2]", "rho[3,1,2]",
-    "rho[1,2,2]", "rho[2,2,2]", "rho[3,2,2]",
-    "zeta" };
-  std::vector<std::string> expect_row_major = {
-    "lp__", "foo", "bar", "theta[1]", "theta[2]", "theta[3]",
-    "gamma[1,1]", "gamma[1,2]", "gamma[2,1]",
-    "gamma[2,2]", "gamma[3,1]", "gamma[3,2]",
-    "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
-    "rho[1,2,2]", "rho[2,1,1]", "rho[2,1,2]",
-    "rho[2,2,1]", "rho[2,2,2]", "rho[3,1,1]",
-    "rho[3,1,2]", "rho[3,2,1]", "rho[3,2,2]",
-    "zeta" };
+  std::vector<std::string> names_col_major
+      = {"lp__",       "foo",        "bar",        "theta[1]",   "theta[2]",
+         "theta[3]",   "gamma[1,1]", "gamma[2,1]", "gamma[3,1]", "gamma[1,2]",
+         "gamma[2,2]", "gamma[3,2]", "rho[1,1,1]", "rho[2,1,1]", "rho[3,1,1]",
+         "rho[1,2,1]", "rho[2,2,1]", "rho[3,2,1]", "rho[1,1,2]", "rho[2,1,2]",
+         "rho[3,1,2]", "rho[1,2,2]", "rho[2,2,2]", "rho[3,2,2]", "zeta"};
+  std::vector<std::string> expect_row_major
+      = {"lp__",       "foo",        "bar",        "theta[1]",   "theta[2]",
+         "theta[3]",   "gamma[1,1]", "gamma[1,2]", "gamma[2,1]", "gamma[2,2]",
+         "gamma[3,1]", "gamma[3,2]", "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
+         "rho[1,2,2]", "rho[2,1,1]", "rho[2,1,2]", "rho[2,2,1]", "rho[2,2,2]",
+         "rho[3,1,1]", "rho[3,1,2]", "rho[3,2,1]", "rho[3,2,2]", "zeta"};
   auto names_row_major = order_param_names_row_major(names_col_major);
   for (size_t i = 0; i < names_col_major.size(); ++i) {
     EXPECT_EQ(expect_row_major[i], names_row_major[i]);
   }
 }
-
 
 TEST(CommandStansummary, header_tests) {
   std::string expect_console
@@ -327,23 +320,23 @@ TEST(CommandStansummary, input_files_flag) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
-  std::string arg_csv_files = "-f src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bern1.csv";
+  std::string arg_csv_files = "-f src" + path_separator + "test"
+                              + path_separator + "interface" + path_separator
+                              + "example_output" + path_separator + "bern1.csv";
   std::string arg_percentiles = "--percentiles \"2,50,95\"";
   std::string arg_include_param = "-i theta divergent__";
 
   run_command_output out
-      = run_command(command + " " + arg_csv_files + " " + arg_percentiles
-		    + " " + arg_include_param);
+      = run_command(command + " " + arg_csv_files + " " + arg_percentiles + " "
+                    + arg_include_param);
   ASSERT_FALSE(out.hasError);
 
-  out = run_command(command + " " + arg_percentiles + " " + arg_csv_files
-		    + " " + arg_include_param);
+  out = run_command(command + " " + arg_percentiles + " " + arg_csv_files + " "
+                    + arg_include_param);
   ASSERT_FALSE(out.hasError);
 
   out = run_command(command + " " + arg_percentiles + " " + arg_include_param
-		    + " " + arg_csv_files);
+                    + " " + arg_csv_files);
   ASSERT_FALSE(out.hasError);
 }
 
