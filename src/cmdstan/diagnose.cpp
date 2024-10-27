@@ -162,7 +162,7 @@ int main(int argc, const char *argv[]) {
       }
     } else if (param_names[i].find("__") == std::string::npos) {
       auto [ess_bulk, ess_tail] = chains.split_rank_normalized_ess(i);
-      double n_eff = ess_bulk > ess_tail ? ess_bulk : ess_tail;
+      double n_eff = ess_bulk < ess_tail ? ess_bulk : ess_tail;
       if (n_eff / num_samples < 0.001)
         bad_n_eff_names.push_back(param_names[i]);
 
