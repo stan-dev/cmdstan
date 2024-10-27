@@ -260,7 +260,7 @@ std::string coords_str(const std::vector<int> &coords) {
  * are listed in row major order.
  * E.g, ( "x[1,1]", "x[2,1]", "x[1,2]", "x[2,2]" ) becomes
  *      ( "x[1,1]", "x[1,2]", "x[2,1]", "x[2,2]" ) becomes
- * 
+ *
  *
  * @param vector of strings
  * @return vector of strings
@@ -278,13 +278,13 @@ std::vector<std::string> order_param_names_row_major(
       auto dims = dimensions(param_names, pname_idx);
       int max = 1;
       for (size_t j = 0; j < dims.size(); j++) {
-	max *= dims[j];
+        max *= dims[j];
       }
       std::vector<int> new_index(dims.size(), 1);
       param_names_row_maj[pname_idx] = basename + coords_str(new_index);
       for (int k = 1; k < max; ++k) {
-	next_index(new_index, dims);
-	param_names_row_maj[pname_idx + k] = basename + coords_str(new_index);
+        next_index(new_index, dims);
+        param_names_row_maj[pname_idx + k] = basename + coords_str(new_index);
       }
       pname_idx += max;
     }
