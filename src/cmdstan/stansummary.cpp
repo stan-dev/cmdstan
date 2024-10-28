@@ -61,26 +61,26 @@ Options:
       ->check(CLI::Range(1, 18));
   app.add_option("--autocorr,-a", autocorr_idx,
                  "Display the chain autocorrelation.", true)
-    ->check(CLI::PositiveNumber);
+      ->check(CLI::PositiveNumber);
   app.add_option("--csv_filename,-c", csv_filename,
                  "Write statistics to a csv.", true)
-    ->check(CLI::NonexistentPath);
+      ->check(CLI::NonexistentPath);
   app.add_option("--percentiles,-p", percentiles_spec, "Percentiles to report.",
                  true);
   app.add_option("--include_param,-i", requested_params_vec,
                  "Include the named parameter in the output. By default all "
                  "are included.",
                  true)
-    ->transform([](auto str) {
+      ->transform([](auto str) {
         // allow both 'theta.1' and 'theta[1]' style.
         std::string token(str);
         stan::io::prettify_stan_csv_name(token);
         return token;
-	})
-    ->take_all();
+      })
+      ->take_all();
   app.add_option("input_files", filenames, "Sampler csv files.", true)
-    ->required()
-    ->check(CLI::ExistingFile);
+      ->required()
+      ->check(CLI::ExistingFile);
 
   try {
     CLI11_PARSE(app, argc, argv);
