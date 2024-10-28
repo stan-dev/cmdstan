@@ -637,7 +637,6 @@ void autocorrelation(const stan::mcmc::chainset &chains,
 
 // functions used by print.cpp, to be deleted when print is deprecated.
 
-
 /**
  * Given a column label, determine whether or not the parameter
  * is a scalar variable or a container variable.
@@ -736,8 +735,5 @@ int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
   }
   return offset;
 }
-
-
-
 
 #endif
