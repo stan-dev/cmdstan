@@ -307,7 +307,8 @@ TEST(CommandStansummary, bad_include_param_args) {
                         + path_separator;
 
   std::stringstream ss_command;
-  ss_command << "bin" << path_separator << "stansummary " << " -i psi --";
+  ss_command << "bin" << path_separator << "stansummary "
+             << " -i psi --";
   for (int i = 1; i < 5; ++i) {
     ss_command << " " << csv_dir << "bern" << i << ".csv";
   }
