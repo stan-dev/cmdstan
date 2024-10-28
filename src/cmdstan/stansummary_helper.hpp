@@ -2,6 +2,7 @@
 #define CMDSTAN_STANSUMMARY_HELPER_HPP
 
 #include <stan/mcmc/chainset.hpp>
+#include <stan/mcmc/chains.hpp>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -633,5 +634,110 @@ void autocorrelation(const stan::mcmc::chainset &chains,
     std::cout << std::endl;
   }
 }
+
+// functions used by print.cpp, to be deleted when print is deprecated.
+
+
+/**
+ * Given a column label, determine whether or not the parameter
+ * is a scalar variable or a container variable.
+ *
+ * @param in column label
+ * @return boolean
+ */
+bool is_container(const std::string &parameter_name) {
+  return (parameter_name.find("[") != std::string::npos);
+}
+
+/**
+ * Return parameter name corresponding to column label.
+ *
+ * @param in column index
+ * @return variable name
+ */
+std::string base_param_name(const stan::mcmc::chains<> &chains, int index) {
+  std::string name = chains.param_name(index);
+  return name.substr(0, name.find("["));
+}
+
+/**
+ * Return parameter name corresponding to column label.
+ *
+ * @param in set of samples from one or more chains
+ * @param in column index
+ * @return parameter name
+ */
+std::string matrix_index(const stan::mcmc::chains<> &chains, int index) {
+  std::string name = chains.param_name(index);
+  return name.substr(name.find("["));
+}
+
+/**
+ * Return vector of dimensions for container variable.
+ *
+ * @param in set of samples from one or more chains
+ * @param in column index of first container element
+ * @return vector of dimensions
+ */
+std::vector<int> dimensions(const stan::mcmc::chains<> &chains,
+                            int start_index) {
+  std::vector<int> dims;
+  int dim;
+
+  std::string name = base_param_name(chains, start_index);
+  int last_matrix_element = start_index;
+  while (last_matrix_element + 1 < chains.num_params()) {
+    if (base_param_name(chains, last_matrix_element + 1) == name)
+      last_matrix_element++;
+    else
+      break;
+  }
+
+  std::stringstream ss(matrix_index(chains, last_matrix_element));
+  ss.get();
+  ss >> dim;
+
+  dims.push_back(dim);
+  while (ss.get() == ',') {
+    ss >> dim;
+    dims.push_back(dim);
+  }
+  return dims;
+}
+
+/**
+ * Return the flat 0-based index of a column major order matrix based on the
+ * 1-based index
+ *
+ * @param in out container element indices
+ * @param in vector of array dimensions
+ * @return offset from first container element.
+ */
+int matrix_index(std::vector<int> &index, const std::vector<int> &dims) {
+  if (dims.size() != index.size())
+    throw std::domain_error("next_index: size mismatch");
+  if (dims.size() == 0)
+    return 0;
+  for (size_t n = 0; n < dims.size(); n++) {
+    if (index[n] <= 0 || index[n] > dims[n]) {
+      std::stringstream message_stream("");
+      message_stream << "matrix_index: index[" << n << "] out of bounds. "
+                     << "dims[" << n << "] = " << dims[n] << "; "
+                     << "index[" << n << "] = " << index[n];
+      throw std::domain_error(message_stream.str());
+    }
+  }
+
+  int offset = 0;
+  int prod = 1;
+  for (size_t i = 0; i < dims.size(); i++) {
+    offset += (index[i] - 1) * prod;
+    prod *= dims[i];
+  }
+  return offset;
+}
+
+
+
 
 #endif

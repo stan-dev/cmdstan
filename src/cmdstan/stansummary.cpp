@@ -89,13 +89,6 @@ Options:
     return app.exit(e);
   }
 
-  if (filenames.empty()) {
-    std::cout << "Error: No input CSV files specified. Please provide at least "
-                 "one input file."
-              << std::endl;
-    return return_codes::NOT_OK;
-  }
-
   // Check options semantic consistency
   if (app.count("--autocorr") && autocorr_idx > filenames.size()) {
     std::cout << "Option --autocorr: " << autocorr_idx
