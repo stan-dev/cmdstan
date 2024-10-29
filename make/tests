@@ -76,6 +76,8 @@ test/interface/fixed_param_sampler_test$(EXE): $(addsuffix $(EXE),$(addprefix sr
 test/interface/mpi_test$(EXE): $(addsuffix $(EXE),$(addprefix src/test/test-models/, proper))
 test/interface/model_output_test$(EXE): src/test/test-models/printer$(EXE)
 test/interface/optimization_output_test$(EXE): src/test/test-models/optimization_output$(EXE)
+test/interface/print_test$(EXE): bin/print$(EXE)
+test/interface/print_uninitialized_test$(EXE): src/test/test-models/print_uninitialized$(EXE)
 test/interface/arguments/argument_configuration_test$(EXE): src/test/test-models/test_model$(EXE)
 test/interface/stansummary_test$(EXE): bin/stansummary$(EXE)
 test/interface/variational_output_test$(EXE): src/test/test-models/variational_output$(EXE)
