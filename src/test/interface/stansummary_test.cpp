@@ -624,7 +624,6 @@ TEST(CommandStansummary, check_include_param_order) {
   }
 }
 
-
 TEST(CommandStansummary, check_reorder_stats) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
