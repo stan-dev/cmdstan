@@ -431,7 +431,7 @@ void write_stats(const std::vector<std::string> &param_names,
                  const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>
                      &col_formats,
                  int max_name_length, int sig_figs, bool as_csv,
-		 std::ostream *out) {
+                 std::ostream *out) {
   bool in_sampler_params = true;
   if (!boost::ends_with(param_names[0], "__")) {
     in_sampler_params = false;
@@ -443,7 +443,8 @@ void write_stats(const std::vector<std::string> &param_names,
         *out << "," << stats(i, j);
       }
     } else {
-      if (i > 0 && in_sampler_params && !boost::ends_with(param_names[i], "__")) {
+      if (i > 0 && in_sampler_params
+          && !boost::ends_with(param_names[i], "__")) {
         in_sampler_params = false;
         std::cout << std::endl;
       }
