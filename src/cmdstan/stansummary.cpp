@@ -158,16 +158,18 @@ Options:
     for (std::string request : requested_params_vec) {
       auto it = pnames.find(request);
       if (it == pnames.end()) {
-	auto find_dups = std::find(invalid_params.begin(), invalid_params.end(), request);
-	if (find_dups == invalid_params.end()) {
-	  invalid_params.emplace_back(request);
-	}
+        auto find_dups
+            = std::find(invalid_params.begin(), invalid_params.end(), request);
+        if (find_dups == invalid_params.end()) {
+          invalid_params.emplace_back(request);
+        }
       } else {
-	valid_params.emplace_back(request);
-	auto find_dups = std::find(valid_params.begin(), valid_params.end(), request);
-	if (find_dups == valid_params.end()) {
-	  valid_params.emplace_back(request);
-	}
+        valid_params.emplace_back(request);
+        auto find_dups
+            = std::find(valid_params.begin(), valid_params.end(), request);
+        if (find_dups == valid_params.end()) {
+          valid_params.emplace_back(request);
+        }
       }
     }
     if (invalid_params.empty()) {
