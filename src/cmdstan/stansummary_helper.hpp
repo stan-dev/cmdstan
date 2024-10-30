@@ -423,7 +423,6 @@ void write_header(const std::vector<std::string> &header,
  * @param max_name_length longest parameter name - (width of 1st output column)
  * @param sig_figs significant digits required
  * @param as_csv flag - true for csv; false for plain text
- * @param reorder_params flag - if true, reorder param names
  * @param out output stream
  */
 void write_stats(const std::vector<std::string> &param_names,
@@ -432,31 +431,26 @@ void write_stats(const std::vector<std::string> &param_names,
                  const Eigen::Matrix<std::ios_base::fmtflags, Eigen::Dynamic, 1>
                      &col_formats,
                  int max_name_length, int sig_figs, bool as_csv,
-                 bool reorder_params, std::ostream *out) {
-  auto pnames = param_names;
-  if (reorder_params) {
-    pnames = order_param_names_row_major(param_names);
-  }
-
+		 std::ostream *out) {
   bool in_sampler_params = true;
-  if (!boost::ends_with(pnames[0], "__")) {
+  if (!boost::ends_with(param_names[0], "__")) {
     in_sampler_params = false;
   }
-  for (size_t i = 0; i < pnames.size(); ++i) {
+  for (size_t i = 0; i < param_names.size(); ++i) {
     if (as_csv) {
-      *out << "\"" << pnames[i] << "\"";
+      *out << "\"" << param_names[i] << "\"";
       for (int j = 0; j < stats.cols(); j++) {
         *out << "," << stats(i, j);
       }
     } else {
-      if (i > 0 && in_sampler_params && !boost::ends_with(pnames[i], "__")) {
+      if (i > 0 && in_sampler_params && !boost::ends_with(param_names[i], "__")) {
         in_sampler_params = false;
         std::cout << std::endl;
       }
-      *out << std::setw(max_name_length + 1) << std::left << pnames[i];
+      *out << std::setw(max_name_length + 1) << std::left << param_names[i];
       *out << std::right;
       for (int j = 0; j < stats.cols(); j++) {
-        if (boost::ends_with(pnames[i], "__") && pnames[i] != "lp__"
+        if (boost::ends_with(param_names[i], "__") && param_names[i] != "lp__"
             && j >= stats.cols() - 3)
           continue;  // don't report ESS or Rhat for sampler state
         std::cout.setf(col_formats(j), std::ios::floatfield);

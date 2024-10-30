@@ -590,7 +590,7 @@ TEST(CommandStansummary, check_csv_output_include_param) {
   }
 }
 
-TEST(CommandStansummary, check_csv_output_include_param_order) {
+TEST(CommandStansummary, check_include_param_order) {
   std::vector<std::string> expect_names
       = {"y[1,1]", "y[2,2]", "y[2,1]", "y[1,3]"};
   std::string path_separator;
@@ -622,4 +622,22 @@ TEST(CommandStansummary, check_csv_output_include_param_order) {
       break;
     }
   }
+}
+
+
+TEST(CommandStansummary, check_reorder_stats) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary " << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+
+  std::ifstream expected_output(
+      "src/test/interface/example_output/mix_summary.nom");
+  std::stringstream ss;
+  ss << expected_output.rdbuf();
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }

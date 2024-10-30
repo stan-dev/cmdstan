@@ -148,7 +148,6 @@ Options:
   stan::io::stan_csv_metadata metadata = csv_parsed[0].metadata;
   std::vector<std::string> param_names = csv_parsed[0].header;
 
-  bool reorder_params = true;
   if (requested_params_vec.size() > 0) {
     auto num_requested = requested_params_vec.size();
     std::vector<std::string> valid_params;
@@ -173,7 +172,6 @@ Options:
       }
     }
     if (invalid_params.empty()) {
-      reorder_params = false;
       param_names.clear();
       std::copy(valid_params.begin(), valid_params.end(),
                 std::back_inserter(param_names));
@@ -196,8 +194,13 @@ Options:
     std::vector<std::string> header = get_header(percentiles);
     stan::mcmc::chainset chains(csv_parsed);
 
+    auto pnames = param_names;
+    if (requested_params_vec.empty()) {
+      pnames = order_param_names_row_major(param_names);
+    }
+
     Eigen::MatrixXd param_stats(num_params, header.size());
-    get_stats(chains, probs, param_names, param_stats);
+    get_stats(chains, probs, pnames, param_stats);
 
     // Console output formatting
     Eigen::VectorXi column_sig_figs(header.size());
@@ -214,8 +217,8 @@ Options:
     std::cout << std::endl;
     write_header(header, column_widths, max_name_length, false, &std::cout);
     std::cout << std::endl;
-    write_stats(param_names, param_stats, column_widths, column_formats,
-                max_name_length, sig_figs, false, reorder_params, &std::cout);
+    write_stats(pnames, param_stats, column_widths, column_formats,
+                max_name_length, sig_figs, false, &std::cout);
     std::cout << std::endl;
     write_sampler_info(metadata, "", &std::cout);
 
@@ -232,7 +235,7 @@ Options:
 
       write_header(header, column_widths, max_name_length, true, &csv_file);
       write_stats(param_names, param_stats, column_widths, column_formats,
-                  max_name_length, sig_figs, true, reorder_params, &csv_file);
+                  max_name_length, sig_figs, true, &csv_file);
       write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
       write_sampler_info(metadata, "# ", &csv_file);
