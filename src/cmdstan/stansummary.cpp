@@ -149,7 +149,6 @@ Options:
   std::vector<std::string> param_names = csv_parsed[0].header;
 
   if (requested_params_vec.size() > 0) {
-    auto num_requested = requested_params_vec.size();
     std::vector<std::string> valid_params;
     std::vector<std::string> invalid_params;
 
