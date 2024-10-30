@@ -589,3 +589,37 @@ TEST(CommandStansummary, check_csv_output_include_param) {
     FAIL();
   }
 }
+
+TEST(CommandStansummary, check_csv_output_include_param_order) {
+  std::vector<std::string> expect_names = {"y[1,1]", "y[2,2]", "y[2,1]", "y[1,3]"};
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+    + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << " -i y.1.1 -i y.2.2 -i y.2.1 -i y.1.3 "
+	     << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+  std::istringstream target_stream(out.output);
+  std::string line;
+
+  std::getline(target_stream, line);  // model name
+  std::getline(target_stream, line);  // chain info
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // warmup time
+  std::getline(target_stream, line);  // sample time
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // header
+  std::getline(target_stream, line);  // blank
+  boost::char_separator<char> sep(" \t\n");
+  for (size_t i = 0; i < expect_names.size(); ++i) {
+    std::getline(target_stream, line);
+    boost::tokenizer<boost::char_separator<char>> line_tok(line, sep);
+    for (const auto& token : line_tok) {
+      EXPECT_EQ(token, expect_names[i]);
+      break;
+    }
+  }
+}

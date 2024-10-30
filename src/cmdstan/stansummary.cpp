@@ -150,22 +150,35 @@ Options:
 
   bool reorder_params = true;
   if (requested_params_vec.size() > 0) {
-    reorder_params = false;
-    std::set<std::string> requested_params(requested_params_vec.begin(),
-                                           requested_params_vec.end());
-    std::set<std::string> check_requested_params(requested_params_vec.begin(),
-                                                 requested_params_vec.end());
-    for (size_t i = 0; i < param_names.size(); ++i) {
-      check_requested_params.erase(param_names[i]);
+    auto num_requested = requested_params_vec.size();
+    std::vector<std::string> valid_params;
+    std::vector<std::string> invalid_params;
+
+    std::set<std::string> pnames(param_names.begin(), param_names.end());
+    for (std::string request : requested_params_vec) {
+      auto it = pnames.find(request);
+      if (it == pnames.end()) {
+	auto find_dups = std::find(invalid_params.begin(), invalid_params.end(), request);
+	if (find_dups == invalid_params.end()) {
+	  invalid_params.emplace_back(request);
+	}
+      } else {
+	valid_params.emplace_back(request);
+	auto find_dups = std::find(valid_params.begin(), valid_params.end(), request);
+	if (find_dups == valid_params.end()) {
+	  valid_params.emplace_back(request);
+	}
+      }
     }
-    if (check_requested_params.size() == 0) {
+    if (invalid_params.empty()) {
+      reorder_params = false;
       param_names.clear();
-      std::copy(requested_params.begin(), requested_params.end(),
+      std::copy(valid_params.begin(), valid_params.end(),
                 std::back_inserter(param_names));
     } else {
       std::cout << "--include_param: Unrecognized parameter(s): ";
-      for (auto param : requested_params) {
-        std::cout << "'" << param << "' ";
+      for (size_t i = 0; i < invalid_params.size(); ++i) {
+        std::cout << "'" << invalid_params[i] << "' ";
       }
       std::cout << std::endl;
       return return_codes::NOT_OK;
