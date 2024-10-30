@@ -233,7 +233,7 @@ Options:
       csv_file << std::setprecision(app.count("--sig_figs") ? sig_figs : 6);
 
       write_header(header, column_widths, max_name_length, true, &csv_file);
-      write_stats(param_names, param_stats, column_widths, column_formats,
+      write_stats(pnames, param_stats, column_widths, column_formats,
                   max_name_length, sig_figs, true, &csv_file);
       write_timing(chains, metadata, warmup_times, sampling_times, thin, "# ",
                    &csv_file);
