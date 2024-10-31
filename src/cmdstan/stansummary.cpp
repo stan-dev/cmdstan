@@ -34,7 +34,7 @@ Options:
   -c, --csv_filename [file]   Write statistics to a csv file.
   -h, --help                  Produce help message, then exit.
   -p, --percentiles [values]  Percentiles to report as ordered set of
-                              comma-separated numbers from (0.1,99.9), inclusive.
+                              comma-separated numbers from (0.0,100.0), inclusive.
                               Default is 5,50,95.
   -s, --sig_figs [n]          Significant figures reported. Default is 2.
                               Must be an integer from (1, 18), inclusive.
@@ -140,7 +140,7 @@ Options:
 
     // check for stan csv file parse errors written to output stream
     std::stringstream cout_ss;
-    stan::mcmc::chains<> chains = parse_csv_files(
+    auto chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
 
     // Get column headers for sampler, model params
