@@ -168,7 +168,7 @@ bool is_container(const std::string &parameter_name) {
  * @return variable name
  */
 template <typename Tchains>
-std::string base_param_name(const Tchains& chains, int index) {
+std::string base_param_name(const Tchains &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(0, name.find("["));
 }
@@ -196,8 +196,7 @@ std::string matrix_index(const Tchains &chains, int index) {
  * @return vector of dimensions
  */
 template <typename Tchains>
-std::vector<int> dimensions(const Tchains &chains,
-                            int start_index) {
+std::vector<int> dimensions(const Tchains &chains, int start_index) {
   std::vector<int> dims;
   int dim;
 
