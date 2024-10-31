@@ -651,7 +651,7 @@ TEST(CommandStansummary, check_reorder_stats_csv) {
                          + "interface" + path_separator + "matrix_output.csv";
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-	     << "-c " << target_csv_file << " " << csv_file;
+             << "-c " << target_csv_file << " " << csv_file;
   run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError);
 
@@ -659,7 +659,7 @@ TEST(CommandStansummary, check_reorder_stats_csv) {
       "src/test/interface/example_output/matrix_summary.csv");
   std::stringstream ss_expected;
   ss_expected << expected_output.rdbuf();
-  
+
   std::ifstream target_stream(target_csv_file.c_str());
   if (!target_stream.is_open()) {
     std::cerr << "Failed to open file: " << target_csv_file << "\n";
