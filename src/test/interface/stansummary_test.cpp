@@ -635,8 +635,47 @@ TEST(CommandStansummary, check_reorder_stats) {
   ASSERT_FALSE(out.hasError);
 
   std::ifstream expected_output(
-      "src/test/interface/example_output/mix_summary.nom");
+      "src/test/interface/example_output/matrix_summary.nom");
   std::stringstream ss;
   ss << expected_output.rdbuf();
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
+}
+
+TEST(CommandStansummary, check_reorder_stats_csv) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_e.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+	     << "-c " << target_csv_file << " " << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+
+  std::ifstream expected_output(
+      "src/test/interface/example_output/matrix_summary.csv");
+  std::stringstream ss_expected;
+  ss_expected << expected_output.rdbuf();
+  
+  std::ifstream target_stream(target_csv_file.c_str());
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    FAIL();
+  }
+  std::stringstream ss_actual;
+  ss_actual << target_stream.rdbuf();
+  target_stream.close();
+
+  EXPECT_EQ(ss_expected.str(), ss_actual.str());
+
+  int return_code = std::remove(target_csv_file.c_str());
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    FAIL();
+  }
 }
