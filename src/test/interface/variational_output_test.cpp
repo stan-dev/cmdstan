@@ -1,5 +1,5 @@
 #include <test/utility.hpp>
-#include <stan/mcmc/chains.hpp>
+#include <stan/mcmc/chainset.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 
@@ -27,13 +27,13 @@ class CmdStan : public testing::Test {
     y22 = "y[2,2]";
   }
 
-  stan::mcmc::chains<> parse_output_file() {
+  stan::mcmc::chainset parse_output_file() {
     std::ifstream output_stream;
     output_stream.open(output_file.data());
 
     stan::io::stan_csv parsed_output
         = stan::io::stan_csv_reader::parse(output_stream, 0);
-    stan::mcmc::chains<> chains(parsed_output);
+    stan::mcmc::chainset chains(parsed_output);
     output_stream.close();
     return chains;
   }
@@ -48,7 +48,7 @@ TEST_F(CmdStan, variational_default) {
 
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
+  auto chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
   ASSERT_EQ(1000, chains.num_samples());
 }
@@ -59,7 +59,7 @@ TEST_F(CmdStan, variational_meanfield) {
 
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
+  auto chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
   ASSERT_EQ(1000, chains.num_samples());
 }
@@ -70,7 +70,7 @@ TEST_F(CmdStan, variational_fullrank) {
 
   ASSERT_EQ(0, out.err_code);
 
-  stan::mcmc::chains<> chains = parse_output_file();
+  auto chains = parse_output_file();
   ASSERT_EQ(1, chains.num_chains());
   ASSERT_EQ(1000, chains.num_samples());
 }

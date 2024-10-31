@@ -6,6 +6,7 @@
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
+#include <boost/tokenizer.hpp>
 
 using cmdstan::test::count_matches;
 using cmdstan::test::get_path_separator;
@@ -69,77 +70,31 @@ TEST(CommandStansummary, next_index_2d) {
   EXPECT_EQ(1, index[1]);
 }
 
-TEST(CommandStansummary, matrix_index_1d) {
-  std::vector<int> dims(1);
-  std::vector<int> index(1, 1);
-  dims[0] = 100;
-
-  EXPECT_EQ(0, matrix_index(index, dims));
-
-  index[0] = 50;
-  EXPECT_EQ(49, matrix_index(index, dims));
-
-  index[0] = 100;
-  EXPECT_EQ(99, matrix_index(index, dims));
-
-  index[0] = 0;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 101;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-}
-
-TEST(CommandStansummary, matrix_index_2d) {
-  std::vector<int> dims(2);
-  std::vector<int> index(2, 1);
-  dims[0] = 100;
-  dims[1] = 3;
-
-  EXPECT_EQ(0, matrix_index(index, dims));
-
-  index[0] = 50;
-  index[1] = 1;
-  EXPECT_EQ(49, matrix_index(index, dims));
-
-  index[0] = 100;
-  index[1] = 1;
-  EXPECT_EQ(99, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 2;
-  EXPECT_EQ(100, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 3;
-  EXPECT_EQ(200, matrix_index(index, dims));
-
-  index[0] = 100;
-  index[1] = 3;
-  EXPECT_EQ(299, matrix_index(index, dims));
-
-  index[0] = 1;
-  index[1] = 0;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 0;
-  index[1] = 1;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 101;
-  index[1] = 1;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
-
-  index[0] = 1;
-  index[1] = 4;
-  EXPECT_THROW(matrix_index(index, dims), std::domain_error);
+TEST(CommandStansummary, order_param_names_row_major) {
+  std::vector<std::string> names_col_major
+      = {"lp__",       "foo",        "bar",        "theta[1]",   "theta[2]",
+         "theta[3]",   "gamma[1,1]", "gamma[2,1]", "gamma[3,1]", "gamma[1,2]",
+         "gamma[2,2]", "gamma[3,2]", "rho[1,1,1]", "rho[2,1,1]", "rho[3,1,1]",
+         "rho[1,2,1]", "rho[2,2,1]", "rho[3,2,1]", "rho[1,1,2]", "rho[2,1,2]",
+         "rho[3,1,2]", "rho[1,2,2]", "rho[2,2,2]", "rho[3,2,2]", "zeta"};
+  std::vector<std::string> expect_row_major
+      = {"lp__",       "foo",        "bar",        "theta[1]",   "theta[2]",
+         "theta[3]",   "gamma[1,1]", "gamma[1,2]", "gamma[2,1]", "gamma[2,2]",
+         "gamma[3,1]", "gamma[3,2]", "rho[1,1,1]", "rho[1,1,2]", "rho[1,2,1]",
+         "rho[1,2,2]", "rho[2,1,1]", "rho[2,1,2]", "rho[2,2,1]", "rho[2,2,2]",
+         "rho[3,1,1]", "rho[3,1,2]", "rho[3,2,1]", "rho[3,2,2]", "zeta"};
+  auto names_row_major = order_param_names_row_major(names_col_major);
+  for (size_t i = 0; i < names_col_major.size(); ++i) {
+    EXPECT_EQ(expect_row_major[i], names_row_major[i]);
+  }
 }
 
 TEST(CommandStansummary, header_tests) {
-  std::string expect
-      = "      Mean  MCSE StdDev     10%      50%       90%      N_Eff     "
-        "N_Eff/s        R_hat\n";
+  std::string expect_console
+      = "      Mean  MCSE StdDev     MAD      10%       50%        90%"
+        "    ESS_bulk     ESS_tail         R_hat\n";
   std::string expect_csv
-      = "name,Mean,MCSE,StdDev,10%,50%,90%,N_Eff,N_Eff/s,R_hat\n";
+      = "name,Mean,MCSE,StdDev,MAD,10%,50%,90%,ESS_bulk,ESS_tail,R_hat\n";
   std::vector<std::string> pcts;
   pcts.push_back("10");
   pcts.push_back("50");
@@ -150,12 +105,15 @@ TEST(CommandStansummary, header_tests) {
   EXPECT_FLOAT_EQ(probs[2], 0.9);
 
   std::vector<std::string> header = get_header(pcts);
-  EXPECT_EQ(header.size(), pcts.size() + 6);
+  EXPECT_EQ(header.size(), pcts.size() + 7);
   EXPECT_EQ(header[0], "Mean");
+  EXPECT_EQ(header[1], "MCSE");
   EXPECT_EQ(header[2], "StdDev");
-  EXPECT_EQ(header[4], "50%");
-  EXPECT_EQ(header[6], "N_Eff");
-  EXPECT_EQ(header[8], "R_hat");
+  EXPECT_EQ(header[3], "MAD");
+  EXPECT_EQ(header[5], "50%");
+  EXPECT_EQ(header[7], "ESS_bulk");
+  EXPECT_EQ(header[8], "ESS_tail");
+  EXPECT_EQ(header[9], "R_hat");
 
   Eigen::VectorXi column_widths(header.size());
   for (size_t i = 0, w = 5; i < header.size(); ++i, ++w) {
@@ -163,7 +121,7 @@ TEST(CommandStansummary, header_tests) {
   }
   std::stringstream ss;
   write_header(header, column_widths, 4, false, &ss);
-  EXPECT_EQ(expect, ss.str());
+  EXPECT_EQ(expect_console, ss.str());
   ss.str(std::string());
   write_header(header, column_widths, 24, true, &ss);
   EXPECT_EQ(expect_csv, ss.str());
@@ -198,59 +156,6 @@ TEST(CommandStansummary, percentiles) {
   EXPECT_THROW(percentiles_to_probs(pcts), std::invalid_argument);
 }
 
-TEST(CommandStansummary, param_tests) {
-  std::string path_separator;
-  path_separator.push_back(get_path_separator());
-
-  std::vector<std::string> pcts;
-  pcts.push_back("10");
-  pcts.push_back("50");
-  pcts.push_back("90");
-  Eigen::VectorXd probs = percentiles_to_probs(pcts);
-
-  // bernoulli model:  6 sampler params, ("lp__", is model param)
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
-  std::vector<std::string> filenames;
-  filenames.push_back(csv_file);
-  stan::io::stan_csv_metadata metadata;
-  Eigen::VectorXd warmup_times(filenames.size());
-  Eigen::VectorXd sampling_times(filenames.size());
-  Eigen::VectorXi thin(filenames.size());
-  stan::mcmc::chains<> chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
-  EXPECT_EQ(chains.num_chains(), 1);
-  EXPECT_EQ(chains.num_params(), 8);
-
-  size_t max_name_length = 0;
-  size_t num_sampler_params = -1;  // don't count name 'lp__'
-  for (int i = 0; i < chains.num_params(); ++i) {
-    if (chains.param_name(i).length() > max_name_length)
-      max_name_length = chains.param_name(i).length();
-    if (stan::io::ends_with("__", chains.param_name(i)))
-      num_sampler_params++;
-  }
-  EXPECT_EQ(num_sampler_params, 6);
-
-  size_t model_params_offset = num_sampler_params + 1;
-  size_t num_model_params = chains.num_params() - model_params_offset;
-  EXPECT_EQ(num_model_params, 1);
-
-  Eigen::MatrixXd model_params(num_model_params, 9);
-  std::vector<int> model_param_idxes(num_model_params);
-  std::iota(model_param_idxes.begin(), model_param_idxes.end(),
-            model_params_offset);
-  get_stats(chains, sampling_times, probs, model_param_idxes, model_params);
-
-  double mean_theta = model_params(0, 0);
-  EXPECT_TRUE(mean_theta > 0.25);
-  EXPECT_TRUE(mean_theta < 0.27);
-  double rhat_theta = model_params(0, 8);
-  EXPECT_TRUE(rhat_theta > 0.999);
-  EXPECT_TRUE(rhat_theta < 1.01);
-}
-
 // good csv file, no draws
 TEST(CommandStansummary, functional_test__issue_342) {
   std::string path_separator;
@@ -259,7 +164,7 @@ TEST(CommandStansummary, functional_test__issue_342) {
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "matrix_output.csv";
   run_command_output out = run_command(command + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError);
 }
 
 // good csv file, variational inference
@@ -271,7 +176,7 @@ TEST(CommandStansummary, variational_inference) {
                          + "interface" + path_separator
                          + "variational_inference_output.csv";
   run_command_output out = run_command(command + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError);
 }
 
 TEST(CommandStansummary, no_args) {
@@ -281,8 +186,7 @@ TEST(CommandStansummary, no_args) {
   std::string command = "bin" + path_separator + "stansummary";
   run_command_output out = run_command(command);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_input_files) {
@@ -294,8 +198,7 @@ TEST(CommandStansummary, bad_input_files) {
                          + "interface" + path_separator + "no_such_file";
   run_command_output out = run_command(command + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_csv_file_arg) {
@@ -305,15 +208,14 @@ TEST(CommandStansummary, bad_csv_file_arg) {
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
+                         + path_separator + "bern1.csv";
   std::string arg_csv_file = "--csv_filename " + path_separator + "bin"
                              + path_separator + "hi_mom.csv";
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_sig_figs_arg) {
@@ -329,15 +231,13 @@ TEST(CommandStansummary, bad_sig_figs_arg) {
   run_command_output out
       = run_command(command + " " + arg_sig_figs + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
   arg_sig_figs = "--sig_figs 101";
   expected_message = "--sig_figs: Value 101 not in range";
   out = run_command(command + " " + arg_sig_figs + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_autocorr_arg) {
@@ -347,27 +247,24 @@ TEST(CommandStansummary, bad_autocorr_arg) {
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
+                         + path_separator + "bern1.csv";
   std::string arg_autocorr = "--autocorr -1";
 
   run_command_output out
       = run_command(command + " " + arg_autocorr + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
   arg_autocorr = "--autocorr 0";
   out = run_command(command + " " + arg_autocorr + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
   expected_message = "not a valid chain id";
   arg_autocorr = "--autocorr 2";
   out = run_command(command + " " + arg_autocorr + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_percentiles_arg) {
@@ -377,30 +274,27 @@ TEST(CommandStansummary, bad_percentiles_arg) {
   std::string command = "bin" + path_separator + "stansummary";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
+                         + path_separator + "bern1.csv";
 
   std::string arg_percentiles = "--percentiles -1";
   run_command_output out
       = run_command(command + " " + arg_percentiles + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
-  arg_percentiles = "--percentiles \"0,100\"";
+  arg_percentiles = "--percentiles \"0,100.001\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
   arg_percentiles = "--percentiles \"2,30,5\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 
   arg_percentiles = "--percentiles \"2,50,95\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  ASSERT_FALSE(out.hasError);
 }
 
 TEST(CommandStansummary, bad_include_param_args) {
@@ -408,43 +302,43 @@ TEST(CommandStansummary, bad_include_param_args) {
       = "--include_param: Unrecognized parameter(s): 'psi' ";
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
-  std::string arg_include_param = "-i psi";
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
 
-  run_command_output out
-      = run_command(command + " " + arg_include_param + " " + csv_file);
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << " -i psi --";
+  for (int i = 1; i < 5; ++i) {
+    ss_command << " " << csv_dir << "bern" << i << ".csv";
+  }
+  run_command_output out = run_command(ss_command.str());
   EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
-  ASSERT_TRUE(out.hasError)
-      << "\"" << out.command << "\" failed to quit with an error";
+  ASSERT_TRUE(out.hasError);
 }
 
 TEST(CommandStansummary, check_console_output) {
-  std::string lp
-      = "lp__            -7.3  3.7e-02     0.77   -9.1  -7.0  -6.8    443    "
-        "19275    1.0";
-  std::string theta
-      = "theta           0.26  6.1e-03     0.12  0.079  0.25  0.47    384    "
-        "16683   1.00";
-  std::string accept_stat
-      = "accept_stat__   0.90  4.6e-03  1.5e-01   0.57  0.96   1.0   1026    "
-        "44597   1.00";
-  std::string energy
-      = "energy__         7.8  5.1e-02  1.0e+00    6.8   7.5   9.9    411    "
-        "17865    1.0";
+  std::vector<std::string> header
+      = {"Mean", "MCSE", "StdDev",   "MAD",      "5%",
+         "50%",  "95%",  "ESS_bulk", "ESS_tail", "R_hat"};
+  std::vector<std::string> divergent
+      = {"divergent__", "0.00", "nan", "0.00", "0.00", "0.00", "0.00", "0.00"};
+  std::vector<std::string> theta
+      = {"theta", "0.25", "0.0033", "0.12", "0.12", "0.077",
+         "0.24",  "0.47", "1408",   "1292", "1.0"};
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
-
-  run_command_output out = run_command(command + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
-
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary ";
+  for (int i = 1; i < 5; ++i) {
+    ss_command << " " << csv_dir << "bern" << i << ".csv";
+  }
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
   std::istringstream target_stream(out.output);
   std::string line;
 
@@ -456,60 +350,71 @@ TEST(CommandStansummary, check_console_output) {
   std::getline(target_stream, line);  // sample time
   std::getline(target_stream, line);  // blank
   std::getline(target_stream, line);  // header
+  boost::char_separator<char> sep(" \t\n");
+  boost::tokenizer<boost::char_separator<char>> header_tok(line, sep);
+  int i = 0;
+  for (const auto& token : header_tok) {
+    EXPECT_EQ(token, header[i]);
+    i++;
+  }
   std::getline(target_stream, line);  // blank
-
   std::getline(target_stream, line);  // lp
-  EXPECT_EQ(lp, line);
   std::getline(target_stream, line);  // accept stat
-  EXPECT_EQ(accept_stat, line);
   std::getline(target_stream, line);  // stepsize
   std::getline(target_stream, line);  // treedepth
   std::getline(target_stream, line);  // n_leapfrog
   std::getline(target_stream, line);  // divergent
-
+  boost::tokenizer<boost::char_separator<char>> divergent_tok(line, sep);
+  i = 0;
+  for (const auto& token : divergent_tok) {
+    EXPECT_EQ(token, divergent[i]);
+    i++;
+  }
   std::getline(target_stream, line);  // energy
-  EXPECT_EQ(energy, line);
-
   std::getline(target_stream, line);  // blank
-
   std::getline(target_stream, line);  // theta
-  EXPECT_EQ(theta, line);
+  boost::tokenizer<boost::char_separator<char>> theta_tok(line, sep);
+  i = 0;
+  for (const auto& token : theta_tok) {
+    EXPECT_EQ(token, theta[i]);
+    i++;
+  }
 }
 
 TEST(CommandStansummary, check_csv_output) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
+      = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   std::string lp
-      = "\"lp__\",-7.2719,0.0365168,0.768874,-9.05757,-6.96978,-6.75008,443."
-        "328,19275.1,1.00037";
-  std::string energy
-      = "\"energy__\""
-        ",7.78428,0.0508815,1.0314,6.80383,7.46839,9.88601,410."
-        "898,17865.1,1.00075";
+      = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,-8.7823,-6.99022,-6."
+        "7503,1512.77,1591.97,1.00073";
   std::string theta
-      = "\"theta\",0.256552,0.00610844,0.119654,0.0786292,0.24996,0.470263,383."
-        "704,16682.8,0.999309";
+      = "\"theta\",0.251297,0.00327489,0.121547,0.123091,0.0771694,0.237476,0."
+        "473885,1407.51,1291.71,1.00679";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_a.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
-                                + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
-
-  run_command_output out
-      = run_command(command + " " + arg_csv_file + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << "--csv_filename=" << target_csv_file;
+  for (int i = 1; i < 5; ++i) {
+    ss_command << " " << csv_dir << "bern" << i << ".csv";
+  }
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
 
   std::ifstream target_stream(target_csv_file.c_str());
-  if (!target_stream.is_open())
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
   std::string line;
   std::getline(target_stream, line);
   EXPECT_EQ(csv_header, line);
@@ -521,42 +426,46 @@ TEST(CommandStansummary, check_csv_output) {
   std::getline(target_stream, line);  // n_leapfrog
   std::getline(target_stream, line);  // divergent
   std::getline(target_stream, line);  // energy
-  EXPECT_EQ(energy, line);
   std::getline(target_stream, line);
   EXPECT_EQ(theta, line);
   target_stream.close();
   int return_code = std::remove(target_csv_file.c_str());
-  if (return_code != 0)
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
 }
 
 TEST(CommandStansummary, check_csv_output_no_percentiles) {
-  std::string csv_header = "name,Mean,MCSE,StdDev,N_Eff,N_Eff/s,R_hat";
+  std::string csv_header = "name,Mean,MCSE,StdDev,MAD,ESS_bulk,ESS_tail,R_hat";
   std::string lp
-      = "\"lp__\",-7.2719,0.0365168,0.768874,443.328,19275.1,1.00037";
+      = "\"lp__\",-7.28676,0.0202121,0.738616,0.329575,1512.77,1591.97,1.00073";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
-
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
-                                + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
-
-  std::string arg_percentiles = "-p \"\"";
-
-  run_command_output out = run_command(command + " " + arg_csv_file + " "
-                                       + csv_file + " " + arg_percentiles);
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_b.csv";
+  std::string arg_percentiles = " -p \"\"";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << "--csv_filename=" << target_csv_file << arg_percentiles;
+  for (int i = 1; i < 5; ++i) {
+    ss_command << " " << csv_dir << "bern" << i << ".csv";
+  }
+  run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   std::ifstream target_stream(target_csv_file.c_str());
-  if (!target_stream.is_open())
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
   std::string line;
   std::getline(target_stream, line);
   EXPECT_EQ(csv_header, line);
@@ -564,39 +473,47 @@ TEST(CommandStansummary, check_csv_output_no_percentiles) {
   EXPECT_EQ(lp, line);
   target_stream.close();
   int return_code = std::remove(target_csv_file.c_str());
-  if (return_code != 0)
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
 }
 
 TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
-  std::string lp = "\"lp__\",-7.3,0.037,0.77,-9.1,-7,-6.8,4.4e+02,1.9e+04,1";
-  std::string energy = "\"energy__\",7.8,0.051,1,6.8,7.5,9.9,4.1e+02,1.8e+04,1";
+      = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
+  std::string lp
+      = "\"lp__\",-7.3,0.02,0.74,0.33,-8.8,-7,-6.8,1.5e+03,1.6e+03,1";
+  std::string energy
+      = "\"energy__\",7.8,0.027,1,0.74,6.8,7.5,9.7,1.4e+03,1.8e+03,1";
   std::string theta
-      = "\"theta\",0.26,0.0061,0.12,0.079,0.25,0.47,3.8e+02,1.7e+04,1";
+      = "\"theta\",0.25,0.0033,0.12,0.12,0.077,0.24,0.47,1.4e+03,1.3e+03,1";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "bernoulli_chain_1.csv";
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_c.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
-                                + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_filename " + target_csv_file;
-  std::string arg_sig_figs = "--sig_figs 2";
-
-  run_command_output out = run_command(command + " " + arg_csv_file + " "
-                                       + arg_sig_figs + " " + csv_file);
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << "--csv_filename=" << target_csv_file << " --sig_figs 2";
+  for (int i = 1; i < 5; ++i) {
+    ss_command << " " << csv_dir << "bern" << i << ".csv";
+  }
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
 
   std::ifstream target_stream(target_csv_file.c_str());
-  if (!target_stream.is_open())
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
   std::string line;
   std::getline(target_stream, line);
   EXPECT_EQ(csv_header, line);
@@ -613,65 +530,51 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
   EXPECT_EQ(theta, line);
   target_stream.close();
   int return_code = std::remove(target_csv_file.c_str());
-  if (return_code != 0)
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
 }
 
 TEST(CommandStansummary, check_csv_output_include_param) {
   std::string csv_header
-      = "name,Mean,MCSE,StdDev,5%,50%,95%,N_Eff,N_Eff/s,R_hat";
-  std::string lp
-      = "\"lp__\",-15.5617,0.97319,6.05585,-25.3432,-15.7562,-5.48405,38.7217,"
-        "372.539,1.00208";
-  std::string energy
-      = "\"energy__\",20.5888,1.01449,6.43127,10.2634,20.8487,30.9906,40.1879,"
-        "386.645,1.00109";
+      = "name,Mean,MCSE,StdDev,MAD,5%,50%,95%,ESS_bulk,ESS_tail,R_hat";
   // note: skipping theta 1-5
   std::string theta6
-      = "\"theta[6]\",5.001,0.365016,5.76072,-4.99688,5.23474,14.1597,249.074,"
-        "2396.33,1.00109";
+      = "\"theta[6]\",5.001,0.365016,5.76072,5.37947,-4.95375,5.22746,14.1688,"
+        "230.645,464.978,1.00054";
   std::string theta7
-      = "\"theta[7]\",8.54125,0.650098,6.22195,-0.841225,8.09613,19.256,91."
-        "6001,881.279,0.999012";
-  // note: skipping theta 8
+      = "\"theta[7]\",8.54125,0.650098,6.22195,5.35785,-0.814388,8.09342,19."
+        "2622,92.3075,241.177,1.00244";
   std::string message = "# Inference for Stan model: eight_schools_cp_model";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
-  std::string command = "bin" + path_separator + "stansummary";
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "example_output"
-                         + path_separator + "eight_schools_output.csv";
+  std::string csv_dir = "src" + path_separator + "test" + path_separator
+                        + "interface" + path_separator + "example_output"
+                        + path_separator;
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_d.csv";
 
-  std::string target_csv_file = "src" + path_separator + "test" + path_separator
-                                + "interface" + path_separator
-                                + "example_output" + path_separator
-                                + "tmp_test_target_csv_file.csv";
-  std::string arg_csv_file = "--csv_filename=" + target_csv_file;
-
-  // both styles of name supported
-  std::string arg_include_param = "--include_param theta.6 -i theta[7]";
-
-  run_command_output out = run_command(command + " " + arg_csv_file + " "
-                                       + arg_include_param + " " + csv_file);
-
-  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << "--csv_filename=" << target_csv_file
+             << " --include_param theta.6 -i theta[7] " << csv_dir
+             << "eight_schools_output.csv";
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
 
   std::ifstream target_stream(target_csv_file.c_str());
-  if (!target_stream.is_open())
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
   std::string line;
   std::getline(target_stream, line);
   EXPECT_EQ(csv_header, line);
-  std::getline(target_stream, line);
-  EXPECT_EQ(lp, line);
-  std::getline(target_stream, line);  // accept_stat
-  std::getline(target_stream, line);  // stepsize
-  std::getline(target_stream, line);  // treedepth
-  std::getline(target_stream, line);  // n_leapfrog
-  std::getline(target_stream, line);  // divergent
-  std::getline(target_stream, line);  // energy
-  EXPECT_EQ(energy, line);
   std::getline(target_stream, line);
   EXPECT_EQ(theta6, line);
   std::getline(target_stream, line);
@@ -680,6 +583,99 @@ TEST(CommandStansummary, check_csv_output_include_param) {
   EXPECT_EQ(message, line);
   target_stream.close();
   int return_code = std::remove(target_csv_file.c_str());
-  if (return_code != 0)
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
     FAIL();
+  }
+}
+
+TEST(CommandStansummary, check_include_param_order) {
+  std::vector<std::string> expect_names
+      = {"y[1,1]", "y[2,2]", "y[2,1]", "y[1,3]"};
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << " -i y.1.1 -i y.2.2 -i y.2.1 -i y.1.3 " << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+  std::istringstream target_stream(out.output);
+  std::string line;
+
+  std::getline(target_stream, line);  // model name
+  std::getline(target_stream, line);  // chain info
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // warmup time
+  std::getline(target_stream, line);  // sample time
+  std::getline(target_stream, line);  // blank
+  std::getline(target_stream, line);  // header
+  std::getline(target_stream, line);  // blank
+  boost::char_separator<char> sep(" \t\n");
+  for (size_t i = 0; i < expect_names.size(); ++i) {
+    std::getline(target_stream, line);
+    boost::tokenizer<boost::char_separator<char>> line_tok(line, sep);
+    for (const auto& token : line_tok) {
+      EXPECT_EQ(token, expect_names[i]);
+      break;
+    }
+  }
+}
+
+TEST(CommandStansummary, check_reorder_stats) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary " << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+
+  std::ifstream expected_output(
+      "src/test/interface/example_output/matrix_summary.nom");
+  std::stringstream ss;
+  ss << expected_output.rdbuf();
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
+}
+
+TEST(CommandStansummary, check_reorder_stats_csv) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string target_csv_file = "test" + path_separator + "interface"
+                                + path_separator
+                                + "tmp_test_target_csv_file_e.csv";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "matrix_output.csv";
+  std::stringstream ss_command;
+  ss_command << "bin" << path_separator << "stansummary "
+             << "-c " << target_csv_file << " " << csv_file;
+  run_command_output out = run_command(ss_command.str());
+  ASSERT_FALSE(out.hasError);
+
+  std::ifstream expected_output(
+      "src/test/interface/example_output/matrix_summary.csv");
+  std::stringstream ss_expected;
+  ss_expected << expected_output.rdbuf();
+
+  std::ifstream target_stream(target_csv_file.c_str());
+  if (!target_stream.is_open()) {
+    std::cerr << "Failed to open file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    FAIL();
+  }
+  std::stringstream ss_actual;
+  ss_actual << target_stream.rdbuf();
+  target_stream.close();
+
+  EXPECT_EQ(ss_expected.str(), ss_actual.str());
+
+  int return_code = std::remove(target_csv_file.c_str());
+  if (return_code != 0) {
+    std::cerr << "Failed to remove file: " << target_csv_file << "\n";
+    std::cerr << "Error: " << std::strerror(errno) << std::endl;
+    FAIL();
+  }
 }

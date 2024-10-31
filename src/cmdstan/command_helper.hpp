@@ -204,7 +204,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
             = std::string("\"" + file_1 + "\" and base file \"" + file + "\"");
         std::stringstream msg;
         msg << "Searching for  \"" << file_name_err << std::endl;
-        msg << "Can't open either of specified files," << file_name_err
+        msg << "Can't open either of specified files, " << file_name_err
             << std::endl;
         throw std::invalid_argument(msg.str());
       } else {
