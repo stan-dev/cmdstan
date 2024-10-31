@@ -1,6 +1,5 @@
 #include <cmdstan/return_codes.hpp>
 #include <cmdstan/stansummary_helper.hpp>
-#include <stan/mcmc/chains.hpp>
 #include <stan/io/ends_with.hpp>
 #include <algorithm>
 #include <fstream>

@@ -163,10 +163,12 @@ bool is_container(const std::string &parameter_name) {
 /**
  * Return parameter name corresponding to column label.
  *
+ * @tparam Tchains - either a mcmc::chains or mcmc::chainset object
  * @param in column index
  * @return variable name
  */
-std::string base_param_name(const stan::mcmc::chainset &chains, int index) {
+template <typename Tchains>
+std::string base_param_name(const Tchains& chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(0, name.find("["));
 }
@@ -174,11 +176,13 @@ std::string base_param_name(const stan::mcmc::chainset &chains, int index) {
 /**
  * Return parameter name corresponding to column label.
  *
+ * @tparam Tchains - either a mcmc::chains or mcmc::chainset object
  * @param in set of samples from one or more chains
  * @param in column index
  * @return parameter name
  */
-std::string matrix_index(const stan::mcmc::chainset &chains, int index) {
+template <typename Tchains>
+std::string matrix_index(const Tchains &chains, int index) {
   std::string name = chains.param_name(index);
   return name.substr(name.find("["));
 }
@@ -186,11 +190,13 @@ std::string matrix_index(const stan::mcmc::chainset &chains, int index) {
 /**
  * Return vector of dimensions for container variable.
  *
+ * @tparam Tchains - either a mcmc::chains or mcmc::chainset object
  * @param in set of samples from one or more chains
  * @param in column index of first container element
  * @return vector of dimensions
  */
-std::vector<int> dimensions(const stan::mcmc::chainset &chains,
+template <typename Tchains>
+std::vector<int> dimensions(const Tchains &chains,
                             int start_index) {
   std::vector<int> dims;
   int dim;
