@@ -27,8 +27,8 @@ TEST(interface, output_sig_figs_1) {
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
   Eigen::VectorXi thin(filenames.size());
-  auto chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  auto chains = parse_csv_files(filenames, metadata, warmup_times,
+                                sampling_times, thin, &std::cout);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.1, 1E-16);
 }
 
@@ -55,8 +55,8 @@ TEST(interface, output_sig_figs_2) {
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
   Eigen::VectorXi thin(filenames.size());
-  auto chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  auto chains = parse_csv_files(filenames, metadata, warmup_times,
+                                sampling_times, thin, &std::cout);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.12, 1E-16);
 }
 
@@ -83,7 +83,7 @@ TEST(interface, output_sig_figs_9) {
   Eigen::VectorXd warmup_times(filenames.size());
   Eigen::VectorXd sampling_times(filenames.size());
   Eigen::VectorXi thin(filenames.size());
-  auto chains = parse_csv_files(
-      filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
+  auto chains = parse_csv_files(filenames, metadata, warmup_times,
+                                sampling_times, thin, &std::cout);
   EXPECT_NEAR(chains.samples(8)(0, 0), 0.123456789, 1E-16);
 }
