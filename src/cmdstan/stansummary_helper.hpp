@@ -557,10 +557,7 @@ void write_all_model_params(const stan::mcmc::chainset &chains,
         if (as_csv) {
           *out << "\"" << chains.param_name(row_maj_index_chains) << "\"";
           for (int j = 0; j < params.cols(); j++) {
-            *out << "," << std::fixed
-                 << std::setprecision(compute_precision(
-                        params(row_maj_index, j), sig_figs, false))
-                 << params(row_maj_index, j);
+            *out << "," << params(row_maj_index, j);
           }
         } else {
           *out << std::setw(max_name_length + 1) << std::left
