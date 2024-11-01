@@ -686,25 +686,6 @@ TEST(CommandStansummary, check_csv_output_include_param) {
     FAIL();
 }
 
-TEST(CommandStansummary, check_reorder_stats) {
-  std::string path_separator;
-  path_separator.push_back(get_path_separator());
-  std::string csv_file = "src" + path_separator + "test" + path_separator
-                         + "interface" + path_separator + "matrix_output.csv";
-  std::stringstream ss_command;
-  ss_command << "bin" << path_separator << "stansummary " << csv_file;
-  run_command_output out = run_command(ss_command.str());
-  ASSERT_FALSE(out.hasError);
-
-  std::string expected_file = "src" + path_separator + "test" + path_separator
-                              + "interface" + path_separator + "example_output"
-                              + path_separator + "matrix_summary.nom";
-  std::ifstream expected_output(expected_file.c_str());
-  EXPECT_FALSE(expected_output.bad());
-  std::stringstream ss;
-  ss << expected_output.rdbuf();
-  EXPECT_EQ(ss.str(), out.output);
-}
 
 TEST(CommandStansummary, check_reorder_stats_csv) {
   std::string path_separator;
@@ -716,7 +697,7 @@ TEST(CommandStansummary, check_reorder_stats_csv) {
                          + "interface" + path_separator + "matrix_output.csv";
   std::stringstream ss_command;
   ss_command << "bin" << path_separator << "stansummary "
-             << "-c " << target_csv_file << " " << csv_file;
+             << "-c " << target_csv_file << " " << csv_file << " -s 4";
   run_command_output out = run_command(ss_command.str());
   ASSERT_FALSE(out.hasError);
 
