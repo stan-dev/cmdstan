@@ -686,7 +686,6 @@ TEST(CommandStansummary, check_csv_output_include_param) {
     FAIL();
 }
 
-
 TEST(CommandStansummary, check_reorder_stats_csv) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
