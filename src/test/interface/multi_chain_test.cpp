@@ -1,7 +1,6 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/mcmc/chains.hpp>
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
 
@@ -30,7 +29,7 @@ TEST(interface, output_multi) {
     Eigen::VectorXd warmup_times(filenames.size());
     Eigen::VectorXd sampling_times(filenames.size());
     Eigen::VectorXi thin(filenames.size());
-    stan::mcmc::chains<> chains = parse_csv_files(
+    auto chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
     constexpr std::array<const char*, 9> names{
         "lp__",        "accept_stat__", "stepsize__",
@@ -55,7 +54,7 @@ TEST(interface, output_multi) {
     Eigen::VectorXd warmup_times(filenames.size());
     Eigen::VectorXd sampling_times(filenames.size());
     Eigen::VectorXi thin(filenames.size());
-    stan::mcmc::chains<> chains = parse_csv_files(
+    auto chains = parse_csv_files(
         filenames, metadata, warmup_times, sampling_times, thin, &std::cout);
     constexpr std::array<const char*, 9> names{
         "lp__",        "accept_stat__", "stepsize__",
