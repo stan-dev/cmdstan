@@ -12,7 +12,7 @@
 #endif
 
 #define CMDSTAN_MAJOR 2
-#define CMDSTAN_MINOR 35
+#define CMDSTAN_MINOR 36
 #define CMDSTAN_PATCH 0
 
 namespace cmdstan {
