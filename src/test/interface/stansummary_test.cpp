@@ -276,6 +276,20 @@ TEST(CommandStansummary, variational_inference) {
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 }
 
+
+// good csv file, no params (data generating program output)
+TEST(CommandStansummary, no_params) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "stansummary";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator
+                         + "datagen_output.csv";
+  run_command_output out = run_command(command + " " + csv_file);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+}
+
+
 TEST(CommandStansummary, no_args) {
   std::string expected_message = "Usage: stansummary";
   std::string path_separator;
