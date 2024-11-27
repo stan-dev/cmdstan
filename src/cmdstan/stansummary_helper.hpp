@@ -687,14 +687,13 @@ void write_sampler_info(const stan::io::stan_csv_metadata &metadata,
   *out << prefix
        << "For each parameter, ESS_bulk and ESS_tail measure the "
           "effective sample size "
-       << std::endl
-       << "for the entire sample (bulk) and for the "
-          "the .05 and .95 tails (tail), "
+          "for the entire sample (bulk) and for the "
+          ".05 and .95 tails (tail), "
        << std::endl;
   *out << prefix
-       << "and R_hat measures the potential scale reduction on split chains."
-       << std::endl
-       << "At convergence R_hat will be very close to 1.00." << std::endl;
+       << "and R_hat measures the potential scale reduction on split chains. "
+          "At convergence R_hat will be very close to 1.00."
+       << std::endl;
 }
 
 /**
