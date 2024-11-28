@@ -410,7 +410,7 @@ void get_stats(const stan::mcmc::chainset &chains,
     params(i, 0) = chains.mean(i_chains);
     params(i, 1) = chains.mcse_mean(i_chains);
     params(i, 2) = chains.sd(i_chains);
-    params(i, 3) = chains.max_abs_deviation(i_chains);
+    params(i, 3) = chains.med_abs_deviation(i_chains);
     Eigen::VectorXd quantiles = chains.quantiles(i_chains, probs);
     for (int j = 0; j < quantiles.size(); j++)
       params(i, 4 + j) = quantiles(j);
