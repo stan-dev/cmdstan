@@ -1,6 +1,16 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.36.0 (10 December 2024)
+======================================================================
+
+ - No longer force fix_param when model has no parameters. (#1288)
+ - Updated stansummary to use split, rank-normalized Rhat and ESS. (#1301)
+ - Fixed stansummary crashing if it is run on a csv file without any `__` columns (#1283)
+ - Fixed stansummary not rebuilding when a dependent file changes (#1283)
+ - Removed support for adding makefile variables in `~/.config/stan/make.local`. Use the `make/local` file in the CmdStan directory instead. (#1282, #1284)
+ - Windows: Don't try to copy tbb.dll if TBB_TARGETS is undefined. (#1285)
+
 v2.35.0 (3 June 2024)
 ======================================================================
 
