@@ -12,15 +12,15 @@ class arg_output_sig_figs : public int_argument {
     _description
         = "The number of significant figures used for the output CSV files.";
     _validity
-        = "0 <= integer <= 18 or -1 to use the default number of significant "
-          "figures";
-    _default = "-1";
-    _default_value = -1;
+        = "0 <= integer <= 18, or -1 to use the system library's default "
+          "number of significant figures (usually 6).";
+    _default = "8";
+    _default_value = 8;
     _value = _default_value;
   }
 
   bool is_valid(int value) {
-    return (value >= 0 && value <= 18) || value == _default_value;
+    return (value >= 0 && value <= 18) || value == -1;
   }
 };
 
