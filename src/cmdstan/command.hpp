@@ -333,8 +333,7 @@ int command(int argc, const char *argv[]) {
     }
 
     if (num_chains == 1) {
-      return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
-          false, stan::model::model_base>(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
@@ -347,8 +346,7 @@ int command(int argc, const char *argv[]) {
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
-      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
-          stan::model::model_base>(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
