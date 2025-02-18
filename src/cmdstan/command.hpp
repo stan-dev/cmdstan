@@ -368,7 +368,7 @@ int command(int argc, const char *argv[]) {
     std::vector<std::string> fname_vec
         = file::make_filenames(fname, "", ".csv", num_chains, id);
 
-    for(auto &f : fname_vec) {
+    for (auto &f : fname_vec) {
       auto file_info = file::get_basename_suffix(f);
       if (file_info.second != ".csv") {
         throw std::invalid_argument("Fitted params file must be a CSV file.");
