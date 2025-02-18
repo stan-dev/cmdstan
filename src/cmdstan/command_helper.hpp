@@ -47,7 +47,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -63,7 +63,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -99,7 +99,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -147,8 +147,8 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
   if (num_chains == 1) {
     return context_vector(1, get_var_context(file));
   }
-  auto make_context = [](auto &&file, auto &&stream,
-                         auto &&file_ending) -> shared_context_ptr {
+  auto make_context = [](auto &&file, auto &&stream) -> shared_context_ptr {
+    auto [file_name, file_ending] = file::get_basename_suffix(file);
     if (file_ending == ".json") {
       using stan::json::json_data;
       return std::make_shared<json_data>(json_data(stream));
@@ -156,11 +156,10 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
       using stan::io::dump;
       return std::make_shared<stan::io::dump>(dump(stream));
     } else {
+      // should never happen, caught by check_valid_file below
       std::stringstream msg;
       msg << "file ending of " << file_ending << " is not supported by cmdstan";
       throw std::invalid_argument(msg.str());
-      using stan::io::dump;
-      return std::make_shared<dump>(dump(stream));
     }
   };
   // use default for all chain inits
@@ -168,36 +167,54 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
     return context_vector(num_chains,
                           std::make_shared<stan::io::empty_var_context>());
   } else {
-    size_t file_marker_pos = file.find_last_of(".");
-    if (file_marker_pos > file.size()) {
-      std::stringstream msg;
-      msg << "Found: \"" << file
-          << "\" but user specified files must end in .json or .R";
-      throw std::invalid_argument(msg.str());
-    }
-    std::string file_name = file.substr(0, file_marker_pos);
-    std::string file_ending = file.substr(file_marker_pos, file.size());
-    if (file_ending != ".json" && file_ending != ".R") {
-      std::stringstream msg;
-      msg << "file ending of " << file_ending << " is not supported by cmdstan";
-      throw std::invalid_argument(msg.str());
-    }
-    if (file_ending != ".json") {
-      std::cerr
-          << "Warning: file '" << file
-          << "' is being read as an 'RDump' file.\n"
-             "\tThis format is deprecated and will not receive new features.\n"
-             "\tConsider saving your data in JSON format instead."
-          << std::endl;
+    auto check_valid_file = [](const std::string &file) {
+      auto [file_name, file_ending] = file::get_basename_suffix(file);
+
+      if (file_ending.empty()) {
+        std::stringstream msg;
+        msg << "Found: \"" << file
+            << "\" but user specified files must end in .json or .R";
+        throw std::invalid_argument(msg.str());
+      }
+      if (file_ending != ".json" && file_ending != ".R") {
+        std::stringstream msg;
+        msg << "file ending of " << file_ending
+            << " is not supported by cmdstan";
+        throw std::invalid_argument(msg.str());
+      }
+      if (file_ending != ".json") {
+        std::cerr << "Warning: file '" << file
+                  << "' is being read as an 'RDump' file.\n"
+                     "\tThis format is deprecated and will not receive new "
+                     "features.\n"
+                     "\tConsider saving your data in JSON format instead."
+                  << std::endl;
+      }
+    };
+
+    bool has_commas = file.find(',') != std::string::npos;
+    auto filenames = file::make_filenames(file, "", "", num_chains, id);
+
+    if (has_commas) {
+      for (auto &&file_name : filenames) {
+        check_valid_file(file_name);
+      }
+    } else {
+      check_valid_file(file);
     }
 
-    auto filenames
-        = file::make_filenames(file_name, "", file_ending, num_chains, id);
     auto &file_1 = filenames[0];
     std::fstream stream_1(file_1.c_str(), std::fstream::in);
     // if file_1 exists we'll assume num_chains of these files exist
     if (stream_1.rdstate() & std::ifstream::failbit) {
-      // if that fails we will try to find a base file
+      // if we were given a user-specified list, this is an error
+      if (has_commas) {
+        std::stringstream msg;
+        msg << "cannot open \"" << file_1 << "\"" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+
+      // otherwise, we will try to find a base file and use n copies of it
       std::fstream stream(file.c_str(), std::fstream::in);
       if (stream.rdstate() & std::ifstream::failbit) {
         std::string file_name_err
@@ -208,43 +225,32 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
             << std::endl;
         throw std::invalid_argument(msg.str());
       } else {
-        return context_vector(num_chains,
-                              make_context(file, stream, file_ending));
+        return context_vector(num_chains, make_context(file, stream));
       }
     } else {
       // If we found file_1 then we'll assume file_{1...N} exists
       context_vector ret;
       ret.reserve(num_chains);
-      ret.push_back(make_context(file_1, stream_1, file_ending));
+      ret.push_back(make_context(file_1, stream_1));
       for (size_t i = 1; i < num_chains; ++i) {
         auto &file_i = filenames[i];
         std::fstream stream_i(file_i.c_str(), std::fstream::in);
         // If any stream fails here something went wrong with file names
         if (stream_i.rdstate() & std::ifstream::failbit) {
           std::stringstream msg;
-          if (file_name.find(',') == std::string::npos) {
+          if (!has_commas) {
             // in this case, we generated a template from the given name
-            msg << "Given the template \"" << file_name << "\", found \""
+            msg << "Given the template \"" << file << "\", found \""
                 << file_1 << "\" but ";
           }
           msg << "cannot open \"" << file_i << "\"" << std::endl;
           throw std::invalid_argument(msg.str());
         }
-        ret.push_back(make_context(file_i, stream_i, file_ending));
+        ret.push_back(make_context(file_i, stream_i));
       }
       return ret;
     }
   }
-  // This should not happen
-  std::cerr
-      << "Warning: file '" << file
-      << "' is being read as an 'RDump' file.\n"
-         "\tThis format is deprecated and will not receive new features.\n"
-         "\tConsider saving your data in JSON format instead."
-      << std::endl;
-  using stan::io::dump;
-  std::fstream stream(file.c_str(), std::fstream::in);
-  return context_vector(num_chains, std::make_shared<dump>(dump(stream)));
 }
 
 /**
@@ -699,7 +705,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&... args) {
+                             Ts &&...args) {
   writers.reserve(num_chains);
   auto filenames = file::make_filenames(filename, tag, suffix, num_chains, id);
 

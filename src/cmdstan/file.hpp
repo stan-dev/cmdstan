@@ -209,22 +209,25 @@ std::vector<std::string> make_filenames(const std::string &filename,
 
     std::transform(filenames.cbegin(), filenames.cend(), names.begin(),
                    [&tag, &type](const std::string &name) {
-                     std::pair<std::string, std::string> base_sfx
-                         = get_basename_suffix(name);
-                     if (type != ".csv" || base_sfx.second.empty()) {
-                       base_sfx.second = type;
+                     auto [base_name, sfx] = get_basename_suffix(name);
+                     if ((!type.empty() && type != ".csv") || sfx.empty()) {
+                       sfx = type;
                      }
                      // TODO: in most cases tag is empty, it would be nice if it
                      // was never used for maximum user control
-                     return base_sfx.first + tag + base_sfx.second;
+                     return base_name + tag + sfx;
                    });
   } else {
     // otherwise, this is a template which gets edited like output.csv ->
     // output_1.csv
-    std::pair<std::string, std::string> base_sfx;
-    base_sfx = get_basename_suffix(filename);
-    if (type != ".csv" || base_sfx.second.empty()) {
-      base_sfx.second = type;
+    auto [base_name, sfx] = get_basename_suffix(filename);
+
+    // first condition here is legacy -- we used to be very lax
+    // about file names, but with things like json outputs
+    // we need to be stricter to avoid collisions, so we only
+    // allow laxity on the suffix for intended-to-be csv files
+    if ((!type.empty() && type != ".csv") || sfx.empty()) {
+      sfx = type;
     }
 
     auto name_iterator = [num_chains, id](auto i) {
@@ -235,7 +238,7 @@ std::vector<std::string> make_filenames(const std::string &filename,
       }
     };
     for (int i = 0; i < num_chains; ++i) {
-      names[i] = base_sfx.first + tag + name_iterator(i) + base_sfx.second;
+      names[i] = base_name + tag + name_iterator(i) + sfx;
     }
   }
 
