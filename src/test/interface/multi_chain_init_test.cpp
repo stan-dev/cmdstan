@@ -63,8 +63,8 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_good) {
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
-     << " init=" << convert_model_path(init_data) <<","<< convert_model_path(init2_3_data)
-     << " method=sample num_chains=2";
+     << " init=" << convert_model_path(init_data) << ","
+     << convert_model_path(init2_3_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_FALSE(out.hasError) << out.output;
@@ -98,29 +98,27 @@ TEST_F(CmdStan, multi_chain_multi_init_file_id_bad) {
 TEST_F(CmdStan, multi_chain_multi_init_file_comma_missing) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
-     << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
-    //  second init file does not exist
-     << " init=" << convert_model_path(init2_data) <<","<< convert_model_path(init2_data)
-     << " method=sample num_chains=2";
+     << " data file=" << convert_model_path(bern_data) << " output file="
+     << convert_model_path(dev_null_path)
+     //  second init file does not exist
+     << " init=" << convert_model_path(init2_data) << ","
+     << convert_model_path(init2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError);
 }
-
 
 TEST_F(CmdStan, multi_chain_multi_init_file_comma_wrong_number) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
-     << " init=" << convert_model_path(init_data) <<","<< convert_model_path(init2_3_data)
-     << " method=sample num_chains=3";
+     << " init=" << convert_model_path(init_data) << ","
+     << convert_model_path(init2_3_data) << " method=sample num_chains=3";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError) << out.output;
 }
-
 
 TEST_F(CmdStan, multi_chain_multi_init_file_actually_used) {
   // the second chain has a bad init value
@@ -141,8 +139,8 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
-     << " init=" << convert_model_path(init2_data) <<","<< convert_model_path(init_bad_2_data)
-     << " method=sample num_chains=2";
+     << " init=" << convert_model_path(init2_data) << ","
+     << convert_model_path(init_bad_2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   ASSERT_TRUE(out.hasError) << out.output;
