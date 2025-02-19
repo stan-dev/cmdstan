@@ -78,7 +78,6 @@ TEST(interface, output_multi_comma) {
   model_path.push_back("test");
   model_path.push_back("test-models");
   model_path.push_back("test_model");
-
   std::string command
       = cmdstan::test::convert_model_path(model_path)
         + " id=10 sample num_warmup=200 num_samples=1 num_chains=2 random seed=1234"
@@ -86,7 +85,6 @@ TEST(interface, output_multi_comma) {
         + "_foo.csv," + cmdstan::test::convert_model_path(model_path)
         + "_bar.csv diagnostic_file=" + cmdstan::test::convert_model_path(model_path)
         + "_diag_foo.csv,"+cmdstan::test::convert_model_path(model_path) + "_diag_bar.csv";
-
   cmdstan::test::run_command_output out = cmdstan::test::run_command(command);
   EXPECT_EQ(int(stan::services::error_codes::OK), out.err_code);
   EXPECT_FALSE(out.hasError);
@@ -116,6 +114,7 @@ TEST(interface, output_multi_comma) {
     std::ifstream diag_file(diag_name);
     EXPECT_TRUE(diag_file.good());
   }
+
   {
     std::string csv_file
         = cmdstan::test::convert_model_path(model_path) + "_bar.csv";

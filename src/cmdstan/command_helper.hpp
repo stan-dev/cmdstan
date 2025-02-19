@@ -16,6 +16,7 @@
 #include <stan/model/model_base.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
 #include <boost/algorithm/string.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -147,21 +148,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
   if (num_chains == 1) {
     return context_vector(1, get_var_context(file));
   }
-  auto make_context = [](auto &&file, auto &&stream) -> shared_context_ptr {
-    auto [file_name, file_ending] = file::get_basename_suffix(file);
-    if (file_ending == ".json") {
-      using stan::json::json_data;
-      return std::make_shared<json_data>(json_data(stream));
-    } else if (file_ending == ".R") {
-      using stan::io::dump;
-      return std::make_shared<stan::io::dump>(dump(stream));
-    } else {
-      // should never happen, caught by check_valid_file below
-      std::stringstream msg;
-      msg << "file ending of " << file_ending << " is not supported by cmdstan";
-      throw std::invalid_argument(msg.str());
-    }
-  };
   // use default for all chain inits
   if (file.empty()) {
     return context_vector(num_chains,
@@ -169,7 +155,6 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
   } else {
     auto check_valid_file = [](const std::string &file) {
       auto [file_name, file_ending] = file::get_basename_suffix(file);
-
       if (file_ending.empty()) {
         std::stringstream msg;
         msg << "Found: \"" << file
@@ -182,6 +167,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
             << " is not supported by cmdstan";
         throw std::invalid_argument(msg.str());
       }
+
       if (file_ending != ".json") {
         std::cerr << "Warning: file '" << file
                   << "' is being read as an 'RDump' file.\n"
@@ -191,56 +177,76 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
                   << std::endl;
       }
     };
-
-    bool has_commas = file.find(',') != std::string::npos;
+    const bool has_commas = file.find(',') != std::string::npos;
     auto filenames = file::make_filenames(file, "", "", num_chains, id);
-
-    if (has_commas) {
-      for (auto &&file_name : filenames) {
-        check_valid_file(file_name);
+    int sentinal = 1;
+    std::cout <<"\nFile: " << file << "\n";
+    for (auto &&file_name : filenames) {
+      std::cout << "file(" << sentinal << "): " << file_name << "\n";
+      sentinal++;
+      check_valid_file(file_name);
+    }
+    auto make_context = [](auto &&file, auto &&stream) -> shared_context_ptr {
+      auto [file_name, file_ending] = file::get_basename_suffix(file);
+      if (file_ending == ".json") {
+        using stan::json::json_data;
+        return std::make_shared<json_data>(json_data(stream));
+      } else if (file_ending == ".R") {
+        using stan::io::dump;
+        return std::make_shared<stan::io::dump>(dump(stream));
+      } else {
+        // should never happen, caught by check_valid_file below
+        std::stringstream msg;
+        msg << "file ending of " << file_ending << " is not supported by cmdstan";
+        throw std::invalid_argument(msg.str());
       }
-    } else {
-      check_valid_file(file);
+    };
+    bool all_exists = true;
+    for (auto&& file_name : filenames) {
+      all_exists &= std::filesystem::exists(file_name);
+    }
+    const bool base_file_exists = std::filesystem::exists(file);
+    if (!all_exists && !base_file_exists) {
+      std::stringstream missing_files;
+      if (filenames.size() == 1 && num_chains == 1) {
+        missing_files << "missing file: [" << file << "]";
+        throw std::invalid_argument(missing_files.str());
+      }
+      missing_files << "missing files: [";
+      for (int i = 0; i < filenames.size(); ++i) {
+        auto&& file_name = filenames[i];
+        if (!std::filesystem::exists(file_name)) {
+          missing_files << file_name;
+          if (i < filenames.size() - 1) {
+            missing_files << ", ";
+          }
+        }
+      }
+      missing_files << "]";
+      // Extra message about _{1..N} trick to inform users
+      if (!has_commas && num_chains > 1) {
+        missing_files << "\n When cmdstan is given a base file ending in _N,"
+        " where N is the cmdstan id argument, and there are multiple chains or pathfinders,"
+        " cmdstan will assume files _{N..(N + num_processes) exists. If you did"
+        " not intend to use this feature please change your file name"
+        " such that your input file name does not end with _N "
+        "(the default value of N is 1).";
+      }
+      throw std::invalid_argument(missing_files.str());
     }
 
-    auto &file_1 = filenames[0];
-    std::fstream stream_1(file_1.c_str(), std::fstream::in);
-    // if file_1 exists we'll assume num_chains of these files exist
-    if (stream_1.rdstate() & std::ifstream::failbit) {
-      // if we were given a user-specified list, this is an error
-      if (has_commas) {
-        std::stringstream msg;
-        msg << "cannot open \"" << file_1 << "\"" << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
-
-      // otherwise, we will try to find a base file and use n copies of it
-      std::fstream stream(file.c_str(), std::fstream::in);
-      if (stream.rdstate() & std::ifstream::failbit) {
-        std::string file_name_err
-            = std::string("\"" + file_1 + "\" and base file \"" + file + "\"");
-        std::stringstream msg;
-        msg << "Searching for  \"" << file_name_err << std::endl;
-        msg << "Can't open either of specified files," << file_name_err
-            << std::endl;
-        throw std::invalid_argument(msg.str());
-      } else {
-        return context_vector(num_chains, make_context(file, stream));
-      }
-    } else {
-      // If we found file_1 then we'll assume file_{1...N} exists
+    if (all_exists) {
       context_vector ret;
       ret.reserve(num_chains);
-      ret.push_back(make_context(file_1, stream_1));
-      for (size_t i = 1; i < num_chains; ++i) {
-        auto &file_i = filenames[i];
+      for (size_t i = 0; i < num_chains; ++i) {
+        auto& file_i = filenames[i];
         std::fstream stream_i(file_i.c_str(), std::fstream::in);
         // If any stream fails here something went wrong with file names
-        if (stream_i.rdstate() & std::ifstream::failbit) {
+        if ((stream_i.rdstate() & std::ifstream::failbit) != 0) {
           std::stringstream msg;
           if (!has_commas) {
             // in this case, we generated a template from the given name
-            msg << "Given the template \"" << file << "\", found \"" << file_1
+            msg << "Given the template \"" << file << "\", found \"" << filenames[0]
                 << "\" but ";
           }
           msg << "cannot open \"" << file_i << "\"" << std::endl;
@@ -249,6 +255,28 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
         ret.push_back(make_context(file_i, stream_i));
       }
       return ret;
+    } else {
+      // Fallback to base file and use n copies of it
+      if (has_commas) {
+        std::stringstream msg;
+        msg << "Files in comma seperated input not found: " << file << "]" << std::endl;
+        throw std::invalid_argument(msg.str());
+      }
+      // otherwise, we will try to find a base file and use n copies of it
+      std::fstream stream(file.c_str(), std::fstream::in);
+      if (stream.rdstate() & std::ifstream::failbit) {
+        std::string file_name_err
+            = std::string("\"" + filenames[0] + "\" and base file \"" + file + "\"");
+        std::stringstream msg;
+        msg << "Searching for  \"" << file_name_err << std::endl;
+        msg << "Can't open either of specified files," << file_name_err
+            << std::endl;
+
+        throw std::invalid_argument(msg.str());
+      } else {
+        return context_vector(num_chains, make_context(file, stream));
+      }
+
     }
   }
 }

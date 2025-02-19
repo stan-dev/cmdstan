@@ -139,10 +139,14 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
      << " output file=" << convert_model_path(dev_null_path)
-     << " init=" << convert_model_path(init2_data) << ","
+     << " init=" << convert_model_path(init_data) << ","
      << convert_model_path(init_bad_2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
+    std::cout << "Command: \n" << cmd << "\n";
+    std::cout << out.output << "\n";
+    std::cout << out.hasError << "\n";
+
   ASSERT_TRUE(out.hasError) << out.output;
 }
 
