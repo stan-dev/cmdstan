@@ -143,10 +143,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
      << convert_model_path(init_bad_2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-    std::cout << "Command: \n" << cmd << "\n";
-    std::cout << out.output << "\n";
-    std::cout << out.hasError << "\n";
-
+  // TODO assert on actual error message content -- should contain "User-specified initialization failed."
   ASSERT_TRUE(out.hasError) << out.output;
 }
 

@@ -48,7 +48,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -64,7 +64,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -100,7 +100,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -179,13 +179,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
     };
     const bool has_commas = file.find(',') != std::string::npos;
     auto filenames = file::make_filenames(file, "", "", num_chains, id);
-    int sentinal = 1;
-    std::cout <<"\nFile: " << file << "\n";
-    for (auto &&file_name : filenames) {
-      std::cout << "file(" << sentinal << "): " << file_name << "\n";
-      sentinal++;
-      check_valid_file(file_name);
-    }
+
     auto make_context = [](auto &&file, auto &&stream) -> shared_context_ptr {
       auto [file_name, file_ending] = file::get_basename_suffix(file);
       if (file_ending == ".json") {
@@ -197,57 +191,58 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
       } else {
         // should never happen, caught by check_valid_file below
         std::stringstream msg;
-        msg << "file ending of " << file_ending << " is not supported by cmdstan";
+        msg << "file ending of " << file_ending
+            << " is not supported by cmdstan";
         throw std::invalid_argument(msg.str());
       }
     };
+
     bool all_exists = true;
-    for (auto&& file_name : filenames) {
-      all_exists &= std::filesystem::exists(file_name);
-    }
-    const bool base_file_exists = std::filesystem::exists(file);
-    if (!all_exists && !base_file_exists) {
-      std::stringstream missing_files;
-      if (filenames.size() == 1 && num_chains == 1) {
-        missing_files << "missing file: [" << file << "]";
-        throw std::invalid_argument(missing_files.str());
+    std::string missing_files;
+
+    // check files are valid and exist, or build up a list of the missing ones
+    // if not
+    {
+      std::stringstream missing_files_stream;
+      missing_files_stream << "missing file";
+      if (num_chains > 1) {
+        missing_files_stream << "s";
       }
-      missing_files << "missing files: [";
-      for (int i = 0; i < filenames.size(); ++i) {
-        auto&& file_name = filenames[i];
-        if (!std::filesystem::exists(file_name)) {
-          missing_files << file_name;
-          if (i < filenames.size() - 1) {
-            missing_files << ", ";
+      missing_files_stream << ": [";
+
+      for (auto &&file_name : filenames) {
+        for (int i = 0; i < filenames.size(); ++i) {
+          auto &&file_name = filenames[i];
+          check_valid_file(file_name);
+
+          if (!std::filesystem::exists(file_name)) {
+            all_exists = false;
+            missing_files_stream << file_name;
+            if (i < filenames.size() - 1) {
+              missing_files_stream << ", ";
+            }
           }
         }
+        all_exists &= std::filesystem::exists(file_name);
       }
-      missing_files << "]";
-      // Extra message about _{1..N} trick to inform users
-      if (!has_commas && num_chains > 1) {
-        missing_files << "\n When cmdstan is given a base file ending in _N,"
-        " where N is the cmdstan id argument, and there are multiple chains or pathfinders,"
-        " cmdstan will assume files _{N..(N + num_processes) exists. If you did"
-        " not intend to use this feature please change your file name"
-        " such that your input file name does not end with _N "
-        "(the default value of N is 1).";
-      }
-      throw std::invalid_argument(missing_files.str());
+      missing_files_stream << "]";
+
+      missing_files = missing_files_stream.str();
     }
 
     if (all_exists) {
       context_vector ret;
       ret.reserve(num_chains);
       for (size_t i = 0; i < num_chains; ++i) {
-        auto& file_i = filenames[i];
+        auto &file_i = filenames[i];
         std::fstream stream_i(file_i.c_str(), std::fstream::in);
         // If any stream fails here something went wrong with file names
         if ((stream_i.rdstate() & std::ifstream::failbit) != 0) {
           std::stringstream msg;
           if (!has_commas) {
             // in this case, we generated a template from the given name
-            msg << "Given the template \"" << file << "\", found \"" << filenames[0]
-                << "\" but ";
+            msg << "Given the template \"" << file << "\", found \""
+                << filenames[0] << "\" but ";
           }
           msg << "cannot open \"" << file_i << "\"" << std::endl;
           throw std::invalid_argument(msg.str());
@@ -255,28 +250,36 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
         ret.push_back(make_context(file_i, stream_i));
       }
       return ret;
+    } else if (has_commas) {
+      // user directly specified a list of files, some of which don't exist
+      throw std::invalid_argument(missing_files);
     } else {
-      // Fallback to base file and use n copies of it
-      if (has_commas) {
-        std::stringstream msg;
-        msg << "Files in comma seperated input not found: " << file << "]" << std::endl;
-        throw std::invalid_argument(msg.str());
-      }
       // otherwise, we will try to find a base file and use n copies of it
       std::fstream stream(file.c_str(), std::fstream::in);
       if (stream.rdstate() & std::ifstream::failbit) {
-        std::string file_name_err
-            = std::string("\"" + filenames[0] + "\" and base file \"" + file + "\"");
         std::stringstream msg;
-        msg << "Searching for  \"" << file_name_err << std::endl;
-        msg << "Can't open either of specified files," << file_name_err
-            << std::endl;
+        msg << missing_files << std::endl;
+
+        if (num_chains > 1) {
+          msg << "Also failed to find base file" << file << std::endl;
+          msg << "When cmdstan is given a file 'name' and there are "
+                 "multiple chains or pathfinders,"
+                 " cmdstan will look for files 'name_{N..(N + "
+                 "num_processes)' where N is the id (typically, 1)."
+                 " If these are not found, then it looks for the exact "
+                 "file name as passed."
+                 " In this case, neither option was found.";
+        }
 
         throw std::invalid_argument(msg.str());
       } else {
+        if (num_chains > 1) {
+          std::cerr << "Warning: file '" << file
+                    << "' is being used to initialize all " << num_chains
+                    << " chains!" << std::endl;
+        }
         return context_vector(num_chains, make_context(file, stream));
       }
-
     }
   }
 }
@@ -733,7 +736,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&... args) {
+                             Ts &&...args) {
   writers.reserve(num_chains);
   auto filenames = file::make_filenames(filename, tag, suffix, num_chains, id);
 
