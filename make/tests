@@ -23,7 +23,6 @@ src/test/%.d : test/%.o
 
 ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
 ############################################################
@@ -56,8 +55,14 @@ test-headers: $(HEADER_TESTS)
 ##
 TEST_MODELS := $(wildcard src/test/test-models/*.stan)
 
+ifneq ($(filter test-models-hpp,$(MAKECMDGOALS)),)
+-include $(patsubst %.stan,%.d,$(TEST_MODELS))
+include src/cmdstan/main.d
+endif
+
 .PHONY: test-models-hpp
 test-models-hpp: $(patsubst %.stan,%.hpp,$(TEST_MODELS)) $(patsubst %.stan,%$(EXE),$(TEST_MODELS))
+
 ##
 # Tests that depend on compiled models
 ##

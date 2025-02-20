@@ -1,5 +1,10 @@
 src/cmdstan/stansummary.d: DEPTARGETS = -MT bin/cmdstan/stansummary.o
+# don't build anything during a `make clean`
+ifneq ($(MAKECMDGOALS),)
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 -include src/cmdstan/stansummary.d
+endif
+endif
 
 bin/cmdstan/%.o : src/cmdstan/%.cpp
 	@mkdir -p $(dir $@)
