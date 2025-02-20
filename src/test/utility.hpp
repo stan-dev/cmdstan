@@ -11,7 +11,7 @@
 #include <vector>
 #include <sys/stat.h>
 
-#define EXPECT_IN_STRING(needle, haystack)      \
+#define EXPECT_IN_STRING(needle, haystack)                  \
   EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 

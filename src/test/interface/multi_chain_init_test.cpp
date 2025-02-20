@@ -163,5 +163,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_R) {
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
   EXPECT_FALSE(out.hasError);
-  EXPECT_IN_STRING("This format is deprecated and will not receive new features", out.output);
+  EXPECT_IN_STRING(
+      "This format is deprecated and will not receive new features",
+      out.output);
 }
