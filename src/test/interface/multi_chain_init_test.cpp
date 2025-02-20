@@ -92,7 +92,9 @@ TEST_F(CmdStan, multi_chain_multi_init_file_id_bad) {
      << " method=sample num_chains=3";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_TRUE(out.hasError);
+  EXPECT_TRUE(out.hasError);
+  EXPECT_IN_STRING("Cannot open some of the requested files", out.output);
+  EXPECT_IN_STRING("In this case, neither option was found.", out.output);
 }
 
 TEST_F(CmdStan, multi_chain_multi_init_file_comma_missing) {
@@ -105,7 +107,8 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_missing) {
      << convert_model_path(init2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_TRUE(out.hasError);
+  EXPECT_TRUE(out.hasError);
+  EXPECT_IN_STRING("Cannot open some of the requested files", out.output);
 }
 
 TEST_F(CmdStan, multi_chain_multi_init_file_comma_wrong_number) {
@@ -117,7 +120,9 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_wrong_number) {
      << convert_model_path(init2_3_data) << " method=sample num_chains=3";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_TRUE(out.hasError) << out.output;
+  EXPECT_TRUE(out.hasError) << out.output;
+  EXPECT_IN_STRING("Number of filenames does not match number of chains",
+                   out.output);
 }
 
 TEST_F(CmdStan, multi_chain_multi_init_file_actually_used) {
@@ -130,7 +135,8 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used) {
      << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_TRUE(out.hasError) << out.output;
+  EXPECT_TRUE(out.hasError) << out.output;
+  EXPECT_IN_STRING("User-specified initialization failed.", out.output);
 }
 
 TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
@@ -143,9 +149,8 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
      << convert_model_path(init_bad_2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  // TODO assert on actual error message content -- should contain
-  // "User-specified initialization failed."
-  ASSERT_TRUE(out.hasError) << out.output;
+  EXPECT_TRUE(out.hasError) << out.output;
+  EXPECT_IN_STRING("User-specified initialization failed.", out.output);
 }
 
 TEST_F(CmdStan, multi_chain_multi_init_file_R) {
@@ -157,5 +162,6 @@ TEST_F(CmdStan, multi_chain_multi_init_file_R) {
      << " method=sample num_chains=4";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
-  ASSERT_FALSE(out.hasError);
+  EXPECT_FALSE(out.hasError);
+  EXPECT_IN_STRING("This format is deprecated and will not receive new features", out.output);
 }

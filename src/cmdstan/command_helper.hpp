@@ -115,11 +115,15 @@ inline void check_valid_context_file_name(const std::string &file) {
   auto [file_name, file_ending] = file::get_basename_suffix(file);
   if (file_ending != ".json") {
     if (file_ending != ".R") {
-      throw std::invalid_argument(
-          "User specified files must end in .json or .R. Found: "
-                  + file_ending.empty()
-              ? file
-              : file_ending);
+      std::stringstream msg;
+      msg << "User specified files must end in .json or .R. Found: ";
+      if (file_ending.empty()) {
+        msg << file;
+      } else {
+        msg << file_ending;
+      }
+      msg << std::endl;
+      throw std::invalid_argument(msg.str());
     }
 
     std::cerr << "Warning: file '" << file
@@ -194,10 +198,11 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
     auto [file_name, file_ending] = file::get_basename_suffix(file);
     if (file_ending == ".json") {
       using stan::json::json_data;
-      return std::make_shared<json_data>(json_data(std::move(stream)));
+      return std::make_shared<json_data>(json_data(stream));
     } else if (file_ending == ".R") {
       using stan::io::dump;
-      return std::make_shared<dump>(dump(std::move(stream)));
+      return std::make_shared<dump>(dump(stream));
+
     } else {
       // should never happen, caught by check_valid_context_file_name above
       std::stringstream msg;

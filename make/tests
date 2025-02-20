@@ -8,7 +8,8 @@ test/%$(EXE) : INC += $(INC_GTEST) -I $(RAPIDJSON)
 test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS)
 	$(LINK.cpp) $(filter-out src/test/test-models/% src/%.csv bin/% test/%.hpp %.hpp-test,$^) $(LDLIBS) $(OUTPUT_OPTION)
 
-test/%.o : src/test/%.cpp $(wildcard src/cmdstan/*.hpp)
+.PRECIOUS: test/%.o
+test/%.o : src/test/%.cpp src/test/utility.hpp $(wildcard src/cmdstan/*.hpp)
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 

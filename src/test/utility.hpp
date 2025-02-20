@@ -3,13 +3,17 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <gtest/gtest.h>
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-
 #include <sys/stat.h>
+
+#define EXPECT_IN_STRING(needle, haystack)      \
+  EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
+      << "could not find '" << needle << "' in '" << haystack << "'";
 
 namespace cmdstan {
 namespace test {
