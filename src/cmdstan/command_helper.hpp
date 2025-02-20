@@ -47,7 +47,7 @@ inline constexpr auto get_arg_pointer(T &&x) {
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
-                                      Args &&... args) {
+                                      Args &&...args) {
   return get_arg_pointer(arg_list->arg(arg1), args...);
 }
 
@@ -63,7 +63,7 @@ inline constexpr auto get_arg_pointer(List &&arg_list, const char *arg1,
  */
 template <typename List, typename... Args>
 inline constexpr auto get_arg(List &&arg_list, const char *arg1,
-                              Args &&... args) {
+                              Args &&...args) {
   return internal::get_arg_pointer(arg_list.arg(arg1), args...);
 }
 
@@ -99,7 +99,7 @@ inline constexpr auto get_arg_val(Arg &&argument, const char *arg_name) {
  * @param args A parameter pack of names of arguments to index into
  */
 template <typename caster, typename List, typename... Args>
-inline constexpr auto get_arg_val(List &&arg_list, Args &&... args) {
+inline constexpr auto get_arg_val(List &&arg_list, Args &&...args) {
   auto *x = get_arg(arg_list, args...);
   if (x != nullptr) {
     return dynamic_cast<std::decay_t<caster> *>(x)->value();
@@ -158,10 +158,12 @@ inline shared_context_ptr get_var_context(const std::string &file) {
 using context_vector = std::vector<shared_context_ptr>;
 /**
  * Make a vector of shared pointers to contexts.
- * @param file The name of the file. For multi-chain we will attempt to find
- *  {file_name}_1{file_ending} and if that fails try to use the named file as
+ * @param file The name of the file. For multi-chain, this can either be a
+ *  comma-separated list, or else we will attempt to find
+ *  {file_name}_{id}{file_ending} and if that fails try to use the named file as
  *  the data for each chain.
  * @param num_chains The number of chains to run
+ * @param id The id of the first chain
  * @return a std vector of shared pointers to var contexts
  */
 context_vector get_vec_var_context(const std::string &file, size_t num_chains,
@@ -236,7 +238,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
     msg << "Cannot open some of the requested files: [";
     msg << boost::algorithm::join(missing_files, ", ");
     msg << "]" << std::endl;
-    msg << "Also failed to find base file" << file << std::endl;
+    msg << "Also failed to find base file " << file << std::endl;
     msg << "When cmdstan is given a file 'name' and there are "
            "multiple chains or pathfinders,"
            " cmdstan will look for files 'name_{N..(N + "
@@ -706,7 +708,7 @@ template <typename T, typename... Ts>
 void init_filestream_writers(std::vector<T> &writers, unsigned int num_chains,
                              unsigned int id, std::string &filename,
                              std::string tag, std::string suffix, int sig_figs,
-                             Ts &&... args) {
+                             Ts &&...args) {
   writers.reserve(num_chains);
   auto filenames = file::make_filenames(filename, tag, suffix, num_chains, id);
 

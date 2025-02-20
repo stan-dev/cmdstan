@@ -15,6 +15,18 @@
   EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 
+#define EXPECT_THROW_MSG(expr, T_e, msg)   \
+  EXPECT_THROW(                            \
+      {                                    \
+        try {                              \
+          expr;                            \
+        } catch (const T_e &e) {           \
+          EXPECT_IN_STRING(msg, e.what()); \
+          throw;                           \
+        }                                  \
+      },                                   \
+      T_e);
+
 namespace cmdstan {
 namespace test {
 
@@ -67,7 +79,8 @@ char multiple_command_separator() {
  * @return the string representation of the path with the appropriate
  *    path separator.
  */
-std::string convert_model_path(const std::vector<std::string> &model_path) {
+template <typename StrVec>
+std::string convert_model_path(StrVec &&model_path) {
   std::string path;
   if (model_path.size() > 0) {
     path.append(model_path[0]);

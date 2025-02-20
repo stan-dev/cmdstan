@@ -256,7 +256,7 @@ std::ifstream safe_open(const std::string &fname) {
   std::ifstream stream(fname.c_str());
   if (fname != "" && (stream.rdstate() & std::ifstream::failbit)) {
     std::stringstream msg;
-    msg << "Can't open specified file, \"" << fname << "\"" << std::endl;
+    msg << "Cannot open specified file, \"" << fname << "\"" << std::endl;
     throw std::invalid_argument(msg.str());
   }
   return stream;
