@@ -254,6 +254,14 @@ build-mpi: $(MPI_TARGETS)
 	@echo ''
 	@echo '--- boost mpi bindings built ---'
 
+# don't build anything during a `make clean`
+# but otherwise, we always want to check main.d
+ifneq ($(MAKECMDGOALS),)
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
+include src/cmdstan/main.d
+endif
+endif
+
 .PHONY: build
 build: bin/stanc$(EXE) $(SUNDIALS_TARGETS) $(MPI_TARGETS) $(TBB_TARGETS) $(CMDSTAN_MAIN_O) $(PRECOMPILED_MODEL_HEADER) bin/stansummary$(EXE) bin/print$(EXE) bin/diagnose$(EXE)
 	@echo ''

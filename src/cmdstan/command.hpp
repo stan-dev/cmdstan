@@ -364,12 +364,17 @@ int command(int argc, const char *argv[]) {
           "Missing fitted_params argument, cannot run generate_quantities "
           "without fitted sample.");
     }
-    auto file_info = file::get_basename_suffix(fname);
-    if (file_info.second != ".csv") {
-      throw std::invalid_argument("Fitted params file must be a CSV file.");
-    }
+
     std::vector<std::string> fname_vec
-        = file::make_filenames(file_info.first, "", ".csv", num_chains, id);
+        = file::make_filenames(fname, "", ".csv", num_chains, id);
+
+    for (auto &f : fname_vec) {
+      auto file_info = file::get_basename_suffix(f);
+      if (file_info.second != ".csv") {
+        throw std::invalid_argument("Fitted params file must be a CSV file.");
+      }
+    }
+
     std::vector<std::string> param_names = get_constrained_param_names(model);
     std::vector<Eigen::MatrixXd> fitted_params_vec;
     fitted_params_vec.reserve(num_chains);

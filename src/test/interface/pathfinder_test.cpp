@@ -1,10 +1,11 @@
 #include <test/utility.hpp>
-#include <test/unit/util.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
+using cmdstan::test::count_matches;
 using cmdstan::test::file_exists;
+using cmdstan::test::is_valid_JSON;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
@@ -143,7 +144,7 @@ TEST_F(CmdStan, pathfinder_save_single_default_num_paths) {
   std::string single_json = result_json_sstream.str();
   ASSERT_FALSE(single_json.empty());
 
-  ASSERT_TRUE(stan::test::is_valid_JSON(single_json));
+  ASSERT_TRUE(is_valid_JSON(single_json));
   single_json.erase(
       std::remove_if(single_json.begin(), single_json.end(), is_whitespace),
       single_json.end());

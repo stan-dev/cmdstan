@@ -120,6 +120,31 @@ TEST(CommandHelper, make_filenames) {
   EXPECT_EQ(names.size(), num_chains);
   EXPECT_EQ(names[0], expect_n4_0);
   EXPECT_EQ(names[1], expect_n4_1);
+
+  // comma-separated list of names
+  std::string fp3 = "foo" + sep + "bar" + sep + "baz.boz,foo" + sep + "bar"
+                    + sep + "gak.boz";
+  names.clear();
+  names.resize(0);
+  names = make_filenames(fp3, "_mu", ".csv", num_chains, id);
+  EXPECT_EQ(names.size(), num_chains);
+  EXPECT_EQ(names[0], "foo" + sep + "bar" + sep + "baz_mu.boz");
+  EXPECT_EQ(names[1], "foo" + sep + "bar" + sep + "gak_mu.boz");
+
+  // comma-separated list of names, non-csv
+  names.clear();
+  names.resize(0);
+  names = make_filenames(fp3, "_mu", ".json", num_chains, id);
+  EXPECT_EQ(names.size(), num_chains);
+  EXPECT_EQ(names[0], "foo" + sep + "bar" + sep + "baz_mu.json");
+  EXPECT_EQ(names[1], "foo" + sep + "bar" + sep + "gak_mu.json");
+
+  // comma-separated list (incorrect length)
+  std::string fp4 = fp3 + ",foo" + sep + "bar" + sep + "flux.boz";
+  names.clear();
+  names.resize(0);
+  EXPECT_THROW(names = make_filenames(fp4, "_mu", ".csv", num_chains, id),
+               std::invalid_argument);
 }
 
 TEST(CommandHelper, check_filename_config_good) {
