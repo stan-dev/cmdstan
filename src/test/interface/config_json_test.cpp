@@ -3,9 +3,9 @@
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::file_exists;
+using cmdstan::test::is_valid_JSON;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
-using cmdstan::test::is_valid_JSON;
 
 class CmdStan : public testing::Test {
  public:

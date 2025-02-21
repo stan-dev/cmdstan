@@ -6,7 +6,6 @@
 
 using cmdstan::test::file_exists;
 
-
 TEST(interface, output_multi) {
   std::vector<std::string> model_path;
   model_path.push_back("src");

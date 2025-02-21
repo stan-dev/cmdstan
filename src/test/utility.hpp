@@ -313,7 +313,7 @@ bool file_exists(const std::string &filename) {
  * Validate JSON using rapidjson parser.
  * @param text String of JSON
  */
-bool is_valid_JSON(std::string& text) {
+bool is_valid_JSON(std::string &text) {
   rapidjson::Document document;
   return !document.Parse<0>(text.c_str()).HasParseError();
 }
