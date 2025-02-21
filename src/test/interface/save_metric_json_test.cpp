@@ -1,5 +1,8 @@
-#include <test/utility.hpp>
+// from the stan submodule -- defines stan::test::is_valid_JSON
 #include <test/unit/util.hpp>
+#undef EXPECT_THROW_MSG
+// normal cmdstan utilities
+#include <test/utility.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
 

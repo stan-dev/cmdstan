@@ -15,6 +15,8 @@
   EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 
+// TODO: a similar macro is defined in both Stan and Stan Math
+//      worth investigating if we can unify them without hassle
 #define EXPECT_THROW_MSG(expr, T_e, msg)   \
   EXPECT_THROW(                            \
       {                                    \
