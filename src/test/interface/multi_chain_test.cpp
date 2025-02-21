@@ -4,6 +4,9 @@
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
 
+using cmdstan::test::file_exists;
+
+
 TEST(interface, output_multi) {
   std::vector<std::string> model_path;
   model_path.push_back("src");
@@ -111,8 +114,7 @@ TEST(interface, output_multi_comma) {
     }
     std::string diag_name
         = cmdstan::test::convert_model_path(model_path) + "_diag_foo.csv";
-    std::ifstream diag_file(diag_name);
-    EXPECT_TRUE(diag_file.good());
+    EXPECT_TRUE(file_exists(diag_name));
   }
 
   {
@@ -137,7 +139,6 @@ TEST(interface, output_multi_comma) {
     }
     std::string diag_name
         = cmdstan::test::convert_model_path(model_path) + "_diag_bar.csv";
-    std::ifstream diag_file(diag_name);
-    EXPECT_TRUE(diag_file.good());
+    EXPECT_TRUE(file_exists(diag_name));
   }
 }

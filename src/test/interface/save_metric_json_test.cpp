@@ -1,7 +1,3 @@
-// from the stan submodule -- defines stan::test::is_valid_JSON
-#include <test/unit/util.hpp>
-#undef EXPECT_THROW_MSG
-// normal cmdstan utilities
 #include <test/utility.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
@@ -11,6 +7,8 @@ using cmdstan::test::file_exists;
 using cmdstan::test::parse_sample;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
+using cmdstan::test::is_valid_JSON;
+using cmdstan::test::count_matches;
 
 class CmdStan : public testing::Test {
  public:
@@ -52,7 +50,7 @@ TEST_F(CmdStan, save_diag_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  ASSERT_TRUE(stan::test::is_valid_JSON(metric));
+  ASSERT_TRUE(is_valid_JSON(metric));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
   EXPECT_EQ(count_matches("[", metric), 1);  // diagonal metric
@@ -73,7 +71,7 @@ TEST_F(CmdStan, save_dense_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  ASSERT_TRUE(stan::test::is_valid_JSON(metric));
+  ASSERT_TRUE(is_valid_JSON(metric));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
   EXPECT_EQ(count_matches("[", metric), 7);  // dense metric
@@ -94,7 +92,7 @@ TEST_F(CmdStan, save_unit_metric) {
   result_sstream << result_stream.rdbuf();
   result_stream.close();
   std::string metric = result_sstream.str();
-  ASSERT_TRUE(stan::test::is_valid_JSON(metric));
+  ASSERT_TRUE(is_valid_JSON(metric));
   EXPECT_EQ(count_matches("stepsize", metric), 1);
   EXPECT_EQ(count_matches("inv_metric", metric), 1);
   EXPECT_EQ(count_matches("[", metric), 1);  // unit metric is diagonal

@@ -3,7 +3,9 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <rapidjson/document.h>
 #include <gtest/gtest.h>
+
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
@@ -305,6 +307,15 @@ int idx_first_match(const std::vector<std::string> &lines,
 bool file_exists(const std::string &filename) {
   struct stat buffer;
   return (stat(filename.c_str(), &buffer) == 0);
+}
+
+/**
+ * Validate JSON using rapidjson parser.
+ * @param text String of JSON
+ */
+bool is_valid_JSON(std::string& text) {
+  rapidjson::Document document;
+  return !document.Parse<0>(text.c_str()).HasParseError();
 }
 
 }  // namespace test

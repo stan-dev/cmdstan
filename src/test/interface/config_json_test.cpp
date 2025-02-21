@@ -1,11 +1,11 @@
-#include <gtest/gtest.h>
-#include <test/unit/util.hpp>
 #include <test/utility.hpp>
+#include <gtest/gtest.h>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::file_exists;
 using cmdstan::test::run_command;
 using cmdstan::test::run_command_output;
+using cmdstan::test::is_valid_JSON;
 
 class CmdStan : public testing::Test {
  public:
@@ -44,7 +44,7 @@ TEST_F(CmdStan, config_json_output_valid) {
   std::string json = result_json_sstream.str();
 
   ASSERT_FALSE(json.empty());
-  ASSERT_TRUE(stan::test::is_valid_JSON(json));
+  ASSERT_TRUE(is_valid_JSON(json));
 }
 
 TEST_F(CmdStan, config_json_output_not_requested) {
