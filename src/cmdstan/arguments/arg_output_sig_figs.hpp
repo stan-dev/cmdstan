@@ -12,8 +12,10 @@ class arg_output_sig_figs : public int_argument {
     _description
         = "The number of significant figures used for the output CSV files.";
     _validity
-        = "0 <= integer <= 18, or -1 to use the current operating system's default "
-          "number of significant figures (This will vary, but on many systems it is 6).";
+        = "0 <= integer <= 18, or -1 to use the current operating system's "
+          "default "
+          "number of significant figures (This will vary, but on many systems "
+          "it is 6).";
     _default = "8";
     _default_value = 8;
     _value = _default_value;
