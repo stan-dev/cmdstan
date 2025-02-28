@@ -13,7 +13,11 @@ class arg_init : public string_argument {
     _description = std::string("Initialization method: ")
                    + std::string("\"x\" initializes randomly between [-x, x], ")
                    + std::string("\"0\" initializes to 0, ")
-                   + std::string("anything else identifies a file of values");
+                   + std::string(
+                       "anything else identifies a file of values. If "
+                       "multiple chains are run, this can either be a single "
+                       "path, in which case its name will have _ID appended, "
+                       "or a comma-separated list of names.");
     _default = "\"2\"";
     _default_value = "2";
     _value = _default_value;

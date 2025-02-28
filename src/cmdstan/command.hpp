@@ -333,8 +333,7 @@ int command(int argc, const char *argv[]) {
     }
 
     if (num_chains == 1) {
-      return_code = stan::services::pathfinder::pathfinder_lbfgs_single<
-          false, stan::model::model_base>(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
           model, *(init_contexts[0]), random_seed, id, init_radius,
           history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
           tol_rel_grad, tol_param, max_lbfgs_iters, num_elbo_draws, num_draws,
@@ -347,8 +346,7 @@ int command(int argc, const char *argv[]) {
       stan::callbacks::unique_stream_writer<std::ofstream> pathfinder_writer(
           std::move(ofs), "# ");
       write_config(pathfinder_writer, parser, model);
-      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi<
-          stan::model::model_base>(
+      return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
           model, init_contexts, random_seed, id, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           max_lbfgs_iters, num_elbo_draws, num_draws, num_psis_draws,
@@ -366,12 +364,17 @@ int command(int argc, const char *argv[]) {
           "Missing fitted_params argument, cannot run generate_quantities "
           "without fitted sample.");
     }
-    auto file_info = file::get_basename_suffix(fname);
-    if (file_info.second != ".csv") {
-      throw std::invalid_argument("Fitted params file must be a CSV file.");
-    }
+
     std::vector<std::string> fname_vec
-        = file::make_filenames(file_info.first, "", ".csv", num_chains, id);
+        = file::make_filenames(fname, "", ".csv", num_chains, id);
+
+    for (auto &f : fname_vec) {
+      auto file_info = file::get_basename_suffix(f);
+      if (file_info.second != ".csv") {
+        throw std::invalid_argument("Fitted params file must be a CSV file.");
+      }
+    }
+
     std::vector<std::string> param_names = get_constrained_param_names(model);
     std::vector<Eigen::MatrixXd> fitted_params_vec;
     fitted_params_vec.reserve(num_chains);
