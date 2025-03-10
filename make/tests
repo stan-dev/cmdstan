@@ -37,7 +37,8 @@ test/dummy.cpp:
 .PHONY: test-headers
 test-headers: $(HEADER_TESTS)
 
-ifneq ($(filter test,$(MAKECMDGOALS)),)
+ifneq ($(filter test/%,$(MAKECMDGOALS)),)
+
 include src/cmdstan/main.d
 
 TEST_SRCS = $(wildcard src/test/*.cpp)
