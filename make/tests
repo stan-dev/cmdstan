@@ -41,7 +41,7 @@ ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 
 include src/cmdstan/main.d
 
-TEST_SRCS = $(wildcard src/test/*.cpp)
+TEST_SRCS = $(wildcard src/test/interface/*.cpp)
 TEST_DEPFILES := $(TEST_SRCS:src/test/%.cpp=test/%.d)
 $(TEST_DEPFILES):
 include $(wildcard $(TEST_DEPFILES))
