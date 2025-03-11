@@ -77,13 +77,6 @@ def makeBuild(j):
     doCommand(command)
 
 
-def makeTestModels(j):
-    if j == None:
-        command = 'make test-models-hpp'
-    else:
-        command = 'make -j%d test-models-hpp' % j
-    doCommand(command)
-
 def makeMathLibs(j):
     if j == None:
         command = 'make -f stan/lib/stan_math/make/standalone math-libs'
@@ -176,7 +169,6 @@ def main():
     makeBuild(j)
     if (isWin()):
         makeMathLibs(j)
-    makeTestModels(j)
 
     # pass 1:  call make to compile test targets
     for i in range(argsIdx,len(sys.argv)):
