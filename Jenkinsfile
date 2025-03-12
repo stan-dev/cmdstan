@@ -12,9 +12,7 @@ def setupCXX(CXX = env.CXX) {
 }
 
 def runTests(String prefix = "") {
-    """ make -j${env.PARALLEL} build
-        ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
-    """
+    "${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface"
 }
 
 def runWinTests(String prefix = "") {
@@ -27,7 +25,6 @@ def runWinTests(String prefix = "") {
             SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
             SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
             SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
-            make -j${env.PARALLEL} build
             python ${prefix}runCmdStanTests.py -j${env.PARALLEL} src/test/interface
         """
     }
@@ -38,7 +35,6 @@ def deleteDirWin() {
     deleteDir()
 }
 
-def isBranch(String b) { env.BRANCH_NAME == b }
 Boolean isPR() { env.CHANGE_URL != null }
 String fork() { env.CHANGE_FORK ?: "stan-dev" }
 String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
@@ -62,7 +58,7 @@ pipeline {
         MAC_CXX = 'clang++'
         LINUX_CXX = 'clang++-6.0'
         WIN_CXX = 'g++'
-        PARALLEL = 8
+        PARALLEL = 4
         MPICXX = 'mpicxx.openmpi'
         GIT_AUTHOR_NAME = 'Stan Jenkins'
         GIT_AUTHOR_EMAIL = 'mc.stanislaw@gmail.com'

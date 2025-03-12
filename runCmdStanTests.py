@@ -15,7 +15,7 @@ import time
 WIN_SFX = '.exe'
 TEST_SFX = '_test.cpp'
 DEBUG = False
-BATCH_SIZE = 25
+BATCH_SIZE = 50
 
 def usage():
     sys.stdout.write('usage: %s <path/test/dir(/files)>\n' % sys.argv[0])
