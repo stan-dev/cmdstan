@@ -325,7 +325,7 @@ namespace internal {
 // support for C++17 (currently missing from our minimum clang version)
 #ifdef _WIN32
 #include <io.h>
-void make_unwritable_file(const std::string &filename) {
+void make_unwritable(const std::string &filename) {
   _chmod(filename.c_str(), _S_IREAD);
 }
 void make_writable(const std::string &filename) {
