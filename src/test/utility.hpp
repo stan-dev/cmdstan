@@ -343,8 +343,11 @@ void make_writable(const std::string &filename) {
 }  // namespace internal
 
 struct temporary_unwritable_file {
-  std::string filename;
-  temporary_unwritable_file(const std::string &filename) : filename(filename) {
+ public:
+  const std::string filename;
+
+  explicit temporary_unwritable_file(std::string filename)
+      : filename(filename) {
     {
       // this will create the file if it does not exist
       std::ofstream ofs(filename);
@@ -353,6 +356,7 @@ struct temporary_unwritable_file {
     EXPECT_TRUE(file_exists(filename));
     internal::make_unwritable(filename);
   }
+
   ~temporary_unwritable_file() noexcept(false) {
     internal::make_writable(filename);
     EXPECT_EQ(remove(filename.c_str()), 0);
