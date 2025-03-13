@@ -13,7 +13,6 @@ using cmdstan::test::run_command_output;
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
-    dev_null_path = {"/dev", "null"};
     multi_normal_model = {"src", "test", "test-models", "multi_normal_model"};
     eight_schools_model = {"src", "test", "test-models", "eight_schools"};
     eight_schools_data
@@ -36,7 +35,6 @@ class CmdStan : public testing::Test {
     std::remove(convert_model_path(output_single_json).c_str());
   }
 
-  std::vector<std::string> dev_null_path;
   std::vector<std::string> multi_normal_model;
   std::vector<std::string> eight_schools_model;
   std::vector<std::string> eight_schools_data;

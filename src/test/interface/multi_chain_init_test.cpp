@@ -21,10 +21,10 @@ class CmdStan : public testing::Test {
     init3_data = {"src", "test", "test-models", "bern_init2.R"};
     init_bad_data = {"src", "test", "test-models", "bern_init_bad.json"};
     init_bad_2_data = {"src", "test", "test-models", "bern_init_bad_2.json"};
-    dev_null_path = {"/dev", "null"};
+    dummy_output = {"test", "ignored.csv"};
   }
   std::vector<std::string> bern_model;
-  std::vector<std::string> dev_null_path;
+  std::vector<std::string> dummy_output;
   std::vector<std::string> bern_data;
   std::vector<std::string> init_data;
   std::vector<std::string> init2_data;
@@ -38,7 +38,7 @@ TEST_F(CmdStan, multi_chain_single_init_file_good) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init_data)
      << " method=sample num_chains=2";
   std::string cmd = ss.str();
@@ -50,7 +50,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_good) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init2_data)
      << " method=sample num_chains=4";
   std::string cmd = ss.str();
@@ -62,7 +62,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_good) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init_data) << ","
      << convert_model_path(init2_3_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
@@ -74,7 +74,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_id_good) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init2_data) << " id=2"
      << " method=sample num_chains=2";
   std::string cmd = ss.str();
@@ -87,7 +87,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_id_bad) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init2_data) << " id=4"
      << " method=sample num_chains=3";
   std::string cmd = ss.str();
@@ -101,7 +101,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_missing) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data) << " output file="
-     << convert_model_path(dev_null_path)
+     << convert_model_path(dummy_output)
      //  second init file does not exist
      << " init=" << convert_model_path(init2_data) << ","
      << convert_model_path(init2_data) << " method=sample num_chains=2";
@@ -115,7 +115,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_comma_wrong_number) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init_data) << ","
      << convert_model_path(init2_3_data) << " method=sample num_chains=3";
   std::string cmd = ss.str();
@@ -130,7 +130,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init_bad_data)
      << " method=sample num_chains=2";
   std::string cmd = ss.str();
@@ -144,7 +144,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_actually_used_comma) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init_data) << ","
      << convert_model_path(init_bad_2_data) << " method=sample num_chains=2";
   std::string cmd = ss.str();
@@ -157,7 +157,7 @@ TEST_F(CmdStan, multi_chain_multi_init_file_R) {
   std::stringstream ss;
   ss << convert_model_path(bern_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " init=" << convert_model_path(init3_data)
      << " method=sample num_chains=4";
   std::string cmd = ss.str();

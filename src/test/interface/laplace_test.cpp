@@ -22,7 +22,7 @@ class CmdStan : public testing::Test {
     multi_normal_mode_json
         = {"src", "test", "test-models", "multi_normal_mode.json"};
     default_file_path = {"src", "test", "test-models", "output.csv"};
-    dev_null_path = {"/dev", "null"};
+    dummy_output = {"test", "ignored.csv"};
     wrong_csv = {"src", "test", "test-models", "bern_fitted_params.csv"};
     simple_jacobian_model
         = {"src", "test", "test-models", "simple_jacobian_model"};
@@ -36,7 +36,7 @@ class CmdStan : public testing::Test {
         = {"src", "test", "test-models", "simplex_mode_bad.csv"};
   }
   std::vector<std::string> default_file_path;
-  std::vector<std::string> dev_null_path;
+  std::vector<std::string> dummy_output;
   std::vector<std::string> simple_jacobian_model;
   std::vector<std::string> simple_jacobian_mode_json;
   std::vector<std::string> multi_normal_model;
@@ -56,14 +56,14 @@ class CmdStan : public testing::Test {
 TEST_F(CmdStan, laplace_good) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv);
   run_command_output out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
 
   ss.str(std::string());
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode=" << convert_model_path(multi_normal_mode_json);
   out = run_command(ss.str());
   ASSERT_FALSE(out.hasError);
@@ -72,7 +72,7 @@ TEST_F(CmdStan, laplace_good) {
 TEST_F(CmdStan, laplace_no_mode_arg) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace 2>&1";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
@@ -82,7 +82,7 @@ TEST_F(CmdStan, laplace_no_mode_arg) {
 TEST_F(CmdStan, laplace_wrong_mode_file) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode=" << convert_model_path(wrong_csv);
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
@@ -92,7 +92,7 @@ TEST_F(CmdStan, laplace_wrong_mode_file) {
 TEST_F(CmdStan, laplace_missing_mode) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode="
      << " 2>&1";
   std::string cmd = ss.str();
@@ -103,7 +103,7 @@ TEST_F(CmdStan, laplace_missing_mode) {
 TEST_F(CmdStan, laplace_bad_draws_arg) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode=" << convert_model_path(multi_normal_mode_csv)
      << " draws=0 2>&1";
   std::string cmd = ss.str();
@@ -114,7 +114,7 @@ TEST_F(CmdStan, laplace_bad_draws_arg) {
 TEST_F(CmdStan, laplace_bad_csv_file) {
   std::stringstream ss;
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode="
      << convert_model_path(multi_normal_mode_csv_bad_config)
      << " draws=10 2>&1";
@@ -124,7 +124,7 @@ TEST_F(CmdStan, laplace_bad_csv_file) {
 
   ss.str(std::string());
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode="
      << convert_model_path(multi_normal_mode_csv_bad_names) << " draws=10 2>&1";
   cmd = ss.str();
@@ -133,7 +133,7 @@ TEST_F(CmdStan, laplace_bad_csv_file) {
 
   ss.str(std::string());
   ss << convert_model_path(multi_normal_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(dummy_output)
      << " method=laplace mode="
      << convert_model_path(multi_normal_mode_csv_bad_values)
      << " draws=10 2>&1";
