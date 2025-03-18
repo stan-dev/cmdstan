@@ -4,7 +4,6 @@
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <cmdstan/arguments/arg_sample.hpp>
 #include <cmdstan/file.hpp>
-#include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
@@ -580,18 +579,14 @@ std::vector<std::vector<double>> get_uparams_r(
  */
 void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
                             std::vector<std::vector<double>> &params_set,
-                            int sig_figs, std::ostream &output_stream) {
-  // header row
-  output_stream << std::setprecision(sig_figs) << "lp__,";
-  std::vector<std::string> p_names;
+                            stan::callbacks::writer &output) {
+  // header
+  std::vector<std::string> p_names{"lp__"};
   model.unconstrained_param_names(p_names, false, false);
-  for (size_t i = 0; i < p_names.size(); ++i) {
-    output_stream << "g_" << p_names[i];
-    if (i == p_names.size() - 1)
-      output_stream << "\n";
-    else
-      output_stream << ",";
-  }
+  std::transform(p_names.begin() + 1, p_names.end(), p_names.begin() + 1,
+                 [](std::string s) { return "g_" + s; });
+  output(p_names);
+
   // data row(s)
   std::vector<int> dummy_params_i;
   double lp;
@@ -604,10 +599,9 @@ void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
       lp = stan::model::log_prob_grad<true, false>(model, params,
                                                    dummy_params_i, gradients);
     }
-    output_stream << lp << ",";
-    std::copy(gradients.begin(), gradients.end() - 1,
-              std::ostream_iterator<double>(output_stream, ","));
-    output_stream << gradients.back() << "\n";
+    // unfortunate: var.grad clears the vector, so need to insert lp afterwards
+    gradients.insert(gradients.begin(), lp);
+    output(gradients);
   }
 }
 

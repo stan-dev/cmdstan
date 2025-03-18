@@ -449,8 +449,7 @@ int command(int argc, const char *argv[]) {
       }
     }
     try {
-      services_log_prob_grad(model, jacobian, params_r_ind, sig_figs,
-                             sample_writers[0].get_stream());
+      services_log_prob_grad(model, jacobian, params_r_ind, sample_writers[0]);
       return_code = return_codes::OK;
     } catch (const std::exception &e) {
       msg << "Error during log_prob calculation:" << std::endl;
@@ -787,7 +786,7 @@ int command(int argc, const char *argv[]) {
           }
         }
       }  // end static HMC
-    }    // ---- sample end ---- //
+    }  // ---- sample end ---- //
   } else if (user_method->arg("variational")) {
     // ---- variational start ---- //
     list_argument *algo = dynamic_cast<list_argument *>(
