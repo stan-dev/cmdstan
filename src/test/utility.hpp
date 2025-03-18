@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 #define EXPECT_IN_STRING(needle, haystack)                  \
   EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
@@ -317,6 +318,51 @@ bool is_valid_JSON(std::string &text) {
   rapidjson::Document document;
   return !document.Parse<0>(text.c_str()).HasParseError();
 }
+
+namespace internal {
+
+// TODO: can be replaced with std::filesystem when we have better compiler
+// support for C++17 (currently missing from our minimum clang version)
+#ifdef _WIN32
+#include <io.h>
+void make_unwritable(const std::string &filename) {
+  _chmod(filename.c_str(), _S_IREAD);
+}
+void make_writable(const std::string &filename) {
+  _chmod(filename.c_str(), _S_IWRITE);
+}
+#else
+void make_unwritable(const std::string &filename) {
+  chmod(filename.c_str(), 0444);
+}
+void make_writable(const std::string &filename) {
+  chmod(filename.c_str(), 0644);
+}
+#endif
+
+}  // namespace internal
+
+struct temporary_unwritable_file {
+ public:
+  const std::string filename;
+
+  explicit temporary_unwritable_file(std::string filename)
+      : filename(filename) {
+    {
+      // this will create the file if it does not exist
+      std::ofstream ofs(filename);
+      ofs.close();
+    }
+    EXPECT_TRUE(file_exists(filename));
+    internal::make_unwritable(filename);
+  }
+
+  ~temporary_unwritable_file() noexcept(false) {
+    internal::make_writable(filename);
+    EXPECT_EQ(remove(filename.c_str()), 0);
+    EXPECT_FALSE(file_exists(filename));
+  }
+};
 
 }  // namespace test
 }  // namespace cmdstan

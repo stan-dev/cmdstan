@@ -30,7 +30,6 @@ class CmdStan : public testing::Test {
                                        "bern_unconstrained_params_short.json"};
     bern_constrained_params_short
         = {"src", "test", "test-models", "bern_constrained_params_short.json"};
-    dev_null_path = {"/dev", "null"};
     test_output = {"test", "output.csv"};
     simplex_model = {"src", "test", "test-models", "simplex_model"};
     simplex_constrained_bad_csv
@@ -48,7 +47,6 @@ class CmdStan : public testing::Test {
   std::vector<std::string> bern_constrained_params_csv;
   std::vector<std::string> bern_unconstrained_params_short;
   std::vector<std::string> bern_constrained_params_short;
-  std::vector<std::string> dev_null_path;
   std::vector<std::string> test_output;
   std::vector<std::string> simplex_model;
   std::vector<std::string> simplex_constrained_csv;
@@ -166,7 +164,7 @@ TEST_F(CmdStan, log_prob_no_params) {
   std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(test_output)
      << " method=log_prob";
   std::string cmd = ss.str();
   run_command_output out = run_command(cmd);
@@ -177,7 +175,7 @@ TEST_F(CmdStan, log_prob_constrained_bad_input) {
   std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(test_output)
      << " method=log_prob constrained_params="
      << convert_model_path(bern_constrained_params_short);
   std::string cmd = ss.str();
@@ -209,7 +207,7 @@ TEST_F(CmdStan, log_prob_constrained_simplex) {
 TEST_F(CmdStan, log_prob_constrained_bad_simplex) {
   std::stringstream ss;
   ss << convert_model_path(simplex_model)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(test_output)
      << " method=log_prob constrained_params="
      << convert_model_path(simplex_constrained_bad_csv);
   std::string cmd = ss.str();
@@ -221,7 +219,7 @@ TEST_F(CmdStan, log_prob_unconstrained_bad_input) {
   std::stringstream ss;
   ss << convert_model_path(bern_log_prob_model)
      << " data file=" << convert_model_path(bern_data)
-     << " output file=" << convert_model_path(dev_null_path)
+     << " output file=" << convert_model_path(test_output)
      << " method=log_prob unconstrained_params="
      << convert_model_path(bern_unconstrained_params_short);
   std::string cmd = ss.str();

@@ -13,7 +13,6 @@ using cmdstan::test::run_command_output;
 class CmdStan : public testing::Test {
  public:
   void SetUp() {
-    dev_null = {"/dev", "null"};
     multi_normal_model = {"src", "test", "test-models", "multi_normal_model"};
     simplex_model = {"src", "test", "test-models", "simplex_model"};
     output_csv = {"test", "output.csv"};
@@ -27,7 +26,6 @@ class CmdStan : public testing::Test {
   }
 
   std::vector<std::string> default_file;
-  std::vector<std::string> dev_null;
   std::vector<std::string> multi_normal_model;
   std::vector<std::string> output_csv;
   std::vector<std::string> output_metric;

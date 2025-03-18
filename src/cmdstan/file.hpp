@@ -272,7 +272,7 @@ std::ifstream safe_open(const std::string &fname) {
 std::unique_ptr<std::ofstream> safe_create(const std::string &fname,
                                            int sig_figs) {
   auto ofs = std::make_unique<std::ofstream>(fname.c_str());
-  ofs->exceptions(std::ofstream::badbit);
+  ofs->exceptions(std::ofstream::badbit | std::ofstream::failbit);
   if (sig_figs > -1) {
     ofs->precision(sig_figs);
   }
