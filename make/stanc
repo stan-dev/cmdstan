@@ -21,9 +21,7 @@ else ifeq ($(OS),Darwin)
  STANC_XATTR := $(shell xattr bin/mac-stanc 2>/dev/null)
 else ifeq ($(OS),Linux)
  OS_TAG := linux
- ifeq ($(shell uname -m),mips64)
-  ARCH_TAG := -mips64el
- else ifeq ($(shell uname -m),ppc64le)
+ ifeq ($(shell uname -m),ppc64le)
   ARCH_TAG := -ppc64el
  else ifeq ($(shell uname -m),s390x)
   ARCH_TAG := -s390x
