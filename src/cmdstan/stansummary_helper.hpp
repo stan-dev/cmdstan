@@ -366,28 +366,29 @@ stan::mcmc::chainset parse_csv_files(const std::vector<std::string> &filenames,
  */
 std::vector<std::string> get_header(
     const std::vector<std::string> &percentiles) {
-  // Mean, MCSE,  StdDev, MAD, ... percentiles ..., ESS_bulk, ESS_tail, R_hat
-  std::vector<std::string> header(percentiles.size() + 7);
-  header.at(0) = "Mean";
-  header.at(1) = "MCSE";
-  header.at(2) = "StdDev";
-  header.at(3) = "MAD";
-  for (size_t i = 0; i < percentiles.size(); ++i) {
-    header[i + 4] = percentiles[i] + '%';
+  // Mean, MCSE,  StdDev, MAD, ... percentiles ...,
+  // ESS_bulk, ESS_tail, ESS_bulk/s, R_hat
+  std::vector<std::string> header;
+  header.emplace_back("Mean");
+  header.emplace_back("MCSE");
+  header.emplace_back("StdDev");
+  header.emplace_back("MAD");
+  for (auto per : percentiles) {
+    header.push_back(per + '%');
   }
-  size_t offset = 4 + percentiles.size();
-  header.at(offset) = "ESS_bulk";
-  header.at(offset + 1) = "ESS_tail";
-  header.at(offset + 2) = "R_hat";
+  header.emplace_back("ESS_bulk");
+  header.emplace_back("ESS_tail");
+  header.emplace_back("ESS_bulk/s");
+  header.emplace_back("R_hat");
   return header;
 }
 
 /**
  * Compute statistics for span of output columns
- *  Mean, MCSE,  StdDev, MAD, ... percentiles ..., ESS_bulk, ESS_tail, R_hat
+ *  Mean, MCSE,  StdDev, MAD, ... percentiles ...,
+ * ESS_bulk, ESS_tail, ESS_bulk/s, R_hat
  *
  * @param in set of samples from one or more chains
- * @param in vector of warmup times  (required for N_eff/S)
  * @param in vector of sampling times (required for N_eff/S)
  * @param in vector of probabilities
  * @param in vector of model param column incides in chains object
@@ -404,6 +405,8 @@ void get_stats(const stan::mcmc::chainset &chains,
     throw std::domain_error("get_stats: size mismatch");
   }
 
+  double total_sampling_time = sampling_times.sum();
+
   // Model parameters
   int i = 0;
   for (int i_chains : cols) {
@@ -415,14 +418,15 @@ void get_stats(const stan::mcmc::chainset &chains,
     for (int j = 0; j < quantiles.size(); j++)
       params(i, 4 + j) = quantiles(j);
 
+    auto offset = 4 + quantiles.size();
     auto [ess_bulk, ess_tail] = chains.split_rank_normalized_ess(i_chains);
 
-    params(i, quantiles.size() + 4) = ess_bulk;
-    params(i, quantiles.size() + 5) = ess_tail;
+    params(i, offset++) = ess_bulk;
+    params(i, offset++) = ess_tail;
+    params(i, offset++) = ess_bulk / total_sampling_time;
 
     auto [rhat_bulk, rhat_tail] = chains.split_rank_normalized_rhat(i_chains);
-    params(i, quantiles.size() + 6)
-        = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
+    params(i, offset++) = rhat_bulk > rhat_tail ? rhat_bulk : rhat_tail;
     i++;
   }
 }
