@@ -583,7 +583,8 @@ TEST(CommandStansummary, check_csv_output_sig_figs) {
   std::string energy
       = "\"energy__\",7.8,0.051,1,0.75,6.8,7.5,9.9,4.9e+02,4.9e+02,2.1e+04,1";
   std::string theta
-      = "\"theta\",0.26,0.0061,0.12,0.12,0.08,0.25,0.47,3.6e+02,4e+02,1.6e+04,1";
+      = "\"theta\",0.26,0.0061,0.12,0.12,0.08,0.25,0.47,3.6e+02,4e+02,1.6e+04,"
+        "1";
 
   std::string path_separator;
   path_separator.push_back(get_path_separator());
