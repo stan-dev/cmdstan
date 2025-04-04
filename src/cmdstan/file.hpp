@@ -105,6 +105,13 @@ std::pair<std::string, std::string> get_basename_suffix(
   return {base, suffix};
 }
 
+std::vector<std::string> split_on_comma(const std::string &input) {
+  std::vector<std::string> result;
+  boost::algorithm::split(result, input, boost::is_any_of(","),
+                          boost::token_compress_on);
+  return result;
+}
+
 /**
  * Check if two file paths are the same file.
  * @note This function only handles very basic access patterns.
@@ -117,6 +124,27 @@ std::pair<std::string, std::string> get_basename_suffix(
  */
 bool check_approx_same_file(const std::string &path1,
                             const std::string &path2) {
+  // if path1 has a comma in it, check all of them
+  // if any match, return true
+  if (path1.find(',') != std::string::npos) {
+    for (const auto &name : split_on_comma(path1)) {
+      if (check_approx_same_file(name, path2)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // same for path2
+  if (path2.find(',') != std::string::npos) {
+    for (const auto &name : split_on_comma(path2)) {
+      if (check_approx_same_file(path1, name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const auto path1_size = path1.size();
   const auto path2_size = path2.size();
   if (path1.empty() || path2.empty()) {
@@ -163,6 +191,14 @@ bool check_approx_same_file(const std::string &path1,
  * @param fname candidate output filename
  */
 void validate_output_filename(const std::string &fname) {
+  // if a , is present, check all values
+  if (fname.find(',') != std::string::npos) {
+    for (const auto &name : split_on_comma(fname)) {
+      validate_output_filename(name);
+    }
+    return;
+  }
+
   std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
   if (!fname.empty()
       && (fname[fname.size() - 1] == PATH_SEPARATOR
@@ -195,9 +231,7 @@ std::vector<std::string> make_filenames(const std::string &filename,
 
   // if a ',' is present, we assume the user fully specified the names
   if (filename.find(',') != std::string::npos) {
-    std::vector<std::string> filenames;
-    boost::algorithm::split(filenames, filename, boost::is_any_of(","),
-                            boost::token_compress_on);
+    std::vector<std::string> filenames = split_on_comma(filename);
     if (filenames.size() != num_chains) {
       std::stringstream msg;
       msg << "Number of filenames does not match number of chains: got "

@@ -277,8 +277,14 @@ int command(int argc, const char *argv[]) {
       = get_vec_var_context(init, num_chains, id);
 
   if (get_arg_val<bool_argument>(parser, "output", "save_cmdstan_config")) {
+    auto base_file = output_file;
+    // when there are commas, take first file
+    auto comma_pos = base_file.find(',');
+    if (comma_pos != std::string::npos) {
+      base_file = base_file.substr(0, comma_pos);
+    }
     auto config_filename
-        = file::get_basename_suffix(output_file).first + "_config.json";
+        = file::get_basename_suffix(base_file).first + "_config.json";
     auto ofs_args = file::safe_create(config_filename, sig_figs);
     stan::callbacks::json_writer<std::ostream> json_args(std::move(ofs_args));
     write_config(json_args, parser, model);

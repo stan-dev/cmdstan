@@ -75,6 +75,12 @@ TEST(CommandHelper, validate_output_filename) {
 
   std::string fp4 = "foo.bar" + sep + ".";
   EXPECT_THROW(validate_output_filename(fp4), std::invalid_argument);
+
+  std::string fp5 = "foo.bar,baz.gak";
+  EXPECT_NO_THROW(validate_output_filename(fp5));
+
+  std::string fp6 = "foo.bar,foo.bar" + sep + ".";
+  EXPECT_THROW(validate_output_filename(fp6), std::invalid_argument);
 }
 
 TEST(CommandHelper, make_filenames) {
@@ -253,4 +259,8 @@ TEST(CommandHelper, check_same_file_test) {
   EXPECT_FALSE(cmdstan::file::check_approx_same_file(path, dot_path_bad));
   std::string dot_path_good = "a/b/file.txt";
   EXPECT_TRUE(cmdstan::file::check_approx_same_file(path, dot_path_good));
+
+  std::string comma_path = path + "," + path;
+  EXPECT_TRUE(cmdstan::file::check_approx_same_file(path, comma_path));
+  EXPECT_TRUE(cmdstan::file::check_approx_same_file(comma_path, path));
 }
