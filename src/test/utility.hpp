@@ -384,7 +384,7 @@ void compare_to_stored_output(const std::string &output,
   expected_output_file.close();
   std::string expected_output = ss.str();
 
-  EXPECT_TRUE(output == expected_output)
+  EXPECT_EQ(output, expected_output)
       << "Output does not match expected output. Expected:\n--------\n"
       << expected_output << "\n--------\nActual:\n--------\n"
       << output
