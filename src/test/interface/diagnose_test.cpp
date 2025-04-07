@@ -96,3 +96,20 @@ TEST(CommandDiagnose, mix) {
   ss << expected_output.rdbuf();
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
+
+TEST(CommandDiagnose, divergences) {
+  std::string path_separator;
+  path_separator.push_back(get_path_separator());
+  std::string command = "bin" + path_separator + "diagnose";
+  std::string csv_file = "src" + path_separator + "test" + path_separator
+                         + "interface" + path_separator + "example_output"
+                         + path_separator + "div_output*.csv";
+
+  run_command_output out = run_command(command + " " + csv_file);
+  ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
+
+  std::ifstream expected_output("src/test/interface/example_output/div.nom");
+  std::stringstream ss;
+  ss << expected_output.rdbuf();
+  EXPECT_EQ(1, count_matches(ss.str(), out.output));
+}

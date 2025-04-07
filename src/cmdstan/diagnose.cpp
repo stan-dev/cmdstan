@@ -76,7 +76,7 @@ int main(int argc, const char *argv[]) {
   stan::io::stan_csv_metadata metadata = csv_parsed[0].metadata;
   std::vector<std::string> param_names = csv_parsed[0].header;
   size_t num_params = param_names.size();
-  int num_samples = chains.num_samples();
+  int num_samples = chains.num_samples() * chains.num_chains();
   std::vector<std::string> bad_n_eff_names;
   std::vector<std::string> bad_rhat_names;
   bool has_errors = false;
