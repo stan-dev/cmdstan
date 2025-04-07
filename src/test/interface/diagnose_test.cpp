@@ -97,7 +97,6 @@ TEST(CommandDiagnose, mix) {
   EXPECT_EQ(1, count_matches(ss.str(), out.output));
 }
 
-
 TEST(CommandDiagnose, divergences) {
   std::string path_separator;
   path_separator.push_back(get_path_separator());
