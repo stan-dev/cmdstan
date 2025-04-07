@@ -1,4 +1,4 @@
-#include <stan/mcmc/chains.hpp>
+#include <stan/mcmc/chainset.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
@@ -28,7 +28,7 @@ TEST(interface, csv_header_consistency) {
 
   std::ifstream ifstream;
   ifstream.open(samples.c_str());
-  stan::mcmc::chains<> chains(
+  stan::mcmc::chainset chains(
       stan::io::stan_csv_reader::parse(ifstream, &std::cout));
   ifstream.close();
 
