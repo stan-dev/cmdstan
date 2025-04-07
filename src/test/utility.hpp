@@ -364,6 +364,34 @@ struct temporary_unwritable_file {
   }
 };
 
+void compare_to_stored_output(const std::string &output,
+                              const std::string &expected_path) {
+  if (getenv("CMDSTAN_UPDATE_EXPECTED_OUTPUT")) {
+    std::ofstream expected_output_file(expected_path);
+    ASSERT_TRUE(expected_output_file.good())
+        << "Could not open expected output file: " << expected_path;
+    expected_output_file << output;
+    expected_output_file.close();
+    std::cout << "Updated expected output file: " << expected_path << std::endl;
+    return;
+  }
+
+  std::ifstream expected_output_file(expected_path);
+  ASSERT_TRUE(expected_output_file.good())
+      << "Could not open expected output file: " << expected_path;
+  std::stringstream ss;
+  ss << expected_output_file.rdbuf();
+  expected_output_file.close();
+  std::string expected_output = ss.str();
+
+  EXPECT_TRUE(output == expected_output)
+      << "Output does not match expected output. Expected:\n--------\n"
+      << expected_output << "\n--------\nActual:\n--------\n"
+      << output
+      << "\n--------\n\nSet CMDSTAN_UPDATE_EXPECTED_OUTPUT=1 to update the "
+         "expected output.\n";
+}
+
 }  // namespace test
 }  // namespace cmdstan
 #endif
