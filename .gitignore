@@ -56,3 +56,7 @@ output*.csv
 #vscode
 .vscode/*
 .vscode/**
+
+#clangd
+compile_commands.json
+compile_flags.txt
