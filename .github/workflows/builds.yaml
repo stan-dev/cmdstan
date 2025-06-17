@@ -50,15 +50,9 @@ jobs:
         }
 
         echo "C:/$RTOOLS/usr/bin;C:/$RTOOLS/$ARCH-w64-mingw32.static.posix/bin" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
-        echo "$(pwd)/lib/tbb" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
+        echo "$(pwd)/stan/lib/stan_math/lib/tbb" | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 
-    - name: Build  libs
+    - name: Build libs and run tests
       run: |
-        echo "CPPFLAGS=-w -Wno-psabi -Wno-misleading-indentation\n" >> make\local
-        echo "STAN_THREADS=true\n" >> make\local
         make -j2 build
-
-    - name: Run unit tests
-      shell: pwsh
-      run: |
         python runCmdStanTests.py -j2 src/test/interface
