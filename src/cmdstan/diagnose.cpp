@@ -203,7 +203,7 @@ int main(int argc, const char *argv[]) {
 
     std::cout << "Such high values indicate incomplete mixing and biased"
               << " estimation." << std::endl
-              << "You should consider regularizating your model"
+              << "You should consider regularizing your model"
               << " with additional prior information or a more"
               << " effective parameterization." << std::endl
               << std::endl;
