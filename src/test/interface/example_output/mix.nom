@@ -12,6 +12,6 @@ Rank-normalized split effective sample size satisfactory for all parameters.
 The following parameters had rank-normalized split R-hat greater than 1.01:
   mu[1], mu[2], sigma[1], theta
 Such high values indicate incomplete mixing and biased estimation.
-You should consider regularizating your model with additional prior information or a more effective parameterization.
+You should consider regularizing your model with additional prior information or a more effective parameterization.
 
 Processing complete.
