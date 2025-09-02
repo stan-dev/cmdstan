@@ -1,6 +1,17 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.37.0 (2 September 2025)
+======================================================================
+
+ - Changed the default value of sig_figs to 8. This should reduce errors when using the output of CmdStan as further input to Stan programs. (#1308)
+ - Updated the behavior of filename arguments when requesting multiple chains. In addition to the existing behavior, users can now pass a comma-separated list of filenames to specify the output files for each chain. This allows for more flexibility in naming output files when running multiple chains. (#1312, #1318)
+ - Added more information when encountering a system error like an unwriteable file or a full disk. (#1316)
+ - Improved dependency discovery when running CmdStan's test suite. (#1314)
+ - Removed the mips64el build of CmdStan. (#1319)
+ - Re-added ESS/s to stansummary. (#1320)
+ - Fixed an issue with the diagnose command using the wrong number of iterations when calculating percentages. (#1321)
+
 v2.36.0 (10 December 2024)
 ======================================================================
 
