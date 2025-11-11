@@ -27,11 +27,6 @@ void write_stan_flags(stan::callbacks::writer &writer) {
 #else
   writer("STAN_NO_RANGE_CHECKS=false");
 #endif
-#ifdef STAN_CPP_OPTIMS
-  writer("STAN_CPP_OPTIMS=true");
-#else
-  writer("STAN_CPP_OPTIMS=false");
-#endif
 }
 
 }  // namespace cmdstan
