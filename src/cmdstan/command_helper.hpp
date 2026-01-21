@@ -528,7 +528,7 @@ Eigen::VectorXd get_laplace_mode(const std::string &fname,
  * @param model Stan model
  * @return vector of vectors of parameter estimates
  */
-std::vector<std::vector<double>> get_uparams_r(
+inline std::vector<std::vector<double>> get_uparams_r(
     const std::string &fname, const stan::model::model_base &model) {
   size_t u_params_cols = 0;
   size_t u_params_rows = 0;
@@ -559,8 +559,8 @@ std::vector<std::vector<double>> get_uparams_r(
   std::vector<std::vector<double>> params_r_ind(
       u_params_rows, std::vector<double>(u_params_cols));
   size_t idx = 0;
-  for (size_t i = 0; i < u_params_rows; ++i) {
-    for (size_t j = 0; j < u_params_cols; ++j) {
+  for (size_t j = 0; j < u_params_cols; ++j) {
+    for (size_t i = 0; i < u_params_rows; ++i) {
       params_r_ind[i][j] = *(u_params_r.data() + idx);
       ++idx;
     }
@@ -577,9 +577,10 @@ std::vector<std::vector<double>> get_uparams_r(
  * @param params_set array of unconstrained parameter values
  * @
  */
-void services_log_prob_grad(const stan::model::model_base &model, bool jacobian,
-                            std::vector<std::vector<double>> &params_set,
-                            stan::callbacks::writer &output) {
+inline void services_log_prob_grad(const stan::model::model_base &model,
+                                   bool jacobian,
+                                   std::vector<std::vector<double>> &params_set,
+                                   stan::callbacks::writer &output) {
   // header
   std::vector<std::string> p_names{"lp__"};
   model.unconstrained_param_names(p_names, false, false);
