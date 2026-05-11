@@ -8,3 +8,4 @@ Here are links to create issues for related Stan projects.
 |-----------|------------|-------|
 | [Math](https://github.com/stan-dev/math/issues/new) <br /> [Stan](https://github.com/stan-dev/stan/issues/new) | [CmdStan](https://github.com/stan-dev/cmdstan/issues/new) <br /> [RStan](https://github.com/stan-dev/rstan/issues/new) <br /> [PyStan](https://github.com/stan-dev/pystan/issues/new) | [shinyStan](https://github.com/stan-dev/shinystan/issues) |
 
+All contributions must follow the [Stan AI Contribution Policy](https://github.com/stan-dev/stan/wiki/AI-Contribution-Policy).
