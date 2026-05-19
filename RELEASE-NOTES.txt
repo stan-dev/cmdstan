@@ -1,11 +1,17 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.39.0 (19 May 2026)
+======================================================================
+
+ - Fixed an issue where the `log_prob` command was reading unconstrained parameters in the incorrect order in some circumstances. (#1337)
+  - Updated tests to account for the new `converged__` column in optimization output. (#1338)
+
 v2.38.0 (13 January 2026)
 ======================================================================
 
  - Removed `STAN_CPP_OPTIMS` from the `model info` command. It was never set to the correct value. (#1332)
- 
+
 v2.37.0 (2 September 2025)
 ======================================================================
 
