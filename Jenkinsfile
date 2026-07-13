@@ -13,12 +13,11 @@ properties([
 
 def runRemainingStages = false
 def WIN_CXX = 'g++'
+def MPI_CXX = 'mpicxx.openmpi'
+def MAC_CXX = 'clang++'
 
 catchError {
   withEnv([
-    'MAC_CXX=clang++',
-    'LINUX_CXX=clang++-6.0',
-    'MPICXX=mpicxx.openmpi',
     'GIT_AUTHOR_NAME=Stan Jenkins',
     'GIT_AUTHOR_EMAIL=mc.stanislaw@gmail.com',
     'GIT_COMMITTER_NAME=Stan Jenkins',
@@ -42,13 +41,13 @@ catchError {
           emailext (
               subject: "[StanJenkins] Autoformattted: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
               body: """
-  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' has been autoformatted and the
-  changes committed to your branch, if permissions allowed.  Please pull these
-  changes before continuing.
+Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' has been autoformatted and the
+changes committed to your branch, if permissions allowed.  Please pull these
+changes before continuing.
 
-  See https://github.com/stan-dev/stan/wiki/Coding-Style-and-Idioms for setting
-  up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
-  """,
+See https://github.com/stan-dev/stan/wiki/Coding-Style-and-Idioms for setting
+up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
+""",
               recipientProviders: [[$class: 'RequesterRecipientProvider']],
               to: env.CHANGE_AUTHOR_EMAIL)
           sh '''
@@ -67,21 +66,29 @@ catchError {
       }
     }
 
+    def scmFull = scmGit(
+      branches: scm.branches,
+      userRemoteConfigs: scm.userRemoteConfigs,
+      extensions: scm.extensions + [cleanBeforeCheckout(),
+        submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
+
+    def prepTests = { extra ->
+      checkout scmFull
+      checkoutPR("stan", params.stan_pr)
+      checkoutPR("stan/lib/stan_math", params.math_pr)
+
+      def local = "CXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS\n"
+      if (params.stanc3_bin_url != "nightly") {
+        local += "STANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n"
+      }
+      writeFile(file: "make/local", text: local + extra)
+    }
+
     if (runRemainingStages) {
       parallel windows: {
         node('windows') {
           stage('Windows interface tests') {
-            checkout scmGit(
-              branches: scm.branches,
-              userRemoteConfigs: scm.userRemoteConfigs,
-              extensions: scm.extensions + [cleanBeforeCheckout(),
-                submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
-
-            def local = "CXX=${WIN_CXX}\nCXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS\n"
-            if (params.stanc3_bin_url != "nightly") {
-              local += "STANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n"
-            }
-            writeFile(file: "make/local", text: local)
+            prepTests("CXX=${WIN_CXX}")
             withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
               bat '''
                   SET "PATH=%RTOOLS%;%RTOOLS%\\usr\\bin;%PATH%"
@@ -89,6 +96,59 @@ catchError {
                   SET "PATH=%CONDA%;%PATH%"
                   python runCmdStanTests.py -j%PARALLEL% src/test/interface
               '''
+            }
+          }
+        }
+      }, linux: {
+        runPod(image: "stanorg/ci:gpu", checkout: false) {
+          stage('Linux interface tests with MPI') {
+            prepTests("""CXX=${MPI_CXX}
+STAN_MPI=true
+CXX_TYPE=gcc""")
+            sh "make build-mpi > build-mpi.log 2>&1"
+            sh './runCmdStanTests.py -j$PARALLEL src/test/interface'
+          }
+        }
+      }, mac: {
+        node('macos') {
+          stage('Mac interface tests') {
+            prepTests("CXX=${MAC_CXX}")
+            sh 'python3 ./runCmdStanTests.py -j$PARALLEL src/test/interface'
+          }
+        }
+      }, upstream: {
+        if (env.BRANCH_NAME == "downstream_tests"
+          || env.BRANCH_NAME == "downstream_hotfix"
+          || env.CHANGE_TARGET) {
+          stage('Upstream CmdStan Performance tests') {
+            build(
+                job: "CCM/Stan/CmdStan Performance Tests/downstream_tests",
+                parameters: [
+                    string(name: 'cmdstan_pr', value: env.BRANCH_NAME),
+                    string(name: 'stan_pr', value: params.stan_pr),
+                    string(name: 'math_pr', value: params.math_pr),
+                    string(name: 'stanc3_bin_url', value: params.stanc3_bin_url)
+                ],
+                wait:true)
+          }
+        }
+      }
+      /* TODO recordIssues? */
+    }
+
+    def downstreams = [
+      master: 'downstream_hotfix',
+      develop: 'downstream_tests',
+      'jenkins-new': 'jenkins-downstream-test' // only for migration testig
+    ]
+    def downstream = downstreams[env.BRANCH_NAME]
+    if (downstream) {
+      podTemplate(inheritFrom: 'jnlp') {
+        node(POD_LABEL) {
+          stage('Update downstream branch') {
+            checkout scm
+            withCredentials([gitUsernamePassword(credentialsId: 'stan-github', gitToolName: 'git-tool')]) {
+              sh "git push --force origin HEAD:refs/heads/$downstream"
             }
           }
         }
