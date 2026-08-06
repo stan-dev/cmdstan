@@ -23,11 +23,17 @@ $(patsubst %.hpp.gch,%.d,$(PRECOMPILED_MODEL_HEADER)) : $(STAN)src/stan/model/mo
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(DEPFLAGS) $<
 
+ifeq ($(CXX_TYPE),clang)
+ifeq ($(shell expr $(CXX_MAJOR) \>= 11),1)
+CXXFLAGS_PCH += -fpch-instantiate-templates
+endif
+endif
+
 $(PRECOMPILED_MODEL_HEADER) : $(STAN)src/stan/model/model_header.hpp
 	@echo ''
 	@echo '--- Compiling pre-compiled header. This might take a few seconds. ---'
 	@mkdir -p $(dir $@)
-	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
+	$(COMPILE.cpp) $(CXXFLAGS_PCH) $< $(OUTPUT_OPTION)
 
 ifeq ($(CXX_TYPE),clang)
 CXXFLAGS_PROGRAM += -include-pch $(PRECOMPILED_MODEL_HEADER)
