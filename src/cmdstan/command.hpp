@@ -394,7 +394,7 @@ int command(int argc, const char *argv[]) {
     }
     return_code = stan::services::standalone_generate(
         model, num_chains, fitted_params_vec, random_seed, interrupt, logger,
-        sample_writers);
+        sample_writers, id);
     // ---- generate_quantities end ---- //
   } else if (user_method->arg("laplace")) {
     // ---- laplace start ---- //

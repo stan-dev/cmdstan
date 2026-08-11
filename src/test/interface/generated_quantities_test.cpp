@@ -112,6 +112,43 @@ TEST_F(CmdStan, generate_quantities_same_in_out_multi_path_diff) {
   ASSERT_TRUE(out.hasError);
 }
 
+// `id` must offset the RNG, as it does for the sample method: two runs that
+// differ only in `id` must not produce identical generated quantities.  This
+// is the launch pattern CmdStanR and CmdStanPy use for parallel chains.
+TEST_F(CmdStan, generate_quantities_chain_id_rng) {
+  std::vector<std::string> out_id_1
+      = {"src", "test", "test-models", "gq_id_1.csv"};
+  std::vector<std::string> out_id_2
+      = {"src", "test", "test-models", "gq_id_2.csv"};
+  auto run_gq = [&](const std::vector<std::string> &out_path, int id) {
+    std::stringstream ss;
+    ss << convert_model_path(bern_gq_model)
+       << " data file=" << convert_model_path(bern_data)
+       << " output file=" << convert_model_path(out_path)
+       << " random seed=12345 id=" << id
+       << " method=generate_quantities fitted_params="
+       << convert_model_path(bern_fitted_params);
+    run_command_output out = run_command(ss.str());
+    EXPECT_FALSE(out.hasError) << out.output;
+  };
+  auto csv_body = [](const std::string &path) {
+    std::ifstream in(path.c_str());
+    std::stringstream out;
+    std::string line;
+    while (std::getline(in, line)) {
+      if (!line.empty() && line[0] != '#')
+        out << line << "\n";
+    }
+    return out.str();
+  };
+  run_gq(out_id_1, 1);
+  run_gq(out_id_2, 2);
+  std::string body_1 = csv_body(convert_model_path(out_id_1));
+  std::string body_2 = csv_body(convert_model_path(out_id_2));
+  ASSERT_FALSE(body_1.empty());
+  EXPECT_NE(body_1, body_2);
+}
+
 TEST_F(CmdStan, generate_quantities_non_scalar_good) {
   std::stringstream ss;
   ss << convert_model_path(gq_non_scalar_model)
