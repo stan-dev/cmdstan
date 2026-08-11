@@ -392,7 +392,6 @@ int command(int argc, const char *argv[]) {
       fitted_params_vec.emplace_back(
           fitted_params.samples.block(0, col_offset, num_rows, num_cols));
     }
-    // `id` offsets the RNG per chain, as it does for the sampler methods
     return_code = stan::services::standalone_generate(
         model, num_chains, fitted_params_vec, random_seed, interrupt, logger,
         sample_writers, id);
