@@ -1,4 +1,5 @@
 #include <test/utility.hpp>
+#include <stan/io/string_utils.hpp>
 #include <gtest/gtest.h>
 #include <string>
 
@@ -71,9 +72,7 @@ TEST_F(CmdStan, log_prob_uparams_rdump) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
   ASSERT_EQ(names[0].compare(0, 2, std::string("lp")), 0);
   ASSERT_EQ(names[1].compare(0, 2, std::string("g_")), 0);
@@ -95,9 +94,7 @@ TEST_F(CmdStan, log_prob_uparams_multi_rdump) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
 
   // log_p values calculated externally
@@ -119,9 +116,7 @@ TEST_F(CmdStan, log_prob_cparams_rdump) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_TRUE(values.size() % names.size() == 0);
 
   ASSERT_FLOAT_EQ(values[0], -26.1950918);
@@ -141,9 +136,7 @@ TEST_F(CmdStan, log_prob_uparams_json) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
 
   ASSERT_FLOAT_EQ(values[0], -26.1950918);
@@ -163,9 +156,7 @@ TEST_F(CmdStan, log_prob_uparams_multi_json) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
 
   // log_p values calculated externally
@@ -187,9 +178,7 @@ TEST_F(CmdStan, log_prob_cparams_json) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
   ASSERT_FLOAT_EQ(values[0], -26.1950918);
 }
@@ -210,9 +199,7 @@ TEST_F(CmdStan, log_prob_cparams_csv) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   ASSERT_EQ(values.size() % names.size(), 0);
   ASSERT_EQ(names[0].compare(0, 2, std::string("lp")), 0);
   ASSERT_EQ(names[1].compare(std::string("g_theta")), 0);
@@ -255,9 +242,7 @@ TEST_F(CmdStan, log_prob_constrained_simplex) {
   std::vector<std::string> header;
   std::vector<double> values;
   parse_sample(convert_model_path(test_output), config, header, values);
-  std::vector<std::string> names;
-  boost::split(names, header[0], boost::is_any_of(","),
-               boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(header[0], ",", true);
   // param is 3-array of 3-simplex, unconstrained params size == 6 + lp__
   ASSERT_EQ(names.size(), 7);
   ASSERT_EQ(values.size() % names.size(), 0);

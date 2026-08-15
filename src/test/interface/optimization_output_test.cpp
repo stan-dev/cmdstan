@@ -1,6 +1,6 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
-#include <boost/algorithm/string.hpp>
+#include <stan/io/string_utils.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 
@@ -52,11 +52,11 @@ TEST_F(CmdStan, optimize_default) {
 
   int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(config[algo_idx], "(Default)"));
+  EXPECT_TRUE(stan::io::contains(config[algo_idx], "(Default)"));
 
   int jacobian_idx = idx_first_match(config, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config[jacobian_idx], "= false (Default)"));
+  EXPECT_TRUE(stan::io::contains(config[jacobian_idx], "= false (Default)"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   auto outputs = values.size();
@@ -83,8 +83,8 @@ TEST_F(CmdStan, optimize_bfgs) {
 
   int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(config[algo_idx], "bfgs"));
-  EXPECT_FALSE(boost::contains(config[algo_idx], "lbfgs"));
+  EXPECT_TRUE(stan::io::contains(config[algo_idx], "bfgs"));
+  EXPECT_FALSE(stan::io::contains(config[algo_idx], "lbfgs"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   auto outputs = values.size();
@@ -111,7 +111,7 @@ TEST_F(CmdStan, optimize_lbfgs) {
 
   int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(config[algo_idx], "lbfgs"));
+  EXPECT_TRUE(stan::io::contains(config[algo_idx], "lbfgs"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   auto outputs = values.size();
@@ -138,7 +138,7 @@ TEST_F(CmdStan, optimize_newton) {
 
   int algo_idx = idx_first_match(config, algorithm);
   EXPECT_NE(algo_idx, -1);
-  EXPECT_TRUE(boost::contains(config[algo_idx], "newton"));
+  EXPECT_TRUE(stan::io::contains(config[algo_idx], "newton"));
 
   ASSERT_NEAR(0, values[0], 0.00001);
   auto outputs = values.size();
@@ -164,7 +164,7 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
 
   int jacobian_idx = idx_first_match(config1, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config1[jacobian_idx], "= false (Default)"));
+  EXPECT_TRUE(stan::io::contains(config1[jacobian_idx], "= false (Default)"));
 
   auto outputs = values1.size();
   ASSERT_NEAR(0, values1[0], 0.00001);
@@ -183,7 +183,7 @@ TEST_F(CmdStan, optimize_jacobian_adjust) {
 
   jacobian_idx = idx_first_match(config2, jacobian);
   EXPECT_NE(jacobian_idx, -1);
-  EXPECT_TRUE(boost::contains(config2[jacobian_idx], "= true"));
+  EXPECT_TRUE(stan::io::contains(config2[jacobian_idx], "= true"));
 
   ASSERT_NEAR(3.3, values2[outputs - 1], 0.01);
 }

@@ -1,8 +1,8 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <boost/lexical_cast.hpp>
 #include <gtest/gtest.h>
+#include <sstream>
 
 template <typename T>
 T argument_value() {
@@ -11,7 +11,9 @@ T argument_value() {
 
 template <typename T>
 std::string argument_string() {
-  return boost::lexical_cast<std::string>(argument_value<T>());
+  std::ostringstream oss;
+  oss << argument_value<T>();
+  return oss.str();
 }
 
 template <>

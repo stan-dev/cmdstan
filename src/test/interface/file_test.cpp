@@ -8,7 +8,6 @@
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <test/utility.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>

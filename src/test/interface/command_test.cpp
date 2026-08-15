@@ -2,8 +2,7 @@
 #include <cmdstan/return_codes.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/services/error_codes.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/math/policies/error_handling.hpp>
+#include <stan/io/string_utils.hpp>
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>
@@ -351,11 +350,11 @@ TEST(StanUiCommand, random_seed_default) {
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random1;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random1.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random1));
       EXPECT_EQ(1, count_matches("]", random1));
@@ -364,11 +363,11 @@ TEST(StanUiCommand, random_seed_default) {
   }
   cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random2;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random2.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random2));
       EXPECT_EQ(1, count_matches("]", random2));
@@ -393,11 +392,11 @@ TEST(StanUiCommand, random_seed_specified_same) {
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random1;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random1.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random1));
       EXPECT_EQ(1, count_matches("]", random1));
@@ -406,11 +405,11 @@ TEST(StanUiCommand, random_seed_specified_same) {
   }
   cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random2;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random2.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random2));
       EXPECT_EQ(1, count_matches("]", random2));
@@ -435,11 +434,11 @@ TEST(StanUiCommand, random_seed_specified_different) {
   std::string cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
   std::vector<std::string> lines;
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random1;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random1.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random1));
       EXPECT_EQ(1, count_matches("]", random1));
@@ -453,11 +452,11 @@ TEST(StanUiCommand, random_seed_specified_different) {
             + " output refresh=0 file=test/output.csv";
   cmd_output = run_command(command).output;
   EXPECT_EQ(1, count_matches("y values:", cmd_output));
-  split(lines, cmd_output, boost::is_any_of("\n"));
+  lines = stan::io::split(cmd_output, "\n");
   std::string random2;
   for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end();
        ++it) {
-    if (boost::starts_with(*it, "y values:")) {
+    if (stan::io::starts_with(*it, "y values:")) {
       random2.assign(*it, 9, std::string::npos);
       EXPECT_EQ(1, count_matches("[", random2));
       EXPECT_EQ(1, count_matches("]", random2));

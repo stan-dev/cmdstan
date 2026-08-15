@@ -2,7 +2,6 @@
 #include <cmdstan/return_codes.hpp>
 #include <stan/services/error_codes.hpp>
 #include <test/utility.hpp>
-#include <boost/math/policies/error_handling.hpp>
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>

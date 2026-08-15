@@ -1,5 +1,6 @@
 #include <stan/mcmc/chains.hpp>
 #include <stan/services/error_codes.hpp>
+#include <stan/io/string_utils.hpp>
 #include <test/utility.hpp>
 #include <gtest/gtest.h>
 #include <ctime>
@@ -50,10 +51,10 @@ TEST(interface, csv_header_consistency) {
     size_t equal = lhs.find("=");
     if (equal != std::string::npos) {
       name = lhs.substr(0, equal);
-      boost::trim(name);
+      stan::io::trim(name);
       if (name.compare("start_datetime") == 0) {
         value = lhs.substr(equal + 1, lhs.size());
-        boost::trim(value);
+        stan::io::trim(value);
         break;
       }
     }
