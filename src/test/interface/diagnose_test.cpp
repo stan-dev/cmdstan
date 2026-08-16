@@ -74,9 +74,10 @@ TEST(CommandDiagnose, mix) {
   std::string command = "bin" + path_separator + "diagnose";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
-                         + path_separator + "mix_output.*";
+                         + path_separator + "mix_output.";
 
-  auto out = run_command(command + " " + csv_file);
+  auto out
+      = run_command(command + " " + csv_file + "1.csv " + csv_file + "2.csv");
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   compare_to_stored_output(out.output,
@@ -89,9 +90,10 @@ TEST(CommandDiagnose, divergences) {
   std::string command = "bin" + path_separator + "diagnose";
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "example_output"
-                         + path_separator + "div_output*.csv";
+                         + path_separator + "div_output_";
 
-  auto out = run_command(command + " " + csv_file);
+  auto out
+      = run_command(command + " " + csv_file + "1.csv " + csv_file + "2.csv");
   ASSERT_FALSE(out.hasError) << "\"" << out.command << "\" quit with an error";
 
   compare_to_stored_output(out.output,
