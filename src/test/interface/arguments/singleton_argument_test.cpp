@@ -1,8 +1,9 @@
 #include <cmdstan/arguments/singleton_argument.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <boost/lexical_cast.hpp>
 #include <gtest/gtest.h>
+#include <string>
+#include <type_traits>
 
 template <typename T>
 T argument_value() {
@@ -11,7 +12,11 @@ T argument_value() {
 
 template <typename T>
 std::string argument_string() {
-  return boost::lexical_cast<std::string>(argument_value<T>());
+  if constexpr (std::is_same_v<T, std::string>) {
+    return argument_value<T>();
+  } else {
+    return std::to_string(argument_value<T>());
+  }
 }
 
 template <>
