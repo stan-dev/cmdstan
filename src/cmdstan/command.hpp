@@ -25,7 +25,7 @@
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
-#include <stan/io/ends_with.hpp>
+#include <stan/io/string_utils.hpp>
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/model/model_base.hpp>

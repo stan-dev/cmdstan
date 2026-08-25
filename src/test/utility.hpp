@@ -1,7 +1,7 @@
 #ifndef TEST__MODELS__UTILITY_HPP
 #define TEST__MODELS__UTILITY_HPP
 
-#include <boost/algorithm/string.hpp>
+#include <stan/io/string_utils.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <rapidjson/document.h>
 #include <gtest/gtest.h>
@@ -15,7 +15,7 @@
 #include <sys/types.h>
 
 #define EXPECT_IN_STRING(needle, haystack)                  \
-  EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
+  EXPECT_TRUE(stan::io::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 
 // TODO: a similar macro is defined in both Stan and Stan Math
@@ -238,11 +238,10 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
   size_t equal_pos = command_output.find("=", start);
 
   while (equal_pos != string::npos) {
-    using boost::trim;
     option = command_output.substr(start, equal_pos - start);
     value = command_output.substr(equal_pos + 1, end - equal_pos - 1);
-    trim(option);
-    trim(value);
+    stan::io::trim(option);
+    stan::io::trim(value);
     output.push_back(pair<string, string>(option, value));
     start = end + 1;
     end = command_output.find("\n", start);
@@ -297,7 +296,7 @@ int idx_first_match(const std::vector<std::string> &lines,
                     std::string &substring) {
   int idx = -1;
   for (int n = 0; n < lines.size(); ++n) {
-    if (boost::contains(lines[n], substring)) {
+    if (stan::io::contains(lines[n], substring)) {
       idx = n;
       break;
     }

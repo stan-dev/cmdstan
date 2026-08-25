@@ -6,7 +6,7 @@
 #include <cmdstan/arguments/argument_parser.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <boost/algorithm/string.hpp>
+#include <stan/io/string_utils.hpp>
 #include <stan/services/error_codes.hpp>
 #include <gtest/gtest.h>
 
@@ -48,11 +48,10 @@ class CmdStanArgumentsArgumentParser : public testing::Test {
    * double arguments, but it could be easily extended.
    */
   void check_suggestion(std::string suggestion) {
-    boost::trim(suggestion);
-    boost::replace_first(suggestion, "<double>",
+    stan::io::trim(suggestion);
+    stan::io::replace_first(suggestion, "<double>",
                          "1e-20");  // replace type with value
-    std::vector<std::string> args;
-    boost::split(args, suggestion, boost::is_any_of(" "));
+    std::vector<std::string> args = stan::io::split(suggestion, " ");
     args.insert(args.begin(), "mymodel");  // add model name
 
     // convert to char** for parse_args

@@ -1,6 +1,6 @@
 #include <cmdstan/return_codes.hpp>
 #include <cmdstan/stansummary_helper.hpp>
-#include <stan/io/ends_with.hpp>
+#include <stan/io/string_utils.hpp>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
@@ -97,10 +97,9 @@ Options:
   }
   std::vector<std::string> percentiles;
   Eigen::VectorXd probs;
-  boost::algorithm::trim(percentiles_spec);
+  stan::io::trim(percentiles_spec);
   if (!percentiles_spec.empty()) {
-    boost::algorithm::split(percentiles, percentiles_spec,
-                            boost::is_any_of(", "), boost::token_compress_on);
+    percentiles = stan::io::split(percentiles_spec, ", ", true);
     try {
       probs = percentiles_to_probs(percentiles);
     } catch (const std::invalid_argument &e) {
@@ -148,7 +147,7 @@ Options:
     for (int i = 0; i < chains.num_params(); ++i) {
       if (chains.param_name(i).length() > max_name_length)
         max_name_length = chains.param_name(i).length();
-      if (stan::io::ends_with("__", chains.param_name(i)))
+      if (stan::io::ends_with(chains.param_name(i), "__"))
         num_sampler_params++;
     }
     // don't count name 'lp__'
