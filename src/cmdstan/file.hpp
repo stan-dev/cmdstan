@@ -1,7 +1,9 @@
 #ifndef CMDSTAN_FILE_HPP
 #define CMDSTAN_FILE_HPP
 
-#include <boost/algorithm/string.hpp>
+#include <stan/io/string_utils.hpp>
+#include <stan/io/ends_with.hpp>
+#include <algorithm>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -106,10 +108,7 @@ std::pair<std::string, std::string> get_basename_suffix(
 }
 
 std::vector<std::string> split_on_comma(const std::string &input) {
-  std::vector<std::string> result;
-  boost::algorithm::split(result, input, boost::is_any_of(","),
-                          boost::token_compress_on);
-  return result;
+  return stan::io::split(input, ",", true);
 }
 
 /**
@@ -202,8 +201,8 @@ void validate_output_filename(const std::string &fname) {
   std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
   if (!fname.empty()
       && (fname[fname.size() - 1] == PATH_SEPARATOR
-          || boost::algorithm::ends_with(fname, "..")
-          || boost::algorithm::ends_with(fname, sep + "."))) {
+          || stan::io::ends_with("..", fname)
+          || stan::io::ends_with(sep + ".", fname))) {
     std::stringstream msg;
     msg << "Ill-formed output filename " << fname << std::endl;
     throw std::invalid_argument(msg.str());

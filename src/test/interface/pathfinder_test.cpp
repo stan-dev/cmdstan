@@ -1,6 +1,7 @@
 #include <test/utility.hpp>
 #include <fstream>
 #include <gtest/gtest.h>
+#include <algorithm>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::count_matches;

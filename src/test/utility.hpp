@@ -1,11 +1,11 @@
 #ifndef TEST__MODELS__UTILITY_HPP
 #define TEST__MODELS__UTILITY_HPP
 
-#include <boost/algorithm/string.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <stan/io/string_utils.hpp>
 #include <rapidjson/document.h>
 #include <gtest/gtest.h>
 
+#include <chrono>
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
@@ -14,8 +14,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define EXPECT_IN_STRING(needle, haystack)                  \
-  EXPECT_TRUE(boost::algorithm::contains(haystack, needle)) \
+#define EXPECT_IN_STRING(needle, haystack)          \
+  EXPECT_TRUE(stan::io::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 
 // TODO: a similar macro is defined in both Stan and Stan Math
@@ -155,8 +155,6 @@ std::ostream &operator<<(std::ostream &os, const run_command_output &out) {
  * @return the system output of the command
  */
 run_command_output run_command(std::string command) {
-  using boost::posix_time::microsec_clock;
-  using boost::posix_time::ptime;
   FILE *in;
   std::string command_plus = command + " 2>&1";  // put stderr to stdout
   in = popen(command_plus.c_str(), "r");
@@ -172,10 +170,10 @@ run_command_output run_command(std::string command) {
   std::string output;
   char buf[1024];
   size_t count;
-  ptime time_start(microsec_clock::universal_time());  // start timer
+  auto time_start = std::chrono::system_clock::now();
   while ((count = fread(&buf, 1, 1024, in)) > 0)
     output += std::string(&buf[0], &buf[count]);
-  ptime time_end(microsec_clock::universal_time());  // end timer
+  auto time_end = std::chrono::system_clock::now();
 
   // bits 15-8 is err code, bit 7 if core dump, bits 6-0 is signal number
   int err_code = pclose(in);
@@ -189,7 +187,11 @@ run_command_output run_command(std::string command) {
     throw std::runtime_error(err_msg.c_str());
   }
   return run_command_output(
-      command, output, (time_end - time_start).total_milliseconds(), err_code);
+      command, output,
+      std::chrono::duration_cast<std::chrono::milliseconds>(time_end
+                                                            - time_start)
+          .count(),
+      err_code);
 }
 
 /**
@@ -238,11 +240,10 @@ std::vector<std::pair<std::string, std::string>> parse_command_output(
   size_t equal_pos = command_output.find("=", start);
 
   while (equal_pos != string::npos) {
-    using boost::trim;
     option = command_output.substr(start, equal_pos - start);
     value = command_output.substr(equal_pos + 1, end - equal_pos - 1);
-    trim(option);
-    trim(value);
+    stan::io::trim(option);
+    stan::io::trim(value);
     output.push_back(pair<string, string>(option, value));
     start = end + 1;
     end = command_output.find("\n", start);
@@ -297,7 +298,7 @@ int idx_first_match(const std::vector<std::string> &lines,
                     std::string &substring) {
   int idx = -1;
   for (int n = 0; n < lines.size(); ++n) {
-    if (boost::contains(lines[n], substring)) {
+    if (stan::io::contains(lines[n], substring)) {
       idx = n;
       break;
     }

@@ -2,7 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARG_SEED_HPP
 
 #include <cmdstan/arguments/singleton_argument.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <chrono>
 #include <string>
 
 namespace cmdstan {
@@ -19,10 +19,9 @@ class arg_seed : public long_long_int_argument {
     _default = "-1";
     _default_value = -1;
     _value = _default_value;
-    _random_value
-        = (boost::posix_time::microsec_clock::universal_time()
-           - boost::posix_time::ptime(boost::posix_time::min_date_time))
-              .total_milliseconds();
+    _random_value = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
   }
 
   bool is_valid(long long int value) {

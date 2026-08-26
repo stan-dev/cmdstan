@@ -7,6 +7,7 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/ends_with.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -14,7 +15,6 @@
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/model/model_base.hpp>
 #include <stan/services/sample/standalone_gqs.hpp>
-#include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -224,7 +224,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
   if (has_commas && !missing_files.empty()) {
     std::stringstream msg;
     msg << "Cannot open some of the requested files: [";
-    msg << boost::algorithm::join(missing_files, ", ");
+    msg << stan::io::join(missing_files, ", ");
     msg << "]" << std::endl;
     throw std::invalid_argument(msg.str());
   }
@@ -235,7 +235,7 @@ context_vector get_vec_var_context(const std::string &file, size_t num_chains,
   if (stream.rdstate() & std::ifstream::failbit) {
     std::stringstream msg;
     msg << "Cannot open some of the requested files: [";
-    msg << boost::algorithm::join(missing_files, ", ");
+    msg << stan::io::join(missing_files, ", ");
     msg << "]" << std::endl;
     msg << "Also failed to find base file " << file << std::endl;
     msg << "When cmdstan is given a file 'name' and there are "
@@ -311,7 +311,7 @@ void parse_stan_csv(const std::string &fname,
   // compute offset, size of parameters block
   col_offset = 0;
   for (auto col_name : fitted_params.header) {
-    if (boost::algorithm::ends_with(col_name, "__")) {
+    if (stan::io::ends_with("__", col_name)) {
       col_offset++;
     } else {
       break;
@@ -435,17 +435,13 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
   std::ifstream in = file::safe_open(fname);
   while (in.peek() == '#') {
     std::getline(in, line);
-    if (boost::contains(line, "method = optimize"))
+    if (stan::io::contains(line, "method = optimize"))
       is_optimization = true;
   }
   std::getline(in, line);
-  std::vector<std::string> names;
-  boost::algorithm::split(names, line, boost::is_any_of(","),
-                          boost::token_compress_on);
+  std::vector<std::string> names = stan::io::split(line, ",", true);
   std::getline(in, line);
-  std::vector<std::string> values;
-  boost::algorithm::split(values, line, boost::is_any_of(","),
-                          boost::token_compress_on);
+  std::vector<std::string> values = stan::io::split(line, ",", true);
   in.close();
   // validate
   if (!is_optimization) {
@@ -455,7 +451,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
   // columns: algorithm outputs ending in "__", params, txparms, and gq vars
   size_t col_offset = 0;
   for (auto name : names) {
-    if (boost::algorithm::ends_with(name, "__")) {
+    if (stan::io::ends_with("__", name)) {
       col_offset++;
     } else {
       break;

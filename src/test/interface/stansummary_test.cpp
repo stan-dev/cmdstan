@@ -1,9 +1,9 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <test/utility.hpp>
+#include <stan/io/string_utils.hpp>
 #include <stan/io/ends_with.hpp>
 #include <fstream>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
 
@@ -284,7 +284,7 @@ TEST(CommandStansummary, no_args) {
   path_separator.push_back(get_path_separator());
   std::string command = "bin" + path_separator + "stansummary";
   run_command_output out = run_command(command);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
@@ -297,7 +297,7 @@ TEST(CommandStansummary, bad_input_files) {
   std::string csv_file = "src" + path_separator + "test" + path_separator
                          + "interface" + path_separator + "no_such_file";
   run_command_output out = run_command(command + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
@@ -315,7 +315,7 @@ TEST(CommandStansummary, bad_csv_file_arg) {
 
   run_command_output out
       = run_command(command + " " + arg_csv_file + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
@@ -332,14 +332,14 @@ TEST(CommandStansummary, bad_sig_figs_arg) {
 
   run_command_output out
       = run_command(command + " " + arg_sig_figs + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
   arg_sig_figs = "--sig_figs 101";
   expected_message = "--sig_figs: Value 101 not in range";
   out = run_command(command + " " + arg_sig_figs + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
@@ -356,20 +356,20 @@ TEST(CommandStansummary, bad_autocorr_arg) {
 
   run_command_output out
       = run_command(command + " " + arg_autocorr + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
   arg_autocorr = "--autocorr 0";
   out = run_command(command + " " + arg_autocorr + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
   expected_message = "not a valid chain id";
   arg_autocorr = "--autocorr 2";
   out = run_command(command + " " + arg_autocorr + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
@@ -386,19 +386,19 @@ TEST(CommandStansummary, bad_percentiles_arg) {
   std::string arg_percentiles = "--percentiles -1";
   run_command_output out
       = run_command(command + " " + arg_percentiles + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
   arg_percentiles = "--percentiles \"101\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
   arg_percentiles = "--percentiles \"2,30,5\"";
   out = run_command(command + " " + arg_percentiles + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 
@@ -420,7 +420,7 @@ TEST(CommandStansummary, bad_include_param_args) {
 
   run_command_output out
       = run_command(command + " " + arg_include_param + " " + csv_file);
-  EXPECT_TRUE(boost::algorithm::contains(out.output, expected_message));
+  EXPECT_TRUE(stan::io::contains(out.output, expected_message));
   ASSERT_TRUE(out.hasError)
       << "\"" << out.command << "\" failed to quit with an error";
 }
