@@ -50,7 +50,7 @@ class CmdStanArgumentsArgumentParser : public testing::Test {
   void check_suggestion(std::string suggestion) {
     stan::io::trim(suggestion);
     stan::io::replace_first(suggestion, "<double>",
-                         "1e-20");  // replace type with value
+                            "1e-20");  // replace type with value
     std::vector<std::string> args = stan::io::split(suggestion, " ");
     args.insert(args.begin(), "mymodel");  // add model name
 

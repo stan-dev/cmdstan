@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#define EXPECT_IN_STRING(needle, haystack)                  \
+#define EXPECT_IN_STRING(needle, haystack)          \
   EXPECT_TRUE(stan::io::contains(haystack, needle)) \
       << "could not find '" << needle << "' in '" << haystack << "'";
 
@@ -189,7 +189,7 @@ run_command_output run_command(std::string command) {
   return run_command_output(
       command, output,
       std::chrono::duration_cast<std::chrono::milliseconds>(time_end
-                                                              - time_start)
+                                                            - time_start)
           .count(),
       err_code);
 }
