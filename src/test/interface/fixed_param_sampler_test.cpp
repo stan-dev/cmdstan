@@ -4,7 +4,6 @@
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
 
 using cmdstan::test::convert_model_path;
 using cmdstan::test::run_command;

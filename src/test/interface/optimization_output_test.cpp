@@ -1,6 +1,5 @@
 #include <test/utility.hpp>
 #include <stan/mcmc/chains.hpp>
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <fstream>
 

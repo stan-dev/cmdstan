@@ -1,9 +1,9 @@
 #include <cmdstan/stansummary_helper.hpp>
 #include <test/utility.hpp>
 #include <stan/io/string_utils.hpp>
+#include <stan/io/ends_with.hpp>
 #include <fstream>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <CLI11/CLI11.hpp>
 
@@ -232,7 +232,7 @@ TEST(CommandStansummary, param_tests) {
   for (int i = 0; i < chains.num_params(); ++i) {
     if (chains.param_name(i).length() > max_name_length)
       max_name_length = chains.param_name(i).length();
-    if (stan::io::ends_with(chains.param_name(i), "__"))
+    if (stan::io::ends_with("__", chains.param_name(i)))
       num_sampler_params++;
   }
   EXPECT_EQ(num_sampler_params, 6);

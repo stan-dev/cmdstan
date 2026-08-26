@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <boost/algorithm/string.hpp>
 
 /**
  * Determine size, and number of decimals required

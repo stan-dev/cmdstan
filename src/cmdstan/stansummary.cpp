@@ -1,13 +1,13 @@
 #include <cmdstan/return_codes.hpp>
 #include <cmdstan/stansummary_helper.hpp>
 #include <stan/io/string_utils.hpp>
+#include <stan/io/ends_with.hpp>
 #include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <ios>
 #include <iostream>
 #include <vector>
-#include <boost/algorithm/string.hpp>
 #include <CLI11/CLI11.hpp>
 
 using cmdstan::return_codes;
@@ -147,7 +147,7 @@ Options:
     for (int i = 0; i < chains.num_params(); ++i) {
       if (chains.param_name(i).length() > max_name_length)
         max_name_length = chains.param_name(i).length();
-      if (stan::io::ends_with(chains.param_name(i), "__"))
+      if (stan::io::ends_with("__", chains.param_name(i)))
         num_sampler_params++;
     }
     // don't count name 'lp__'

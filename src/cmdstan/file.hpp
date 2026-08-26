@@ -2,6 +2,7 @@
 #define CMDSTAN_FILE_HPP
 
 #include <stan/io/string_utils.hpp>
+#include <stan/io/ends_with.hpp>
 #include <algorithm>
 #include <string>
 #include <fstream>
@@ -200,8 +201,8 @@ void validate_output_filename(const std::string &fname) {
   std::string sep = std::string(1, cmdstan::file::PATH_SEPARATOR);
   if (!fname.empty()
       && (fname[fname.size() - 1] == PATH_SEPARATOR
-          || stan::io::ends_with(fname, "..")
-          || stan::io::ends_with(fname, sep + "."))) {
+          || stan::io::ends_with("..", fname)
+          || stan::io::ends_with(sep + ".", fname))) {
     std::stringstream msg;
     msg << "Ill-formed output filename " << fname << std::endl;
     throw std::invalid_argument(msg.str());

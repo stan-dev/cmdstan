@@ -7,6 +7,7 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/ends_with.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/stan_csv_reader.hpp>
@@ -310,7 +311,7 @@ void parse_stan_csv(const std::string &fname,
   // compute offset, size of parameters block
   col_offset = 0;
   for (auto col_name : fitted_params.header) {
-    if (stan::io::ends_with(col_name, "__")) {
+    if (stan::io::ends_with("__", col_name)) {
       col_offset++;
     } else {
       break;
@@ -450,7 +451,7 @@ Eigen::VectorXd get_laplace_mode_csv(const std::string &fname,
   // columns: algorithm outputs ending in "__", params, txparms, and gq vars
   size_t col_offset = 0;
   for (auto name : names) {
-    if (stan::io::ends_with(name, "__")) {
+    if (stan::io::ends_with("__", name)) {
       col_offset++;
     } else {
       break;
