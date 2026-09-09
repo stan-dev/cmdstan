@@ -148,7 +148,7 @@ include make/program
 include make/tests
 include make/command
 
-CMDSTAN_VERSION := 2.39.0
+CMDSTAN_VERSION := 2.40.0
 
 .PHONY: help
 help:
