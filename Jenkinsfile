@@ -9,6 +9,7 @@ def props = [
             description: 'Custom stanc3 binary url'),
     booleanParam(defaultValue: false, name: 'downsteam', description: 'Run downstream tests from stan (was previously downstream_hotfix [master]/downstream_tests [develop])'),
     booleanParam(defaultValue: false, name: 'run_all', description: 'Pretend all files changes'),
+    booleanParam(defaultValue: false, name: 'build_tarballs', description: 'Build tarballs as if for a release'),
   ])
 ]
 
@@ -153,11 +154,20 @@ CXX_TYPE=gcc""")
         }
       }
     }
-    if (env.TAG_NAME) {
+    if (env.TAG_NAME || params.build_tarballs) {
       runPod(image: "stanorg/ci:gpu", checkout: false) {
+        def download_stanc = { args ->
+          def platform = args.platform ?: 'linux';
+          if (params.stanc3_bin_url != 'nightly') {
+            sh "wget -q --show-progress '${params.stanc3_bin_url}/bin/${platform}-stanc'"
+          } else {
+            def tagName = env.TAG_NAME ?: 'nightly';
+            sh "wget -q --show-progress 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc'"
+          }
+        }
+
         stage("Build tarballs") {
-          def tagName = env.TAG_NAME;
-          def version = env.TAG_NAME.substring(1, env.TAG_NAME.length());
+          def version = env.TAG_NAME ? env.TAG_NAME.substring(1, env.TAG_NAME.length()) : env.GIT_COMMIT ;
 
           checkout scmGit(
             branches: scm.branches,
@@ -166,29 +176,36 @@ CXX_TYPE=gcc""")
               [cleanBeforeCheckout(),
                [$class: 'RelativeTargetDirectory', relativeTargetDir: "cmdstan-${version}"],
                submodule(recursiveSubmodules: true, shallow: true, depth: 2)]);
+          if (params.stan_pr)
+            checkoutPR("cmdstan-${version}/stan", params.stan_pr)
+          if (params.math_pr)
+            checkoutPR("cmdstan-${version}/stan/lib/stan_math", params.math_pr)
 
-          sh """
-             PLATFORMS=("linux" "macos" "linux")
-             for PLATFORM in \${PLATFORMS[@]}
-             do
-               wget -q --show-progress "https://github.com/stan-dev/stanc3/releases/download/v${version}/\$PLATFORM-stanc" -o cmdstan-${version}/bin/\$PLATFORM-stanc
-             done
-             tar --exclude-vcs --hard-dereference -chzvf cmdstan-${version}.tar.gz cmdstan-${version}/
-          """
+          sh "mkdir cmdstan-${version}/bin -p"
+          dir("cmdstan-${version}/bin"){
+            for (platform in ["windows", "macos", "linux"]) {
+              download_stanc(platform: platform)
+            }
+          }
+          sh "tar --exclude-vcs --hard-dereference -chzf cmdstan-${version}.tar.gz cmdstan-${version}/"
 
-          sh """
-             rm cmdstan-${version}/bin/*-stanc
-             ARCHS=("arm64" "armel" "armhf" "ppc64el" "s390x")
-             for ARCH_NAME in \${ARCHS[@]}
-             do
-                 wget -q --show-progress "https://github.com/stan-dev/stanc3/releases/download/v${version}/linux-\${ARCH_NAME}-stanc" -o cmdstan-${version}/bin/linux-stanc
-                 tar --exclude-vcs --hard-dereference -chzvf "cmdstan-${version}-linux-\${ARCH_NAME}.tar.gz" cmdstan-${version}/
-                 rm "cmdstan-${version}/bin/linux-stanc"
-             done
-          """
-          retry(3) {
+          // build the non-x86-linux tarballs
+          sh "rm cmdstan-${version}/bin/*-stanc"
+          for(arch in ["arm64", "armel", "armhf", "ppc64el", "s390x"]) {
+            def platform = "linux-${arch}"
+            download_stanc(platform: platform)
+            sh """
+               mv ${platform}-stanc cmdstan-${version}/bin/linux-stanc
+               tar --exclude-vcs --hard-dereference -chzf 'cmdstan-${version}-linux-${arch}.tar.gz' cmdstan-${version}/
+               rm cmdstan-${version}/bin/linux-stan
+            """
+          }
+
+          archiveArtifacts './*.tar.gz'
+
+          if (env.TAG_NAME) {
             withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
-              sh "gh release upload $tagName ./*.tar.gz || gh release create $tagName --draft ./*.tar.gz"
+              sh "gh release upload ${env.TAG_NAME} ./*.tar.gz || gh release create ${env.TAG_NAME} --draft ./*.tar.gz"
             }
           }
         }
