@@ -182,15 +182,14 @@ CXX_TYPE=gcc""")
              for ARCH_NAME in \${ARCHS[@]}
              do
                  wget -q --show-progress "https://github.com/stan-dev/stanc3/releases/download/v${version}/linux-\${ARCH_NAME}-stanc" -o cmdstan-${version}/bin/linux-stanc
-                 tar -czvf "cmdstan-${version}-linux-\${ARCH_NAME}.tar.gz" "cmdstan-${version}"
+                 tar --exclude-vcs --hard-dereference -chzvf "cmdstan-${version}-linux-\${ARCH_NAME}.tar.gz" cmdstan-${version}/
                  rm "cmdstan-${version}/bin/linux-stanc"
              done
           """
-
-          withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
-            sh """
-               gh release create $tagName --draft ./*.tar.gz
-            """
+          retry(3) {
+            withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
+              sh "gh release create $tagName --draft ./*.tar.gz"
+            }
           }
         }
       }
