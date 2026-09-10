@@ -188,7 +188,7 @@ CXX_TYPE=gcc""")
           """
           retry(3) {
             withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
-              sh "gh release create $tagName --draft ./*.tar.gz"
+              sh "gh release upload $tagName ./*.tar.gz || gh release create $tagName --draft ./*.tar.gz"
             }
           }
         }
