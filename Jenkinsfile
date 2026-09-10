@@ -159,34 +159,35 @@ CXX_TYPE=gcc""")
         def download_stanc = { args ->
           def platform = args.platform ?: 'linux';
           if (params.stanc3_bin_url != 'nightly') {
-            sh "wget -q --show-progress '${params.stanc3_bin_url}/bin/${platform}-stanc'"
+            sh "curl -LO '${params.stanc3_bin_url}/bin/${platform}-stanc'"
           } else {
             def tagName = env.TAG_NAME ?: 'nightly';
-            sh "wget -q --show-progress 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc'"
+            sh "curl -LO 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc'"
           }
         }
 
         stage("Build tarballs") {
           def version = env.TAG_NAME ? env.TAG_NAME.substring(1, env.TAG_NAME.length()) : env.GIT_COMMIT ;
 
-          checkout scmGit(
-            branches: scm.branches,
-            userRemoteConfigs: scm.userRemoteConfigs,
-            extensions: scm.extensions +
-              [cleanBeforeCheckout(),
-               [$class: 'RelativeTargetDirectory', relativeTargetDir: "cmdstan-${version}"],
-               submodule(recursiveSubmodules: true, shallow: true, depth: 2)]);
-          if (params.stan_pr)
-            checkoutPR("cmdstan-${version}/stan", params.stan_pr)
-          if (params.math_pr)
-            checkoutPR("cmdstan-${version}/stan/lib/stan_math", params.math_pr)
+          dir("cmdstan-${version}"){
+            checkout scmGit(
+              branches: scm.branches,
+              userRemoteConfigs: scm.userRemoteConfigs,
+              extensions: scm.extensions + [cleanBeforeCheckout(),
+                                            submodule(recursiveSubmodules: true, shallow: true, depth: 2)]);
+            if (params.stan_pr)
+              checkoutPR("stan", params.stan_pr)
+            if (params.math_pr)
+              checkoutPR("stan/lib/stan_math", params.math_pr)
 
-          sh "mkdir cmdstan-${version}/bin -p"
-          dir("cmdstan-${version}/bin"){
-            for (platform in ["windows", "macos", "linux"]) {
-              download_stanc(platform: platform)
+            sh "mkdir -p bin"
+            dir("bin"){
+              for (platform in ["windows", "macos", "linux"]) {
+                download_stanc(platform: platform)
+              }
             }
           }
+
           sh "tar --exclude-vcs --hard-dereference -chzf cmdstan-${version}.tar.gz cmdstan-${version}/"
 
           // build the non-x86-linux tarballs
