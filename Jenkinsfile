@@ -153,6 +153,48 @@ CXX_TYPE=gcc""")
         }
       }
     }
+    if (env.TAG_NAME) {
+      runPod(image: "stanorg/ci:gpu", checkout: false) {
+        stage("Build tarballs") {
+          def tagName = env.TAG_NAME;
+          def version = env.TAG_NAME.substring(1, env.TAG_NAME.length());
+
+          checkout scmGit(
+            branches: scm.branches,
+            userRemoteConfigs: scm.userRemoteConfigs,
+            extensions: scm.extensions +
+              [cleanBeforeCheckout(),
+               [$class: 'RelativeTargetDirectory', relativeTargetDir: "cmdstan-${version}"],
+               submodule(recursiveSubmodules: true, shallow: true, depth: 2)]);
+
+          sh """
+             PLATFORMS=("linux" "macos" "linux")
+             for PLATFORM in \${PLATFORMS[@]}
+             do
+               wget -q --show-progress "https://github.com/stan-dev/stanc3/releases/download/v${version}/\$PLATFORM-stanc" -o cmdstan-${version}/bin/\$PLATFORM-stanc
+             done
+             tar --exclude-vcs --hard-dereference -chzvf cmdstan-${version}.tar.gz cmdstan-${version}/
+          """
+
+          sh """
+             rm cmdstan-${version}/bin/*-stanc
+             ARCHS=("arm64" "armel" "armhf" "ppc64el" "s390x")
+             for ARCH_NAME in \${ARCHS[@]}
+             do
+                 wget -q --show-progress "https://github.com/stan-dev/stanc3/releases/download/v${version}/linux-\${ARCH_NAME}-stanc" -o cmdstan-${version}/bin/linux-stanc
+                 tar -czvf "cmdstan-${version}-linux-\${ARCH_NAME}.tar.gz" "cmdstan-${version}"
+                 rm "cmdstan-${version}/bin/linux-stanc"
+             done
+          """
+
+          withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
+            sh """
+               gh release create $tagName --draft ./*.tar.gz
+            """
+          }
+        }
+      }
+    }
   }
 }
 
