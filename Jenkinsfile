@@ -198,7 +198,7 @@ CXX_TYPE=gcc""")
             sh """
                mv ${platform}-stanc cmdstan-${version}/bin/linux-stanc
                tar --exclude-vcs --hard-dereference -chzf 'cmdstan-${version}-linux-${arch}.tar.gz' cmdstan-${version}/
-               rm cmdstan-${version}/bin/linux-stan
+               rm cmdstan-${version}/bin/linux-stanc
             """
           }
 
