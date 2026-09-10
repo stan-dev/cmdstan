@@ -202,7 +202,7 @@ CXX_TYPE=gcc""")
             """
           }
 
-          archiveArtifacts '.*.tar.gz'
+          archiveArtifacts 'cmdstan*.tar.gz'
 
           if (env.TAG_NAME) {
             withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
