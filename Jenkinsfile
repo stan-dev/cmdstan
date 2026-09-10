@@ -1,6 +1,5 @@
-properties([
-  disableConcurrentBuilds(abortPrevious: !params.downstream),
-  buildDiscarder(logRotator(numToKeepStr: '20', daysToKeepStr: '30')),
+def props = [
+  buildDiscarder(logRotator(numToKeepStr: '40', daysToKeepStr: '30')),
   parameters([
     string(defaultValue: '', name: 'stan_pr',
            description: "Stan PR to test against. Will check out this PR in the downstream Stan repo."),
@@ -10,8 +9,15 @@ properties([
             description: 'Custom stanc3 binary url'),
     booleanParam(defaultValue: false, name: 'downsteam', description: 'Run downstream tests from stan (was previously downstream_hotfix [master]/downstream_tests [develop])'),
     booleanParam(defaultValue: false, name: 'run_all', description: 'Pretend all files changes'),
+    booleanParam(defaultValue: false, name: 'build_tarballs', description: 'Build tarballs as if for a release'),
   ])
-])
+]
+
+if (!params.downstream) {
+  props <<= disableConcurrentBuilds(abortPrevious: env.BRANCH_NAME != 'develop')
+}
+
+properties(props)
 
 def commit
 def runRemainingStages = false
@@ -144,6 +150,64 @@ CXX_TYPE=gcc""")
         node(POD_LABEL) {
           stage('Update performance tests submodule') {
             updateSubmodule('performance-tests-cmdstan', 'master', 'cmdstan', commit)
+          }
+        }
+      }
+    }
+    if (env.TAG_NAME || params.build_tarballs) {
+      runPod(image: "stanorg/ci:gpu", checkout: false) {
+        def download_stanc = { args ->
+          def platform = args.platform ?: 'linux';
+          if (params.stanc3_bin_url != 'nightly') {
+            sh "curl -LO '${params.stanc3_bin_url}/bin/${platform}-stanc' --retry 5 --retry-delay 10"
+          } else {
+            def tagName = env.TAG_NAME ?: 'nightly';
+            sh "curl -LO 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc' --retry 5 --retry-delay 10"
+          }
+        }
+
+        stage("Build tarballs") {
+          def version = env.TAG_NAME ? env.TAG_NAME.substring(1, env.TAG_NAME.length()) : env.GIT_COMMIT ;
+
+          dir("cmdstan-${version}"){
+            checkout scmGit(
+              branches: scm.branches,
+              userRemoteConfigs: scm.userRemoteConfigs,
+              extensions: scm.extensions + [cleanBeforeCheckout(),
+                                            submodule(recursiveSubmodules: true, shallow: true, depth: 2)]);
+            if (params.stan_pr)
+              checkoutPR("stan", params.stan_pr)
+            if (params.math_pr)
+              checkoutPR("stan/lib/stan_math", params.math_pr)
+
+            sh "mkdir -p bin"
+            dir("bin"){
+              for (platform in ["windows", "macos", "linux"]) {
+                download_stanc(platform: platform)
+              }
+            }
+          }
+
+          sh "tar --exclude-vcs --hard-dereference -chzf cmdstan-${version}.tar.gz cmdstan-${version}/"
+
+          // build the non-x86-linux tarballs
+          sh "rm cmdstan-${version}/bin/*-stanc"
+          for(arch in ["arm64", "armel", "armhf", "ppc64el", "s390x"]) {
+            def platform = "linux-${arch}"
+            download_stanc(platform: platform)
+            sh """
+               mv ${platform}-stanc cmdstan-${version}/bin/linux-stanc
+               tar --exclude-vcs --hard-dereference -chzf 'cmdstan-${version}-linux-${arch}.tar.gz' cmdstan-${version}/
+               rm cmdstan-${version}/bin/linux-stanc
+            """
+          }
+
+          archiveArtifacts '.*.tar.gz'
+
+          if (env.TAG_NAME) {
+            withCredentials([usernamePassword(usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN', credentialsId: 'stan-github')]) {
+              sh "gh release upload ${env.TAG_NAME} ./*.tar.gz || gh release create ${env.TAG_NAME} --draft ./*.tar.gz"
+            }
           }
         }
       }
