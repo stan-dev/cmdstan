@@ -19,6 +19,7 @@ if (!params.downstream) {
 
 properties(props)
 
+def image = 'stanorg/ci:v1'
 def commit
 def runRemainingStages = false
 def WIN_CXX = 'g++'
@@ -35,7 +36,7 @@ catchError {
     'GIT_COMMITTER_NAME=Stan Jenkins',
     'GIT_COMMITTER_EMAIL=mc.stanislaw@gmail.com'
   ]) {
-    runPod(image: "stanorg/ci:gpu", cpus: 2) {
+    runPod(image: image, cpus: 2) {
       commit = sh(returnStdout: true, script: "git rev-parse HEAD").trim()
       runRemainingStages = params.downstream || params.run_all || filesChanged('src/cmdstan', 'src/test', 'lib', 'examples', 'make', 'stan', 'install-tbb.bat', 'makefile', 'runCmdStanTests.py', 'test-all.sh', 'Jenkinsfile')
 
@@ -110,7 +111,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
           }
         }
       }, linux: {
-        runPod(image: "stanorg/ci:gpu", checkout: false) {
+        runPod(image: image, checkout: false) {
           stage('Linux interface tests with MPI') {
             prepTests("""CXX=${MPI_CXX}
 STAN_MPI=true
@@ -155,7 +156,7 @@ CXX_TYPE=gcc""")
       }
     }
     if (env.TAG_NAME || params.build_tarballs) {
-      runPod(image: "stanorg/ci:gpu", checkout: false) {
+      runPod(image: image, checkout: false) {
         def download_stanc = { args ->
           def platform = args.platform ?: 'linux';
           if (params.stanc3_bin_url != 'nightly') {
