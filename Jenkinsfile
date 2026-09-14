@@ -91,7 +91,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
       checkoutPR("stan", params.stan_pr)
       checkoutPR("stan/lib/stan_math", params.math_pr)
 
-      def local = "CXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS -Werror -Wno-unused-command-line-argument -Wno-error=overloaded-virtual=\n"
+      def local = "CXXFLAGS+=-Werror -Wp,-D_GLIBCXX_ASSERTIONS\n"
       if (params.stanc3_bin_url != "nightly") {
         local += "STANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n"
       }
@@ -102,7 +102,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
       parallel windows: {
         node('windows') {
           stage('Windows interface tests') {
-            prepTests("CXX=${WIN_CXX}")
+            prepTests("CXX=${WIN_CXX}\nCXXFLAGS+=-Wno-error=overloaded-virtual= ")
             withEnv(["PATH+TBB=${WORKSPACE}\\stan\\lib\\stan_math\\lib\\tbb"]) {
               bat """$WINSETENV
                   python runCmdStanTests.py -j%PARALLEL% src/test/interface
@@ -116,14 +116,14 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
             prepTests("""CXX=${MPI_CXX}
 STAN_MPI=true
 CXX_TYPE=gcc""")
-            sh "make build-mpi > build-mpi.log 2>&1"
+            sh "make build-mpi"
             sh './runCmdStanTests.py -j$PARALLEL src/test/interface'
           }
         }
       }, mac: {
         node('macos') {
           stage('Mac interface tests') {
-            prepTests("CXX=${MAC_CXX}")
+            prepTests("CXX=${MAC_CXX}\nCXXFLAGS+=-Wno-unused-command-line-argument")
             sh 'python3 ./runCmdStanTests.py -j$PARALLEL src/test/interface'
           }
         }
