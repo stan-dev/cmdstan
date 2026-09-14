@@ -91,7 +91,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
       checkoutPR("stan", params.stan_pr)
       checkoutPR("stan/lib/stan_math", params.math_pr)
 
-      def local = "CXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS -Werror -Wno-unused-command-line-argument\n"
+      def local = "CXXFLAGS+=-Wp,-D_GLIBCXX_ASSERTIONS -Werror -Wno-unused-command-line-argument -Wno-error=overloaded-virtual=\n"
       if (params.stanc3_bin_url != "nightly") {
         local += "STANC3_TEST_BIN_URL=${params.stanc3_bin_url}\n"
       }
