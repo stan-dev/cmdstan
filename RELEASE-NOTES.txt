@@ -1,6 +1,13 @@
 CMDSTAN RELEASE NOTES
 ======================================================================
 
+v2.40.0 (16 September 2026)
+======================================================================
+
+ - Updated precompiled header logic to use newer clang features when available. (#1346)
+ - Updated standalone generated quantities to respect the chain ID. (#1347)
+ - Reduce dependencies on the Boost library headers. (#1348)
+
 v2.39.0 (19 May 2026)
 ======================================================================
 
