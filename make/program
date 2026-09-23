@@ -44,7 +44,7 @@ endif
 ifneq ($(findstring allow-undefined,$(STANCFLAGS)),)
 
 USER_HEADER ?= $(dir $(STAN_TARGETS))user_header.hpp
-$(STAN_TARGETS) : CXXFLAGS_PROGRAM += -include $(USER_HEADER)
+$(STAN_TARGETS) : CXXFLAGS_PROGRAM += -include $(subst \,/,$(USER_HEADER))
 ##
 # Give a better error message if the USER_HEADER is not found
 ##
