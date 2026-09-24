@@ -163,10 +163,10 @@ CXX_TYPE=gcc""")
         def download_stanc = { args ->
           def platform = args.platform ?: 'linux';
           if (params.stanc3_bin_url != 'nightly') {
-            sh "curl -LO '${params.stanc3_bin_url}/bin/${platform}-stanc' --retry 5 --retry-delay 10"
+            sh "curl -fLO '${params.stanc3_bin_url}/bin/${platform}-stanc' --retry 5 --retry-delay 10"
           } else {
             def tagName = env.TAG_NAME ?: 'nightly';
-            sh "curl -LO 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc' --retry 5 --retry-delay 10"
+            sh "curl -fLO 'https://github.com/stan-dev/stanc3/releases/download/${tagName}/${platform}-stanc' --retry 5 --retry-delay 10"
           }
         }
 
