@@ -201,8 +201,9 @@ Options:
     Eigen::MatrixXd model_params(num_model_params, header.size());
 
     get_stats(chains, sampling_times, probs, {0}, lp_param);
+    // MCSE, ESS, and R_hat are not meaningful for the sampler diagnostics
     get_stats(chains, sampling_times, probs, sampler_params_idxes,
-              sampler_params);
+              sampler_params, false);
     get_stats(chains, sampling_times, probs, model_param_idxes, model_params);
 
     // Console output formatting
