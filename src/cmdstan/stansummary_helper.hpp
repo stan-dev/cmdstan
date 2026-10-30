@@ -8,6 +8,7 @@
 #include <ios>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -393,11 +394,12 @@ std::vector<std::string> get_header(
  * @param in vector of model param column incides in chains object
  * @param in span length
  * @param in out matrix of model param statistics
+ * @param in convergence_diagnostics if false, MCSE, ESS, and R_hat are NaN
  */
 void get_stats(const stan::mcmc::chainset &chains,
                const Eigen::VectorXd &sampling_times,
                const Eigen::VectorXd &probs, std::vector<int> cols,
-               Eigen::MatrixXd &params) {
+               Eigen::MatrixXd &params, bool convergence_diagnostics = true) {
   params.setZero();
 
   if (params.rows() != cols.size()) {
@@ -405,12 +407,13 @@ void get_stats(const stan::mcmc::chainset &chains,
   }
 
   double total_sampling_time = sampling_times.sum();
+  constexpr double nan = std::numeric_limits<double>::quiet_NaN();
 
   // Model parameters
   int i = 0;
   for (int i_chains : cols) {
     params(i, 0) = chains.mean(i_chains);
-    params(i, 1) = chains.mcse_mean(i_chains);
+    params(i, 1) = convergence_diagnostics ? chains.mcse_mean(i_chains) : nan;
     params(i, 2) = chains.sd(i_chains);
     params(i, 3) = chains.med_abs_deviation(i_chains);
     Eigen::VectorXd quantiles = chains.quantiles(i_chains, probs);
@@ -418,6 +421,12 @@ void get_stats(const stan::mcmc::chainset &chains,
       params(i, 4 + j) = quantiles(j);
 
     auto offset = 4 + quantiles.size();
+    if (!convergence_diagnostics) {
+      for (int j = 0; j < 4; ++j)
+        params(i, offset++) = nan;
+      i++;
+      continue;
+    }
     auto [ess_bulk, ess_tail] = chains.split_rank_normalized_ess(i_chains);
 
     params(i, offset++) = ess_bulk;
