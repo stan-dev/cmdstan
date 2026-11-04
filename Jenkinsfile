@@ -87,6 +87,7 @@ up the autoformatter locally.  (Check console output at ${env.BUILD_URL})
         submodule(recursiveSubmodules: true, shallow: true, depth: 2)])
 
     def prepTests = { extra ->
+      deleteDir()
       checkout scmFull
       checkoutPR("stan", params.stan_pr)
       checkoutPR("stan/lib/stan_math", params.math_pr)
