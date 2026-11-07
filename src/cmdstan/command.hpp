@@ -263,6 +263,16 @@ int command(int argc, const char *argv[]) {
     init_null_writers(metric_json_writers, num_chains);
   }
 
+  // write transformed data file if requested
+  {
+    std::string transformed_data_file
+        = get_arg_val<string_argument>(parser, "output", "transformed_data");
+    if (!transformed_data_file.empty()) {
+      auto td_file = file::safe_create(transformed_data_file, sig_figs);
+      model.write_transformed_data_json(td_file.get());
+    }
+  }
+
   // Setup initial parameter values - arg "init"
   // arg is either filename or init radius value
   std::string init = get_arg_val<string_argument>(parser, "init");
