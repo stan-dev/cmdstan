@@ -61,6 +61,7 @@ test/interface/datetime_test$(EXE):               $(call depends_on_test_models,
 test/interface/elapsed_time_test$(EXE):           $(call depends_on_test_models, test_model)
 test/interface/fixed_param_sampler_test$(EXE):    $(call depends_on_test_models, empty proper)
 test/interface/generated_quantities_test$(EXE):   $(call depends_on_test_models, bern_gq_model bern_extra_model gq_non_scalar test_model)
+test/interface/save_trans_data_json_test$(EXE):   $(call depends_on_test_models, gq_non_scalar)
 test/interface/laplace_test$(EXE):                $(call depends_on_test_models, multi_normal_model simple_jacobian_model simplex_model)
 test/interface/log_prob_test$(EXE):               $(call depends_on_test_models, bern_log_prob_model bern_gq_model simplex_model)
 test/interface/metric_test$(EXE):                 $(call depends_on_test_models, test_model proper)

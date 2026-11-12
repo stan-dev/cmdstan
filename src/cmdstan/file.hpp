@@ -296,7 +296,7 @@ std::ifstream safe_open(const std::string &fname) {
 }
 
 /**
- * Opens input stream for file and sets exception flags.
+ * Opens output stream for file and sets exception flags.
  *
  * @param fname name of file which exists and has read perms.
  * @param sig_figs number of digits to print

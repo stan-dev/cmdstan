@@ -2,6 +2,7 @@
 #define CMDSTAN_ARGUMENTS_ARG_OUTPUT_HPP
 
 #include <cmdstan/arguments/arg_diagnostic_file.hpp>
+#include <cmdstan/arguments/arg_transformed_data_file.hpp>
 #include <cmdstan/arguments/arg_output_file.hpp>
 #include <cmdstan/arguments/arg_output_sig_figs.hpp>
 #include <cmdstan/arguments/arg_profile_file.hpp>
@@ -27,6 +28,7 @@ class arg_output : public categorical_argument {
         "Save the CmdStan configuration (parsed arguments + default values) as "
         "JSON alongside the output files",
         false));
+    _subarguments.push_back(new arg_transformed_data_file());
   }
 };
 
