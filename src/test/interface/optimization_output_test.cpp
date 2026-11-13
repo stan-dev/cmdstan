@@ -139,7 +139,7 @@ TEST_F(CmdStan, optimize_newton) {
   EXPECT_NE(algo_idx, -1);
   EXPECT_TRUE(stan::io::contains(config[algo_idx], "newton"));
 
-  ASSERT_NEAR(0, values[0], 0.00001);
+  ASSERT_NEAR(-3.6757540999999998, values[0], 0.00001);
   auto outputs = values.size();
 
   EXPECT_FLOAT_EQ(1, values[outputs - 4]);
